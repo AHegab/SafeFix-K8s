@@ -1,0 +1,981 @@
+{
+  "version": "1.0",
+  "generatedAt": "2025-10-13T14:01:04.067271Z",
+  "source": "SafeFixK8s/Normalizer",
+  "findings": [
+    {
+      "findingId": "112ce6b493e3b9da903a173c82238d97",
+      "tool": "trivy-config",
+      "ruleId": "KSV117",
+      "severity": "MEDIUM",
+      "resourceRef": {
+        "kind": "Object",
+        "name": "unknown"
+      },
+      "message": "deployment orders in orders namespace should not set spec.template.spec.containers.ports.containerPort to less than 1024",
+      "location": {
+        "file": "orders-deploy.yaml",
+        "line": null
+      },
+      "labels": {
+        "url": "https://avd.aquasec.com/misconfig/ksv117"
+      }
+    },
+    {
+      "findingId": "30469a0b8c1871c77aba7bacab083c92",
+      "tool": "kube-score",
+      "ruleId": {
+        "name": "Stable version",
+        "id": "stable-version",
+        "target_type": "all",
+        "comment": "Checks if the object is using a deprecated apiVersion",
+        "optional": false
+      },
+      "severity": "INFO",
+      "resourceRef": {
+        "kind": "Object",
+        "name": "unknown"
+      },
+      "message": {
+        "check": {
+          "name": "Stable version",
+          "id": "stable-version",
+          "target_type": "all",
+          "comment": "Checks if the object is using a deprecated apiVersion",
+          "optional": false
+        },
+        "grade": 10,
+        "skipped": false,
+        "comments": null
+      },
+      "location": {
+        "file": "",
+        "line": null
+      },
+      "labels": {}
+    },
+    {
+      "findingId": "1e007b9dd9e99ddc8fd27c02519ac6b2",
+      "tool": "kube-score",
+      "ruleId": {
+        "name": "Label values",
+        "id": "label-values",
+        "target_type": "all",
+        "comment": "Validates label values",
+        "optional": false
+      },
+      "severity": "INFO",
+      "resourceRef": {
+        "kind": "Object",
+        "name": "unknown"
+      },
+      "message": {
+        "check": {
+          "name": "Label values",
+          "id": "label-values",
+          "target_type": "all",
+          "comment": "Validates label values",
+          "optional": false
+        },
+        "grade": 10,
+        "skipped": false,
+        "comments": null
+      },
+      "location": {
+        "file": "",
+        "line": null
+      },
+      "labels": {}
+    },
+    {
+      "findingId": "11f54036eb5f72b234ec123fc9ee354a",
+      "tool": "kube-score",
+      "ruleId": {
+        "name": "Container Ephemeral Storage Request Equals Limit",
+        "id": "container-ephemeral-storage-request-equals-limit",
+        "target_type": "Pod",
+        "comment": "Make sure all pods have matching ephemeral-storage requests and limits",
+        "optional": true
+      },
+      "severity": "INFO",
+      "resourceRef": {
+        "kind": "Object",
+        "name": "unknown"
+      },
+      "message": [
+        {
+          "path": "",
+          "summary": "Skipped because container-ephemeral-storage-request-equals-limit is ignored",
+          "description": ""
+        }
+      ],
+      "location": {
+        "file": "",
+        "line": null
+      },
+      "labels": {}
+    },
+    {
+      "findingId": "96a67dc23ace1798613862056f5d3b96",
+      "tool": "kube-score",
+      "ruleId": {
+        "name": "Container Ports Check",
+        "id": "container-ports-check",
+        "target_type": "Pod",
+        "comment": "Container Ports Checks",
+        "optional": true
+      },
+      "severity": "INFO",
+      "resourceRef": {
+        "kind": "Object",
+        "name": "unknown"
+      },
+      "message": [
+        {
+          "path": "",
+          "summary": "Skipped because container-ports-check is ignored",
+          "description": ""
+        }
+      ],
+      "location": {
+        "file": "",
+        "line": null
+      },
+      "labels": {}
+    },
+    {
+      "findingId": "7f2e189137ac1bf67bea4192f36e1b8d",
+      "tool": "kube-score",
+      "ruleId": {
+        "name": "Pod Topology Spread Constraints",
+        "id": "pod-topology-spread-constraints",
+        "target_type": "Pod",
+        "comment": "Pod Topology Spread Constraints",
+        "optional": false
+      },
+      "severity": "INFO",
+      "resourceRef": {
+        "kind": "Object",
+        "name": "unknown"
+      },
+      "message": [
+        {
+          "path": "",
+          "summary": "Pod Topology Spread Constraints",
+          "description": "No Pod Topology Spread Constraints set, kube-scheduler defaults assumed"
+        }
+      ],
+      "location": {
+        "file": "",
+        "line": null
+      },
+      "labels": {}
+    },
+    {
+      "findingId": "071b777de4c2d812ac9e884616b3014b",
+      "tool": "kube-score",
+      "ruleId": {
+        "name": "Container Memory Requests Equal Limits",
+        "id": "container-memory-requests-equal-limits",
+        "target_type": "Pod",
+        "comment": "Makes sure that all pods have the same memory requests as limits set.",
+        "optional": true
+      },
+      "severity": "INFO",
+      "resourceRef": {
+        "kind": "Object",
+        "name": "unknown"
+      },
+      "message": [
+        {
+          "path": "",
+          "summary": "Skipped because container-memory-requests-equal-limits is ignored",
+          "description": ""
+        }
+      ],
+      "location": {
+        "file": "",
+        "line": null
+      },
+      "labels": {}
+    },
+    {
+      "findingId": "d4c8c77a1fd3fa1afe7947518e008ef4",
+      "tool": "kube-score",
+      "ruleId": {
+        "name": "Container Image Pull Policy",
+        "id": "container-image-pull-policy",
+        "target_type": "Pod",
+        "comment": "Makes sure that the pullPolicy is set to Always. This makes sure that imagePullSecrets are always validated.",
+        "optional": false
+      },
+      "severity": "INFO",
+      "resourceRef": {
+        "kind": "Object",
+        "name": "unknown"
+      },
+      "message": [
+        {
+          "path": "orders",
+          "summary": "ImagePullPolicy is not set to Always",
+          "description": "It's recommended to always set the ImagePullPolicy to Always, to make sure that the imagePullSecrets are always correct, and to always get the image you want."
+        }
+      ],
+      "location": {
+        "file": "",
+        "line": null
+      },
+      "labels": {}
+    },
+    {
+      "findingId": "f4cdb3c8f336edb294c8fe5639afe5cb",
+      "tool": "kube-score",
+      "ruleId": {
+        "name": "Container Seccomp Profile",
+        "id": "container-seccomp-profile",
+        "target_type": "Pod",
+        "comment": "Makes sure that all pods have at a seccomp policy configured.",
+        "optional": true
+      },
+      "severity": "INFO",
+      "resourceRef": {
+        "kind": "Object",
+        "name": "unknown"
+      },
+      "message": [
+        {
+          "path": "",
+          "summary": "Skipped because container-seccomp-profile is ignored",
+          "description": ""
+        }
+      ],
+      "location": {
+        "file": "",
+        "line": null
+      },
+      "labels": {}
+    },
+    {
+      "findingId": "b27e8e317f20da13a8b0495050e62e95",
+      "tool": "kube-score",
+      "ruleId": {
+        "name": "Container Image Tag",
+        "id": "container-image-tag",
+        "target_type": "Pod",
+        "comment": "Makes sure that a explicit non-latest tag is used",
+        "optional": false
+      },
+      "severity": "INFO",
+      "resourceRef": {
+        "kind": "Object",
+        "name": "unknown"
+      },
+      "message": {
+        "check": {
+          "name": "Container Image Tag",
+          "id": "container-image-tag",
+          "target_type": "Pod",
+          "comment": "Makes sure that a explicit non-latest tag is used",
+          "optional": false
+        },
+        "grade": 10,
+        "skipped": false,
+        "comments": null
+      },
+      "location": {
+        "file": "",
+        "line": null
+      },
+      "labels": {}
+    },
+    {
+      "findingId": "4923f51b48416bcc487add96d0cd02c6",
+      "tool": "kube-score",
+      "ruleId": {
+        "name": "Environment Variable Key Duplication",
+        "id": "environment-variable-key-duplication",
+        "target_type": "Pod",
+        "comment": "Makes sure that duplicated environment variable keys are not duplicated",
+        "optional": false
+      },
+      "severity": "INFO",
+      "resourceRef": {
+        "kind": "Object",
+        "name": "unknown"
+      },
+      "message": {
+        "check": {
+          "name": "Environment Variable Key Duplication",
+          "id": "environment-variable-key-duplication",
+          "target_type": "Pod",
+          "comment": "Makes sure that duplicated environment variable keys are not duplicated",
+          "optional": false
+        },
+        "grade": 10,
+        "skipped": false,
+        "comments": null
+      },
+      "location": {
+        "file": "",
+        "line": null
+      },
+      "labels": {}
+    },
+    {
+      "findingId": "85d89d9f5411b9ee796f0641c95b3f63",
+      "tool": "kube-score",
+      "ruleId": {
+        "name": "Container Ephemeral Storage Request and Limit",
+        "id": "container-ephemeral-storage-request-and-limit",
+        "target_type": "Pod",
+        "comment": "Makes sure all pods have ephemeral-storage requests and limits set",
+        "optional": false
+      },
+      "severity": "INFO",
+      "resourceRef": {
+        "kind": "Object",
+        "name": "unknown"
+      },
+      "message": [
+        {
+          "path": "orders",
+          "summary": "Ephemeral Storage limit is not set",
+          "description": "Resource limits are recommended to avoid resource DDOS. Set resources.limits.ephemeral-storage"
+        },
+        {
+          "path": "orders",
+          "summary": "Ephemeral Storage request is not set",
+          "description": "Resource requests are recommended to make sure the application can start and run without crashing. Set resource.requests.ephemeral-storage"
+        }
+      ],
+      "location": {
+        "file": "",
+        "line": null
+      },
+      "labels": {}
+    },
+    {
+      "findingId": "82130b9b697910e8c5abbde482b92540",
+      "tool": "kube-score",
+      "ruleId": {
+        "name": "Pod Probes Identical",
+        "id": "pod-probes-identical",
+        "target_type": "Pod",
+        "comment": "Container has the same readiness and liveness probe",
+        "optional": false
+      },
+      "severity": "INFO",
+      "resourceRef": {
+        "kind": "Object",
+        "name": "unknown"
+      },
+      "message": [
+        {
+          "path": "",
+          "summary": "Container has the same readiness and liveness probe",
+          "description": "Using the same probe for liveness and readiness is very likely dangerous. It's generally better to avoid re-using the same probe."
+        }
+      ],
+      "location": {
+        "file": "",
+        "line": null
+      },
+      "labels": {}
+    },
+    {
+      "findingId": "51e98fad23063fd0a7a657d4c85bec3a",
+      "tool": "kube-score",
+      "ruleId": {
+        "name": "Container Security Context User Group ID",
+        "id": "container-security-context-user-group-id",
+        "target_type": "Pod",
+        "comment": "Makes sure that all pods have a security context with valid UID and GID set ",
+        "optional": false
+      },
+      "severity": "INFO",
+      "resourceRef": {
+        "kind": "Object",
+        "name": "unknown"
+      },
+      "message": {
+        "check": {
+          "name": "Container Security Context User Group ID",
+          "id": "container-security-context-user-group-id",
+          "target_type": "Pod",
+          "comment": "Makes sure that all pods have a security context with valid UID and GID set ",
+          "optional": false
+        },
+        "grade": 10,
+        "skipped": false,
+        "comments": null
+      },
+      "location": {
+        "file": "",
+        "line": null
+      },
+      "labels": {}
+    },
+    {
+      "findingId": "3de03b5968f446eb42ffbbc7333953ad",
+      "tool": "kube-score",
+      "ruleId": {
+        "name": "Container Resource Requests Equal Limits",
+        "id": "container-resource-requests-equal-limits",
+        "target_type": "Pod",
+        "comment": "Makes sure that all pods have the same requests as limits on resources set.",
+        "optional": true
+      },
+      "severity": "INFO",
+      "resourceRef": {
+        "kind": "Object",
+        "name": "unknown"
+      },
+      "message": [
+        {
+          "path": "",
+          "summary": "Skipped because container-resource-requests-equal-limits is ignored",
+          "description": ""
+        }
+      ],
+      "location": {
+        "file": "",
+        "line": null
+      },
+      "labels": {}
+    },
+    {
+      "findingId": "9e68bbf174c93643f00737d8f47d828b",
+      "tool": "kube-score",
+      "ruleId": {
+        "name": "Container CPU Requests Equal Limits",
+        "id": "container-cpu-requests-equal-limits",
+        "target_type": "Pod",
+        "comment": "Makes sure that all pods have the same CPU requests as limits set.",
+        "optional": true
+      },
+      "severity": "INFO",
+      "resourceRef": {
+        "kind": "Object",
+        "name": "unknown"
+      },
+      "message": [
+        {
+          "path": "",
+          "summary": "Skipped because container-cpu-requests-equal-limits is ignored",
+          "description": ""
+        }
+      ],
+      "location": {
+        "file": "",
+        "line": null
+      },
+      "labels": {}
+    },
+    {
+      "findingId": "6cbd4c887d4672c9351668af0cf191f2",
+      "tool": "kube-score",
+      "ruleId": {
+        "name": "Pod Probes",
+        "id": "pod-probes",
+        "target_type": "Pod",
+        "comment": "Makes sure that all Pods have safe probe configurations",
+        "optional": false
+      },
+      "severity": "INFO",
+      "resourceRef": {
+        "kind": "Object",
+        "name": "unknown"
+      },
+      "message": [
+        {
+          "path": "",
+          "summary": "The pod is not targeted by a service, skipping probe checks.",
+          "description": ""
+        }
+      ],
+      "location": {
+        "file": "",
+        "line": null
+      },
+      "labels": {}
+    },
+    {
+      "findingId": "48cc5e6ad6e415507a4725a9e26ba328",
+      "tool": "kube-score",
+      "ruleId": {
+        "name": "Container Security Context Privileged",
+        "id": "container-security-context-privileged",
+        "target_type": "Pod",
+        "comment": "Makes sure that all pods have a unprivileged security context set",
+        "optional": false
+      },
+      "severity": "INFO",
+      "resourceRef": {
+        "kind": "Object",
+        "name": "unknown"
+      },
+      "message": {
+        "check": {
+          "name": "Container Security Context Privileged",
+          "id": "container-security-context-privileged",
+          "target_type": "Pod",
+          "comment": "Makes sure that all pods have a unprivileged security context set",
+          "optional": false
+        },
+        "grade": 10,
+        "skipped": false,
+        "comments": null
+      },
+      "location": {
+        "file": "",
+        "line": null
+      },
+      "labels": {}
+    },
+    {
+      "findingId": "4e5a9f9891178620fae7998b8301ed0a",
+      "tool": "kube-score",
+      "ruleId": {
+        "name": "Container Security Context ReadOnlyRootFilesystem",
+        "id": "container-security-context-readonlyrootfilesystem",
+        "target_type": "Pod",
+        "comment": "Makes sure that all pods have a security context with read only filesystem set",
+        "optional": false
+      },
+      "severity": "INFO",
+      "resourceRef": {
+        "kind": "Object",
+        "name": "unknown"
+      },
+      "message": {
+        "check": {
+          "name": "Container Security Context ReadOnlyRootFilesystem",
+          "id": "container-security-context-readonlyrootfilesystem",
+          "target_type": "Pod",
+          "comment": "Makes sure that all pods have a security context with read only filesystem set",
+          "optional": false
+        },
+        "grade": 10,
+        "skipped": false,
+        "comments": null
+      },
+      "location": {
+        "file": "",
+        "line": null
+      },
+      "labels": {}
+    },
+    {
+      "findingId": "1b06795ebbc583babd632c1cb6531838",
+      "tool": "kube-score",
+      "ruleId": {
+        "name": "Container Resources",
+        "id": "container-resources",
+        "target_type": "Pod",
+        "comment": "Makes sure that all pods have resource limits and requests set. The --ignore-container-cpu-limit flag can be used to disable the requirement of having a CPU limit",
+        "optional": false
+      },
+      "severity": "INFO",
+      "resourceRef": {
+        "kind": "Object",
+        "name": "unknown"
+      },
+      "message": {
+        "check": {
+          "name": "Container Resources",
+          "id": "container-resources",
+          "target_type": "Pod",
+          "comment": "Makes sure that all pods have resource limits and requests set. The --ignore-container-cpu-limit flag can be used to disable the requirement of having a CPU limit",
+          "optional": false
+        },
+        "grade": 10,
+        "skipped": false,
+        "comments": null
+      },
+      "location": {
+        "file": "",
+        "line": null
+      },
+      "labels": {}
+    },
+    {
+      "findingId": "be4c95bdebae381b063c2533a870c293",
+      "tool": "kube-score",
+      "ruleId": {
+        "name": "Pod NetworkPolicy",
+        "id": "pod-networkpolicy",
+        "target_type": "Pod",
+        "comment": "Makes sure that all Pods are targeted by a NetworkPolicy",
+        "optional": false
+      },
+      "severity": "INFO",
+      "resourceRef": {
+        "kind": "Object",
+        "name": "unknown"
+      },
+      "message": [
+        {
+          "path": "",
+          "summary": "The pod does not have a matching NetworkPolicy",
+          "description": "Create a NetworkPolicy that targets this pod to control who/what can communicate with this pod. Note, this feature needs to be supported by the CNI implementation used in the Kubernetes cluster to have an effect."
+        }
+      ],
+      "location": {
+        "file": "",
+        "line": null
+      },
+      "labels": {}
+    },
+    {
+      "findingId": "4b67344d18ad8f036508c2aebcc3e9ec",
+      "tool": "kube-score",
+      "ruleId": {
+        "name": "Deployment has host PodAntiAffinity",
+        "id": "deployment-has-host-podantiaffinity",
+        "target_type": "Deployment",
+        "comment": "Makes sure that a podAntiAffinity has been set that prevents multiple pods from being scheduled on the same node. https://kubernetes.io/docs/concepts/configuration/assign-pod-node/",
+        "optional": false
+      },
+      "severity": "MEDIUM",
+      "resourceRef": {
+        "kind": "Object",
+        "name": "unknown"
+      },
+      "message": [
+        {
+          "path": "",
+          "summary": "Skipped because the deployment has less than 2 replicas",
+          "description": ""
+        }
+      ],
+      "location": {
+        "file": "",
+        "line": null
+      },
+      "labels": {}
+    },
+    {
+      "findingId": "f8e5c3b276ce244d216f5d50815c9dc5",
+      "tool": "kube-score",
+      "ruleId": {
+        "name": "Deployment targeted by HPA does not have replicas configured",
+        "id": "deployment-targeted-by-hpa-does-not-have-replicas-configured",
+        "target_type": "Deployment",
+        "comment": "Makes sure that Deployments using a HorizontalPodAutoscaler doesn't have a statically configured replica count set",
+        "optional": false
+      },
+      "severity": "INFO",
+      "resourceRef": {
+        "kind": "Object",
+        "name": "unknown"
+      },
+      "message": [
+        {
+          "path": "",
+          "summary": "Skipped because the deployment is not targeted by a HorizontalPodAutoscaler",
+          "description": ""
+        }
+      ],
+      "location": {
+        "file": "",
+        "line": null
+      },
+      "labels": {}
+    },
+    {
+      "findingId": "74f47ce27e504231d03e5ebb780a6d57",
+      "tool": "kube-score",
+      "ruleId": {
+        "name": "Deployment Pod Selector labels match template metadata labels",
+        "id": "deployment-pod-selector-labels-match-template-metadata-labels",
+        "target_type": "Deployment",
+        "comment": "Ensure the StatefulSet selector labels match the template metadata labels.",
+        "optional": false
+      },
+      "severity": "INFO",
+      "resourceRef": {
+        "kind": "Object",
+        "name": "unknown"
+      },
+      "message": {
+        "check": {
+          "name": "Deployment Pod Selector labels match template metadata labels",
+          "id": "deployment-pod-selector-labels-match-template-metadata-labels",
+          "target_type": "Deployment",
+          "comment": "Ensure the StatefulSet selector labels match the template metadata labels.",
+          "optional": false
+        },
+        "grade": 10,
+        "skipped": false,
+        "comments": null
+      },
+      "location": {
+        "file": "",
+        "line": null
+      },
+      "labels": {}
+    },
+    {
+      "findingId": "f0bd75ede7bc511303da87f01c01c09a",
+      "tool": "kube-score",
+      "ruleId": {
+        "name": "Deployment Strategy",
+        "id": "deployment-strategy",
+        "target_type": "Deployment",
+        "comment": "Makes sure that all Deployments targeted by service use RollingUpdate strategy",
+        "optional": false
+      },
+      "severity": "MEDIUM",
+      "resourceRef": {
+        "kind": "Object",
+        "name": "unknown"
+      },
+      "message": [
+        {
+          "path": "",
+          "summary": "Skipped as the Deployment is not targeted by a service",
+          "description": ""
+        }
+      ],
+      "location": {
+        "file": "",
+        "line": null
+      },
+      "labels": {}
+    },
+    {
+      "findingId": "07e4f52a9eee72f5c14569554d27bef8",
+      "tool": "kube-score",
+      "ruleId": {
+        "name": "Deployment Replicas",
+        "id": "deployment-replicas",
+        "target_type": "Deployment",
+        "comment": "Makes sure that Deployment has multiple replicas",
+        "optional": false
+      },
+      "severity": "MEDIUM",
+      "resourceRef": {
+        "kind": "Object",
+        "name": "unknown"
+      },
+      "message": [
+        {
+          "path": "",
+          "summary": "Skipped as the Deployment is not targeted by service",
+          "description": ""
+        }
+      ],
+      "location": {
+        "file": "",
+        "line": null
+      },
+      "labels": {}
+    },
+    {
+      "findingId": "0519eded2cd9e65d7153404a9635412b",
+      "tool": "kube-score",
+      "ruleId": {
+        "name": "Deployment has PodDisruptionBudget",
+        "id": "deployment-has-poddisruptionbudget",
+        "target_type": "Deployment",
+        "comment": "Makes sure that all Deployments are targeted by a PDB",
+        "optional": false
+      },
+      "severity": "MEDIUM",
+      "resourceRef": {
+        "kind": "Object",
+        "name": "unknown"
+      },
+      "message": [
+        {
+          "path": "",
+          "summary": "Skipped because the deployment has less than 2 replicas",
+          "description": ""
+        }
+      ],
+      "location": {
+        "file": "",
+        "line": null
+      },
+      "labels": {}
+    },
+    {
+      "findingId": "e708f6f2501ed132099cfb1fe3bb828c",
+      "tool": "yamllint",
+      "ruleId": "yaml-lint",
+      "severity": "MEDIUM",
+      "resourceRef": {
+        "kind": "YAML",
+        "name": "orders-deploy.yaml"
+      },
+      "message": "missing document start \"---\" (document-start)",
+      "location": {
+        "file": "/work/tests/orders-deploy.yaml",
+        "line": 1
+      },
+      "labels": {}
+    },
+    {
+      "findingId": "312a0c33d56f1704cafc94f7465aa6fe",
+      "tool": "yamllint",
+      "ruleId": "yaml-lint",
+      "severity": "HIGH",
+      "resourceRef": {
+        "kind": "YAML",
+        "name": "orders-deploy.yaml"
+      },
+      "message": "line too long (88 > 80 characters) (line-length)",
+      "location": {
+        "file": "/work/tests/orders-deploy.yaml",
+        "line": 19
+      },
+      "labels": {}
+    },
+    {
+      "findingId": "a086a06e33263513cb16c3751047c8c6",
+      "tool": "yamllint",
+      "ruleId": "yaml-lint",
+      "severity": "HIGH",
+      "resourceRef": {
+        "kind": "YAML",
+        "name": "orders-deploy.yaml"
+      },
+      "message": "line too long (101 > 80 characters) (line-length)",
+      "location": {
+        "file": "/work/tests/orders-deploy.yaml",
+        "line": 27
+      },
+      "labels": {}
+    },
+    {
+      "findingId": "05f0f51b958aaf735bf382eb2b0cb382",
+      "tool": "yamllint",
+      "ruleId": "yaml-lint",
+      "severity": "HIGH",
+      "resourceRef": {
+        "kind": "YAML",
+        "name": "orders-deploy.yaml"
+      },
+      "message": "too many spaces inside braces (braces)",
+      "location": {
+        "file": "/work/tests/orders-deploy.yaml",
+        "line": 50
+      },
+      "labels": {}
+    },
+    {
+      "findingId": "005a641665ff5707db2cee30ef770582",
+      "tool": "yamllint",
+      "ruleId": "yaml-lint",
+      "severity": "HIGH",
+      "resourceRef": {
+        "kind": "YAML",
+        "name": "orders-deploy.yaml"
+      },
+      "message": "too many spaces inside braces (braces)",
+      "location": {
+        "file": "/work/tests/orders-deploy.yaml",
+        "line": 54
+      },
+      "labels": {}
+    },
+    {
+      "findingId": "9aa467330ea6abc87c14e167ce86036f",
+      "tool": "checkov",
+      "ruleId": "CKV2_K8S_6",
+      "severity": "INFO",
+      "resourceRef": {
+        "kind": "Object",
+        "name": "Pod.orders.orders.app-orders"
+      },
+      "message": "Minimize the admission of pods which lack an associated NetworkPolicy",
+      "location": {
+        "file": "/orders-deploy.yaml",
+        "line": 1
+      },
+      "labels": {
+        "guideline": null
+      }
+    },
+    {
+      "findingId": "47340a0fa3c98aec22d258d5e38cea26",
+      "tool": "terrascan",
+      "ruleId": "secCompProfile",
+      "severity": "MEDIUM",
+      "resourceRef": {
+        "kind": "Object",
+        "name": "unknown"
+      },
+      "message": "Default seccomp profile not enabled will make the container to make non-essential system calls",
+      "location": {
+        "file": "orders-deploy.yaml",
+        "line": 1
+      },
+      "labels": {}
+    },
+    {
+      "findingId": "74027673bf8d0c7b0be2fb55bc2cbb96",
+      "tool": "trufflehog",
+      "ruleId": "URI",
+      "severity": "HIGH",
+      "resourceRef": {
+        "kind": "Repository",
+        "name": "\\"
+      },
+      "message": "High-entropy or credential-like pattern",
+      "location": {
+        "file": "/work/.venv/Lib/site-packages/pip/_vendor/urllib3/util/url.py",
+        "line": 148
+      },
+      "labels": {}
+    },
+    {
+      "findingId": "0f8a73eb7878b5022f4ef44be5d1c08f",
+      "tool": "trufflehog",
+      "ruleId": "URI",
+      "severity": "HIGH",
+      "resourceRef": {
+        "kind": "Repository",
+        "name": "\\"
+      },
+      "message": "High-entropy or credential-like pattern",
+      "location": {
+        "file": "/work/.venv/Lib/site-packages/pip/_vendor/urllib3/util/__pycache__/url.cpython-311.pyc",
+        "line": 1
+      },
+      "labels": {}
+    },
+    {
+      "findingId": "5a828c7613426262a92b2461dc709a9e",
+      "tool": "trufflehog",
+      "ruleId": "Github",
+      "severity": "HIGH",
+      "resourceRef": {
+        "kind": "Repository",
+        "name": "\\"
+      },
+      "message": "High-entropy or credential-like pattern",
+      "location": {
+        "file": "/work/docker-bench-security/.git/packed-refs",
+        "line": 4
+      },
+      "labels": {}
+    },
+    {
+      "findingId": "a6645c742d227231717791d393ad2fc8",
+      "tool": "trufflehog",
+      "ruleId": "Github",
+      "severity": "HIGH",
+      "resourceRef": {
+        "kind": "Repository",
+        "name": "\\"
+      },
+      "message": "High-entropy or credential-like pattern",
+      "location": {
+        "file": "/work/docker-bench-security/.github/workflows/slsa.yml",
+        "line": 77
+      },
+      "labels": {}
+    }
+  ]
+}
