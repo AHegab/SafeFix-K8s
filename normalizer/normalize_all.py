@@ -277,19 +277,30 @@ def from_yamllint(p: Path) -> List[Dict]:
 
 def from_checkov(p: Path) -> List[Dict]:
     data = load_json(p) or {}
-    findings = []
-    for r in data.get("results", {}).get("failed_checks", []):
-        rule = r.get("check_id")
-        sev  = r.get("severity") or "INFO"
-        msg  = r.get("check_name") or r.get("description")
-        addr = r.get("resource") or r.get("resource_address") or ""
-        kind = "Object"
-        name = addr or "unknown"
-        file = r.get("file_path") or r.get("repo_file_path") or ""
-        line = r.get("file_line_range", [None, None])[0]
-        labels = {"guideline": r.get("guideline")}
-        findings.append(_mk("checkov", rule, sev, kind, name, msg, file=file, line=line, labels=labels))
+    findings: List[Dict] = []
+
+    # Checkov may return an object OR a list of report objects
+    items: List[Dict] = []
+    if isinstance(data, list):
+        items = [d for d in data if isinstance(d, dict)]
+    elif isinstance(data, dict):
+        items = [data]
+
+    for item in items:
+        res = (item.get("results") or {}) if isinstance(item, dict) else {}
+        for r in (res.get("failed_checks") or []):
+            rule = r.get("check_id")
+            sev  = r.get("severity") or "INFO"
+            msg  = r.get("check_name") or r.get("description")
+            addr = r.get("resource") or r.get("resource_address") or ""
+            kind = "Object"
+            name = addr or "unknown"
+            file = r.get("file_path") or r.get("repo_file_path") or ""
+            line = (r.get("file_line_range") or [None, None])[0]
+            labels = {"guideline": r.get("guideline")}
+            findings.append(_mk("checkov", rule, sev, kind, name, msg, file=file, line=line, labels=labels))
     return findings
+
 
 def from_terrascan(p: Path) -> List[Dict]:
     data = load_json(p) or {}
@@ -464,6 +475,20 @@ def main():
     with OUT.open("w", encoding="utf-8") as f:
         json.dump(bundle, f, ensure_ascii=False, indent=2)
     print(f"[ok] wrote {OUT} with {len(bundle['findings'])} findings.")
+    
+    # Delete all raw files after successful normalization
+    deleted_count = 0
+    if RAW_DIR.exists():
+        for raw_file in RAW_DIR.iterdir():
+            # Skip directories (e.g., logs/)
+            if raw_file.is_file():
+                try:
+                    raw_file.unlink()
+                    deleted_count += 1
+                    print(f"[cleanup] deleted {raw_file.name}")
+                except Exception as e:
+                    warn(f"Failed to delete {raw_file.name}: {e}")
+    print(f"[cleanup] removed {deleted_count} raw file(s).")
 
 if __name__ == "__main__":
     main()

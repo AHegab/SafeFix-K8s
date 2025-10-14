@@ -7,7 +7,7 @@ $ErrorActionPreference = "Stop"
 
 # --- paths --------------------------------------------------------------------
 $RepoRoot = Split-Path -Parent $PSScriptRoot
-$OutDir   = Join-Path $PSScriptRoot "..\output\raw"
+$OutDir   = Join-Path $RepoRoot "output\raw"
 New-Item -ItemType Directory -Force -Path $OutDir | Out-Null
 
 # --- helpers ------------------------------------------------------------------
@@ -18,32 +18,36 @@ function Write-NonEmpty($Path) {
 }
 
 # paths
-$ToolsDir   = Join-Path $RepoRoot "tools"
-$KsDir      = Join-Path $ToolsDir "kubescape"
-$KsExe      = Join-Path $KsDir "kubescape.exe"
-$KsArtifacts= Join-Path $KsDir "artifacts"   # local policy bundle cache
-$LogsDir    = Join-Path $RepoRoot "output\logs"
+$ToolsDir    = Join-Path $RepoRoot "tools"
+$KsDir       = Join-Path $ToolsDir "kubescape"
+$KsLocalExe  = Join-Path $KsDir "kubescape.exe"
+$KsArtifacts = Join-Path $KsDir "artifacts"   # local policy bundle cache
+$LogsDir     = Join-Path $RepoRoot "output\logs"
 New-Item -ItemType Directory -Force -Path $LogsDir | Out-Null
 
-function Ensure-KubescapeCLI {
-  if (Test-Path $KsExe) { return }
-  New-Item -ItemType Directory -Force -Path $KsDir | Out-Null
-  Write-Host "Downloading Kubescape CLI -> $KsExe"
-  $url = "https://github.com/kubescape/kubescape/releases/latest/download/kubescape-windows-amd64.exe"
-  Invoke-WebRequest -Uri $url -OutFile $KsExe -UseBasicParsing
-  Unblock-File -Path $KsExe -ErrorAction SilentlyContinue
+function Get-KubescapeExe {
+  try {
+    $cmd = Get-Command kubescape -ErrorAction Stop
+    return $cmd.Source
+  } catch {
+    if (!(Test-Path $KsLocalExe)) {
+      New-Item -ItemType Directory -Force -Path $KsDir | Out-Null
+      Write-Host "Downloading Kubescape CLI -> $KsLocalExe"
+      $url = "https://github.com/kubescape/kubescape/releases/latest/download/kubescape-windows-amd64.exe"
+      Invoke-WebRequest -Uri $url -OutFile $KsLocalExe -UseBasicParsing
+      Unblock-File -Path $KsLocalExe -ErrorAction SilentlyContinue
+    }
+    return $KsLocalExe
+  }
 }
 
 function Ensure-KubescapeArtifacts {
   if (Test-Path $KsArtifacts -and (Get-ChildItem $KsArtifacts -Recurse -ErrorAction SilentlyContinue)) { return }
-  Write-Host "Fetching Kubescape artifacts (one-time) -> $KsArtifacts"
   New-Item -ItemType Directory -Force -Path $KsArtifacts | Out-Null
-  & $KsExe download artifacts --output $KsArtifacts 2>&1 | Tee-Object -FilePath (Join-Path $LogsDir "kubescape_download.log") | Out-Null
-}
-
-function _ContainerPath($HostPath) {
-  $rel = (Resolve-Path $HostPath).Path.Substring($PWD.Path.Length).TrimStart('\','/')
-  return "/work/$($rel.Replace('\','/'))"
+  $exe = Get-KubescapeExe
+  Write-Host "Fetching Kubescape artifacts (one-time) -> $KsArtifacts"
+  & $exe download artifacts --output $KsArtifacts 2>&1 `
+    | Tee-Object -FilePath (Join-Path $LogsDir "kubescape_download.log") | Out-Null
 }
 
 function _WrapPlaceholder($Out, $tool, $msg) {
@@ -77,7 +81,6 @@ function Get-DetectorImages {
   )
 }
 
-
 function Save-DetectorImages {
   $imgs = Get-DetectorImages
   foreach ($img in $imgs) {
@@ -102,7 +105,6 @@ function Load-DetectorImages {
 }
 
 function Ensure-DetectorImages {
-  # Load from <repo>/images when possible; pull any missing; save back to cache.
   Load-DetectorImages
   $missing = @()
   foreach ($img in Get-DetectorImages) {
@@ -161,7 +163,7 @@ function Invoke-WithTiming {
 
 # --- manifest linters ---------------------------------------------------------
 function Det-KubeLinter {
-  param([string]$Path="tests",[string]$Out="$OutDir\kubelinter_raw.json")
+  param([string]$Path=".",[string]$Out="$OutDir\kubelinter_raw.json")
   try {
     docker run --rm -v "${PWD}:/work:ro" stackrox/kube-linter:latest `
       lint "/work/$Path" --format json | Set-Content -Encoding UTF8 -Path $Out
@@ -170,7 +172,7 @@ function Det-KubeLinter {
 }
 
 function Det-Polaris {
-  param([string]$Path="tests",[string]$Out="$OutDir\polaris_raw.json")
+  param([string]$Path=".",[string]$Out="$OutDir\polaris_raw.json")
   try {
     docker run --rm -v "${PWD}:/work:ro" quay.io/fairwinds/polaris:latest `
       polaris audit --audit-path "/work/$Path" --format json `
@@ -180,10 +182,10 @@ function Det-Polaris {
 }
 
 function Det-KubeScore {
-  param([string]$Path="tests",[string]$Out="$OutDir\kubescore_raw.json")
+  param([string]$Path=".",[string]$Out="$OutDir\kubescore_raw.json")
   try {
     $root  = (Resolve-Path $Path).Path
-    $files = Get-ChildItem -Path $root -Recurse -Include *.yaml,*.yml |
+    $files = Get-ChildItem -Path $root -Recurse -File -Include *.yaml,*.yml |
       ForEach-Object { "/work/" + ($_.FullName.Substring($PWD.Path.Length).TrimStart('\','/').Replace('\','/')) }
     if ($files.Count -eq 0) { throw "kube-score: no YAML in '$Path'." }
     $cmd = @("run","--rm","-v","${PWD}:/work:ro","zegl/kube-score:latest","score","--output-format","json") + $files
@@ -193,117 +195,105 @@ function Det-KubeScore {
 }
 
 # --- replacements / additions -------------------------------------------------
+# --- KUBESCAPE (local CLI; JSON straight to file) -----------------------------
 function Det-Kubescape {
-  param(
-    [string]$Path = "tests",
-    [string]$Out  = "$OutDir\kubescape_raw.json"
-  )
+  param([string]$Path=".", [string]$Out="$OutDir\kubescape_raw.json")
   try {
-    $target = (Resolve-Path -LiteralPath $Path).Path
-    $ymls = Get-ChildItem -Path $target -Recurse -Include *.yml,*.yaml -ErrorAction SilentlyContinue
-    if (-not $ymls -or $ymls.Count -eq 0) {
-      '[]' | Set-Content -Encoding UTF8 -Path $Out
-      Write-Host "[kubescape] -> $Out (no YAML files)"
-      return
-    }
-
-    Ensure-KubescapeCLI
-    Ensure-KubescapeArtifacts   # << one-time network, then cached
-
-    $stderr = Join-Path $LogsDir "kubescape_stderr.txt"
-    $psi = New-Object System.Diagnostics.ProcessStartInfo
-    $psi.FileName = $KsExe
-    $psi.ArgumentList = @(
-      "scan","-f", $target,
-      "--use-artifacts-from", $KsArtifacts,
-      "--format","json","--format-version","v2","-o","-",
-      "--eula-sign"
-    )
-    $psi.RedirectStandardOutput = $true
-    $psi.RedirectStandardError  = $true
-    $psi.UseShellExecute = $false
-    $p = [System.Diagnostics.Process]::Start($psi)
-    $stdout = $p.StandardOutput.ReadToEnd()
-    $errout = $p.StandardError.ReadToEnd()
-    $p.WaitForExit()
-    $errout | Set-Content -Encoding UTF8 -Path $stderr
-
-    if ($p.ExitCode -ne 0 -or [string]::IsNullOrWhiteSpace($stdout)) {
-      '[]' | Set-Content -Encoding UTF8 -Path $Out
-      Write-Host "[kubescape] -> $Out (CLI error, see logs\kubescape_stderr.txt)"
-      return
-    }
-
-    $stdout | Set-Content -Encoding UTF8 -Path $Out
-    try { $null = (Get-Content -Raw $Out -Encoding UTF8 | ConvertFrom-Json) } catch { '[]' | Set-Content -Encoding UTF8 -Path $Out }
-    Write-Host "[kubescape] -> $Out"
-  }
-  catch {
+    Ensure-KubescapeArtifacts
+    $ks = (Get-Command kubescape -ErrorAction Stop).Source
+    $root = (Resolve-Path -LiteralPath $Path).Path
+    & $ks scan $root --format json --format-version v2 --use-artifacts-from $KsArtifacts --output $Out | Out-Null
+    if (!(Test-Path $Out) -and (Test-Path "${Out}.json")) { Move-Item -Force "${Out}.json" $Out }
+    Write-NonEmpty $Out; Write-Host "[kubescape] -> $Out"
+  } catch {
     '[]' | Set-Content -Encoding UTF8 -Path $Out
-    Write-Host "[kubescape] -> $Out (error; wrote empty JSON)"
+    Write-Host "[kubescape] -> $Out (error: $($_.Exception.Message))"
   }
 }
 
-
-
+# --- KUBESEC (Docker; robust relative paths + JSON merge) ---------------------
+# --- KUBESEC (Docker; read files via STDIN, merge JSON) ----------------------
+# --- KUBESEC (Docker; pass files as args, merge per-file JSON lines) ----------
+# --- KUBESEC (scan each file, parse robustly, merge JSON) ---------------------
 function Det-Kubesec {
   param(
-    [string]$Path = "tests",
+    [string]$Path = ".",
     [string]$Out  = "$OutDir\kubesec_raw.json"
   )
   try {
-    $root  = (Resolve-Path $Path).Path
-    $files = Get-ChildItem -Path $root -Recurse -Include *.yml,*.yaml
-    if ($files.Count -eq 0) {
+    $root = (Resolve-Path -LiteralPath $Path).Path
+    $cand = Get-ChildItem -Path $root -Recurse -File -Include *.yml,*.yaml -ErrorAction SilentlyContinue
+    if (-not $cand -or $cand.Count -eq 0) {
       '[]' | Set-Content -Encoding UTF8 -Path $Out
-      Write-Host "[kubesec] -> $Out (no files)"
+      Write-Host "[kubesec] -> $Out (no YAML files)"
       return
     }
 
-    $objects = New-Object System.Collections.ArrayList
-    foreach ($f in $files) {
-      $rel = $f.FullName.Substring($PWD.Path.Length).TrimStart('\','/')
-      $w   = "/work/$rel".Replace('\','/')
-      $args = @("run","--rm","-v","${PWD}:/work:ro","kubesec/kubesec:latest","scan","--format=json",$w)
-      $raw  = docker @args 2>$null
+    # Keep likely K8s manifests
+    $manifests = foreach ($f in $cand) {
+      $head = Get-Content -Path $f.FullName -TotalCount 200 -ErrorAction SilentlyContinue | Out-String
+      if ($head -match '(?m)^\s*apiVersion\s*:' -and $head -match '(?m)^\s*kind\s*:') { $f }
+    }
+    if (-not $manifests -or $manifests.Count -eq 0) {
+      '[]' | Set-Content -Encoding UTF8 -Path $Out
+      Write-Host "[kubesec] -> $Out (no K8s manifests)"
+      return
+    }
 
-      # Strip any stdout noise; keep only JSON-looking lines
-      $clean = ($raw -split "`r?`n") | ForEach-Object { $_.Trim() } |
-               Where-Object { $_.StartsWith("{") -or $_.StartsWith("[") }
-      foreach ($line in $clean) {
-        try { [void]$objects.Add( ($line | ConvertFrom-Json) ) } catch { }
+    $stderrLog = Join-Path $LogsDir "kubesec_stderr.txt"
+    '' | Set-Content -Encoding UTF8 -Path $stderrLog
+    $all = New-Object System.Collections.ArrayList
+
+    foreach ($f in $manifests) {
+      # build /work/<relative> so docker can read it
+      $rel = $f.FullName.Substring($PWD.Path.Length).TrimStart('\','/')
+      $workPath = "/work/$($rel -replace '\\','/')"
+
+      $raw = docker run --rm -v "${PWD}:/work:ro" kubesec/kubesec:latest `
+               scan --format=json $workPath 2>&1
+
+      # log noise
+      ($raw -split "`r?`n" | % { $_.Trim() } |
+        ? { $_ -and -not ($_.StartsWith('[') -or $_.StartsWith('{')) }) |
+        Add-Content -Path $stderrLog
+
+      # try parse as-is
+      $parsed = $null
+      try { $parsed = ($raw | ConvertFrom-Json) } catch {
+        # fall back: extract the first JSON array/object in the output
+        $m = [regex]::Match($raw, '(?s)(\[[\s\S]*\]|\{[\s\S]*\})')
+        if ($m.Success) { try { $parsed = ($m.Value | ConvertFrom-Json) } catch { } }
+      }
+
+      if ($parsed -ne $null) {
+        if ($parsed -is [System.Collections.IEnumerable] -and -not ($parsed -is [string])) {
+          foreach ($item in $parsed) { [void]$all.Add($item) }
+        } else {
+          [void]$all.Add($parsed)
+        }
       }
     }
 
-    # If parsing yielded nothing (still noisy build), output a valid empty array
-    if ($objects.Count -eq 0) {
-      '[]' | Set-Content -Encoding UTF8 -Path $Out
-    } else {
-      ($objects | ConvertTo-Json -Depth 64) | Set-Content -Encoding UTF8 -Path $Out
-    }
+    if ($all.Count -eq 0) { '[]' | Set-Content -Encoding UTF8 -Path $Out }
+    else { ($all | ConvertTo-Json -Depth 64) | Set-Content -Encoding UTF8 -Path $Out }
 
-    # Validate once (fast): if invalid, force []
-    try {
-      $null = (Get-Content -Raw -Encoding UTF8 $Out) | ConvertFrom-Json
-    } catch {
-      '[]' | Set-Content -Encoding UTF8 -Path $Out
-    }
-
-    Write-NonEmpty $Out
+    # sanity
+    try { $null = (Get-Content -Raw -Encoding UTF8 $Out) | ConvertFrom-Json } catch { '[]' | Set-Content -Encoding UTF8 -Path $Out }
     Write-Host "[kubesec] -> $Out"
   }
   catch {
     '[]' | Set-Content -Encoding UTF8 -Path $Out
-    Write-Host "[kubesec] -> $Out (placeholder)"
+    Write-Host "[kubesec] -> $Out (error: $($_.Exception.Message))"
   }
 }
+
 
 
 
 
 # --- config scanners / IaC ----------------------------------------------------
 function Det-TrivyConfig {
-  param([string]$Path="tests",[string]$Out="$OutDir\trivy_config_raw.json")
+  param([string]$Path=".",[string]$Out="$OutDir\trivy_config_raw.json")
   try {
     docker run --rm -v "${PWD}:/work:ro" aquasec/trivy:latest `
       config --quiet --format json "/work/$Path" | Set-Content -Encoding UTF8 -Path $Out
@@ -312,7 +302,7 @@ function Det-TrivyConfig {
 }
 
 function Det-Checkov {
-  param([string]$Path="tests",[string]$Out="$OutDir\checkov_raw.json")
+  param([string]$Path=".",[string]$Out="$OutDir\checkov_raw.json")
   try {
     docker run --rm -v "${PWD}:/work:ro" bridgecrew/checkov:latest `
       -d "/work/$Path" -o json | Set-Content -Encoding UTF8 -Path $Out
@@ -321,7 +311,7 @@ function Det-Checkov {
 }
 
 function Det-Terrascan {
-  param([string]$Path="tests",[string]$Out="$OutDir\terrascan_raw.json")
+  param([string]$Path=".",[string]$Out="$OutDir\terrascan_raw.json")
   try {
     docker run --rm -v "${PWD}:/work:ro" tenable/terrascan:latest `
       scan -d "/work/$Path" -o json | Set-Content -Encoding UTF8 -Path $Out
@@ -330,7 +320,7 @@ function Det-Terrascan {
 }
 
 function Det-Yamllint {
-  param([string]$Path="tests",[string]$Out="$OutDir\yamllint_raw.txt")
+  param([string]$Path=".",[string]$Out="$OutDir\yamllint_raw.txt")
   try {
     docker run --rm -v "${PWD}:/work:ro" cytopia/yamllint:latest `
       -f parsable -s "/work/$Path" | Set-Content -Encoding UTF8 -Path $Out
@@ -416,18 +406,15 @@ function Det-TruffleHog {
   } catch { _WrapPlaceholder $Out "trufflehog" $_.Exception.Message }
 }
 
-
 # --- convenience: run everything ---------------------------------------------
 function Det-RunAll {
   param(
-    [string]$Path="tests",
+    [string]$Path=".",
     [string]$Image=""
   )
 
-  # Ensure images are available locally from repo cache
   Ensure-DetectorImages
 
-  # Steps list (for progress bar + timing)
   $steps = @(
     "KubeLinter","Polaris","TrivyConfig","KubeScore",
     "Yamllint","Checkov","Terrascan",
