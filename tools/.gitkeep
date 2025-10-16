@@ -1,0 +1,2 @@
+# This file ensures the tools directory is tracked in git
+# Downloaded binaries and artifacts are gitignored but the directory structure is preserved

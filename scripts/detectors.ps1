@@ -2,6 +2,7 @@
 # SafeFix-K8s detectors runner
 # - Caches all Docker images in <repo>/images/*.tar so runs can be offline
 # - Shows a progress bar and per-tool timings + total runtime summary
+# - Logs all operations to output/logs/detectors_YYYYMMDD_HHMMSS.log
 
 $ErrorActionPreference = "Stop"
 
@@ -10,6 +11,33 @@ $RepoRoot = Split-Path -Parent $PSScriptRoot
 $OutDir   = Join-Path $RepoRoot "output\raw"
 New-Item -ItemType Directory -Force -Path $OutDir | Out-Null
 
+$LogsDir = Join-Path $RepoRoot "output\logs"
+New-Item -ItemType Directory -Force -Path $LogsDir | Out-Null
+
+# Create timestamped log file for this run
+$global:DetectorLogFile = Join-Path $LogsDir ("detectors_" + (Get-Date -Format "yyyyMMdd_HHmmss") + ".log")
+
+# --- logging ------------------------------------------------------------------
+function Write-Log {
+  param(
+    [Parameter(Mandatory)][string]$Message,
+    [string]$Level = "INFO"
+  )
+  $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+  $logMsg = "[$timestamp] [$Level] $Message"
+  
+  # Console output with colors
+  switch ($Level) {
+    "ERROR" { Write-Host $logMsg -ForegroundColor Red }
+    "WARN"  { Write-Host $logMsg -ForegroundColor Yellow }
+    "INFO"  { Write-Host $logMsg -ForegroundColor Cyan }
+    default { Write-Host $logMsg }
+  }
+  
+  # File output
+  Add-Content -Path $global:DetectorLogFile -Value $logMsg -Encoding UTF8
+}
+
 # --- helpers ------------------------------------------------------------------
 function Write-NonEmpty($Path) {
   if (!(Test-Path $Path) -or ((Get-Item $Path).Length -lt 3)) {
@@ -17,13 +45,10 @@ function Write-NonEmpty($Path) {
   }
 }
 
-# paths
 $ToolsDir    = Join-Path $RepoRoot "tools"
 $KsDir       = Join-Path $ToolsDir "kubescape"
 $KsLocalExe  = Join-Path $KsDir "kubescape.exe"
 $KsArtifacts = Join-Path $KsDir "artifacts"   # local policy bundle cache
-$LogsDir     = Join-Path $RepoRoot "output\logs"
-New-Item -ItemType Directory -Force -Path $LogsDir | Out-Null
 
 function Get-KubescapeExe {
   try {
@@ -51,13 +76,14 @@ function Ensure-KubescapeArtifacts {
 }
 
 function _WrapPlaceholder($Out, $tool, $msg) {
+  Write-Log "Creating placeholder for $tool : $msg" "WARN"
   '[{"tool":"' + $tool + '","note":"' + ($msg -replace '"','''') + '"}]' |
     Set-Content -Encoding UTF8 -Path $Out
   Write-Host "[$tool] -> $Out (placeholder)"
 }
 
 # --- images cache inside repo -------------------------------------------------
-$ImagesDir = Join-Path $RepoRoot "images"         # <repo>/images
+$ImagesDir = Join-Path $RepoRoot "images"
 New-Item -ItemType Directory -Force -Path $ImagesDir | Out-Null
 
 function Get-DetectorImages {
@@ -75,9 +101,10 @@ function Get-DetectorImages {
     "tenable/terrascan:latest",
     "zegl/kube-score:latest",
     "cytopia/yamllint:latest",
-    # keep these two only; no “kubescape-ci”
     "quay.io/kubescape/kubescape:latest",
-    "kubesec/kubesec:latest"
+    "kubesec/kubesec:latest",
+    "ghcr.io/shopify/kubeaudit:latest",
+    "ghcr.io/kyverno/kyverno-cli:latest"
   )
 }
 
@@ -147,15 +174,26 @@ function Invoke-WithTiming {
     [Parameter(Mandatory)][string]$Name,
     [Parameter(Mandatory)][scriptblock]$Action
   )
+  Write-Log "Starting $Name" "INFO"
   $sw = [System.Diagnostics.Stopwatch]::StartNew()
   $status = "ok"
-  try   { & $Action }
-  catch { $status = "error"; throw }
+  $errorMsg = $null
+  try {
+    & $Action
+  }
+  catch {
+    $status = "error"
+    $errorMsg = $_.Exception.Message
+    Write-Log "$Name failed: $errorMsg" "ERROR"
+    throw
+  }
   finally {
     $sw.Stop()
+    $elapsed = [math]::Round($sw.Elapsed.TotalSeconds,2)
+    Write-Log "$Name completed in $elapsed seconds (status: $status)" "INFO"
     [void]$global:ToolTimings.Add([pscustomobject]@{
       Tool   = $Name
-      Seconds= [math]::Round($sw.Elapsed.TotalSeconds,2)
+      Seconds= $elapsed
       Status = $status
     })
   }
@@ -195,26 +233,46 @@ function Det-KubeScore {
 }
 
 # --- replacements / additions -------------------------------------------------
-# --- KUBESCAPE (local CLI; JSON straight to file) -----------------------------
+# KUBESCAPE (local CLI; JSON to file; cached artifacts)
 function Det-Kubescape {
-  param([string]$Path=".", [string]$Out="$OutDir\kubescape_raw.json")
+  param(
+    [string]$Path = ".",
+    [string]$Out  = "$OutDir\kubescape_raw.json"
+  )
   try {
-    Ensure-KubescapeArtifacts
-    $ks = (Get-Command kubescape -ErrorAction Stop).Source
+    # 1) Ensure CLI exists
+    $ks = $null
+    try { $ks = (Get-Command kubescape -ErrorAction Stop).Source }
+    catch { throw "kubescape CLI not found in PATH. Install it or put kubescape.exe under tools\kubescape." }
+
+    # 2) Find YAMLs (so we can fail gracefully if none)
     $root = (Resolve-Path -LiteralPath $Path).Path
-    & $ks scan $root --format json --format-version v2 --use-artifacts-from $KsArtifacts --output $Out | Out-Null
-    if (!(Test-Path $Out) -and (Test-Path "${Out}.json")) { Move-Item -Force "${Out}.json" $Out }
-    Write-NonEmpty $Out; Write-Host "[kubescape] -> $Out"
-  } catch {
+    $ymls = Get-ChildItem -Path $root -Recurse -File -Include *.yaml,*.yml -ErrorAction SilentlyContinue
+    if (-not $ymls -or $ymls.Count -eq 0) {
+      '[]' | Set-Content -Encoding UTF8 -Path $Out
+      Write-Host "[kubescape] -> $Out (no YAML files)"
+      return
+    }
+
+    # 3) Run exactly like your screenshot, but emit JSON to $Out
+    # Kubescape supports: --format json --output <file>
+    & $ks scan $root --format json --output $Out | Out-Null
+
+    # Some versions write to '<file>.json'; normalize if needed
+    if (!(Test-Path $Out)) {
+      if (Test-Path "${Out}.json") { Move-Item -Force "${Out}.json" $Out }
+    }
+
+    Write-NonEmpty $Out
+    Write-Host "[kubescape] -> $Out"
+  }
+  catch {
     '[]' | Set-Content -Encoding UTF8 -Path $Out
     Write-Host "[kubescape] -> $Out (error: $($_.Exception.Message))"
   }
 }
 
-# --- KUBESEC (Docker; robust relative paths + JSON merge) ---------------------
-# --- KUBESEC (Docker; read files via STDIN, merge JSON) ----------------------
-# --- KUBESEC (Docker; pass files as args, merge per-file JSON lines) ----------
-# --- KUBESEC (scan each file, parse robustly, merge JSON) ---------------------
+# KUBESEC (Docker; scan each file, merge JSON)
 function Det-Kubesec {
   param(
     [string]$Path = ".",
@@ -229,7 +287,6 @@ function Det-Kubesec {
       return
     }
 
-    # Keep likely K8s manifests
     $manifests = foreach ($f in $cand) {
       $head = Get-Content -Path $f.FullName -TotalCount 200 -ErrorAction SilentlyContinue | Out-String
       if ($head -match '(?m)^\s*apiVersion\s*:' -and $head -match '(?m)^\s*kind\s*:') { $f }
@@ -245,22 +302,18 @@ function Det-Kubesec {
     $all = New-Object System.Collections.ArrayList
 
     foreach ($f in $manifests) {
-      # build /work/<relative> so docker can read it
       $rel = $f.FullName.Substring($PWD.Path.Length).TrimStart('\','/')
       $workPath = "/work/$($rel -replace '\\','/')"
 
       $raw = docker run --rm -v "${PWD}:/work:ro" kubesec/kubesec:latest `
-               scan --format=json $workPath 2>&1
+              scan --format=json $workPath 2>&1
 
-      # log noise
       ($raw -split "`r?`n" | % { $_.Trim() } |
         ? { $_ -and -not ($_.StartsWith('[') -or $_.StartsWith('{')) }) |
         Add-Content -Path $stderrLog
 
-      # try parse as-is
       $parsed = $null
       try { $parsed = ($raw | ConvertFrom-Json) } catch {
-        # fall back: extract the first JSON array/object in the output
         $m = [regex]::Match($raw, '(?s)(\[[\s\S]*\]|\{[\s\S]*\})')
         if ($m.Success) { try { $parsed = ($m.Value | ConvertFrom-Json) } catch { } }
       }
@@ -277,7 +330,6 @@ function Det-Kubesec {
     if ($all.Count -eq 0) { '[]' | Set-Content -Encoding UTF8 -Path $Out }
     else { ($all | ConvertTo-Json -Depth 64) | Set-Content -Encoding UTF8 -Path $Out }
 
-    # sanity
     try { $null = (Get-Content -Raw -Encoding UTF8 $Out) | ConvertFrom-Json } catch { '[]' | Set-Content -Encoding UTF8 -Path $Out }
     Write-Host "[kubesec] -> $Out"
   }
@@ -287,8 +339,56 @@ function Det-Kubesec {
   }
 }
 
+# KUBEAUDIT (Docker)
+function Det-KubeAudit {
+  param([string]$Path=".", [string]$Out="$OutDir\kubeaudit_raw.json")
+  try {
+    $cmd = @(
+      "run","--rm","-v","${PWD}:/work:ro",
+      "shopify/kubeaudit:latest",             # docker hub image (works out-of-box)
+      "all","-f","/work/$Path","-o","json"
+    )
+    $raw = docker @cmd 2>&1
+    if (-not $raw) { $raw = "[]" }
+    $raw | Set-Content -Encoding UTF8 -Path $Out
+    if ((Get-Item $Out).Length -lt 3) { '[]' | Set-Content -Encoding UTF8 -Path $Out }
+    Write-Host "[kubeaudit] -> $Out"
+  } catch {
+    # fallback: try GHCR and invoke binary path
+    try {
+      $raw = docker run --rm -v "${PWD}:/work:ro" `
+        ghcr.io/shopify/kubeaudit:latest /usr/local/bin/kubeaudit all -f "/work/$Path" -o json 2>&1
+      if (-not $raw) { $raw = "[]" }
+      $raw | Set-Content -Encoding UTF8 -Path $Out
+      if ((Get-Item $Out).Length -lt 3) { '[]' | Set-Content -Encoding UTF8 -Path $Out }
+      Write-Host "[kubeaudit] -> $Out"
+    } catch {
+      '[]' | Set-Content -Encoding UTF8 -Path $Out
+      Write-Host "[kubeaudit] -> $Out (fallback failed: $($_.Exception.Message))"
+    }
+  }
+}
 
 
+# KYVERNO-CLI (Docker) — optional, if you have policies/
+function Det-Kyverno {
+  param(
+    [string]$Path=".",
+    [string]$Policies="policies",
+    [string]$Out="$OutDir\kyverno_raw.json"
+  )
+  try {
+    $raw = docker run --rm -v "${PWD}:/work:ro" ghcr.io/kyverno/kyverno-cli:latest `
+      apply "/work/$Policies/*.yaml" --resource "/work/$Path" --policy-report -o json 2>&1
+    if (-not $raw) { $raw = "[]" }
+    $raw | Set-Content -Encoding UTF8 -Path $Out
+    if ((Get-Item $Out).Length -lt 3) { '[]' | Set-Content -Encoding UTF8 -Path $Out }
+    Write-Host "[kyverno] -> $Out"
+  } catch {
+    '[]' | Set-Content -Encoding UTF8 -Path $Out
+    Write-Host "[kyverno] -> $Out (error: $($_.Exception.Message))"
+  }
+}
 
 
 # --- config scanners / IaC ----------------------------------------------------
@@ -382,13 +482,14 @@ function Det-TruffleHog {
   try {
     $exFile = Join-Path $env:TEMP "trufflehog_exclude.txt"
 @(
-  "^/work/\.venv/",
-  "^/work/.*/__pycache__/",
-  "^/work/.*\.pyc$",
-  "^/work/output/",
-  "^/work/images/",            # cache noise
-  "^/work/\.git/",
-  "^/work/docker-bench-security/"
+  "^/work/\.venv($|/)",
+  "^/\.venv($|/)",
+  "^/work/output($|/)",
+  "^/output($|/)",
+  "^/work/images($|/)",
+  "^/images($|/)",
+  "^/work/\.git($|/)",
+  "^/\.git($|/)"
 ) | Set-Content -Encoding UTF8 -Path $exFile
 
     $args = @(
@@ -398,11 +499,16 @@ function Det-TruffleHog {
       "trufflesecurity/trufflehog:latest",
       "filesystem","/work/$Path",
       "--json",
-      "--exclude-paths","/exclude.txt"
+      "--exclude-paths","/exclude.txt",
+      "--only-verified"
     )
-    docker @args | Set-Content -Encoding UTF8 -Path $Out
-    Remove-Item $exFile -ErrorAction SilentlyContinue
-    Write-NonEmpty $Out; Write-Host "[trufflehog] -> $Out"
+        $outText = docker @args 2>&1
+    if (-not $outText) { $outText = "[]" }
+    $outText | Set-Content -Encoding UTF8 -Path $Out
+    # don't fail just because it's empty
+    if ((Get-Item $Out).Length -lt 3) { '[]' | Set-Content -Encoding UTF8 -Path $Out }
+    Write-Host "[trufflehog] -> $Out"
+
   } catch { _WrapPlaceholder $Out "trufflehog" $_.Exception.Message }
 }
 
@@ -413,15 +519,24 @@ function Det-RunAll {
     [string]$Image=""
   )
 
+  Write-Log "============================================================" "INFO"
+  Write-Log "SafeFixK8s Detectors Starting" "INFO"
+  Write-Log "Log file: $global:DetectorLogFile" "INFO"
+  Write-Log "Target path: $Path" "INFO"
+  if ($Image) { Write-Log "Image scan: $Image" "INFO" }
+  Write-Log "============================================================" "INFO"
+
   Ensure-DetectorImages
 
   $steps = @(
     "KubeLinter","Polaris","TrivyConfig","KubeScore",
     "Yamllint","Checkov","Terrascan",
-    "Kubescape","Kubesec",
+    "Kubescape","Kubesec","KubeAudit","Kyverno",
     "Gitleaks","TruffleHog"
   )
   if ($Image) { $steps += @("Syft","Grype","Hadolint","Dockle") }
+
+  Write-Log "Running $($steps.Count) detector tools" "INFO"
 
   Start-ProgressSession -count $steps.Count
   $totalSw = [System.Diagnostics.Stopwatch]::StartNew()
@@ -436,10 +551,15 @@ function Det-RunAll {
       "Yamllint"     { Invoke-WithTiming -Name $s { Det-Yamllint -Path $Path } }
       "Checkov"      { Invoke-WithTiming -Name $s { Det-Checkov -Path $Path } }
       "Terrascan"    { Invoke-WithTiming -Name $s { Det-Terrascan -Path $Path } }
+
       "Kubescape"    { Invoke-WithTiming -Name $s { Det-Kubescape -Path $Path } }
-      "Kubesec"      { Invoke-WithTiming -Name $s { Det-Kubesec -Path $Path } }
+      "Kubesec"      { Invoke-WithTiming -Name $s { Det-Kubesec   -Path $Path } }
+      "KubeAudit"    { Invoke-WithTiming -Name $s { Det-KubeAudit -Path $Path } }
+      "Kyverno"      { Invoke-WithTiming -Name $s { Det-Kyverno   -Path $Path } }
+
       "Gitleaks"     { Invoke-WithTiming -Name $s { Det-Gitleaks -Path . } }
       "TruffleHog"   { Invoke-WithTiming -Name $s { Det-TruffleHog -Path . } }
+
       "Syft"         { Invoke-WithTiming -Name $s { if ($Image) { Det-Syft -Image $Image } } }
       "Grype"        { Invoke-WithTiming -Name $s { if ($Image) { Det-Grype -Image $Image } } }
       "Hadolint"     { Invoke-WithTiming -Name $s { if ($Image) { Det-Hadolint -Dockerfile (Join-Path $PWD "Dockerfile") } } }
@@ -450,10 +570,17 @@ function Det-RunAll {
   $totalSw.Stop()
   End-Progress
 
-  Write-Host ""
-  Write-Host "────────── Detectors runtime summary ──────────"
+  Write-Log "" "INFO"
+  Write-Log "============================================================" "INFO"
+  Write-Log "Detectors Runtime Summary" "INFO"
+  Write-Log "============================================================" "INFO"
+  
   $global:ToolTimings | Sort-Object Seconds -Descending |
     Format-Table @{Label="Tool";Expression={$_.Tool}}, @{Label="Sec";Expression={$_.Seconds}}, Status -Auto
-  Write-Host ("Total time: {0:N2} sec" -f $totalSw.Elapsed.TotalSeconds)
-  Write-Host "All detectors finished."
+  
+  $totalTime = [math]::Round($totalSw.Elapsed.TotalSeconds, 2)
+  Write-Log "Total time: $totalTime sec" "INFO"
+  Write-Log "All detectors finished." "INFO"
+  Write-Log "Log saved to: $global:DetectorLogFile" "INFO"
+  Write-Log "============================================================" "INFO"
 }

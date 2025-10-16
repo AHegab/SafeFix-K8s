@@ -179,5 +179,35 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
-/docker-bench-security
-/images
+
+# SafeFixK8s specific ignores
+# --------------------------
+
+# Cached Docker images (large binary files)
+/images/*.tar
+/images/
+
+# Generated outputs
+/output/raw/*.json
+/output/raw/*.txt
+/output/normalized_findings.json
+/output/tool_detection_matrix.csv
+/output/tool_detection_matrix.json
+/output/thesis_*.csv
+
+# Log files (keep directory structure but ignore logs)
+/output/logs/*.log
+/output/logs/*.txt
+
+# Downloaded tools and artifacts
+/tools/kubescape/kubescape.exe
+/tools/kubescape/artifacts/
+/tools/kubeaudit
+/tools/kubeaudit.exe
+
+# Keep directory structure but ignore contents
+!output/.gitkeep
+!output/raw/.gitkeep
+!output/logs/.gitkeep
+!images/.gitkeep
+!tools/.gitkeep
