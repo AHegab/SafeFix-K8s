@@ -1,51 +1,14 @@
 # normalizer/normalize_all.py
 # Robust normalizer for SafeFixK8s outputs
-
 from __future__ import annotations
-import json, hashlib, re, csv, sys
+import json, hashlib, sys, re
 from pathlib import Path
 from datetime import datetime
 from typing import Any, Dict, Iterable, List
-from collections import defaultdict
 
 ROOT    = Path(__file__).resolve().parents[1]
 RAW_DIR = ROOT / "output" / "raw"
 OUT     = ROOT / "output" / "normalized_findings.json"
-MATRIX_CSV = ROOT / "output" / "tool_detection_matrix.csv"
-MATRIX_JSON = ROOT / "output" / "tool_detection_matrix.json"
-LOGS_DIR = ROOT / "output" / "logs"
-
-# Ensure logs directory exists
-LOGS_DIR.mkdir(parents=True, exist_ok=True)
-
-# Setup logging
-LOG_FILE = LOGS_DIR / f"normalizer_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.log"
-
-def log(msg: str, level: str = "INFO") -> None:
-    """Write to both console and log file."""
-    timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
-    log_msg = f"[{timestamp}] [{level}] {msg}"
-    
-    # Console output (with colors for errors/warnings)
-    # Use ASCII-safe version for console to avoid Windows encoding issues
-    console_msg = log_msg.replace("✓", "[OK]").replace("→", "->")
-    
-    try:
-        if level == "ERROR":
-            print(f"\033[91m{console_msg}\033[0m", file=sys.stderr)  # Red
-        elif level == "WARN":
-            print(f"\033[93m{console_msg}\033[0m")  # Yellow
-        elif level == "INFO":
-            print(console_msg)
-        else:
-            print(console_msg)
-    except UnicodeEncodeError:
-        # Fallback for really problematic consoles
-        print(console_msg.encode('ascii', 'replace').decode('ascii'))
-    
-    # File output (keep Unicode for log files)
-    with LOG_FILE.open("a", encoding="utf-8") as f:
-        f.write(log_msg + "\n")
 
 # ------------------------
 # helpers
@@ -55,7 +18,7 @@ def now_iso() -> str:
     return datetime.utcnow().isoformat(timespec="microseconds") + "Z"
 
 def warn(msg: str) -> None:
-    log(msg, "WARN")
+    print(f"[WARN] {msg}")
 
 def _hash_id(parts: Iterable[str]) -> str:
     h = hashlib.md5()
@@ -67,7 +30,6 @@ def _hash_id(parts: Iterable[str]) -> str:
         h.update(p.encode("utf-8", errors="ignore"))
         h.update(b"|")
     return h.hexdigest()
-
 def load_json(p: Path) -> Any:
     """
     Robust loader:
@@ -80,20 +42,25 @@ def load_json(p: Path) -> Any:
         if not p.exists() or p.stat().st_size == 0:
             return []
         raw = p.read_bytes()
+        # Strip UTF-8 BOM if present
         if raw.startswith(b"\xef\xbb\xbf"):
             raw = raw[3:]
+
         text = raw.decode("utf-8", errors="replace").strip()
         if not text:
             return []
 
+        # Skip obvious placeholders or shell error text
         low = text.lower()
         if ("placeholder" in low) or ("error response from daemon" in low) or ("exec /kubeaudit" in low):
             warn(f"Placeholder/diagnostic text in {p}; skipping.")
             return []
 
+        # First try standard JSON
         try:
             return json.loads(text)
         except json.JSONDecodeError:
+            # Try JSON Lines
             objs: List[Any] = []
             ok = True
             for line in text.splitlines():
@@ -113,8 +80,9 @@ def load_json(p: Path) -> Any:
     except Exception as e:
         warn(f"Failed to read {p}: {e}")
         return []
-
+    
 def iter_json_lines(p: Path) -> Iterable[Any]:
+    """Yield JSON objects from a file that may contain JSON-lines with noise."""
     if not p.exists() or p.stat().st_size == 0:
         warn(f"Missing/empty: {p}")
         return
@@ -123,9 +91,11 @@ def iter_json_lines(p: Path) -> Iterable[Any]:
             s = ln.strip()
             if not s:
                 continue
+            # ignore Go log lines like {"level":"info-0",...} that *are* JSON too – still parse them
             try:
                 yield json.loads(s)
             except Exception:
+                # skip non-JSON garbage lines
                 continue
 
 def safe_text(p: Path) -> str:
@@ -137,7 +107,7 @@ def safe_text(p: Path) -> str:
     except Exception as e:
         warn(f"Text read failed {p}: {e}")
         return ""
-
+    
 def sev_norm(s: Any, default="INFO") -> str:
     if s is None:
         return default
@@ -153,6 +123,7 @@ def sev_norm(s: Any, default="INFO") -> str:
     if su.startswith("ERR"): return "HIGH"
     return default
 
+
 def _norm_msg(msg: Any) -> str:
     if isinstance(msg, dict):
         for k in ("Message", "message", "summary", "text"):
@@ -163,6 +134,19 @@ def _norm_msg(msg: Any) -> str:
     if msg is None:
         return ""
     return str(msg)
+
+def _dedupe_key(f: Dict[str, Any]) -> tuple:
+    rr = f.get("resourceRef", {}) or {}
+    loc = f.get("location", {}) or {}
+    return (
+        f.get("tool",""),
+        f.get("ruleId",""),
+        rr.get("kind",""),
+        rr.get("name",""),
+        loc.get("file",""),
+        int(loc.get("line", 0) or 0),
+        _norm_msg(f.get("message"))
+    )
 
 def _mk(
     tool: str,
@@ -175,23 +159,16 @@ def _mk(
     line: int | None = None,
     labels: Dict[str, Any] | None = None,
 ) -> Dict[str, Any]:
-    # coerce ruleId to a clean string
-    rid = rule
-    if not isinstance(rid, str):
-        try:
-            rid = (rid.get("id") or rid.get("name")) if isinstance(rid, dict) else str(rid)
-        except Exception:
-            rid = "unknown"
     msg = _norm_msg(message)
-    fid = _hash_id([tool, rid, kind, name, file, str(line or 0), msg])
+    fid = _hash_id([tool, rule, kind, name, file, str(line or 0), msg])
     return {
         "findingId": fid,
         "tool": tool,
-        "ruleId": rid or "unknown",
+        "ruleId": rule or "unknown",
         "severity": sev_norm(severity, default="INFO"),
         "resourceRef": {"kind": kind or "Object", "name": name or "unknown"},
-        "message": message,
-        "location": {"file": file or "", "line": (int(line) if isinstance(line, int) or (isinstance(line, str) and line.isdigit()) else None)},
+        "message": msg if isinstance(message, str) else message,
+        "location": {"file": file or "", "line": line},
         "labels": labels or {}
     }
 
@@ -203,6 +180,7 @@ def from_kubelinter(p: Path) -> List[Dict]:
     data = load_json(p) or {}
     findings = []
     for it in data.get("Reports", []) or data.get("reports", []) or []:
+        # kube-linter JSON v2/v1 vary; try generic fields
         tool = "kubelinter"
         rule = it.get("Check", {}).get("name") or it.get("check") or it.get("Diagnostic", {}).get("check") or it.get("name")
         msg  = it.get("Message") or it.get("message") or it
@@ -247,31 +225,31 @@ def from_kubescore(p: Path) -> List[Dict]:
     findings: List[Dict] = []
     if not data:
         return findings
-    items = data if isinstance(data, list) else [data]
 
-    def sev_from_grade(g):
-        try:
-            g = float(g)
-            return "HIGH" if g < 5 else ("MEDIUM" if g < 7 else "INFO")
-        except:
-            return "INFO"
+    items = data if isinstance(data, list) else [data]
 
     for item in items:
         objmeta = item.get("object", {}) if isinstance(item, dict) else {}
-        kind = objmeta.get("kind") or item.get("kind") or "Object"
-        name = objmeta.get("name") or item.get("name") or "unknown"
-        file = item.get("fileName") or item.get("filename") or item.get("file") or ""
+        kind = (objmeta.get("kind") or item.get("kind") or "Object") if isinstance(item, dict) else "Object"
+        name = (objmeta.get("name") or item.get("name") or "unknown") if isinstance(item, dict) else "unknown"
+        file = ""
+        if isinstance(item, dict):
+            file = item.get("fileName") or item.get("filename") or item.get("file") or ""
 
         checks = []
         if isinstance(item, dict) and isinstance(item.get("checks"), list):
             checks = item["checks"]
+        elif isinstance(item, dict) and any(k in item for k in ("check","id","grade","severity","comment","comments","message")):
+            checks = [item]
 
         for chk in checks:
-            chkmeta = chk.get("check") or {}
-            rule = chkmeta.get("id") or chkmeta.get("name") or "unknown"
-            raw_sev = sev_from_grade(chk.get("grade", 10))
-            msg = chk.get("comment") or chk.get("comments") or chk.get("message") or chkmeta
+            rule = (chk.get("check") or chk.get("id") or chk.get("name") or "unknown")
+            raw_sev = (chk.get("grade") or chk.get("severity") or chk.get("type") or "MEDIUM")
+            if str(raw_sev).lower() == "security":
+                raw_sev = "HIGH"
+            msg = (chk.get("comment") or chk.get("comments") or chk.get("message") or chk)
             findings.append(_mk("kube-score", rule, raw_sev, kind, name, msg, file=file))
+
     return findings
 
 _yamllint_re = re.compile(r"^(?P<file>.+):(?P<line>\d+):(?P<col>\d+):\s\[(?P<severity>\w+)\]\s(?P<message>.+)$")
@@ -282,6 +260,7 @@ def from_yamllint(p: Path) -> List[Dict]:
     for ln in txt.splitlines():
         m = _yamllint_re.match(ln.strip())
         if not m:
+            # try braces warning line (tool sometimes prints different)
             continue
         d = m.groupdict()
         findings.append(_mk(
@@ -299,6 +278,8 @@ def from_yamllint(p: Path) -> List[Dict]:
 def from_checkov(p: Path) -> List[Dict]:
     data = load_json(p) or {}
     findings: List[Dict] = []
+
+    # Checkov may return an object OR a list of report objects
     items: List[Dict] = []
     if isinstance(data, list):
         items = [d for d in data if isinstance(d, dict)]
@@ -320,6 +301,7 @@ def from_checkov(p: Path) -> List[Dict]:
             findings.append(_mk("checkov", rule, sev, kind, name, msg, file=file, line=line, labels=labels))
     return findings
 
+
 def from_terrascan(p: Path) -> List[Dict]:
     data = load_json(p) or {}
     findings = []
@@ -335,11 +317,14 @@ def from_terrascan(p: Path) -> List[Dict]:
     return findings
 
 def from_gitleaks(p: Path) -> List[Dict]:
+    # gitleaks default docker command emits JSON lines (one object per finding).
     findings = []
     for it in iter_json_lines(p):
+        # filter out non-finding log events (they still parse)
         if not isinstance(it, dict):
             continue
         if "rule" not in it and "Description" not in it and "RuleID" not in it:
+            # probably a log line from gitleaks itself
             continue
         rule = it.get("RuleID") or it.get("rule") or it.get("Description")
         sev  = "HIGH"
@@ -350,29 +335,36 @@ def from_gitleaks(p: Path) -> List[Dict]:
     return findings
 
 def from_trufflehog(p: Path) -> List[Dict]:
+    # trufflehog docker emits a mix of logs (JSON) and results as JSON lines
     findings = []
     for it in iter_json_lines(p):
         if not isinstance(it, dict):
             continue
+        # Known fields: "DetectorName" / "Raw", "Redacted", "SourceMetadata", "Verification"
         detector = it.get("DetectorName") or it.get("DetectorType") or it.get("rule")
         if not detector:
+            # might be a log line like {"level":"info-0", ...}
             continue
         sev = "HIGH"
-        msg = "High-entropy or credential-like pattern"
+        msg = f"High-entropy or credential-like pattern"
         src = (((it.get("SourceMetadata") or {}).get("Data") or {}).get("Filesystem") or {})
         file = src.get("file") or it.get("File") or ""
         line = src.get("line") or it.get("Line") or 0
-        findings.append(_mk("trufflehog", detector, sev, "Repository", "\\", msg, file=file, line=int(line or 0)))
+        rule = detector
+        findings.append(_mk("trufflehog", rule, sev, "Repository", "\\", msg, file=file, line=int(line or 0)))
     return findings
 
 def from_syft(p: Path) -> List[Dict]:
     data = load_json(p) or {}
     findings = []
-    for pkg in data.get("artifacts", []) or []:
+    for pkg in data.get("artifacts", []) or data.get("artifactsByImage", []) or []:
         name = pkg.get("name")
         ver  = pkg.get("version")
         labels = {"type": (pkg.get("type") or pkg.get("packageType") or "").lower()}
         findings.append(_mk("syft","SBOM-PACKAGE","INFO","Image", f"{name}:{ver}", f"Package {name}:{ver} present", labels=labels))
+    # some older syft formats:
+    for img in data.get("artifacts", []) if isinstance(data.get("artifacts"), dict) else []:
+        pass
     return findings
 
 def from_grype(p: Path) -> List[Dict]:
@@ -392,6 +384,7 @@ def from_grype(p: Path) -> List[Dict]:
 def from_kubescape(p: Path) -> List[Dict]:
     data = load_json(p) or {}
     findings = []
+    # v2 format: controls -> rules -> resources
     for ctrl in data.get("controls", []) or data.get("report", {}).get("controls", []) or []:
         rule = ctrl.get("controlID") or ctrl.get("id") or ctrl.get("name")
         sev  = ctrl.get("severity") or "MEDIUM"
@@ -406,15 +399,16 @@ def from_kubescape(p: Path) -> List[Dict]:
 def from_kubesec(p: Path) -> List[Dict]:
     data = load_json(p)
     findings = []
-    items: List[Any] = []
     if isinstance(data, list):
         items = data
     elif isinstance(data, dict):
         items = data.get("results") or data.get("checks") or []
         if not isinstance(items, list):
             items = [items]
+    else:
+        items = []
     for it in items:
-        rule = (it.get("id") or it.get("selector") or "kubesec")
+        rule = it.get("id") or it.get("selector") or "kubesec"
         sev  = it.get("severity") or "MEDIUM"
         file = (it.get("file") or it.get("target") or it.get("path") or "")
         kind = (it.get("object", {}) or {}).get("kind") or "Object"
@@ -423,50 +417,15 @@ def from_kubesec(p: Path) -> List[Dict]:
         findings.append(_mk("kubesec", rule, sev, kind, name, msg, file=file))
     return findings
 
-def from_kubeaudit(p: Path) -> List[Dict]:
-    data = load_json(p)
-    findings = []
-    items = (data.get("results") if isinstance(data, dict) else data) or []
-    for it in items:
-        rule = it.get("auditResultName") or it.get("name") or "kubeaudit"
-        sev  = it.get("severity") or it.get("level") or "MEDIUM"
-        obj  = it.get("resource") or {}
-        kind = obj.get("kind") or "Object"
-        name = obj.get("name") or "unknown"
-        file = it.get("file") or ""
-        msg  = it.get("message") or it.get("remediation") or it
-        findings.append(_mk("kubeaudit", rule, sev, kind, name, msg, file=file))
-    return findings
-
-def from_kyverno(p: Path) -> List[Dict]:
-    data = load_json(p)
-    findings: List[Dict] = []
-    if not data:
-        return findings
-    # kyverno apply -o json outputs policy reports; normalize common shapes
-    items = []
-    if isinstance(data, dict) and "policyReport" in data:
-        items = data["policyReport"].get("results", [])
-    elif isinstance(data, dict) and "results" in data:
-        items = data["results"]
-    elif isinstance(data, list):
-        items = data
-    for it in items:
-        rule = it.get("policy") or it.get("policyName") or it.get("rule") or "kyverno"
-        sev  = it.get("severity") or it.get("priority") or "MEDIUM"
-        res  = (it.get("resources") or [{}])[0] if isinstance(it.get("resources"), list) else (it.get("resource") or {})
-        kind = res.get("kind") or "Object"
-        name = res.get("name") or "unknown"
-        file = (it.get("file") or "")
-        msg  = it.get("message") or it.get("description") or it
-        findings.append(_mk("kyverno", rule, sev, kind, name, msg, file=file))
-    return findings
-
 # ------------------------
 # collector
 # ------------------------
 
 def _fingerprint(f: Dict) -> str:
+    """
+    Stable hash for deduping: based on sorted JSON of a reduced view
+    so that dicts are never used as set keys.
+    """
     reduced = {
         "tool": f.get("tool", ""),
         "ruleId": f.get("ruleId", ""),
@@ -480,222 +439,56 @@ def _fingerprint(f: Dict) -> str:
     blob = json.dumps(reduced, sort_keys=True, ensure_ascii=False, default=str)
     return hashlib.sha1(blob.encode("utf-8")).hexdigest()
 
-def _issue_key(f: Dict) -> str:
-    """Generate a key for grouping similar issues (ignoring tool name)"""
-    rr = f.get("resourceRef", {}) or {}
-    loc = f.get("location", {}) or {}
-    # Group by: ruleId + resource kind/name + file
-    return f"{f.get('ruleId', 'unknown')}|{rr.get('kind', '')}|{rr.get('name', '')}|{loc.get('file', '')}"
-
-def generate_detection_matrix(findings: List[Dict]) -> Dict[str, Any]:
-    """
-    Generate a matrix showing which tools detected which issues.
-    Returns dict with matrix data and summary statistics.
-    """
-    # Group findings by issue key
-    issue_groups = defaultdict(list)
-    for f in findings:
-        key = _issue_key(f)
-        issue_groups[key].append(f)
-    
-    # Build matrix rows
-    matrix_rows = []
-    all_tools = set()
-    
-    for issue_key, group in issue_groups.items():
-        # Get representative finding (first one)
-        rep = group[0]
-        rr = rep.get("resourceRef", {}) or {}
-        loc = rep.get("location", {}) or {}
-        
-        # Collect which tools detected this issue
-        tools_detected = sorted(set(f.get("tool", "unknown") for f in group))
-        all_tools.update(tools_detected)
-        
-        # Get severity (use highest if multiple)
-        severities = [f.get("severity", "INFO") for f in group]
-        sev_order = {"CRITICAL": 4, "HIGH": 3, "MEDIUM": 2, "LOW": 1, "INFO": 0, "UNKNOWN": 0}
-        max_sev = max(severities, key=lambda s: sev_order.get(s, 0))
-        
-        row = {
-            "ruleId": rep.get("ruleId", "unknown"),
-            "severity": max_sev,
-            "resourceKind": rr.get("kind", ""),
-            "resourceName": rr.get("name", ""),
-            "file": loc.get("file", ""),
-            "detectionCount": len(group),
-            "toolsDetected": tools_detected,
-            "toolCount": len(tools_detected)
-        }
-        matrix_rows.append(row)
-    
-    # Sort by detection count (descending), then by severity
-    matrix_rows.sort(key=lambda r: (-r["detectionCount"], -sev_order.get(r["severity"], 0)))
-    
-    # Generate summary statistics
-    all_tools_list = sorted(all_tools)
-    tool_stats = {tool: {"total": 0, "unique": 0} for tool in all_tools_list}
-    
-    for row in matrix_rows:
-        for tool in row["toolsDetected"]:
-            tool_stats[tool]["total"] += 1
-            if row["toolCount"] == 1:
-                tool_stats[tool]["unique"] += 1
-    
-    return {
-        "matrix": matrix_rows,
-        "toolStats": tool_stats,
-        "allTools": all_tools_list,
-        "totalIssues": len(matrix_rows),
-        "totalFindings": len(findings)
-    }
-
-def save_detection_matrix_csv(matrix_data: Dict[str, Any], output_path: Path):
-    """Save detection matrix as CSV with tool columns"""
-    log(f"Building CSV matrix with {len(matrix_data['matrix'])} rows", "INFO")
-    all_tools = matrix_data["allTools"]
-    
-    try:
-        with output_path.open("w", encoding="utf-8", newline="") as f:
-            # Create headers
-            headers = ["RuleID", "Severity", "ResourceKind", "ResourceName", "File", "DetectionCount", "ToolCount"]
-            headers.extend(all_tools)  # Add a column for each tool
-            
-            writer = csv.DictWriter(f, fieldnames=headers)
-            writer.writeheader()
-            
-            for row in matrix_data["matrix"]:
-                csv_row = {
-                    "RuleID": row["ruleId"],
-                    "Severity": row["severity"],
-                    "ResourceKind": row["resourceKind"],
-                    "ResourceName": row["resourceName"],
-                    "File": row["file"],
-                    "DetectionCount": row["detectionCount"],
-                    "ToolCount": row["toolCount"]
-                }
-                # Mark which tools detected this issue
-                for tool in all_tools:
-                    csv_row[tool] = "✓" if tool in row["toolsDetected"] else ""
-                
-                writer.writerow(csv_row)
-        
-        log(f"CSV matrix written successfully", "INFO")
-    except Exception as e:
-        log(f"Failed to write CSV matrix: {e}", "ERROR")
-        raise
-
 def collect_all() -> List[Dict]:
-    log("Starting collection from all raw files", "INFO")
     findings: List[Dict] = []
-    
-    parsers = [
-        ("kubelinter", RAW_DIR / "kubelinter_raw.json", from_kubelinter),
-        ("polaris", RAW_DIR / "polaris_raw.json", from_polaris),
-        ("trivy-config", RAW_DIR / "trivy_config_raw.json", from_trivy_config),
-        ("kube-score", RAW_DIR / "kubescore_raw.json", from_kubescore),
-        ("yamllint", RAW_DIR / "yamllint_raw.txt", from_yamllint),
-        ("checkov", RAW_DIR / "checkov_raw.json", from_checkov),
-        ("terrascan", RAW_DIR / "terrascan_raw.json", from_terrascan),
-        ("gitleaks", RAW_DIR / "gitleaks_raw.json", from_gitleaks),
-        ("trufflehog", RAW_DIR / "trufflehog_raw.json", from_trufflehog),
-        ("kubescape", RAW_DIR / "kubescape_raw.json", from_kubescape),
-        ("kubesec", RAW_DIR / "kubesec_raw.json", from_kubesec),
-        ("kubeaudit", RAW_DIR / "kubeaudit_raw.json", from_kubeaudit),
-        ("kyverno", RAW_DIR / "kyverno_raw.json", from_kyverno),
-    ]
-    
-    for tool_name, file_path, parser_func in parsers:
-        try:
-            log(f"Parsing {tool_name} from {file_path.name}", "INFO")
-            tool_findings = parser_func(file_path)
-            findings.extend(tool_findings)
-            log(f"  → {tool_name}: {len(tool_findings)} findings", "INFO")
-        except Exception as e:
-            log(f"  → {tool_name}: FAILED - {e}", "ERROR")
-            # Continue processing other tools even if one fails
+    findings += from_kubelinter(RAW_DIR / "kubelinter_raw.json")
+    findings += from_polaris(RAW_DIR / "polaris_raw.json")
+    findings += from_trivy_config(RAW_DIR / "trivy_config_raw.json")
+    findings += from_kubescore(RAW_DIR / "kubescore_raw.json")
+    findings += from_yamllint(RAW_DIR / "yamllint_raw.txt")
+    findings += from_checkov(RAW_DIR / "checkov_raw.json")
+    findings += from_terrascan(RAW_DIR / "terrascan_raw.json")
+    findings += from_gitleaks(RAW_DIR / "gitleaks_raw.json")
+    findings += from_trufflehog(RAW_DIR / "trufflehog_raw.json")
+    # Optional extras; load_json returns [] for bad placeholders, so these are safe:
+    findings += from_kubescape(RAW_DIR / "kubescape_raw.json")
+    findings += from_kubesec(RAW_DIR / "kubesec_raw.json")
 
-    log(f"Collection complete: {len(findings)} total findings", "INFO")
-    return findings
+    seen: set[str] = set()
+    deduped: List[Dict] = []
+    for f in findings:
+        key = _fingerprint(f)
+        if key in seen:
+            continue
+        seen.add(key)
+        deduped.append(f)
+    return deduped
 
 def main():
-    log("="*60, "INFO")
-    log("SafeFixK8s Normalizer Starting", "INFO")
-    log(f"Log file: {LOG_FILE}", "INFO")
-    log("="*60, "INFO")
+    bundle = {
+        "version": "1.0",
+        "generatedAt": now_iso(),
+        "source": "SafeFixK8s/Normalizer",
+        "findings": collect_all()
+    }
+    OUT.parent.mkdir(parents=True, exist_ok=True)
+    with OUT.open("w", encoding="utf-8") as f:
+        json.dump(bundle, f, ensure_ascii=False, indent=2)
+    print(f"[ok] wrote {OUT} with {len(bundle['findings'])} findings.")
     
-    try:
-        findings = collect_all()
-        
-        log("Building normalized findings bundle", "INFO")
-        bundle = {
-            "version": "1.0",
-            "generatedAt": now_iso(),
-            "source": "SafeFixK8s/Normalizer",
-            "findings": findings
-        }
-        
-        log(f"Writing normalized findings to {OUT}", "INFO")
-        OUT.parent.mkdir(parents=True, exist_ok=True)
-        with OUT.open("w", encoding="utf-8") as f:
-            json.dump(bundle, f, ensure_ascii=False, indent=2)
-        log(f"✓ Wrote {OUT} with {len(bundle['findings'])} findings (with duplicates)", "INFO")
-        
-        # Generate detection matrix
-        log("Generating detection matrix", "INFO")
-        matrix_data = generate_detection_matrix(findings)
-        
-        # Save matrix as JSON
-        log(f"Writing matrix JSON to {MATRIX_JSON}", "INFO")
-        with MATRIX_JSON.open("w", encoding="utf-8") as f:
-            json.dump(matrix_data, f, ensure_ascii=False, indent=2)
-        log(f"✓ Matrix JSON saved to {MATRIX_JSON}", "INFO")
-        
-        # Save matrix as CSV
-        log(f"Writing matrix CSV to {MATRIX_CSV}", "INFO")
-        save_detection_matrix_csv(matrix_data, MATRIX_CSV)
-        log(f"✓ Matrix CSV saved to {MATRIX_CSV}", "INFO")
-        
-        # Print summary
-        log("", "INFO")
-        log("="*60, "INFO")
-        log("TOOL DETECTION SUMMARY", "INFO")
-        log("="*60, "INFO")
-        log(f"Total unique issues: {matrix_data['totalIssues']}", "INFO")
-        log(f"Total findings (with duplicates): {matrix_data['totalFindings']}", "INFO")
-        log("", "INFO")
-        log("Per-Tool Statistics:", "INFO")
-        log(f"{'Tool':<20} {'Total':<10} {'Unique':<10}", "INFO")
-        log("-"*40, "INFO")
-        for tool, stats in sorted(matrix_data["toolStats"].items()):
-            log(f"{tool:<20} {stats['total']:<10} {stats['unique']:<10}", "INFO")
-        log("="*60, "INFO")
-        log("", "INFO")
-        
-        # Delete all raw files after successful normalization (keep logs/)
-        log("Starting cleanup of raw files", "INFO")
-        deleted_count = 0
-        if RAW_DIR.exists():
-            for raw_file in RAW_DIR.iterdir():
-                if raw_file.is_file():
-                    try:
-                        raw_file.unlink()
-                        deleted_count += 1
-                        log(f"Deleted {raw_file.name}", "INFO")
-                    except Exception as e:
-                        log(f"Failed to delete {raw_file.name}: {e}", "ERROR")
-        log(f"✓ Cleanup complete: removed {deleted_count} raw file(s)", "INFO")
-        
-        log("="*60, "INFO")
-        log("Normalizer completed successfully", "INFO")
-        log(f"Log saved to: {LOG_FILE}", "INFO")
-        log("="*60, "INFO")
-        
-    except Exception as e:
-        log(f"FATAL ERROR: {e}", "ERROR")
-        import traceback
-        log(traceback.format_exc(), "ERROR")
-        sys.exit(1)
+    # Delete all raw files after successful normalization
+    deleted_count = 0
+    if RAW_DIR.exists():
+        for raw_file in RAW_DIR.iterdir():
+            # Skip directories (e.g., logs/)
+            if raw_file.is_file():
+                try:
+                    raw_file.unlink()
+                    deleted_count += 1
+                    print(f"[cleanup] deleted {raw_file.name}")
+                except Exception as e:
+                    warn(f"Failed to delete {raw_file.name}: {e}")
+    print(f"[cleanup] removed {deleted_count} raw file(s).")
 
 if __name__ == "__main__":
     main()
