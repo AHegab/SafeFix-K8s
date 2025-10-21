@@ -181,3 +181,85 @@ cython_debug/
 .cursorindexingignore
 /docker-bench-security
 /images
+
+# ============================================================================
+# SafeFixK8s Specific Ignores
+# ============================================================================
+
+# Scanner output files - raw results from security tools
+detection/output/raw/*.json
+detection/output/raw/*.txt
+!detection/output/raw/.gitkeep
+
+# Scanner logs
+detection/output/logs/*.log
+detection/output/logs/*.txt
+!detection/output/logs/.gitkeep
+
+# Normalized output
+output/normalized_findings.json
+output/*.json
+!output/.gitkeep
+
+# Temporary files
+temp_show.py
+*.tmp
+*.temp
+
+# Tool-specific outputs
+detection/results.json
+detection/kubescape_*.json
+detection/kubeaudit_*.json
+
+# Test outputs and reports
+tests/reports/*.html
+tests/reports/*.json
+tests/reports/*.xml
+tests/test_output.json
+
+# Docker images cache
+detection/images/*
+!detection/images/.gitkeep
+
+# PowerShell debug/transcript files
+*.ps1.log
+Transcript-*.txt
+
+# VS Code workspace settings (optional - uncomment if you don't want to share)
+# .vscode/settings.json
+# .vscode/launch.json
+
+# Windows specific
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# macOS specific
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Tool downloads and binaries
+*.exe
+*.msi
+*.zip
+kubeaudit.exe
+kubescape.exe
+!detection/tools/**/*.exe
+
+# Sensitive data and credentials
+*.key
+*.pem
+*.crt
+secrets/
+credentials/
+
+# Large files that shouldn't be in repo
+*.tar
+*.tar.gz
+*.iso
+
+# Backup files
+*.bak
+*.backup
+*~
