@@ -4,8 +4,9 @@ A comprehensive Kubernetes YAML security scanning framework that aggregates find
 
 ## Overview
 
-SafeFixK8s scans Kubernetes YAML files for security misconfigurations, vulnerabilities, and best practice violations using 8 different security tools:
+SafeFixK8s scans Kubernetes YAML files for security misconfigurations, vulnerabilities, and best practice violations using **11 security tools** (8 core + 3 extended):
 
+### Core Tools (8)
 - **KubeAudit** - Security auditing tool for Kubernetes clusters
 - **Kubescape** - ARMO's comprehensive security platform
 - **KubeLinter** - Static analysis tool for Kubernetes YAML files
@@ -15,11 +16,20 @@ SafeFixK8s scans Kubernetes YAML files for security misconfigurations, vulnerabi
 - **Yamllint** - YAML file linter
 - **KubeConform** - Kubernetes resource validation
 
+### Extended Tools (3) - NEW!
+- **kube-bench** - CIS Kubernetes Benchmark compliance checker
+- **rbac-police** - RBAC and permissions analysis tool
+- **pluto** - Deprecated Kubernetes API version detector
+
 ## Features
 
-- **Multi-tool scanning**: Leverages 8 different security tools for comprehensive coverage
+- **Multi-tool scanning**: Leverages 11 different security tools for comprehensive coverage
+- **Extended coverage**: Includes CIS benchmarks, RBAC analysis, and API deprecation detection
 - **Unified output**: Normalizes findings from all tools into a single JSON format
 - **Flexible execution**: Supports both local CLI tools and Docker-based scanning
+- **Two scan modes**: 
+  - `Det-RunLean`: Fast scan with 8 core tools
+  - `Det-RunExtended`: Comprehensive scan with all 11 tools
 - **Detailed reporting**: Includes timing information and tool-specific results
 - **Error handling**: Graceful handling of tool failures with placeholder outputs
 
@@ -38,6 +48,8 @@ Other tools will automatically use Docker containers if not installed locally.
 
 ## Installation
 
+### Basic Installation
+
 1. Clone the repository:
 ```bash
 git clone https://github.com/AHegab/SafeFixK8s.git
@@ -48,6 +60,61 @@ cd SafeFixK8s
 ```powershell
 .\setup-images.ps1
 ```
+
+### Installing Extended Tools (Optional)
+
+#### kube-bench (CIS Kubernetes Benchmark Compliance)
+
+**Windows (Automated):**
+```powershell
+# Run as Administrator
+.\install-kube-bench.ps1
+```
+
+**Linux/macOS (Automated):**
+```bash
+# Run with sudo or as root
+sudo ./install-kube-bench.sh
+```
+
+**Manual Installation:**
+- Download from: https://github.com/aquasecurity/kube-bench/releases/tag/v0.13.0
+- Extract and add to PATH
+- Verify: `kube-bench version`
+
+**Note:** kube-bench is designed to run **on Kubernetes cluster nodes** (master/worker), not for static YAML analysis. It performs CIS benchmark compliance checks on running cluster components.
+
+#### pluto (Deprecated API Detection)
+
+**Windows (Chocolatey):**
+```powershell
+choco install pluto
+```
+
+**macOS/Linux (Homebrew):**
+```bash
+brew install FairwindsOps/tap/pluto
+```
+
+**Manual Installation:**
+- Download from: https://github.com/FairwindsOps/pluto/releases
+- Extract and add to PATH
+- Verify: `pluto version`
+
+#### rbac-police (RBAC Analysis)
+
+The framework includes a built-in PowerShell-based RBAC analyzer. For advanced cluster-based RBAC analysis:
+
+**kubectl plugin:**
+```bash
+# Using krew
+kubectl krew install rbac-police
+
+# Or download from
+# https://github.com/FairwindsOps/rbac-police/releases
+```
+
+**Note:** The built-in implementation works with RBAC manifest files and requires no additional installation.
 
 ## Usage
 
@@ -62,17 +129,26 @@ cd detection
 
 ### Scan a Directory
 
-Scan all Kubernetes YAML files in a directory:
-
+**Option 1: Fast Scan (8 core tools)**
 ```powershell
 Det-RunLean "..\tests"
 ```
 
+**Option 2: Extended Scan (11 tools including CIS, RBAC, API deprecation)**
+```powershell
+Det-RunExtended "..\tests"
+```
+
 This will:
 1. Scan all YAML files in the `tests` directory
-2. Run all 8 security tools
+2. Run selected security tools (8 or 11)
 3. Save raw results to `detection/output/raw/`
 4. Display timing information for each tool
+
+**Recommendation:** Use `Det-RunLean` for regular scans. Use `Det-RunExtended` when you need:
+- CIS benchmark compliance checks
+- Deep RBAC permissions analysis
+- Kubernetes API deprecation detection
 
 ### Run Individual Tools
 
@@ -102,11 +178,18 @@ Det-Yamllint "..\tests"
 
 # Scan with KubeConform
 Det-KubeConform "..\tests"
+
+# NEW: Extended tools
+Det-KubeBench "..\tests"      # CIS Benchmarks
+Det-RBACPolice "..\tests"     # RBAC Analysis
+Det-Pluto "..\tests"          # API Deprecation
 ```
 
 ### Output Locations
 
 Raw tool outputs are saved to:
+
+**Core Tools:**
 ```
 detection/output/raw/
 ├── kubeaudit_raw.json
@@ -117,6 +200,15 @@ detection/output/raw/
 ├── kubescore_raw.json
 ├── kubeconform_raw.json
 └── yamllint_raw.txt
+```
+
+**Extended Tools (when using Det-RunExtended):**
+```
+detection/output/raw/
+├── ... (core tools above)
+├── kube-bench_raw.json       # CIS Benchmark results
+├── rbacpolice_raw.json       # RBAC analysis results
+└── pluto_raw.json            # Deprecated API results
 ```
 
 ## Directory Structure
@@ -216,6 +308,70 @@ cat ..\output\normalized_findings.json
 - Validates Kubernetes resources against schemas
 - JSON output format
 - Strict validation mode
+
+### kube-bench (Extended Tool)
+- **Purpose**: CIS Kubernetes Benchmark compliance checking
+- **Requirement**: Must run on actual Kubernetes cluster nodes
+- **Output**: JSON format with CIS benchmark test results
+- **Limitation**: Does not analyze YAML manifests - requires runtime access to cluster components
+
+**Usage on cluster nodes:**
+```bash
+# On master node
+sudo kube-bench run --targets master --json
+
+# On worker node
+sudo kube-bench run --targets node --json
+
+# Full cluster scan (run on appropriate nodes)
+sudo kube-bench run --targets master,node,etcd,policies --json
+```
+
+**Check version:**
+```bash
+kube-bench version
+```
+
+**Available test targets:**
+- `master` - Control plane components (API server, scheduler, controller-manager)
+- `node` - Worker node components (kubelet, proxy)
+- `etcd` - Etcd data store
+- `policies` - Security policies and RBAC
+
+**Configuration location:**
+- Windows: `C:\Program Files\kube-bench\cfg\`
+- Linux: `/etc/kube-bench/` or `/opt/kube-bench/cfg/`
+
+### rbac-police (Extended Tool)
+- **Purpose**: RBAC permissions analysis
+- **Implementation**: Built-in PowerShell analyzer for manifests
+- **Output**: JSON format with permission findings
+- **Detects**: Wildcard permissions, overly permissive roles
+
+**What it checks:**
+- Wildcard verbs (`verbs: ["*"]`)
+- Wildcard resources (`resources: ["*"]`)
+- Wildcard API groups (`apiGroups: ["*"]`)
+
+### pluto (Extended Tool)
+- **Purpose**: Deprecated Kubernetes API detection
+- **Requirement**: Local CLI installation
+- **Output**: JSON format with deprecated API findings
+- **Works with**: Any Kubernetes manifest files (offline analysis)
+
+**Usage:**
+```bash
+# Scan directory for deprecated APIs
+pluto detect-files -d ./manifests --output json
+
+# Scan for specific Kubernetes version
+pluto detect-files -d ./manifests --target-versions k8s=v1.29.0 --output json
+```
+
+**Helpful for:**
+- Planning Kubernetes version upgrades
+- Identifying APIs removed in newer versions
+- Ensuring manifest compatibility
 
 ## Troubleshooting
 

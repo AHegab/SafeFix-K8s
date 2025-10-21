@@ -1,14 +1,28 @@
 # normalizer/normalize_all.py
-# Robust normalizer for SafeFixK8s outputs
+# Robust normalizer for SafeFixK8s outputs + Consensus (N tools agree)
 from __future__ import annotations
-import json, hashlib, sys, re
+
+import argparse
+import csv
+import hashlib
+import json
+import os
+import re
+import sys
 from pathlib import Path
 from datetime import datetime
-from typing import Any, Dict, Iterable, List
+from typing import Any, Dict, Iterable, List, Tuple, Optional, Set
+
+# ------------------------
+# defaults / constants
+# ------------------------
 
 ROOT    = Path(__file__).resolve().parents[1]
 RAW_DIR = ROOT / "detection" / "output" / "raw"
-OUT     = ROOT / "output" / "normalized_findings.json"
+OUT_JSON= ROOT / "output" / "normalized_findings.json"
+OUT_DIR = ROOT / "output"
+
+SEV_ORDER = {"INFO": 1, "LOW": 2, "MEDIUM": 3, "HIGH": 4, "CRITICAL": 5}
 
 # ------------------------
 # helpers
@@ -18,7 +32,10 @@ def now_iso() -> str:
     return datetime.utcnow().isoformat(timespec="microseconds") + "Z"
 
 def warn(msg: str) -> None:
-    print(f"[WARN] {msg}")
+    print(f"[WARN] {msg}", file=sys.stderr)
+
+def note(msg: str) -> None:
+    print(f"[info] {msg}")
 
 def _hash_id(parts: Iterable[str]) -> str:
     h = hashlib.md5()
@@ -26,32 +43,24 @@ def _hash_id(parts: Iterable[str]) -> str:
         if p is None:
             p = ""
         if not isinstance(p, str):
-            p = json.dumps(p, sort_keys=True, ensure_ascii=False)
+            p = json.dumps(p, sort_keys=True, ensure_ascii=False, default=str)
         h.update(p.encode("utf-8", errors="ignore"))
         h.update(b"|")
     return h.hexdigest()
 
-def from_kubeaudit(p: Path) -> List[Dict]:
-    data = load_json(p)
-    findings: List[Dict] = []
-    items = data if isinstance(data, list) else ([data] if isinstance(data, dict) else [])
-    for it in items:
-        if not isinstance(it, dict):
-            continue
-        rule = it.get("auditResultName") or it.get("name") or it.get("id") or "kubeaudit"
-        sev = (it.get("severity") or "warning").upper()
-        if sev == "ERROR": sev = "HIGH"
-        elif sev == "WARNING": sev = "MEDIUM"
-        elif sev == "INFO": sev = "LOW"
-        obj = it.get("resource") or {}
-        kind = obj.get("kind") or "Object"
-        name = obj.get("name") or "unknown"
-        ns = obj.get("namespace")
-        msg = it.get("message") or it.get("remediation") or rule
-        labels = {}
-        if ns: labels["namespace"] = ns
-        findings.append(_mk("kubeaudit", rule, sev, kind, name, msg, labels=labels))
-    return findings
+def relpath_or_same(p: str) -> str:
+    """Normalize file paths to be relative to repo root when possible."""
+    try:
+        if not p:
+            return ""
+        pp = Path(p)
+        # If it's already relative, keep it
+        if not pp.is_absolute():
+            return str(pp.as_posix())
+        # Try to make relative to ROOT
+        return str(pp.relative_to(ROOT).as_posix())
+    except Exception:
+        return p.replace("\\", "/")
 
 def load_json(p: Path) -> Any:
     """
@@ -73,9 +82,9 @@ def load_json(p: Path) -> Any:
         if not text:
             return []
 
-        # Skip obvious placeholders or shell error text
+        # Skip obvious placeholders or docker error text
         low = text.lower()
-        if ("placeholder" in low) or ("error response from daemon" in low) or ("exec /kubeaudit" in low):
+        if ("placeholder" in low) or ("error response from daemon" in low):
             warn(f"Placeholder/diagnostic text in {p}; skipping.")
             return []
 
@@ -103,7 +112,7 @@ def load_json(p: Path) -> Any:
     except Exception as e:
         warn(f"Failed to read {p}: {e}")
         return []
-    
+
 def iter_json_lines(p: Path) -> Iterable[Any]:
     """Yield JSON objects from a file that may contain JSON-lines with noise."""
     if not p.exists() or p.stat().st_size == 0:
@@ -114,11 +123,9 @@ def iter_json_lines(p: Path) -> Iterable[Any]:
             s = ln.strip()
             if not s:
                 continue
-            # ignore Go log lines like {"level":"info-0",...} that *are* JSON too – still parse them
             try:
                 yield json.loads(s)
             except Exception:
-                # skip non-JSON garbage lines
                 continue
 
 def safe_text(p: Path) -> str:
@@ -130,46 +137,32 @@ def safe_text(p: Path) -> str:
     except Exception as e:
         warn(f"Text read failed {p}: {e}")
         return ""
-    
+
 def sev_norm(s: Any, default="INFO") -> str:
     if s is None:
         return default
     s = str(s)
     su = s.upper()
     sl = s.lower()
-    if su in {"LOW","MEDIUM","HIGH","CRITICAL","INFO","UNKNOWN"}:
+    if su in SEV_ORDER:
         return su
     if sl == "critical": return "CRITICAL"
     if sl in {"warning","warn"}: return "MEDIUM"
-    if sl in {"advice","info","ok","passed","bestpractice","best_practice"}: return "INFO"
+    if sl in {"advice","ok","passed","bestpractice","best_practice","info"}: return "INFO"
     if su.startswith("WARN"): return "MEDIUM"
     if su.startswith("ERR"): return "HIGH"
     return default
 
-
 def _norm_msg(msg: Any) -> str:
     if isinstance(msg, dict):
-        for k in ("Message", "message", "summary", "text"):
+        for k in ("Message", "message", "summary", "text", "reason", "description"):
             v = msg.get(k)
             if isinstance(v, str):
                 return v
-        return json.dumps(msg, sort_keys=True, ensure_ascii=False)
+        return json.dumps(msg, sort_keys=True, ensure_ascii=False, default=str)
     if msg is None:
         return ""
     return str(msg)
-
-def _dedupe_key(f: Dict[str, Any]) -> tuple:
-    rr = f.get("resourceRef", {}) or {}
-    loc = f.get("location", {}) or {}
-    return (
-        f.get("tool",""),
-        f.get("ruleId",""),
-        rr.get("kind",""),
-        rr.get("name",""),
-        loc.get("file",""),
-        int(loc.get("line", 0) or 0),
-        _norm_msg(f.get("message"))
-    )
 
 def _mk(
     tool: str,
@@ -181,23 +174,63 @@ def _mk(
     file: str | None = None,
     line: int | None = None,
     labels: Dict[str, Any] | None = None,
+    namespace: Optional[str] = None,
+    tool_version: Optional[str] = None,
+    raw_file: Optional[str] = None,
 ) -> Dict[str, Any]:
     msg = _norm_msg(message)
-    fid = _hash_id([tool, rule, kind, name, file, str(line or 0), msg])
-    return {
-        "findingId": fid,
+    file = relpath_or_same(file or "")
+    rid = _hash_id([tool, rule, kind, namespace or "", name, file, str(line or 0), msg])
+    d = {
+        "findingId": rid,
         "tool": tool,
-        "ruleId": rule or "unknown",
+        "ruleId": (rule or "unknown"),
         "severity": sev_norm(severity, default="INFO"),
-        "resourceRef": {"kind": kind or "Object", "name": name or "unknown"},
+        "resourceRef": {
+            "kind": (kind or "Object"),
+            "name": (name or "unknown"),
+            "namespace": namespace or ""
+        },
         "message": msg if isinstance(message, str) else message,
-        "location": {"file": file or "", "line": line},
+        "location": {"file": file, "line": line},
         "labels": labels or {}
     }
+    if tool_version:
+        d["toolVersion"] = tool_version
+    if raw_file:
+        d["rawFile"] = raw_file
+    return d
+
+def highest_severity(severities: Iterable[str]) -> str:
+    top = "INFO"
+    for s in severities:
+        ss = sev_norm(s, "INFO")
+        if SEV_ORDER[ss] > SEV_ORDER[top]:
+            top = ss
+    return top
 
 # ------------------------
-# mappers
+# loaders: existing tools
 # ------------------------
+
+def from_kubeaudit(p: Path) -> List[Dict]:
+    data = load_json(p)
+    findings: List[Dict] = []
+    items = data if isinstance(data, list) else ([data] if isinstance(data, dict) else [])
+    for it in items:
+        if not isinstance(it, dict):
+            continue
+        # kubeaudit outputs vary; normalize common fields
+        rule = it.get("auditResultName") or it.get("name") or it.get("id") or "kubeaudit"
+        sev_raw = it.get("severity") or it.get("level") or "MEDIUM"
+        sev = sev_norm(sev_raw)
+        obj = it.get("resource") or {}
+        kind = obj.get("kind") or "Object"
+        name = obj.get("name") or "unknown"
+        ns = obj.get("namespace") or obj.get("ns")
+        msg = it.get("message") or it.get("remediation") or rule
+        findings.append(_mk("kubeaudit", rule, sev, kind, name, msg, labels={}, namespace=ns, raw_file=str(p)))
+    return findings
 
 def from_kubelinter(p: Path) -> List[Dict]:
     data = load_json(p) or {}
@@ -205,46 +238,37 @@ def from_kubelinter(p: Path) -> List[Dict]:
     for it in data.get("Reports", []) or data.get("reports", []) or []:
         if not isinstance(it, dict):
             continue
-        # kube-linter JSON v2/v1 vary; try generic fields
         tool = "kubelinter"
-        # Check can be a string directly or nested object
         check_field = it.get("Check")
         if isinstance(check_field, dict):
             rule = check_field.get("name") or check_field.get("id")
         else:
             rule = check_field or it.get("check")
-        
-        # Get message from Diagnostic or directly
         diag = it.get("Diagnostic", {})
         if isinstance(diag, dict):
             msg = diag.get("Message") or diag.get("message")
         else:
             msg = it.get("Message") or it.get("message")
-        
         sev  = it.get("Severity") or it.get("severity") or "MEDIUM"
         obj  = it.get("Object", {}) or it.get("object", {}) or {}
-        
-        # Handle K8sObject nested structure
         k8s_obj = obj.get("K8sObject") or obj.get("k8sObject") or {}
         if isinstance(k8s_obj, dict):
             gvk = k8s_obj.get("GroupVersionKind") or {}
             kind = gvk.get("Kind") or k8s_obj.get("kind") or "Object"
             name = k8s_obj.get("Name") or k8s_obj.get("name") or "unknown"
+            ns   = k8s_obj.get("Namespace") or k8s_obj.get("namespace")
         else:
             kind = obj.get("kind") or "Object"
             name = obj.get("name") or "unknown"
-        
-        # Get file from Metadata
+            ns   = obj.get("namespace")
         metadata = obj.get("Metadata") or obj.get("metadata") or {}
         file = metadata.get("FilePath") or metadata.get("filePath") or obj.get("file") or ""
-        
-        findings.append(_mk(tool, rule, sev, kind, name, {"Message": msg or rule}, file=file))
+        findings.append(_mk(tool, rule, sev, kind, name, {"Message": msg or rule}, file=file, namespace=ns, raw_file=str(p)))
     return findings
 
 def from_polaris(p: Path) -> List[Dict]:
     data = load_json(p) or {}
     findings = []
-    # Polaris structure: Results -> each has Results (checks) and PodResult
     for res in data.get("Results", []) or data.get("results", []):
         if not isinstance(res, dict):
             continue
@@ -252,27 +276,21 @@ def from_polaris(p: Path) -> List[Dict]:
         name = res.get("Name") or res.get("name") or "unknown"
         namespace = res.get("Namespace") or res.get("namespace") or ""
         file = res.get("FilePath") or res.get("filePath") or ""
-        
-        # Process resource-level checks
         checks_dict = res.get("Results", {}) or res.get("results", {})
         if isinstance(checks_dict, dict):
             for check_id, check_data in checks_dict.items():
                 if not isinstance(check_data, dict):
                     continue
-                # Only report failures (Success: false)
                 if check_data.get("Success", True):
                     continue
                 rule = check_data.get("ID") or check_id
                 sev = check_data.get("Severity") or check_data.get("severity") or "INFO"
-                # Map polaris severity: danger->HIGH, warning->MEDIUM
-                if sev.lower() == "danger":
+                if str(sev).lower() == "danger":
                     sev = "HIGH"
-                elif sev.lower() == "warning":
+                elif str(sev).lower() == "warning":
                     sev = "MEDIUM"
                 msg = check_data.get("Message") or check_data.get("message") or rule
-                findings.append(_mk("polaris", rule, sev, kind, name, msg, file=file))
-        
-        # Process pod-level checks
+                findings.append(_mk("polaris", rule, sev, kind, name, msg, file=file, namespace=namespace, raw_file=str(p)))
         pod_result = res.get("PodResult") or res.get("podResult")
         if isinstance(pod_result, dict):
             pod_checks = pod_result.get("Results", {}) or pod_result.get("results", {})
@@ -284,12 +302,12 @@ def from_polaris(p: Path) -> List[Dict]:
                         continue
                     rule = check_data.get("ID") or check_id
                     sev = check_data.get("Severity") or check_data.get("severity") or "INFO"
-                    if sev.lower() == "danger":
+                    if str(sev).lower() == "danger":
                         sev = "HIGH"
-                    elif sev.lower() == "warning":
+                    elif str(sev).lower() == "warning":
                         sev = "MEDIUM"
                     msg = check_data.get("Message") or check_data.get("message") or rule
-                    findings.append(_mk("polaris", rule, sev, kind, name, msg, file=file))
+                    findings.append(_mk("polaris", rule, sev, kind, name, msg, file=file, namespace=namespace, raw_file=str(p)))
     return findings
 
 def from_trivy_config(p: Path) -> List[Dict]:
@@ -298,12 +316,14 @@ def from_trivy_config(p: Path) -> List[Dict]:
     for r in data.get("Results", []) or data.get("results", []) or []:
         file = r.get("Target") or r.get("target") or ""
         for m in r.get("Misconfigurations", []) or r.get("misconfigurations", []) or []:
-            rule = m.get("ID") or m.get("id")
-            sev  = m.get("Severity") or m.get("severity")
-            msg  = m.get("Message") or m.get("message")
+            rule = m.get("ID") or m.get("id") or "unknown"
+            sev  = m.get("Severity") or m.get("severity") or "INFO"
+            msg  = m.get("Message") or m.get("message") or rule
             kind = "Object"
             name = "unknown"
-            findings.append(_mk("trivy-config", rule, sev, kind, name, msg, file=file, labels={"url": m.get("PrimaryURL") or m.get("primaryURL")}))
+            ns   = None
+            labels = {"url": m.get("PrimaryURL") or m.get("primaryURL")}
+            findings.append(_mk("trivy-config", rule, sev, kind, name, msg, file=file, labels=labels, namespace=ns, raw_file=str(p)))
     return findings
 
 def from_kubescore(p: Path) -> List[Dict]:
@@ -311,31 +331,27 @@ def from_kubescore(p: Path) -> List[Dict]:
     findings: List[Dict] = []
     if not data:
         return findings
-
     items = data if isinstance(data, list) else [data]
-
     for item in items:
         objmeta = item.get("object", {}) if isinstance(item, dict) else {}
         kind = (objmeta.get("kind") or item.get("kind") or "Object") if isinstance(item, dict) else "Object"
         name = (objmeta.get("name") or item.get("name") or "unknown") if isinstance(item, dict) else "unknown"
+        ns   = (objmeta.get("namespace") or item.get("namespace"))
         file = ""
         if isinstance(item, dict):
             file = item.get("fileName") or item.get("filename") or item.get("file") or ""
-
         checks = []
         if isinstance(item, dict) and isinstance(item.get("checks"), list):
             checks = item["checks"]
         elif isinstance(item, dict) and any(k in item for k in ("check","id","grade","severity","comment","comments","message")):
             checks = [item]
-
         for chk in checks:
             rule = (chk.get("check") or chk.get("id") or chk.get("name") or "unknown")
             raw_sev = (chk.get("grade") or chk.get("severity") or chk.get("type") or "MEDIUM")
             if str(raw_sev).lower() == "security":
                 raw_sev = "HIGH"
             msg = (chk.get("comment") or chk.get("comments") or chk.get("message") or chk)
-            findings.append(_mk("kube-score", rule, raw_sev, kind, name, msg, file=file))
-
+            findings.append(_mk("kube-score", rule, raw_sev, kind, name, msg, file=file, namespace=ns, raw_file=str(p)))
     return findings
 
 _yamllint_re = re.compile(r"^(?P<file>.+):(?P<line>\d+):(?P<col>\d+):\s\[(?P<severity>\w+)\]\s(?P<message>.+)$")
@@ -346,7 +362,6 @@ def from_yamllint(p: Path) -> List[Dict]:
     for ln in txt.splitlines():
         m = _yamllint_re.match(ln.strip())
         if not m:
-            # try braces warning line (tool sometimes prints different)
             continue
         d = m.groupdict()
         findings.append(_mk(
@@ -357,21 +372,24 @@ def from_yamllint(p: Path) -> List[Dict]:
             name=Path(d["file"]).name,
             message=d["message"],
             file=d["file"],
-            line=int(d["line"])
+            line=int(d["line"]),
+            namespace=None,
+            raw_file=str(p)
         ))
     return findings
+
+# ------------------------
+# loaders: optional/extra tools already scaffolded
+# ------------------------
 
 def from_checkov(p: Path) -> List[Dict]:
     data = load_json(p) or {}
     findings: List[Dict] = []
-
-    # Checkov may return an object OR a list of report objects
     items: List[Dict] = []
     if isinstance(data, list):
         items = [d for d in data if isinstance(d, dict)]
     elif isinstance(data, dict):
         items = [data]
-
     for item in items:
         res = (item.get("results") or {}) if isinstance(item, dict) else {}
         for r in (res.get("failed_checks") or []):
@@ -384,9 +402,8 @@ def from_checkov(p: Path) -> List[Dict]:
             file = r.get("file_path") or r.get("repo_file_path") or ""
             line = (r.get("file_line_range") or [None, None])[0]
             labels = {"guideline": r.get("guideline")}
-            findings.append(_mk("checkov", rule, sev, kind, name, msg, file=file, line=line, labels=labels))
+            findings.append(_mk("checkov", rule, sev, kind, name, msg, file=file, line=line, labels=labels, raw_file=str(p)))
     return findings
-
 
 def from_terrascan(p: Path) -> List[Dict]:
     data = load_json(p) or {}
@@ -399,85 +416,41 @@ def from_terrascan(p: Path) -> List[Dict]:
         name = v.get("resource", {}).get("name") or "unknown"
         file = v.get("file") or v.get("file_path") or ""
         line = v.get("line")
-        findings.append(_mk("terrascan", rule, sev, kind, name, msg, file=file, line=line))
+        findings.append(_mk("terrascan", rule, sev, kind, name, msg, file=file, line=line, raw_file=str(p)))
     return findings
 
 def from_gitleaks(p: Path) -> List[Dict]:
-    """
-    Parse gitleaks JSON output.
-    Gitleaks outputs a mix of human-readable text and JSON array.
-    We need to extract the JSON array part.
-    
-    Example structure:
-    [
-      {
-        "RuleID": "kubernetes-secret-yaml",
-        "Description": "Possible Kubernetes Secret detected...",
-        "StartLine": 2,
-        "EndLine": 9,
-        "Match": "kind: Secret\\n...",
-        "Secret": "password: cGFzc3dvcmQ=",
-        "File": "/scan/tests/34.unencrypted_secret.yaml",
-        "Fingerprint": "/scan/tests/34.unencrypted_secret.yaml:kubernetes-secret-yaml:2"
-      }
-    ]
-    """
     findings = []
-    
-    # Read file and extract JSON array
     try:
         if not p.exists() or p.stat().st_size == 0:
             return findings
-        
-        # Read as bytes first to handle BOM properly
         raw_bytes = p.read_bytes()
-        
-        # Strip UTF-8 BOM if present
         if raw_bytes.startswith(b"\xef\xbb\xbf"):
             raw_bytes = raw_bytes[3:]
-        
         content = raw_bytes.decode("utf-8", errors="ignore")
-        
-        # Find the JSON array part - look for newline + [ + newline + { pattern
-        # to avoid matching ANSI color codes like [1;3;m
-        import re
-        match = re.search(r'\n\[\s*\n\s*\{', content)
+        import re as _re
+        match = _re.search(r'\n\[\s*\n\s*\{', content)
         if not match:
-            warn(f"No JSON array found in {p.name}")
             return findings
-        
-        # Extract from the matched '[' position
-        json_start = match.start() + 1  # +1 to skip the \n before [
+        json_start = match.start() + 1
         json_part = content[json_start:].strip()
         data = json.loads(json_part)
-        
         if not isinstance(data, list):
             data = [data]
-        
         for item in data:
             if not isinstance(item, dict):
                 continue
-            
-            # Skip if not a finding (log lines)
             rule_id = item.get("RuleID")
             if not rule_id:
                 continue
-            
             description = item.get("Description", "")
             file_path = item.get("File", "")
             start_line = item.get("StartLine", 0)
-            secret_match = item.get("Secret", "")
-            
-            # Extract filename from path
-            file_name = file_path.split("/")[-1] if file_path else "unknown"
-            
-            # Severity based on rule type
+            file_name = Path(file_path).name if file_path else "unknown"
             severity = "HIGH"
-            if "generic" in rule_id.lower():
+            if "generic" in str(rule_id).lower():
                 severity = "MEDIUM"
-            
-            message = description or f"Secret detected: {secret_match[:50]}"
-            
+            message = description or "Secret detected"
             findings.append(_mk(
                 "gitleaks",
                 rule_id,
@@ -486,83 +459,262 @@ def from_gitleaks(p: Path) -> List[Dict]:
                 file_name,
                 message,
                 file=file_path,
-                line=int(start_line)
+                line=int(start_line),
+                raw_file=str(p)
             ))
-    
     except Exception as e:
         warn(f"Failed to parse {p.name}: {e}")
-    
     return findings
 
 def from_trufflehog(p: Path) -> List[Dict]:
-    # trufflehog docker emits a mix of logs (JSON) and results as JSON lines
     findings = []
     for it in iter_json_lines(p):
         if not isinstance(it, dict):
             continue
-        # Known fields: "DetectorName" / "Raw", "Redacted", "SourceMetadata", "Verification"
         detector = it.get("DetectorName") or it.get("DetectorType") or it.get("rule")
         if not detector:
-            # might be a log line like {"level":"info-0", ...}
             continue
         sev = "HIGH"
-        msg = f"High-entropy or credential-like pattern"
+        msg = "High-entropy or credential-like pattern"
         src = (((it.get("SourceMetadata") or {}).get("Data") or {}).get("Filesystem") or {})
         file = src.get("file") or it.get("File") or ""
         line = src.get("line") or it.get("Line") or 0
-        rule = detector
-        findings.append(_mk("trufflehog", rule, sev, "Repository", "\\", msg, file=file, line=int(line or 0)))
+        findings.append(_mk("trufflehog", detector, sev, "Repository", "\\", msg, file=file, line=int(line or 0), raw_file=str(p)))
     return findings
 
-def from_syft(p: Path) -> List[Dict]:
-    data = load_json(p) or {}
-    findings = []
-    for pkg in data.get("artifacts", []) or data.get("artifactsByImage", []) or []:
-        name = pkg.get("name")
-        ver  = pkg.get("version")
-        labels = {"type": (pkg.get("type") or pkg.get("packageType") or "").lower()}
-        findings.append(_mk("syft","SBOM-PACKAGE","INFO","Image", f"{name}:{ver}", f"Package {name}:{ver} present", labels=labels))
-    # some older syft formats:
-    for img in data.get("artifacts", []) if isinstance(data.get("artifacts"), dict) else []:
-        pass
+# ------------------------
+# NEW loaders: kube-bench, rbac-police, pluto
+# ------------------------
+
+def from_kubebench(p: Path) -> List[Dict]:
+    """
+    kube-bench typical JSON structure:
+    {
+      "Controls": [
+        {
+          "id":"1 Master Node Security Configuration",
+          "tests":[
+            {
+              "section":"1.1",
+              "desc":"Ensure ...",
+              "results":[{"test_number":"1.1.1","test_desc":"Ensure ...", "status":"FAIL"|"WARN"|"PASS", "audit":"...", "actual_value":"...", ...}]
+            }
+          ]
+        }
+      ],
+      "node_name":"ip-10-0-0-1", "version":"..."
+    }
+    We emit only FAIL/WARN as findings.
+    """
+    data = load_json(p)
+    if not data:
+        return []
+    
+    findings: List[Dict] = []
+    
+    # Handle list or dict
+    if isinstance(data, list):
+        # If it's a list, it might be a list of result objects or placeholder
+        if not data or not isinstance(data[0], dict):
+            return []
+        # Take first item if it looks like a kube-bench result
+        if "Controls" in data[0] or "controls" in data[0]:
+            data = data[0]
+        else:
+            # It's a list of placeholder objects, skip
+            return []
+    
+    if not isinstance(data, dict):
+        return []
+    
+    node = data.get("node_name") or data.get("nodeName") or "node"
+    version = data.get("version") or data.get("kube-bench_version") or None
+    ctrls = data.get("Controls") or data.get("controls") or []
+    for ctrl in ctrls:
+        tests = ctrl.get("tests") or []
+        for t in tests:
+            results = t.get("results") or []
+            for r in results:
+                status = str(r.get("status","")).upper()
+                if status not in {"FAIL","WARN"}:
+                    continue
+                rule = r.get("test_number") or r.get("id") or t.get("section") or "kube-bench"
+                msg  = r.get("test_desc") or r.get("desc") or "CIS benchmark finding"
+                sev  = "HIGH" if status == "FAIL" else "MEDIUM"
+                findings.append(_mk(
+                    "kube-bench", rule, sev,
+                    kind="Node", name=node, message=msg,
+                    labels={"status": status, "control": ctrl.get("id") or ctrl.get("title")},
+                    tool_version=version, raw_file=str(p)
+                ))
     return findings
 
-def from_grype(p: Path) -> List[Dict]:
-    data = load_json(p) or {}
-    findings = []
-    for m in data.get("matches", []) or []:
-        vuln = (m.get("vulnerability") or {})
-        art  = (m.get("artifact") or {})
-        rule = vuln.get("id") or "unknown"
-        sev  = vuln.get("severity") or "MEDIUM"
-        pkg  = f"{art.get('name')} {art.get('version')}"
-        img  = (data.get("source", {}) or {}).get("target", "") or "image"
-        msg  = f"{pkg} vulnerable"
-        findings.append(_mk("grype", rule, sev, "Image", img, msg))
+def from_rbacpolice(p: Path) -> List[Dict]:
+    """
+    rbac-police JSON varies by version/flags. General patterns include objects describing risky bindings/roles, with fields like:
+      - kind/name/namespace of Role/ClusterRole/RoleBinding
+      - verdict/risk/reason (overly permissive, wildcard verbs/resources)
+      - subjects (serviceAccount, user, group)
+    We capture high-level 'rule' from risk/reason and attach subject/role info in labels.
+    """
+    data = load_json(p)
+    if not data:
+        return []
+    
+    findings: List[Dict] = []
+    
+    # Ensure we have a list
+    items = data if isinstance(data, list) else [data]
+    for it in items:
+        if not isinstance(it, dict):
+            continue
+        kind = it.get("kind") or it.get("objectKind") or "RBAC"
+        name = it.get("name") or it.get("objectName") or "unknown"
+        ns   = it.get("namespace") or ""
+        verdict = str(it.get("verdict") or it.get("result") or "").lower()
+        risk    = it.get("risk") or {}
+        reason  = risk.get("reason") if isinstance(risk, dict) else it.get("reason")
+        rule    = (risk.get("rule") if isinstance(risk, dict) else None) or "rbac-overly-permissive"
+        sev     = "HIGH" if "critical" in str(risk).lower() or "admin" in str(reason).lower() else "MEDIUM"
+        msg     = reason or verdict or "Overly permissive RBAC configuration"
+        labels  = {}
+        if isinstance(risk, dict):
+            labels.update({k: v for k, v in risk.items() if k not in {"reason","rule"}})
+        if it.get("subjects"):
+            labels["subjects"] = it["subjects"]
+        if it.get("roleRef"):
+            labels["roleRef"] = it["roleRef"]
+        findings.append(_mk("rbac-police", rule, sev, kind, name, msg, namespace=ns, labels=labels, raw_file=str(p)))
     return findings
+
+def from_pluto(p: Path) -> List[Dict]:
+    """
+    Pluto JSON (detect) often returns a list of items like:
+      {
+        "name":"my-deploy",
+        "namespace":"default",
+        "kind":"Deployment",
+        "api":"apps/v1beta1",
+        "replacementApi":"apps/v1",
+        "deprecated":"true",
+        "removedIn":"1.16",
+        "deprecatedIn":"1.9",
+        "helmChart":"...", "file":"..."
+      }
+    We emit any deprecated/removed API as a finding.
+    """
+    data = load_json(p)
+    if not data:
+        return []
+    
+    findings: List[Dict] = []
+    
+    # Handle both dict (with "items" key) and direct list
+    if isinstance(data, dict):
+        # Pluto often wraps items in an "items" array
+        items = data.get("items", [])
+        if not items:
+            # Maybe the dict itself is a single finding
+            items = [data] if data.get("api") or data.get("kind") else []
+    else:
+        items = data if isinstance(data, list) else [data]
+    for it in items:
+        if not isinstance(it, dict):
+            continue
+        kind = it.get("kind") or "Object"
+        name = it.get("name") or "unknown"
+        ns   = it.get("namespace") or ""
+        file = it.get("file") or it.get("manifest") or ""
+        api  = it.get("api") or it.get("apiVersion") or ""
+        repl = it.get("replacementApi") or it.get("replacedBy") or ""
+        dep  = str(it.get("deprecated") or it.get("isDeprecated") or "true").lower() in {"true","yes","1"}
+        removed_in = it.get("removedIn") or ""
+        deprecated_in = it.get("deprecatedIn") or ""
+        if not api:
+            continue
+        rule = f"deprecated-api:{api}"
+        sev  = "HIGH" if removed_in else "MEDIUM"
+        msg  = f"Deprecated API {api}. Use {repl or 'supported API'}"
+        labels = {"replacementApi": repl, "removedIn": removed_in, "deprecatedIn": deprecated_in}
+        findings.append(_mk("pluto", rule, sev, kind, name, msg, file=file, namespace=ns, labels=labels, raw_file=str(p)))
+    return findings
+
+# ------------------------
+# collector & dedupe
+# ------------------------
+
+def _fingerprint(f: Dict) -> str:
+    reduced = {
+        "tool": f.get("tool", ""),
+        "ruleId": f.get("ruleId", ""),
+        "severity": f.get("severity", ""),
+        "resourceKind": f.get("resourceRef", {}).get("kind", ""),
+        "resourceName": f.get("resourceRef", {}).get("name", ""),
+        "resourceNs": f.get("resourceRef", {}).get("namespace", ""),
+        "file": f.get("location", {}).get("file", ""),
+        "line": f.get("location", {}).get("line", ""),
+        "message": str(f.get("message", ""))[:200],
+    }
+    blob = json.dumps(reduced, sort_keys=True, ensure_ascii=False, default=str)
+    return hashlib.sha1(blob.encode("utf-8")).hexdigest()
+
+def collect_all(raw_dir: Path) -> List[Dict]:
+    f: List[Dict] = []
+    # base 8
+    f += from_kubelinter(raw_dir / "kubelinter_raw.json")
+    f += from_kubeaudit(raw_dir / "kubeaudit_raw.json")
+    f += from_polaris(raw_dir / "polaris_raw.json")
+    f += from_trivy_config(raw_dir / "trivy_config_raw.json")
+    f += from_kubescore(raw_dir / "kubescore_raw.json")
+    f += from_yamllint(raw_dir / "yamllint_raw.txt")
+    f += from_kubescape(raw_dir / "kubescape_raw.json")
+    f += from_kubeconform(raw_dir / "kubeconform_raw.json")
+    # optional extras (if present)
+    f += from_checkov(raw_dir / "checkov_raw.json")
+    f += from_terrascan(raw_dir / "terrascan_raw.json")
+    f += from_gitleaks(raw_dir / "gitleaks_raw.json")
+    f += from_trufflehog(raw_dir / "trufflehog_raw.json")
+    # NEW 2 tools (rbac-police and pluto only, kube-bench removed)
+    f += from_rbacpolice(raw_dir / "rbacpolice_raw.json")
+    f += from_pluto(raw_dir / "pluto_raw.json")
+
+    # dedupe
+    seen: Set[str] = set()
+    deduped: List[Dict] = []
+    for item in f:
+        key = _fingerprint(item)
+        if key in seen:
+            continue
+        seen.add(key)
+        deduped.append(item)
+    return deduped
+
+# ------------------------
+# missing loader stubs you already had
+# ------------------------
 
 def from_kubescape(p: Path) -> List[Dict]:
     data = load_json(p) or {}
     findings: List[Dict] = []
 
-    # If it's an array of per-file results, flatten and keep only failures
+    # Handle array form
     if isinstance(data, list):
         for entry in data:
             if not isinstance(entry, dict):
                 continue
-            # try standard fields
             results = entry.get("results") or []
             resources = entry.get("resources") or []
-            # build map resourceID -> (kind,name,file)
             rmap = {}
             for res in resources:
                 rid = res.get("resourceID", "")
                 if not rid: continue
                 obj = res.get("object", {}) or {}
                 src = res.get("source", {}) or {}
+                meta = obj.get("metadata") or {}
                 rmap[rid] = {
                     "kind": obj.get("kind",""),
-                    "name": (obj.get("metadata", {}) or {}).get("name",""),
+                    "name": meta.get("name","") if isinstance(meta, dict) else "",
+                    "ns": meta.get("namespace","") if isinstance(meta, dict) else "",
                     "file": src.get("relativePath",""),
                 }
             for resu in results:
@@ -576,28 +728,25 @@ def from_kubescape(p: Path) -> List[Dict]:
                     cname = ctrl.get("name","")
                     msg = cname or cid or "Kubescape control failed"
                     findings.append(_mk(
-                        "kubescape",
-                        cid or "unknown",
-                        "MEDIUM",
-                        meta.get("kind","Resource"),
-                        meta.get("name","unknown"),
-                        msg,
-                        file=meta.get("file",""),
+                        "kubescape", cid or "unknown", "MEDIUM",
+                        meta.get("kind","Resource"), meta.get("name","unknown"), msg,
+                        file=meta.get("file",""), namespace=meta.get("ns",""), raw_file=str(p)
                     ))
         return findings
 
-    # otherwise, handle the single-object schema as before
-    controls_summary = (data.get("summaryDetails", {}) or {}).get("controls", {}) or {}
+    # Single object schema
     resources_list = data.get("resources", []) or []
     resource_map = {}
     for res in resources_list:
         res_id = res.get("resourceID", "")
         if res_id:
             obj = res.get("object", {}) or {}
+            meta = obj.get("metadata") or {}
             source = res.get("source", {}) or {}
             resource_map[res_id] = {
                 "kind": obj.get("kind", ""),
-                "name": obj.get("metadata", {}).get("name", "") if isinstance(obj.get("metadata"), dict) else "",
+                "name": meta.get("name", "") if isinstance(meta, dict) else "",
+                "ns": meta.get("namespace", "") if isinstance(meta, dict) else "",
                 "file": source.get("relativePath", "")
             }
 
@@ -608,6 +757,7 @@ def from_kubescape(p: Path) -> List[Dict]:
         res_meta = resource_map.get(resource_id, {})
         kind = res_meta.get("kind", "Resource")
         name = res_meta.get("name", "unknown")
+        ns   = res_meta.get("ns", "")
         file = res_meta.get("file", "")
         for control in controls:
             status_info = control.get("status", {}) or {}
@@ -616,239 +766,294 @@ def from_kubescape(p: Path) -> List[Dict]:
             control_id = control.get("controlID", "")
             control_name = control.get("name", "")
             sev = "MEDIUM"
-            findings.append(_mk("kubescape", control_id, sev, kind, name, control_name or control_id, file=file))
+            findings.append(_mk("kubescape", control_id, sev, kind, name, control_name or control_id, file=file, namespace=ns, raw_file=str(p)))
     return findings
 
-def from_kubesec(p: Path) -> List[Dict]:
-    data = load_json(p)
-    findings = []
-    if isinstance(data, list):
-        items = data
-    elif isinstance(data, dict):
-        items = data.get("results") or data.get("checks") or []
-        if not isinstance(items, list):
-            items = [items]
-    else:
-        items = []
-    for it in items:
-        if not isinstance(it, dict):
-            continue
-        rule = it.get("id") or it.get("selector") or "kubesec"
-        sev  = it.get("severity") or "MEDIUM"
-        file = (it.get("file") or it.get("target") or it.get("path") or "")
-        obj = it.get("object", {})
-        if isinstance(obj, dict):
-            kind = obj.get("kind") or "Object"
-            name = obj.get("name") or "unknown"
-        else:
-            kind = "Object"
-            name = "unknown"
-        msg  = it.get("reason") or it.get("message") or it.get("recommendations") or it
-        findings.append(_mk("kubesec", rule, sev, kind, name, msg, file=file))
-    return findings
-
-# ------------------------
-# collector
-# ------------------------
-
-def _fingerprint(f: Dict) -> str:
+def from_kubeconform(p: Path) -> List[Dict]:
     """
-    Stable hash for deduping: based on sorted JSON of a reduced view
-    so that dicts are never used as set keys.
+    kubeconform -output json -strict -summary -verbose
+    The JSON contains per-file results with valid/invalid items; surface invalids and errors.
     """
-    reduced = {
-        "tool": f.get("tool", ""),
-        "ruleId": f.get("ruleId", ""),
-        "severity": f.get("severity", ""),
-        "resourceKind": f.get("resourceRef", {}).get("kind", ""),
-        "resourceName": f.get("resourceRef", {}).get("name", ""),
-        "file": f.get("location", {}).get("file", ""),
-        "line": f.get("location", {}).get("line", ""),
-        "message": str(f.get("message", ""))[:200],
-    }
-    blob = json.dumps(reduced, sort_keys=True, ensure_ascii=False, default=str)
-    return hashlib.sha1(blob.encode("utf-8")).hexdigest()
-
-def collect_all() -> List[Dict]:
+    data = load_json(p) or {}
     findings: List[Dict] = []
-    findings += from_kubelinter(RAW_DIR / "kubelinter_raw.json")
-    findings += from_kubeaudit(RAW_DIR / "kubeaudit_raw.json")
-    findings += from_polaris(RAW_DIR / "polaris_raw.json")
-    findings += from_trivy_config(RAW_DIR / "trivy_config_raw.json")
-    findings += from_kubescore(RAW_DIR / "kubescore_raw.json")
-    findings += from_yamllint(RAW_DIR / "yamllint_raw.txt")
-    findings += from_checkov(RAW_DIR / "checkov_raw.json")
-    findings += from_terrascan(RAW_DIR / "terrascan_raw.json")
-    findings += from_gitleaks(RAW_DIR / "gitleaks_raw.json")
-    findings += from_trufflehog(RAW_DIR / "trufflehog_raw.json")
-    # Optional extras; load_json returns [] for bad placeholders, so these are safe:
-    findings += from_kubescape(RAW_DIR / "kubescape_raw.json")
-    findings += from_kubesec(RAW_DIR / "kubesec_raw.json")
-
-    seen: set[str] = set()
-    deduped: List[Dict] = []
-    for f in findings:
-        key = _fingerprint(f)
-        if key in seen:
+    
+    # kubeconform produces a dict with "resources" array
+    resources = data.get("resources", [])
+    
+    for res in resources:
+        if not isinstance(res, dict):
             continue
-        seen.add(key)
-        deduped.append(f)
-    return deduped
+        
+        status = res.get("status", "")
+        
+        # Only report invalid and error statuses
+        if status not in ("statusInvalid", "statusError"):
+            continue
+        
+        file = res.get("filename", "")
+        kind = res.get("kind", "Object")
+        name = res.get("name", "unknown")
+        version = res.get("version", "")
+        msg = res.get("msg", "")
+        
+        # Determine severity based on status
+        sev = "HIGH" if status == "statusInvalid" else "MEDIUM"
+        
+        # Build rule ID
+        if status == "statusInvalid":
+            rule = "schema-validation-failed"
+        else:
+            rule = "schema-error"
+        
+        # Extract validation errors for more detail
+        validation_errors = res.get("validationErrors", [])
+        if validation_errors:
+            for err in validation_errors:
+                err_path = err.get("path", "")
+                err_msg = err.get("msg", "")
+                full_msg = f"{msg} - Path: {err_path}, Error: {err_msg}"
+                findings.append(_mk(
+                    "kubeconform", rule, sev, kind, name, full_msg,
+                    file=file, namespace="", 
+                    labels={"apiVersion": version, "status": status},
+                    raw_file=str(p)
+                ))
+        else:
+            findings.append(_mk(
+                "kubeconform", rule, sev, kind, name, msg,
+                file=file, namespace="",
+                labels={"apiVersion": version, "status": status},
+                raw_file=str(p)
+            ))
+    
+    return findings
 
-def generate_excel_report(findings: List[Dict]) -> None:
-    """Generate Excel report with tools as columns and vulnerabilities grouped by resource."""
+# ------------------------
+# consensus / aggregation
+# ------------------------
+
+def group_key(f: Dict, strategy: str) -> Tuple[str, str, str, str]:
+    """
+    Return a grouping key for consensus counting.
+    strategy in {"rule", "message", "rule_or_message"}
+    """
+    ref = f.get("resourceRef", {}) or {}
+    ns  = ref.get("namespace","") or ""
+    kind= ref.get("kind","") or ""
+    name= ref.get("name","") or ""
+    file= (f.get("location",{}) or {}).get("file","") or ""
+    rule= str(f.get("ruleId","") or "").strip()
+    msg = _norm_msg(f.get("message","") or "").strip()
+
+    # Use namespace/kind/name primarily; fall back to file if name is unknown
+    id_part = (ns, kind, name if name != "unknown" else f"{name}@{file}")
+
+    if strategy == "rule":
+        return (*id_part, rule or msg or "unknown")
+    if strategy == "message":
+        return (*id_part, msg or rule or "unknown")
+    # rule_or_message
+    return (*id_part, rule or msg or "unknown")
+
+def compute_consensus(findings: List[Dict], threshold: int, strategy: str) -> Tuple[List[Dict], List[Dict]]:
+    """
+    Returns (annotated_findings, consensus_groups)
+    consensus_groups is a list of grouped objects with tools, count, top severity, confirmed flag.
+    """
+    # map group -> {tools set, severities, sample, members idx}
+    groups: Dict[Tuple[str,str,str,str], Dict[str, Any]] = {}
+    for idx, f in enumerate(findings):
+        gk = group_key(f, strategy)
+        ent = groups.setdefault(gk, {"tools": set(), "severities": [], "members": [], "sample": f})
+        ent["tools"].add(f.get("tool","unknown"))
+        ent["severities"].append(f.get("severity","INFO"))
+        ent["members"].append(idx)
+
+    consensus_rows: List[Dict] = []
+    for gk, ent in groups.items():
+        tools = sorted(ent["tools"])
+        count = len(tools)
+        top_sev = highest_severity(ent["severities"])
+        confirmed = (count >= threshold)
+        # annotate members
+        for i in ent["members"]:
+            findings[i]["toolsAgreeCount"] = count
+            findings[i]["confirmed"] = confirmed
+        ns, kind, name_or_file, rule_or_msg = gk
+        sample = ent["sample"]
+        consensus_rows.append({
+            "namespace": ns,
+            "kind": kind,
+            "name": sample.get("resourceRef",{}).get("name") or name_or_file,
+            "file": (sample.get("location",{}) or {}).get("file",""),
+            "groupKey": rule_or_msg,
+            "tools": tools,
+            "count": count,
+            "severity": top_sev,
+            "confirmed": confirmed
+        })
+    return findings, consensus_rows
+
+# ------------------------
+# Excel & CSV outputs
+# ------------------------
+
+def write_excel(findings: List[Dict], out_path: Path) -> None:
     try:
         import openpyxl
         from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
     except ImportError:
         warn("openpyxl not installed. Run: pip install openpyxl")
-        warn("Skipping Excel generation...")
         return
-    
-    # Group findings by resource (kind + name + file)
+
+    # group resource -> vuln -> tools
     grouped = {}
+    toolset: Set[str] = set()
     for f in findings:
-        res_ref = f.get("resourceRef", {})
+        ref = f.get("resourceRef", {})
         loc = f.get("location", {})
-        resource_key = (
-            res_ref.get("kind", "Object"),
-            res_ref.get("name", "unknown"),
-            loc.get("file", "")
-        )
-        if resource_key not in grouped:
-            grouped[resource_key] = {}
-        
-        tool = f.get("tool", "unknown")
-        rule_raw = f.get("ruleId", "unknown")
-        # Convert rule to string if it's a dict
-        if isinstance(rule_raw, dict):
-            rule = rule_raw.get("id") or rule_raw.get("name") or json.dumps(rule_raw)
-        else:
-            rule = str(rule_raw)
-        
-        severity = f.get("severity", "INFO")
-        message = f.get("message", "")
-        if isinstance(message, dict):
-            message = message.get("Message", json.dumps(message))
-        message = str(message)[:200]  # Limit message length
-        
-        vuln_key = f"{rule} [{severity}]"
-        if vuln_key not in grouped[resource_key]:
-            grouped[resource_key][vuln_key] = {
-                "rule": rule,
-                "severity": severity,
-                "message": message,
-                "tools": set()
-            }
-        grouped[resource_key][vuln_key]["tools"].add(tool)
-    
-    # Get all unique tools
-    all_tools = set()
-    for resource_vulns in grouped.values():
-        for vuln_data in resource_vulns.values():
-            all_tools.update(vuln_data["tools"])
-    all_tools = sorted(all_tools)
-    
-    # Create workbook
+        key = (ref.get("namespace",""), ref.get("kind","Object"), ref.get("name","unknown"), loc.get("file",""))
+        vuln_key = f"{f.get('ruleId','unknown')} [{f.get('severity','INFO')}]"
+        entry = grouped.setdefault(key, {})
+        row = entry.setdefault(vuln_key, {"rule": f.get("ruleId","unknown"),
+                                          "severity": f.get("severity","INFO"),
+                                          "message": _norm_msg(f.get("message",""))[:200],
+                                          "tools": set(),
+                                          "toolsAgreeCount": f.get("toolsAgreeCount", 1),
+                                          "confirmed": f.get("confirmed", False)})
+        row["tools"].add(f.get("tool","unknown"))
+        toolset.add(f.get("tool","unknown"))
+
+    tools = sorted(toolset)
     wb = openpyxl.Workbook()
     ws = wb.active
     ws.title = "Security Findings"
-    
-    # Define styles
+
     header_fill = PatternFill(start_color="4472C4", end_color="4472C4", fill_type="solid")
     header_font = Font(color="FFFFFF", bold=True)
-    border = Border(
-        left=Side(style='thin'),
-        right=Side(style='thin'),
-        top=Side(style='thin'),
-        bottom=Side(style='thin')
-    )
-    
-    # Headers
-    headers = ["Resource Kind", "Resource Name", "File", "Vulnerability", "Severity", "Message"] + all_tools
-    for col_idx, header in enumerate(headers, 1):
-        cell = ws.cell(row=1, column=col_idx, value=header)
-        cell.fill = header_fill
-        cell.font = header_font
-        cell.alignment = Alignment(horizontal="center", vertical="center")
-        cell.border = border
-    
-    # Data rows
-    row_idx = 2
-    for (kind, name, file), vulns in sorted(grouped.items()):
-        resource_start_row = row_idx
-        
-        for vuln_key, vuln_data in sorted(vulns.items()):
-            ws.cell(row=row_idx, column=1, value=kind).border = border
-            ws.cell(row=row_idx, column=2, value=name).border = border
-            ws.cell(row=row_idx, column=3, value=file or "N/A").border = border
-            ws.cell(row=row_idx, column=4, value=vuln_data["rule"]).border = border
-            
-            # Severity cell with color
-            sev_cell = ws.cell(row=row_idx, column=5, value=vuln_data["severity"])
-            sev_cell.border = border
-            if vuln_data["severity"] == "CRITICAL":
-                sev_cell.fill = PatternFill(start_color="C00000", end_color="C00000", fill_type="solid")
-                sev_cell.font = Font(color="FFFFFF", bold=True)
-            elif vuln_data["severity"] == "HIGH":
-                sev_cell.fill = PatternFill(start_color="FF0000", end_color="FF0000", fill_type="solid")
-                sev_cell.font = Font(color="FFFFFF")
-            elif vuln_data["severity"] == "MEDIUM":
+    border = Border(left=Side(style='thin'), right=Side(style='thin'),
+                    top=Side(style='thin'), bottom=Side(style='thin'))
+
+    headers = ["Namespace", "Kind", "Name", "File", "Vulnerability", "Severity", "Message",
+               "ToolsAgreeCount", "Confirmed"] + tools
+    for c, h in enumerate(headers, 1):
+        cell = ws.cell(row=1, column=c, value=h)
+        cell.fill = header_fill; cell.font = header_font
+        cell.alignment = Alignment(horizontal="center", vertical="center"); cell.border = border
+
+    r = 2
+    for (ns, kind, name, file), vulns in sorted(grouped.items()):
+        for _, d in sorted(vulns.items(), key=lambda kv: (-SEV_ORDER.get(kv[1]["severity"],1), kv[0])):
+            ws.cell(r,1, ns).border = border
+            ws.cell(r,2, kind).border = border
+            ws.cell(r,3, name).border = border
+            ws.cell(r,4, file or "N/A").border = border
+            ws.cell(r,5, d["rule"]).border = border
+
+            sev_cell = ws.cell(r,6, d["severity"]); sev_cell.border = border
+            if d["severity"] == "CRITICAL":
+                sev_cell.fill = PatternFill(start_color="C00000", end_color="C00000", fill_type="solid"); sev_cell.font = Font(color="FFFFFF", bold=True)
+            elif d["severity"] == "HIGH":
+                sev_cell.fill = PatternFill(start_color="FF0000", end_color="FF0000", fill_type="solid"); sev_cell.font = Font(color="FFFFFF")
+            elif d["severity"] == "MEDIUM":
                 sev_cell.fill = PatternFill(start_color="FFC000", end_color="FFC000", fill_type="solid")
-            elif vuln_data["severity"] == "LOW":
+            elif d["severity"] == "LOW":
                 sev_cell.fill = PatternFill(start_color="FFFF00", end_color="FFFF00", fill_type="solid")
-            
-            ws.cell(row=row_idx, column=6, value=vuln_data["message"]).border = border
-            
-            # Tool columns - mark with "yes", "no", or leave empty
-            for col_idx, tool in enumerate(all_tools, 7):
-                cell = ws.cell(row=row_idx, column=col_idx)
-                if tool in vuln_data["tools"]:
+
+            ws.cell(r,7, d["message"]).border = border
+            ws.cell(r,8, d["toolsAgreeCount"]).border = border
+            ws.cell(r,9, "Y" if d["confirmed"] else "N").border = border
+
+            for c, t in enumerate(tools, 10):
+                cell = ws.cell(r, c)
+                if t in d["tools"]:
                     cell.value = "yes"
                     cell.fill = PatternFill(start_color="C6EFCE", end_color="C6EFCE", fill_type="solid")
                 else:
                     cell.value = "no"
                 cell.border = border
-            
-            row_idx += 1
-    
-    # Adjust column widths
-    ws.column_dimensions['A'].width = 15
-    ws.column_dimensions['B'].width = 25
-    ws.column_dimensions['C'].width = 30
-    ws.column_dimensions['D'].width = 30
-    ws.column_dimensions['E'].width = 12
-    ws.column_dimensions['F'].width = 50
-    for col_idx in range(7, 7 + len(all_tools)):
-        ws.column_dimensions[openpyxl.utils.get_column_letter(col_idx)].width = 12
-    
-    # Freeze header row
+            r += 1
+
+    # widths
+    widths = {"A":14, "B":14, "C":26, "D":36, "E":32, "F":12, "G":60, "H":16, "I":12}
+    for col, w in widths.items():
+        ws.column_dimensions[col].width = w
+    for idx in range(10, 10+len(tools)):
+        from openpyxl.utils import get_column_letter
+        ws.column_dimensions[get_column_letter(idx)].width = 12
     ws.freeze_panes = "A2"
-    
-    # Save
-    excel_path = OUT.parent / "security_findings.xlsx"
-    wb.save(excel_path)
-    print(f"[ok] wrote Excel report: {excel_path}")
+
+    out_xlsx = out_path
+    out_xlsx.parent.mkdir(parents=True, exist_ok=True)
+    wb.save(out_xlsx)
+    note(f"wrote Excel: {out_xlsx}")
+
+def write_csv(consensus_rows: List[Dict], out_csv: Path) -> None:
+    out_csv.parent.mkdir(parents=True, exist_ok=True)
+    with out_csv.open("w", newline="", encoding="utf-8") as f:
+        w = csv.writer(f)
+        w.writerow(["Namespace","Kind","Name","File","GroupKey","ToolsAgreeCount","Confirmed","Severity","Tools"])
+        for r in sorted(consensus_rows, key=lambda x:(-SEV_ORDER.get(x["severity"],1), x["namespace"], x["kind"], x["name"])):
+            w.writerow([r["namespace"], r["kind"], r["name"], r["file"], r["groupKey"],
+                        r["count"], "Y" if r["confirmed"] else "N", r["severity"], ",".join(r["tools"])])
+
+# ------------------------
+# CLI
+# ------------------------
+
+def parse_args() -> argparse.Namespace:
+    ap = argparse.ArgumentParser(description="Normalize SafeFixK8s outputs & compute multi-tool consensus.")
+    ap.add_argument("--raw-dir", default=str(RAW_DIR), help="Directory containing raw tool outputs.")
+    ap.add_argument("--out-json", default=str(OUT_JSON), help="Path to write normalized JSON bundle.")
+    ap.add_argument("--out-excel", default=str(OUT_DIR / "security_findings.xlsx"), help="Path to Excel report.")
+    ap.add_argument("--out-csv", default=str(OUT_DIR / "consensus_findings.csv"), help="Path to consensus CSV.")
+    ap.add_argument("--threshold", type=int, default=3, help="Minimum distinct tools that must agree to mark 'confirmed'.")
+    ap.add_argument("--group-by", choices=["rule","message","rule_or_message"], default="rule",
+                    help="How to group findings across tools when counting agreement.")
+    ap.add_argument("--no-excel", action="store_true", help="Skip Excel generation.")
+    ap.add_argument("--no-csv", action="store_true", help="Skip CSV consensus export.")
+    return ap.parse_args()
+
+# ------------------------
+# main
+# ------------------------
 
 def main():
-    all_findings = collect_all()
-    
+    args = parse_args()
+    raw_dir = Path(args.raw_dir)
+    out_json= Path(args.out_json)
+    out_excel= Path(args.out_excel)
+    out_csv = Path(args.out_csv)
+
+    all_findings = collect_all(raw_dir)
+
+    # consensus
+    annotated, consensus_rows = compute_consensus(all_findings, threshold=args.threshold, strategy=args.group_by)
+
     bundle = {
-        "version": "1.0",
+        "version": "1.1",
         "generatedAt": now_iso(),
         "source": "SafeFixK8s/Normalizer",
-        "findings": all_findings
+        "threshold": args.threshold,
+        "groupBy": args.group_by,
+        "findings": annotated
     }
-    OUT.parent.mkdir(parents=True, exist_ok=True)
-    with OUT.open("w", encoding="utf-8") as f:
-        json.dump(bundle, f, ensure_ascii=False, indent=2)
-    print(f"[ok] wrote {OUT} with {len(bundle['findings'])} findings.")
-    
-    # Generate Excel report
-    generate_excel_report(all_findings)
-    
-    # NO LONGER DELETING RAW FILES - Keep them for reference
-    print(f"[info] Raw detection files preserved in: {RAW_DIR}")
+    out_json.parent.mkdir(parents=True, exist_ok=True)
+    with out_json.open("w", encoding="utf-8") as f:
+        json.dump(bundle, f, ensure_ascii=False, indent=2, default=str)
+    note(f"wrote {out_json} with {len(annotated)} findings.")
+
+    if not args.no_csv:
+        write_csv(consensus_rows, out_csv)
+
+    if not args.no_excel:
+        write_excel(annotated, out_excel)
+
+    note(f"Raw detection files preserved in: {raw_dir}")
+
+# ------------------------
+# entry
+# ------------------------
 
 if __name__ == "__main__":
     main()
