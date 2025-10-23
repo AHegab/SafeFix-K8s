@@ -1,0 +1,30 @@
+# metadata:
+#   id: CKV_K8S_LATEST_PULL_ALWAYS
+#   name: Using :latest without imagePullPolicy: Always
+#   category: KUBERNETES
+
+# scope:
+#   provider: kubernetes
+
+# definition:
+#   and:
+#     # 1) Image ends with :latest (case-insensitive)
+#     - cond_type: attribute
+#       resource_types: ["kubernetes"]
+#       attribute: "$..containers[*].image"
+#       operator: regex_match
+#       value: ":[Ll]atest$"
+
+#     # 2) EITHER pullPolicy is not Always, OR it's missing
+#     - or:
+#         - cond_type: attribute
+#           resource_types: ["kubernetes"]
+#           attribute: "$..containers[*].imagePullPolicy"
+#           operator: not_equals
+#           value: "Always"
+
+#         - cond_type: attribute
+#           resource_types: ["kubernetes"]
+#           attribute: "$..containers[*].imagePullPolicy"
+#           operator: exists
+#           value: false

@@ -1,0 +1,15 @@
+checks:
+  images:
+    tag: "error"
+  controllers:
+    readinessProbe: "error"
+    livenessProbe: "error"
+  security:
+    readOnlyRootFilesystem: "error"
+    hostPathVolumes: "error"
+    runAsNonRoot: "error"
+    allowPrivilegeEscalation: "error"
+    privileged: "error"
+    seccompProfile: "error"
+  serviceAccount:
+    automountServiceAccountToken: "error"

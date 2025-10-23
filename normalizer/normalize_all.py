@@ -346,11 +346,22 @@ def from_kubescore(p: Path) -> List[Dict]:
         elif isinstance(item, dict) and any(k in item for k in ("check","id","grade","severity","comment","comments","message")):
             checks = [item]
         for chk in checks:
-            rule = (chk.get("check") or chk.get("id") or chk.get("name") or "unknown")
-            raw_sev = (chk.get("grade") or chk.get("severity") or chk.get("type") or "MEDIUM")
-            if str(raw_sev).lower() == "security":
-                raw_sev = "HIGH"
-            msg = (chk.get("comment") or chk.get("comments") or chk.get("message") or chk)
+            # Ensure rule is a string, not a dict
+            if isinstance(chk, dict):
+                rule = (chk.get("check") or chk.get("id") or chk.get("name") or "unknown")
+                # If rule is still a dict, extract the ID
+                if isinstance(rule, dict):
+                    rule = rule.get("id") or rule.get("name") or "unknown"
+                raw_sev = (chk.get("grade") or chk.get("severity") or chk.get("type") or "MEDIUM")
+                if str(raw_sev).lower() == "security":
+                    raw_sev = "HIGH"
+                msg = (chk.get("comment") or chk.get("comments") or chk.get("message") or chk)
+            else:
+                rule = "unknown"
+                raw_sev = "MEDIUM"
+                msg = str(chk)
+            # Ensure rule is a string
+            rule = str(rule) if not isinstance(rule, str) else rule
             findings.append(_mk("kube-score", rule, raw_sev, kind, name, msg, file=file, namespace=ns, raw_file=str(p)))
     return findings
 
@@ -997,6 +1008,606 @@ def write_csv(consensus_rows: List[Dict], out_csv: Path) -> None:
             w.writerow([r["namespace"], r["kind"], r["name"], r["file"], r["groupKey"],
                         r["count"], "Y" if r["confirmed"] else "N", r["severity"], ",".join(r["tools"])])
 
+def write_html(findings: List[Dict], out_html: Path) -> None:
+    """Generate an interactive HTML vulnerability/tool matrix."""
+    # Group by resource -> vulnerability -> tools
+    grouped = {}
+    all_tools: Set[str] = set()
+    
+    for f in findings:
+        ref = f.get("resourceRef", {})
+        loc = f.get("location", {})
+        ns = ref.get("namespace", "")
+        kind = ref.get("kind", "Object")
+        name = ref.get("name", "unknown")
+        file = loc.get("file", "")
+        
+        resource_key = f"{ns}/{kind}/{name}@{file}" if ns else f"{kind}/{name}@{file}"
+        rule = f.get("ruleId", "unknown")
+        sev = f.get("severity", "INFO")
+        tool = f.get("tool", "unknown")
+        msg = _norm_msg(f.get("message", ""))[:150]
+        
+        vuln_key = f"{rule} [{sev}]"
+        
+        if resource_key not in grouped:
+            grouped[resource_key] = {
+                "namespace": ns,
+                "kind": kind,
+                "name": name,
+                "file": file,
+                "vulnerabilities": {}
+            }
+        
+        if vuln_key not in grouped[resource_key]["vulnerabilities"]:
+            grouped[resource_key]["vulnerabilities"][vuln_key] = {
+                "rule": rule,
+                "severity": sev,
+                "message": msg,
+                "tools": set(),
+                "count": 0,
+                "confirmed": f.get("confirmed", False)
+            }
+        
+        grouped[resource_key]["vulnerabilities"][vuln_key]["tools"].add(tool)
+        grouped[resource_key]["vulnerabilities"][vuln_key]["count"] = len(grouped[resource_key]["vulnerabilities"][vuln_key]["tools"])
+        all_tools.add(tool)
+    
+    tools_sorted = sorted(all_tools)
+    
+    # Generate HTML
+    html = """<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeFixK8s - Vulnerability/Tool Matrix</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .stat-card .number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .stat-card .label {
+            color: #666;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .filters {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .filters label {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .filters select, .filters input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.95em;
+        }
+        
+        .content {
+            padding: 30px;
+            overflow-x: auto;
+        }
+        
+        .resource-section {
+            margin-bottom: 40px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .resource-section:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .resource-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .resource-header:hover {
+            background: linear-gradient(135deg, #5568d3 0%, #653a8b 100%);
+        }
+        
+        .resource-info h3 {
+            font-size: 1.3em;
+            margin-bottom: 5px;
+        }
+        
+        .resource-info .meta {
+            font-size: 0.85em;
+            opacity: 0.9;
+        }
+        
+        .resource-stats {
+            text-align: right;
+        }
+        
+        .resource-stats .vuln-count {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        
+        .resource-stats .vuln-label {
+            font-size: 0.85em;
+            opacity: 0.9;
+        }
+        
+        .matrix-container {
+            padding: 20px;
+            background: white;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+        }
+        
+        thead th {
+            background: #f8f9fa;
+            padding: 12px 8px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #dee2e6;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        tbody tr {
+            border-bottom: 1px solid #e9ecef;
+            transition: background-color 0.2s;
+        }
+        
+        tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        td {
+            padding: 12px 8px;
+            vertical-align: top;
+        }
+        
+        .vuln-cell {
+            max-width: 400px;
+        }
+        
+        .vuln-rule {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .vuln-message {
+            font-size: 0.85em;
+            color: #666;
+            line-height: 1.4;
+        }
+        
+        .severity-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .severity-CRITICAL {
+            background: #8B0000;
+            color: white;
+        }
+        
+        .severity-HIGH {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .severity-MEDIUM {
+            background: #ffc107;
+            color: #000;
+        }
+        
+        .severity-LOW {
+            background: #ffeb3b;
+            color: #000;
+        }
+        
+        .severity-INFO {
+            background: #e9ecef;
+            color: #666;
+        }
+        
+        .tool-cell {
+            text-align: center;
+            width: 80px;
+        }
+        
+        .tool-indicator {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            line-height: 24px;
+            font-weight: bold;
+            font-size: 0.75em;
+        }
+        
+        .tool-yes {
+            background: #28a745;
+            color: white;
+        }
+        
+        .tool-no {
+            background: #e9ecef;
+            color: #999;
+        }
+        
+        .confirmed-badge {
+            display: inline-block;
+            background: #17a2b8;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.7em;
+            font-weight: 600;
+            margin-left: 8px;
+            text-transform: uppercase;
+        }
+        
+        .tool-count {
+            display: inline-block;
+            background: #6c757d;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.7em;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+        
+        .collapsed .matrix-container {
+            display: none;
+        }
+        
+        .toggle-icon {
+            font-size: 1.5em;
+            transition: transform 0.3s;
+        }
+        
+        .collapsed .toggle-icon {
+            transform: rotate(-90deg);
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            table {
+                font-size: 0.8em;
+            }
+            
+            .tool-cell {
+                width: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛡️ SafeFixK8s Security Analysis</h1>
+            <p>Vulnerability/Tool Detection Matrix</p>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="number" id="total-findings">0</div>
+                <div class="label">Total Findings</div>
+            </div>
+            <div class="stat-card">
+                <div class="number" id="total-resources">0</div>
+                <div class="label">Resources Analyzed</div>
+            </div>
+            <div class="stat-card">
+                <div class="number" id="total-tools">0</div>
+                <div class="label">Tools Used</div>
+            </div>
+            <div class="stat-card">
+                <div class="number" id="critical-high">0</div>
+                <div class="label">Critical + High</div>
+            </div>
+        </div>
+        
+        <div class="filters">
+            <label for="severity-filter">Severity:</label>
+            <select id="severity-filter">
+                <option value="all">All Severities</option>
+                <option value="CRITICAL">Critical</option>
+                <option value="HIGH">High</option>
+                <option value="MEDIUM">Medium</option>
+                <option value="LOW">Low</option>
+                <option value="INFO">Info</option>
+            </select>
+            
+            <label for="tool-filter">Tool:</label>
+            <select id="tool-filter">
+                <option value="all">All Tools</option>
+""" + "\n".join([f'                <option value="{tool}">{tool}</option>' for tool in tools_sorted]) + """
+            </select>
+            
+            <label for="search">Search:</label>
+            <input type="text" id="search" placeholder="Filter by resource or vulnerability...">
+            
+            <button onclick="expandAll()" style="margin-left: auto; padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Expand All</button>
+            <button onclick="collapseAll()" style="padding: 8px 16px; background: #6c757d; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Collapse All</button>
+        </div>
+        
+        <div class="content" id="matrix-content">
+"""
+    
+    # Generate resource sections
+    for resource_key, resource_data in sorted(grouped.items(), key=lambda x: len(x[1]["vulnerabilities"]), reverse=True):
+        ns = resource_data["namespace"]
+        kind = resource_data["kind"]
+        name = resource_data["name"]
+        file = resource_data["file"]
+        vulns = resource_data["vulnerabilities"]
+        
+        ns_display = f"{ns}/" if ns else ""
+        file_display = f" • {file}" if file else ""
+        
+        html += f"""
+            <div class="resource-section" data-resource="{resource_key}">
+                <div class="resource-header" onclick="toggleSection(this)">
+                    <div class="resource-info">
+                        <h3>{ns_display}{kind}/{name}</h3>
+                        <div class="meta">{file_display}</div>
+                    </div>
+                    <div class="resource-stats">
+                        <div class="vuln-count">{len(vulns)}</div>
+                        <div class="vuln-label">Vulnerabilities</div>
+                    </div>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="matrix-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Vulnerability</th>
+                                <th>Severity</th>
+                                <th>Tools</th>
+"""
+        
+        for tool in tools_sorted:
+            html += f'                                <th class="tool-cell">{tool}</th>\n'
+        
+        html += """                            </tr>
+                        </thead>
+                        <tbody>
+"""
+        
+        for vuln_key, vuln_data in sorted(vulns.items(), key=lambda x: (-SEV_ORDER.get(x[1]["severity"], 1), x[0])):
+            rule = vuln_data["rule"]
+            sev = vuln_data["severity"]
+            msg = vuln_data["message"]
+            vuln_tools = vuln_data["tools"]
+            count = vuln_data["count"]
+            confirmed = vuln_data["confirmed"]
+            
+            confirmed_badge = '<span class="confirmed-badge">✓ Confirmed</span>' if confirmed else ''
+            tool_count_badge = f'<span class="tool-count">{count} tools</span>'
+            
+            html += f"""                            <tr data-severity="{sev}" data-tools='{json.dumps(list(vuln_tools))}'>
+                                <td class="vuln-cell">
+                                    <div class="vuln-rule">{rule}</div>
+                                    <div class="vuln-message">{msg}</div>
+                                </td>
+                                <td>
+                                    <span class="severity-badge severity-{sev}">{sev}</span>
+                                    {confirmed_badge}
+                                </td>
+                                <td>{tool_count_badge}</td>
+"""
+            
+            for tool in tools_sorted:
+                if tool in vuln_tools:
+                    html += '                                <td class="tool-cell"><span class="tool-indicator tool-yes">✓</span></td>\n'
+                else:
+                    html += '                                <td class="tool-cell"><span class="tool-indicator tool-no">—</span></td>\n'
+            
+            html += """                            </tr>
+"""
+        
+        html += """                        </tbody>
+                    </table>
+                </div>
+            </div>
+"""
+    
+    html += """        </div>
+    </div>
+    
+    <script>
+        // Calculate statistics
+        const totalFindings = """ + str(len(findings)) + """;
+        const totalResources = """ + str(len(grouped)) + """;
+        const totalTools = """ + str(len(tools_sorted)) + """;
+        
+        let criticalHighCount = 0;
+        document.querySelectorAll('[data-severity]').forEach(row => {
+            const sev = row.getAttribute('data-severity');
+            if (sev === 'CRITICAL' || sev === 'HIGH') {
+                criticalHighCount++;
+            }
+        });
+        
+        document.getElementById('total-findings').textContent = totalFindings;
+        document.getElementById('total-resources').textContent = totalResources;
+        document.getElementById('total-tools').textContent = totalTools;
+        document.getElementById('critical-high').textContent = criticalHighCount;
+        
+        function toggleSection(header) {
+            const section = header.parentElement;
+            section.classList.toggle('collapsed');
+        }
+        
+        function expandAll() {
+            document.querySelectorAll('.resource-section').forEach(section => {
+                section.classList.remove('collapsed');
+            });
+        }
+        
+        function collapseAll() {
+            document.querySelectorAll('.resource-section').forEach(section => {
+                section.classList.add('collapsed');
+            });
+        }
+        
+        // Filtering
+        const severityFilter = document.getElementById('severity-filter');
+        const toolFilter = document.getElementById('tool-filter');
+        const searchInput = document.getElementById('search');
+        
+        function applyFilters() {
+            const sevValue = severityFilter.value;
+            const toolValue = toolFilter.value;
+            const searchValue = searchInput.value.toLowerCase();
+            
+            document.querySelectorAll('.resource-section').forEach(section => {
+                const resourceKey = section.getAttribute('data-resource').toLowerCase();
+                let hasVisibleRows = false;
+                
+                section.querySelectorAll('tbody tr').forEach(row => {
+                    const rowSev = row.getAttribute('data-severity');
+                    const rowTools = JSON.parse(row.getAttribute('data-tools'));
+                    const rowText = row.textContent.toLowerCase();
+                    
+                    let show = true;
+                    
+                    // Severity filter
+                    if (sevValue !== 'all' && rowSev !== sevValue) {
+                        show = false;
+                    }
+                    
+                    // Tool filter
+                    if (toolValue !== 'all' && !rowTools.includes(toolValue)) {
+                        show = false;
+                    }
+                    
+                    // Search filter
+                    if (searchValue && !rowText.includes(searchValue) && !resourceKey.includes(searchValue)) {
+                        show = false;
+                    }
+                    
+                    row.style.display = show ? '' : 'none';
+                    if (show) hasVisibleRows = true;
+                });
+                
+                section.style.display = hasVisibleRows ? '' : 'none';
+            });
+        }
+        
+        severityFilter.addEventListener('change', applyFilters);
+        toolFilter.addEventListener('change', applyFilters);
+        searchInput.addEventListener('input', applyFilters);
+        
+        // Collapse all by default for better performance
+        collapseAll();
+    </script>
+</body>
+</html>
+"""
+    
+    out_html.parent.mkdir(parents=True, exist_ok=True)
+    out_html.write_text(html, encoding="utf-8")
+    note(f"wrote HTML matrix: {out_html}")
+
 # ------------------------
 # CLI
 # ------------------------
@@ -1007,11 +1618,13 @@ def parse_args() -> argparse.Namespace:
     ap.add_argument("--out-json", default=str(OUT_JSON), help="Path to write normalized JSON bundle.")
     ap.add_argument("--out-excel", default=str(OUT_DIR / "security_findings.xlsx"), help="Path to Excel report.")
     ap.add_argument("--out-csv", default=str(OUT_DIR / "consensus_findings.csv"), help="Path to consensus CSV.")
+    ap.add_argument("--out-html", default=str(OUT_DIR / "vulnerability_matrix.html"), help="Path to HTML matrix report.")
     ap.add_argument("--threshold", type=int, default=3, help="Minimum distinct tools that must agree to mark 'confirmed'.")
     ap.add_argument("--group-by", choices=["rule","message","rule_or_message"], default="rule",
                     help="How to group findings across tools when counting agreement.")
     ap.add_argument("--no-excel", action="store_true", help="Skip Excel generation.")
     ap.add_argument("--no-csv", action="store_true", help="Skip CSV consensus export.")
+    ap.add_argument("--no-html", action="store_true", help="Skip HTML matrix generation.")
     return ap.parse_args()
 
 # ------------------------
@@ -1024,6 +1637,7 @@ def main():
     out_json= Path(args.out_json)
     out_excel= Path(args.out_excel)
     out_csv = Path(args.out_csv)
+    out_html = Path(args.out_html)
 
     all_findings = collect_all(raw_dir)
 
@@ -1048,6 +1662,9 @@ def main():
 
     if not args.no_excel:
         write_excel(annotated, out_excel)
+
+    if not args.no_html:
+        write_html(annotated, out_html)
 
     note(f"Raw detection files preserved in: {raw_dir}")
 
