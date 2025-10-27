@@ -1,0 +1,2493 @@
+{
+  "generated_at": "2025-10-26T12:59:10Z",
+  "version": "sfk-v6.0-llm-payload",
+  "items": [
+    {
+      "file": "(unknown)",
+      "category": "CAP_SYS_ADMIN",
+      "tools": [
+        "KubeLinter",
+        "Kubescape"
+      ],
+      "support_count": 2,
+      "rule_ids": [],
+      "hints": [
+        "drop-net-raw-capability",
+        "insecure-capabilities",
+        "insecure-capabilities"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "(unknown)",
+      "category": "DEFAULT_NAMESPACE",
+      "tools": [
+        "KubeLinter"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "hints": [
+        "no-extensions-v1beta"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "(unknown)",
+      "category": "HARD_CODED_CREDS",
+      "tools": [
+        "KubeLinter",
+        "Kubescape"
+      ],
+      "support_count": 2,
+      "rule_ids": [],
+      "hints": [
+        "env-var-secret",
+        "Add Checkov, Conftest, and Gitleaks integration\nIntroduces Checkov, Conftest, and Gitleaks as new detectors in the scanning pipeline. Updates orchestration functions to include these tools, adds configuration files for Checkov, Kube-Linter, and Polaris, and implements HTML vulnerability matrix output. Also improves normalization logic for kube-score findings and removes obsolete test and log files.",
+        "Add Checkov, Conftest, and Gitleaks integration\nIntroduces Checkov, Conftest, and Gitleaks as new detectors in the scanning pipeline. Updates orchestration functions to include these tools, adds configuration files for Checkov, Kube-Linter, and Polaris, and implements HTML vulnerability matrix output. Also improves normalization logic for kube-score findings and removes obsolete test and log files."
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "(unknown)",
+      "category": "HOSTPATH",
+      "tools": [
+        "KubeLinter",
+        "Kubescape"
+      ],
+      "support_count": 2,
+      "rule_ids": [],
+      "hints": [
+        "docker-sock",
+        "host system directory \"/var/run/docker.sock\" is mounted on container \"jenkins-agent\"",
+        "docker-sock"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "(unknown)",
+      "category": "IMAGE_LATEST",
+      "tools": [
+        "KubeLinter"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "hints": [
+        "The container \"jenkins-agent\" is using an invalid container image, \"jenkins/inbound-agent:latest\". Please use images that are not blocked by the `BlockList` criteria : [\".*:(latest)$\" \"^[^:]*$\" \"(.*/[^:]+)$\"]",
+        "The container \"nginx\" is using an invalid container image, \"nginx:latest\". Please use images that are not blocked by the `BlockList` criteria : [\".*:(latest)$\" \"^[^:]*$\" \"(.*/[^:]+)$\"]",
+        "The container \"app-container\" is using an invalid container image, \"myimage:latest\". Please use images that are not blocked by the `BlockList` criteria : [\".*:(latest)$\" \"^[^:]*$\" \"(.*/[^:]+)$\"]"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "(unknown)",
+      "category": "NO_RES_LIMITS",
+      "tools": [
+        "KubeLinter",
+        "Kubescape"
+      ],
+      "support_count": 2,
+      "rule_ids": [],
+      "hints": [
+        "unset-cpu-requirements",
+        "unset-memory-requirements",
+        "resources-memory-limits"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "(unknown)",
+      "category": "PRIVILEGED",
+      "tools": [
+        "KubeLinter"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "hints": [
+        "privileged-container"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "(unknown)",
+      "category": "PRIV_ESCALATION",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "hints": [
+        "rule-allow-privilege-escalation",
+        "rule-allow-privilege-escalation",
+        "rule-allow-privilege-escalation"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "(unknown)",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "tools": [
+        "KubeLinter"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "hints": [
+        "run-as-non-root",
+        "container \"jenkins-agent\" is not set to runAsNonRoot",
+        "container \"nginx\" is not set to runAsNonRoot"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "(unknown)",
+      "category": "SERVICEACCOUNT_TOKEN_AUTO",
+      "tools": [
+        "KubeLinter"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "hints": [
+        "deprecated-service-account-field"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "(unknown)",
+      "category": "SERVICE_NODEPORT",
+      "tools": [
+        "KubeLinter"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "hints": [
+        "dangling-service"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "(unknown)",
+      "category": "YAML_FORMATTING",
+      "tools": [
+        "KubeLinter"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "hints": [
+        "duplicate-env-var"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "/spec",
+      "category": "SCHEMA_INVALID",
+      "tools": [
+        "KubeConform"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "hints": [
+        "missing property 'selector'"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "13.jenkins_agent_pod.yaml",
+      "category": "CAP_SYS_ADMIN",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CapabilityOrSecurityContextMissing"
+      ],
+      "hints": [
+        "CapabilityOrSecurityContextMissing"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "13.jenkins_agent_pod.yaml",
+      "category": "HARD_CODED_CREDS",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "hints": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "13.jenkins_agent_pod.yaml",
+      "category": "HOSTPATH",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "SensitivePathsMounted"
+      ],
+      "hints": [
+        "SensitivePathsMounted"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "13.jenkins_agent_pod.yaml",
+      "category": "NO_APPARMOR",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AppArmorAnnotationMissing"
+      ],
+      "hints": [
+        "AppArmorAnnotationMissing"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "13.jenkins_agent_pod.yaml",
+      "category": "NO_SECCOMP",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "SeccompProfileMissing"
+      ],
+      "hints": [
+        "SeccompProfileMissing"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "13.jenkins_agent_pod.yaml",
+      "category": "PRIV_ESCALATION",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "hints": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "13.jenkins_agent_pod.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "hints": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "13.jenkins_agent_pod.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "RunAsNonRootPSCNilCSCNil"
+      ],
+      "hints": [
+        "RunAsNonRootPSCNilCSCNil"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "13.jenkins_agent_pod.yaml",
+      "category": "YAML_FORMATTING",
+      "tools": [
+        "Yamllint"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "hints": [
+        "YAML formatting",
+        "YAML formatting",
+        "YAML formatting"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "13.nginx_privileged_deployment.yaml",
+      "category": "CAP_SYS_ADMIN",
+      "tools": [
+        "Checkov",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "support_count": 3,
+      "rule_ids": [
+        "CKV_K8S_37",
+        "CapabilityOrSecurityContextMissing",
+        "KSV004",
+        "KSV106"
+      ],
+      "hints": [
+        "Minimize the admission of containers with capabilities assigned",
+        "CapabilityOrSecurityContextMissing",
+        "Default capabilities: some containers do not drop any"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "13.nginx_privileged_deployment.yaml",
+      "category": "DEFAULT_NAMESPACE",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV110",
+        "KSV118"
+      ],
+      "hints": [
+        "Workloads in the default namespace",
+        "Default security context configured"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "13.nginx_privileged_deployment.yaml",
+      "category": "HARD_CODED_CREDS",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "hints": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "13.nginx_privileged_deployment.yaml",
+      "category": "IMAGE_LATEST",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_14",
+        "KSV013"
+      ],
+      "hints": [
+        "Image Tag should be fixed - not latest or blank",
+        "Image tag \":latest\" used"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "13.nginx_privileged_deployment.yaml",
+      "category": "NO_APPARMOR",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AppArmorAnnotationMissing"
+      ],
+      "hints": [
+        "AppArmorAnnotationMissing"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "13.nginx_privileged_deployment.yaml",
+      "category": "NO_PROBES",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_8"
+      ],
+      "hints": [
+        "Liveness Probe Should be Configured"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "13.nginx_privileged_deployment.yaml",
+      "category": "NO_RES_LIMITS",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_10",
+        "CKV_K8S_11",
+        "CKV_K8S_12",
+        "CKV_K8S_13",
+        "KSV011",
+        "KSV015",
+        "KSV016",
+        "KSV018"
+      ],
+      "hints": [
+        "CPU requests should be set",
+        "CPU limits should be set",
+        "Memory limits should be set"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "13.nginx_privileged_deployment.yaml",
+      "category": "NO_SECCOMP",
+      "tools": [
+        "Checkov",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "support_count": 3,
+      "rule_ids": [
+        "CKV_K8S_31",
+        "KSV104",
+        "SeccompProfileMissing"
+      ],
+      "hints": [
+        "Ensure that the seccomp profile is set to docker/default or runtime/default",
+        "SeccompProfileMissing",
+        "Seccomp policies disabled"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "13.nginx_privileged_deployment.yaml",
+      "category": "PRIVILEGED",
+      "tools": [
+        "Checkov",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "support_count": 3,
+      "rule_ids": [
+        "CKV_K8S_22",
+        "KSV001",
+        "KSV017",
+        "PrivilegedTrue"
+      ],
+      "hints": [
+        "Use read-only filesystem for containers where possible",
+        "PrivilegedTrue",
+        "Can elevate its own privileges"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "13.nginx_privileged_deployment.yaml",
+      "category": "PRIV_ESCALATION",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "hints": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "13.nginx_privileged_deployment.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "hints": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "13.nginx_privileged_deployment.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "tools": [
+        "KubeAudit",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "KSV003",
+        "KSV012",
+        "RunAsNonRootPSCNilCSCNil"
+      ],
+      "hints": [
+        "RunAsNonRootPSCNilCSCNil",
+        "Default capabilities: some containers do not drop all",
+        "Runs as root user"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "13.nginx_privileged_deployment.yaml",
+      "category": "SCHEMA_INVALID",
+      "tools": [
+        "KubeConform"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "hints": [
+        "nginx-deployment"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "13.nginx_privileged_deployment.yaml",
+      "category": "YAML_FORMATTING",
+      "tools": [
+        "Yamllint"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "hints": [
+        "YAML formatting",
+        "YAML formatting",
+        "YAML formatting"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "14.deployment_single_replica.yaml",
+      "category": "CAP_SYS_ADMIN",
+      "tools": [
+        "Checkov",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "support_count": 3,
+      "rule_ids": [
+        "CKV_K8S_37",
+        "CapabilityOrSecurityContextMissing",
+        "KSV004",
+        "KSV106"
+      ],
+      "hints": [
+        "Minimize the admission of containers with capabilities assigned",
+        "CapabilityOrSecurityContextMissing",
+        "Default capabilities: some containers do not drop any"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "14.deployment_single_replica.yaml",
+      "category": "DEFAULT_NAMESPACE",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV110",
+        "KSV118"
+      ],
+      "hints": [
+        "Workloads in the default namespace",
+        "Default security context configured",
+        "Default security context configured"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "14.deployment_single_replica.yaml",
+      "category": "HARD_CODED_CREDS",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "hints": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "14.deployment_single_replica.yaml",
+      "category": "IMAGE_LATEST",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_14",
+        "KSV013"
+      ],
+      "hints": [
+        "Image Tag should be fixed - not latest or blank",
+        "Image tag \":latest\" used"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "14.deployment_single_replica.yaml",
+      "category": "NO_APPARMOR",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AppArmorAnnotationMissing"
+      ],
+      "hints": [
+        "AppArmorAnnotationMissing"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "14.deployment_single_replica.yaml",
+      "category": "NO_PROBES",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_8"
+      ],
+      "hints": [
+        "Liveness Probe Should be Configured"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "14.deployment_single_replica.yaml",
+      "category": "NO_RES_LIMITS",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_10",
+        "CKV_K8S_11",
+        "CKV_K8S_12",
+        "CKV_K8S_13",
+        "KSV011",
+        "KSV015",
+        "KSV016",
+        "KSV018"
+      ],
+      "hints": [
+        "CPU requests should be set",
+        "CPU limits should be set",
+        "Memory limits should be set"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "14.deployment_single_replica.yaml",
+      "category": "NO_SECCOMP",
+      "tools": [
+        "Checkov",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "support_count": 3,
+      "rule_ids": [
+        "CKV_K8S_31",
+        "KSV104",
+        "SeccompProfileMissing"
+      ],
+      "hints": [
+        "Ensure that the seccomp profile is set to docker/default or runtime/default",
+        "SeccompProfileMissing",
+        "Seccomp policies disabled"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "14.deployment_single_replica.yaml",
+      "category": "PRIVILEGED",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_22",
+        "KSV001"
+      ],
+      "hints": [
+        "Use read-only filesystem for containers where possible",
+        "Can elevate its own privileges"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "14.deployment_single_replica.yaml",
+      "category": "PRIV_ESCALATION",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "hints": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "14.deployment_single_replica.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "hints": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "14.deployment_single_replica.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "tools": [
+        "KubeAudit",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "KSV003",
+        "KSV012",
+        "RunAsNonRootPSCNilCSCNil"
+      ],
+      "hints": [
+        "RunAsNonRootPSCNilCSCNil",
+        "Default capabilities: some containers do not drop all",
+        "Runs as root user"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "14.deployment_single_replica.yaml",
+      "category": "SCHEMA_INVALID",
+      "tools": [
+        "KubeConform"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "hints": [
+        "single-replica-deployment"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "14.deployment_single_replica.yaml",
+      "category": "YAML_FORMATTING",
+      "tools": [
+        "Yamllint"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "hints": [
+        "YAML formatting",
+        "YAML formatting",
+        "YAML formatting"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "14.genkubesec_privileged_pod.yaml",
+      "category": "CAP_SYS_ADMIN",
+      "tools": [
+        "Checkov",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "support_count": 3,
+      "rule_ids": [
+        "CKV_K8S_37",
+        "CapabilityOrSecurityContextMissing",
+        "KSV004",
+        "KSV106"
+      ],
+      "hints": [
+        "Minimize the admission of containers with capabilities assigned",
+        "CapabilityOrSecurityContextMissing",
+        "Default capabilities: some containers do not drop any"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "14.genkubesec_privileged_pod.yaml",
+      "category": "DEFAULT_NAMESPACE",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV110",
+        "KSV118"
+      ],
+      "hints": [
+        "Workloads in the default namespace",
+        "Default security context configured"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "14.genkubesec_privileged_pod.yaml",
+      "category": "HARD_CODED_CREDS",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "hints": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "14.genkubesec_privileged_pod.yaml",
+      "category": "IMAGE_LATEST",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_14",
+        "KSV013"
+      ],
+      "hints": [
+        "Image Tag should be fixed - not latest or blank",
+        "Image tag \":latest\" used"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "14.genkubesec_privileged_pod.yaml",
+      "category": "NO_APPARMOR",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AppArmorAnnotationMissing"
+      ],
+      "hints": [
+        "AppArmorAnnotationMissing"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "14.genkubesec_privileged_pod.yaml",
+      "category": "NO_PROBES",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_8"
+      ],
+      "hints": [
+        "Liveness Probe Should be Configured"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "14.genkubesec_privileged_pod.yaml",
+      "category": "NO_RES_LIMITS",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_10",
+        "CKV_K8S_11",
+        "CKV_K8S_12",
+        "CKV_K8S_13",
+        "KSV011",
+        "KSV015",
+        "KSV016",
+        "KSV018"
+      ],
+      "hints": [
+        "CPU requests should be set",
+        "CPU limits should be set",
+        "Memory limits should be set"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "14.genkubesec_privileged_pod.yaml",
+      "category": "NO_SECCOMP",
+      "tools": [
+        "Checkov",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "support_count": 3,
+      "rule_ids": [
+        "CKV_K8S_31",
+        "KSV104",
+        "SeccompProfileMissing"
+      ],
+      "hints": [
+        "Ensure that the seccomp profile is set to docker/default or runtime/default",
+        "SeccompProfileMissing",
+        "Seccomp policies disabled"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "14.genkubesec_privileged_pod.yaml",
+      "category": "PRIVILEGED",
+      "tools": [
+        "Checkov",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "support_count": 3,
+      "rule_ids": [
+        "CKV_K8S_22",
+        "KSV001",
+        "KSV017",
+        "PrivilegedTrue"
+      ],
+      "hints": [
+        "Use read-only filesystem for containers where possible",
+        "PrivilegedTrue",
+        "Can elevate its own privileges"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "14.genkubesec_privileged_pod.yaml",
+      "category": "PRIV_ESCALATION",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "hints": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "14.genkubesec_privileged_pod.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "hints": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "14.genkubesec_privileged_pod.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "tools": [
+        "KubeAudit",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "KSV003",
+        "KSV012",
+        "RunAsNonRootPSCNilCSCNil"
+      ],
+      "hints": [
+        "RunAsNonRootPSCNilCSCNil",
+        "Default capabilities: some containers do not drop all",
+        "Runs as root user"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "14.genkubesec_privileged_pod.yaml",
+      "category": "SCHEMA_INVALID",
+      "tools": [
+        "KubeConform"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "hints": [
+        "pod-name"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "14.genkubesec_privileged_pod.yaml",
+      "category": "YAML_FORMATTING",
+      "tools": [
+        "Yamllint"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "hints": [
+        "YAML formatting",
+        "YAML formatting",
+        "YAML formatting"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "14.ingress_deprecated_api.yaml",
+      "category": "DEPRECATED_API",
+      "tools": [
+        "Pluto"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "extensions/v1beta1"
+      ],
+      "hints": [
+        "Ingress extensions/v1beta1"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "14.ingress_deprecated_api.yaml",
+      "category": "SCHEMA_INVALID",
+      "tools": [
+        "KubeConform"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "hints": [
+        "gateway-ingress"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "14.ingress_deprecated_api.yaml",
+      "category": "YAML_FORMATTING",
+      "tools": [
+        "Yamllint"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "hints": [
+        "YAML formatting",
+        "YAML formatting",
+        "YAML formatting"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "15.pod_privilege_escalation.yaml",
+      "category": "CAP_SYS_ADMIN",
+      "tools": [
+        "Checkov",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "support_count": 3,
+      "rule_ids": [
+        "CKV_K8S_37",
+        "CapabilityOrSecurityContextMissing",
+        "KSV004",
+        "KSV106"
+      ],
+      "hints": [
+        "Minimize the admission of containers with capabilities assigned",
+        "CapabilityOrSecurityContextMissing",
+        "Default capabilities: some containers do not drop any"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "15.pod_privilege_escalation.yaml",
+      "category": "DEFAULT_NAMESPACE",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV110",
+        "KSV118"
+      ],
+      "hints": [
+        "Workloads in the default namespace",
+        "Default security context configured"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "15.pod_privilege_escalation.yaml",
+      "category": "HARD_CODED_CREDS",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "hints": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "15.pod_privilege_escalation.yaml",
+      "category": "IMAGE_LATEST",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_14",
+        "KSV013"
+      ],
+      "hints": [
+        "Image Tag should be fixed - not latest or blank",
+        "Image tag \":latest\" used"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "15.pod_privilege_escalation.yaml",
+      "category": "NO_APPARMOR",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AppArmorAnnotationMissing"
+      ],
+      "hints": [
+        "AppArmorAnnotationMissing"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "15.pod_privilege_escalation.yaml",
+      "category": "NO_PROBES",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_8"
+      ],
+      "hints": [
+        "Liveness Probe Should be Configured"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "15.pod_privilege_escalation.yaml",
+      "category": "NO_RES_LIMITS",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_10",
+        "CKV_K8S_11",
+        "CKV_K8S_12",
+        "CKV_K8S_13",
+        "KSV011",
+        "KSV015",
+        "KSV016",
+        "KSV018"
+      ],
+      "hints": [
+        "CPU requests should be set",
+        "CPU limits should be set",
+        "Memory limits should be set"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "15.pod_privilege_escalation.yaml",
+      "category": "NO_SECCOMP",
+      "tools": [
+        "Checkov",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "support_count": 3,
+      "rule_ids": [
+        "CKV_K8S_31",
+        "KSV104",
+        "SeccompProfileMissing"
+      ],
+      "hints": [
+        "Ensure that the seccomp profile is set to docker/default or runtime/default",
+        "SeccompProfileMissing",
+        "Seccomp policies disabled"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "15.pod_privilege_escalation.yaml",
+      "category": "PRIVILEGED",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_22",
+        "KSV001"
+      ],
+      "hints": [
+        "Use read-only filesystem for containers where possible",
+        "Can elevate its own privileges"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "15.pod_privilege_escalation.yaml",
+      "category": "PRIV_ESCALATION",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AllowPrivilegeEscalationTrue"
+      ],
+      "hints": [
+        "AllowPrivilegeEscalationTrue"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "15.pod_privilege_escalation.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "hints": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "15.pod_privilege_escalation.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "tools": [
+        "KubeAudit",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "KSV003",
+        "KSV012",
+        "RunAsNonRootPSCNilCSCNil"
+      ],
+      "hints": [
+        "RunAsNonRootPSCNilCSCNil",
+        "Default capabilities: some containers do not drop all",
+        "Runs as root user"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "15.pod_privilege_escalation.yaml",
+      "category": "SCHEMA_INVALID",
+      "tools": [
+        "KubeConform"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "hints": [
+        "example-pod"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "15.pod_privilege_escalation.yaml",
+      "category": "YAML_FORMATTING",
+      "tools": [
+        "Yamllint"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "hints": [
+        "YAML formatting",
+        "YAML formatting",
+        "YAML formatting"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "16.busybox_pod_missing_memory.yaml",
+      "category": "CAP_SYS_ADMIN",
+      "tools": [
+        "Checkov",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "support_count": 3,
+      "rule_ids": [
+        "CKV_K8S_37",
+        "CapabilityOrSecurityContextMissing",
+        "KSV004",
+        "KSV106"
+      ],
+      "hints": [
+        "Minimize the admission of containers with capabilities assigned",
+        "CapabilityOrSecurityContextMissing",
+        "Default capabilities: some containers do not drop any"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "16.busybox_pod_missing_memory.yaml",
+      "category": "DEFAULT_NAMESPACE",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV118"
+      ],
+      "hints": [
+        "Default security context configured",
+        "Default security context configured"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "16.busybox_pod_missing_memory.yaml",
+      "category": "HARD_CODED_CREDS",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "hints": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "16.busybox_pod_missing_memory.yaml",
+      "category": "NO_APPARMOR",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AppArmorAnnotationMissing"
+      ],
+      "hints": [
+        "AppArmorAnnotationMissing"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "16.busybox_pod_missing_memory.yaml",
+      "category": "NO_PROBES",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_8"
+      ],
+      "hints": [
+        "Liveness Probe Should be Configured"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "16.busybox_pod_missing_memory.yaml",
+      "category": "NO_RES_LIMITS",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_11",
+        "CKV_K8S_12",
+        "CKV_K8S_13",
+        "KSV011",
+        "KSV016",
+        "KSV018"
+      ],
+      "hints": [
+        "CPU limits should be set",
+        "Memory limits should be set",
+        "Memory requests should be set"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "16.busybox_pod_missing_memory.yaml",
+      "category": "NO_SECCOMP",
+      "tools": [
+        "Checkov",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "support_count": 3,
+      "rule_ids": [
+        "CKV_K8S_31",
+        "KSV104",
+        "SeccompProfileMissing"
+      ],
+      "hints": [
+        "Ensure that the seccomp profile is set to docker/default or runtime/default",
+        "SeccompProfileMissing",
+        "Seccomp policies disabled"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "16.busybox_pod_missing_memory.yaml",
+      "category": "PRIVILEGED",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_22",
+        "KSV001"
+      ],
+      "hints": [
+        "Use read-only filesystem for containers where possible",
+        "Can elevate its own privileges"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "16.busybox_pod_missing_memory.yaml",
+      "category": "PRIV_ESCALATION",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "hints": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "16.busybox_pod_missing_memory.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "hints": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "16.busybox_pod_missing_memory.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "tools": [
+        "KubeAudit",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "KSV003",
+        "KSV012",
+        "RunAsNonRootPSCNilCSCNil"
+      ],
+      "hints": [
+        "RunAsNonRootPSCNilCSCNil",
+        "Default capabilities: some containers do not drop all",
+        "Runs as root user"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "16.busybox_pod_missing_memory.yaml",
+      "category": "SCHEMA_INVALID",
+      "tools": [
+        "KubeConform"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "hints": [
+        "busybox-pod"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "16.busybox_pod_missing_memory.yaml",
+      "category": "YAML_FORMATTING",
+      "tools": [
+        "Yamllint"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "hints": [
+        "YAML formatting",
+        "YAML formatting",
+        "YAML formatting"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "20.wordpress_mariadb_compose.yaml",
+      "category": "SCHEMA_INVALID",
+      "tools": [
+        "KubeConform"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "hints": [
+        "error while parsing: missing 'kind' key"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "20.wordpress_mariadb_compose.yaml",
+      "category": "YAML_FORMATTING",
+      "tools": [
+        "Yamllint"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "hints": [
+        "YAML formatting",
+        "YAML formatting",
+        "YAML formatting"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "26.flink_port_mismatch.yaml",
+      "category": "CAP_SYS_ADMIN",
+      "tools": [
+        "Checkov",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "support_count": 3,
+      "rule_ids": [
+        "CKV_K8S_37",
+        "CapabilityOrSecurityContextMissing",
+        "KSV004",
+        "KSV106"
+      ],
+      "hints": [
+        "Minimize the admission of containers with capabilities assigned",
+        "CapabilityOrSecurityContextMissing",
+        "Default capabilities: some containers do not drop any"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "26.flink_port_mismatch.yaml",
+      "category": "DEFAULT_NAMESPACE",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV0125",
+        "KSV110",
+        "KSV118"
+      ],
+      "hints": [
+        "Workloads in the default namespace",
+        "Default security context configured",
+        "Default security context configured"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "26.flink_port_mismatch.yaml",
+      "category": "HARD_CODED_CREDS",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "hints": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "26.flink_port_mismatch.yaml",
+      "category": "IMAGE_LATEST",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_14",
+        "KSV013"
+      ],
+      "hints": [
+        "Image Tag should be fixed - not latest or blank",
+        "Image tag \":latest\" used"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "26.flink_port_mismatch.yaml",
+      "category": "NO_APPARMOR",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AppArmorAnnotationMissing"
+      ],
+      "hints": [
+        "AppArmorAnnotationMissing"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "26.flink_port_mismatch.yaml",
+      "category": "NO_PROBES",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_8"
+      ],
+      "hints": [
+        "Liveness Probe Should be Configured"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "26.flink_port_mismatch.yaml",
+      "category": "NO_RES_LIMITS",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_10",
+        "CKV_K8S_11",
+        "CKV_K8S_12",
+        "CKV_K8S_13",
+        "KSV011",
+        "KSV015",
+        "KSV016",
+        "KSV018"
+      ],
+      "hints": [
+        "CPU requests should be set",
+        "CPU limits should be set",
+        "Memory limits should be set"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "26.flink_port_mismatch.yaml",
+      "category": "NO_SECCOMP",
+      "tools": [
+        "Checkov",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "support_count": 3,
+      "rule_ids": [
+        "CKV_K8S_31",
+        "KSV104",
+        "SeccompProfileMissing"
+      ],
+      "hints": [
+        "Ensure that the seccomp profile is set to docker/default or runtime/default",
+        "SeccompProfileMissing",
+        "Seccomp policies disabled"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "26.flink_port_mismatch.yaml",
+      "category": "PRIVILEGED",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_22",
+        "KSV001"
+      ],
+      "hints": [
+        "Use read-only filesystem for containers where possible",
+        "Can elevate its own privileges"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "26.flink_port_mismatch.yaml",
+      "category": "PRIV_ESCALATION",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "hints": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "26.flink_port_mismatch.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "hints": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "26.flink_port_mismatch.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "tools": [
+        "KubeAudit",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "KSV003",
+        "KSV012",
+        "RunAsNonRootPSCNilCSCNil"
+      ],
+      "hints": [
+        "RunAsNonRootPSCNilCSCNil",
+        "Default capabilities: some containers do not drop all",
+        "Runs as root user"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "26.flink_port_mismatch.yaml",
+      "category": "SCHEMA_INVALID",
+      "tools": [
+        "KubeConform"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "hints": [
+        "flink"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "26.flink_port_mismatch.yaml",
+      "category": "YAML_FORMATTING",
+      "tools": [
+        "Yamllint"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "hints": [
+        "YAML formatting",
+        "YAML formatting",
+        "YAML formatting"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "27.kubeteus_misconfigured_policy.yaml",
+      "category": "SCHEMA_INVALID",
+      "tools": [
+        "KubeConform"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "hints": [
+        "egress-product"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "27.kubeteus_misconfigured_policy.yaml",
+      "category": "YAML_FORMATTING",
+      "tools": [
+        "Yamllint"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "hints": [
+        "YAML formatting",
+        "YAML formatting",
+        "YAML formatting"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "28.role_overly_permissive.yaml",
+      "category": "RBAC_OVER_PERMISSIVE",
+      "tools": [
+        "KubeConform",
+        "RBACPolice"
+      ],
+      "support_count": 2,
+      "rule_ids": [],
+      "hints": [
+        "frontend-role",
+        "DangerousVerb_delete"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "28.role_overly_permissive.yaml",
+      "category": "YAML_FORMATTING",
+      "tools": [
+        "Yamllint"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "hints": [
+        "YAML formatting",
+        "YAML formatting",
+        "YAML formatting"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "29.helm_rabbitmq_hardcoded_credentials.yaml",
+      "category": "SCHEMA_INVALID",
+      "tools": [
+        "KubeConform"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "hints": [
+        "error while parsing: missing 'kind' key"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "29.helm_rabbitmq_hardcoded_credentials.yaml",
+      "category": "YAML_FORMATTING",
+      "tools": [
+        "Yamllint"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "hints": [
+        "YAML formatting",
+        "YAML formatting"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "CAP_SYS_ADMIN",
+      "tools": [
+        "Checkov",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "support_count": 3,
+      "rule_ids": [
+        "CKV_K8S_37",
+        "CapabilityOrSecurityContextMissing",
+        "KSV004",
+        "KSV106"
+      ],
+      "hints": [
+        "Minimize the admission of containers with capabilities assigned",
+        "CapabilityOrSecurityContextMissing",
+        "Default capabilities: some containers do not drop any"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "DEFAULT_NAMESPACE",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV0125",
+        "KSV110",
+        "KSV118"
+      ],
+      "hints": [
+        "Workloads in the default namespace",
+        "Default security context configured",
+        "Restrict container images to trusted registries"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "HARD_CODED_CREDS",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "hints": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "IMAGE_LATEST",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_15"
+      ],
+      "hints": [
+        "Image Pull Policy should be Always"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "NO_APPARMOR",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AppArmorAnnotationMissing"
+      ],
+      "hints": [
+        "AppArmorAnnotationMissing"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "NO_PROBES",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_8"
+      ],
+      "hints": [
+        "Liveness Probe Should be Configured"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "NO_RES_LIMITS",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_10",
+        "CKV_K8S_11",
+        "CKV_K8S_12",
+        "CKV_K8S_13",
+        "KSV011",
+        "KSV015",
+        "KSV016",
+        "KSV018"
+      ],
+      "hints": [
+        "CPU requests should be set",
+        "CPU limits should be set",
+        "Memory limits should be set"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "NO_SECCOMP",
+      "tools": [
+        "Checkov",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "support_count": 3,
+      "rule_ids": [
+        "CKV_K8S_31",
+        "KSV104",
+        "SeccompProfileMissing"
+      ],
+      "hints": [
+        "Ensure that the seccomp profile is set to docker/default or runtime/default",
+        "SeccompProfileMissing",
+        "Seccomp policies disabled"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "PRIVILEGED",
+      "tools": [
+        "Checkov",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "support_count": 3,
+      "rule_ids": [
+        "CKV_K8S_22",
+        "KSV001",
+        "KSV017",
+        "PrivilegedTrue"
+      ],
+      "hints": [
+        "Use read-only filesystem for containers where possible",
+        "PrivilegedTrue",
+        "Can elevate its own privileges"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "PRIV_ESCALATION",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "hints": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "hints": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "tools": [
+        "KubeAudit",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "KSV003",
+        "KSV012",
+        "RunAsNonRootPSCNilCSCNil"
+      ],
+      "hints": [
+        "RunAsNonRootPSCNilCSCNil",
+        "Default capabilities: some containers do not drop all",
+        "Runs as root user"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "SCHEMA_INVALID",
+      "tools": [
+        "KubeConform"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "hints": [
+        "efs-plugin"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "YAML_FORMATTING",
+      "tools": [
+        "Yamllint"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "hints": [
+        "YAML formatting",
+        "YAML formatting"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "3.multus_cni_misconfig.yaml",
+      "category": "SCHEMA_INVALID",
+      "tools": [
+        "KubeConform"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "hints": [
+        "multus-cni-config"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "3.multus_cni_misconfig.yaml",
+      "category": "YAML_FORMATTING",
+      "tools": [
+        "Yamllint"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "hints": [
+        "YAML formatting",
+        "YAML formatting"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "CAP_SYS_ADMIN",
+      "tools": [
+        "Checkov",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "support_count": 3,
+      "rule_ids": [
+        "CKV_K8S_37",
+        "CapabilityOrSecurityContextMissing",
+        "KSV004",
+        "KSV106"
+      ],
+      "hints": [
+        "Minimize the admission of containers with capabilities assigned",
+        "CapabilityOrSecurityContextMissing",
+        "Default capabilities: some containers do not drop any"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "DEFAULT_NAMESPACE",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV110",
+        "KSV118"
+      ],
+      "hints": [
+        "Workloads in the default namespace",
+        "Default security context configured",
+        "Default security context configured"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "HARD_CODED_CREDS",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "hints": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "IMAGE_LATEST",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_15"
+      ],
+      "hints": [
+        "Image Pull Policy should be Always"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "NO_APPARMOR",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AppArmorAnnotationMissing"
+      ],
+      "hints": [
+        "AppArmorAnnotationMissing"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "NO_PROBES",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_8"
+      ],
+      "hints": [
+        "Liveness Probe Should be Configured"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "NO_RES_LIMITS",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_10",
+        "CKV_K8S_11",
+        "CKV_K8S_12",
+        "CKV_K8S_13",
+        "KSV011",
+        "KSV015",
+        "KSV016",
+        "KSV018"
+      ],
+      "hints": [
+        "CPU requests should be set",
+        "CPU limits should be set",
+        "Memory limits should be set"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "NO_SECCOMP",
+      "tools": [
+        "Checkov",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "support_count": 3,
+      "rule_ids": [
+        "CKV_K8S_31",
+        "KSV104",
+        "SeccompProfileMissing"
+      ],
+      "hints": [
+        "Ensure that the seccomp profile is set to docker/default or runtime/default",
+        "SeccompProfileMissing",
+        "Seccomp policies disabled"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "PRIVILEGED",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_22",
+        "KSV001"
+      ],
+      "hints": [
+        "Use read-only filesystem for containers where possible",
+        "Can elevate its own privileges"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "PRIV_ESCALATION",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "hints": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "hints": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "tools": [
+        "KubeAudit",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "KSV003",
+        "KSV012",
+        "RunAsNonRootPSCNilCSCNil"
+      ],
+      "hints": [
+        "RunAsNonRootPSCNilCSCNil",
+        "Default capabilities: some containers do not drop all",
+        "Runs as root user"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "SCHEMA_INVALID",
+      "tools": [
+        "KubeConform"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "hints": [
+        "nginx"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "YAML_FORMATTING",
+      "tools": [
+        "Yamllint"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "hints": [
+        "YAML formatting",
+        "YAML formatting"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "34.unencrypted_secret.yaml",
+      "category": "HARD_CODED_CREDS",
+      "tools": [
+        "Gitleaks"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "kubernetes-secret-yaml"
+      ],
+      "hints": [
+        "kubernetes-secret-yaml"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "34.unencrypted_secret.yaml",
+      "category": "SCHEMA_INVALID",
+      "tools": [
+        "KubeConform"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "hints": [
+        "mysecret"
+      ],
+      "policy": "least-privilege"
+    },
+    {
+      "file": "34.unencrypted_secret.yaml",
+      "category": "YAML_FORMATTING",
+      "tools": [
+        "Yamllint"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "hints": [
+        "YAML formatting"
+      ],
+      "policy": "least-privilege"
+    }
+  ]
+}

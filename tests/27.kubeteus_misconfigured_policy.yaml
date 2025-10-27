@@ -1,0 +1,18 @@
+apiVersion: crd.projectcalico.org/v1
+kind: NetworkPolicy
+metadata:
+  name: egress-product
+  namespace: bookinfo
+spec:
+  # Selector uses a misspelled label ('productpagee') so the policy does not match any pods.
+  selector: app == 'productpagee'
+  egress:
+    - action: Allow
+      protocol: TCP
+      # 'endpointSelector' is not a valid field for Calico network policies; the correct field is 'selector'.
+      source:
+        endpointSelector: app == 'details'
+      destination:
+        # The port is incorrect: the productpage pod listens on 9080, not 9081.
+        ports:
+          - 9081

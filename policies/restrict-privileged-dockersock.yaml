@@ -1,0 +1,62 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: restrict-privileged-and-dockersock
+spec:
+  validationFailureAction: Audit
+  background: true
+  rules:
+  - name: no-privileged-containers
+    match:
+      any:
+      - resources:
+          kinds: ["Pod", "Deployment", "StatefulSet", "DaemonSet", "Job", "CronJob"]
+    validate:
+      message: "Privileged containers are not allowed."
+      pattern:
+        spec:
+          # If present, enforce no privileged in pod template (for Deployments/Jobs/CronJobs)
+          =(jobTemplate):
+            spec:
+              template:
+                spec:
+                  =(initContainers):
+                    - =(securityContext):
+                        =(privileged): "false"
+                  =(ephemeralContainers):
+                    - =(securityContext):
+                        =(privileged): "false"
+                  containers:
+                    - =(securityContext):
+                        =(privileged): "false"
+          # If no jobTemplate, enforce directly (for Pod, Deployment, etc.)
+          =(template):
+            spec:
+              =(initContainers):
+                - =(securityContext):
+                    =(privileged): "false"
+              =(ephemeralContainers):
+                - =(securityContext):
+                    =(privileged): "false"
+              containers:
+                - =(securityContext):
+                    =(privileged): "false"
+  - name: no-docker-sock-mount
+    match:
+      any:
+      - resources:
+          kinds: ["Pod", "Deployment", "StatefulSet", "DaemonSet", "Job", "CronJob"]
+    validate:
+      message: "HostPath mount of /var/run/docker.sock is not allowed."
+      deny:
+        conditions:
+          any:
+          - key: "{{ request.object.spec.volumes[?hostPath.path == '/var/run/docker.sock'] }}"
+            operator: NotEquals
+            value: ""
+          - key: "{{ request.object.spec.template.spec.volumes[?hostPath.path == '/var/run/docker.sock'] }}"
+            operator: NotEquals
+            value: ""
+          - key: "{{ request.object.spec.jobTemplate.spec.template.spec.volumes[?hostPath.path == '/var/run/docker.sock'] }}"
+            operator: NotEquals
+            value: ""

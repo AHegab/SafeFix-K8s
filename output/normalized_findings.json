@@ -1,2763 +1,3533 @@
 {
-  "version": "1.1",
-  "generatedAt": "2025-10-23T11:22:00.105174Z",
-  "source": "SafeFixK8s/Normalizer",
-  "threshold": 3,
-  "groupBy": "rule",
+  "generated_at": "2025-10-27T09:15:55Z",
+  "source": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw",
+  "total_raw_findings": 1572,
+  "normalized_count": 152,
   "findings": [
     {
-      "findingId": "b1c0f04664d971d6626acdc3f9b17566",
-      "tool": "kubelinter",
-      "ruleId": "docker-sock",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "Pod",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": {
-        "Message": "host system directory \"/var/run/docker.sock\" is mounted on container \"jenkins-agent\""
-      },
-      "location": {
-        "file": "/scan/13.jenkins_agent_pod.yaml",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubelinter_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "d02a9636c8cc3e9a518e3ba52546f978",
-      "tool": "kubelinter",
-      "ruleId": "latest-tag",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "Pod",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": {
-        "Message": "The container \"jenkins-agent\" is using an invalid container image, \"jenkins/inbound-agent:latest\". Please use images that are not blocked by the `BlockList` criteria : [\".*:(latest)$\" \"^[^:]*$\" \"(.*/[^:]+)$\"]"
-      },
-      "location": {
-        "file": "/scan/13.jenkins_agent_pod.yaml",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubelinter_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "45b264466a02010eec65e57509cf92b8",
-      "tool": "kubelinter",
-      "ruleId": "no-read-only-root-fs",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "Pod",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": {
-        "Message": "container \"jenkins-agent\" does not have a read-only root file system"
-      },
-      "location": {
-        "file": "/scan/13.jenkins_agent_pod.yaml",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubelinter_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "369940cd7b7447f987bde1bfd9801385",
-      "tool": "kubelinter",
-      "ruleId": "run-as-non-root",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "Pod",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": {
-        "Message": "container \"jenkins-agent\" is not set to runAsNonRoot"
-      },
-      "location": {
-        "file": "/scan/13.jenkins_agent_pod.yaml",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubelinter_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "aa2aa683ff637a67837bfc5bf538a8b2",
-      "tool": "kubelinter",
-      "ruleId": "unset-cpu-requirements",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "Pod",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": {
-        "Message": "container \"jenkins-agent\" has cpu request 0"
-      },
-      "location": {
-        "file": "/scan/13.jenkins_agent_pod.yaml",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubelinter_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "6b0f5e24b10ff2df6f90a258ac81f914",
-      "tool": "kubelinter",
-      "ruleId": "unset-memory-requirements",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "Pod",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": {
-        "Message": "container \"jenkins-agent\" has memory limit 0"
-      },
-      "location": {
-        "file": "/scan/13.jenkins_agent_pod.yaml",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubelinter_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "bf6468ee8c9753588cd32f742180184d",
-      "tool": "kubelinter",
-      "ruleId": "latest-tag",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "Deployment",
-        "name": "nginx-deployment",
-        "namespace": ""
-      },
-      "message": {
-        "Message": "The container \"nginx\" is using an invalid container image, \"nginx:latest\". Please use images that are not blocked by the `BlockList` criteria : [\".*:(latest)$\" \"^[^:]*$\" \"(.*/[^:]+)$\"]"
-      },
-      "location": {
-        "file": "/scan/13.nginx_privileged_deployment.yaml",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubelinter_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "9911bc76ea65c4d492884b31266444f9",
-      "tool": "kubelinter",
-      "ruleId": "mismatching-selector",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "Deployment",
-        "name": "nginx-deployment",
-        "namespace": ""
-      },
-      "message": {
-        "Message": "object has no selector specified"
-      },
-      "location": {
-        "file": "/scan/13.nginx_privileged_deployment.yaml",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubelinter_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "6fdc0f4f5100883632eed83243e10005",
-      "tool": "kubelinter",
-      "ruleId": "no-anti-affinity",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "Deployment",
-        "name": "nginx-deployment",
-        "namespace": ""
-      },
-      "message": {
-        "Message": "object has 2 replicas but does not specify inter pod anti-affinity"
-      },
-      "location": {
-        "file": "/scan/13.nginx_privileged_deployment.yaml",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubelinter_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "5095f704a70c40211850a9bca23e66c9",
-      "tool": "kubelinter",
-      "ruleId": "no-read-only-root-fs",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "Deployment",
-        "name": "nginx-deployment",
-        "namespace": ""
-      },
-      "message": {
-        "Message": "container \"nginx\" does not have a read-only root file system"
-      },
-      "location": {
-        "file": "/scan/13.nginx_privileged_deployment.yaml",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubelinter_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "7650fd6a07159dbb9c36761b569ec04c",
-      "tool": "kubelinter",
-      "ruleId": "privilege-escalation-container",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "Deployment",
-        "name": "nginx-deployment",
-        "namespace": ""
-      },
-      "message": {
-        "Message": "container \"nginx\" is Privileged hence allows privilege escalation."
-      },
-      "location": {
-        "file": "/scan/13.nginx_privileged_deployment.yaml",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubelinter_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "b101f0359e183a138591b63ed9d502db",
-      "tool": "kubelinter",
-      "ruleId": "privileged-container",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "Deployment",
-        "name": "nginx-deployment",
-        "namespace": ""
-      },
-      "message": {
-        "Message": "container \"nginx\" is privileged"
-      },
-      "location": {
-        "file": "/scan/13.nginx_privileged_deployment.yaml",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubelinter_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "4adb604d559f6520d9da137a146fcc89",
-      "tool": "kubelinter",
-      "ruleId": "run-as-non-root",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "Deployment",
-        "name": "nginx-deployment",
-        "namespace": ""
-      },
-      "message": {
-        "Message": "container \"nginx\" is not set to runAsNonRoot"
-      },
-      "location": {
-        "file": "/scan/13.nginx_privileged_deployment.yaml",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubelinter_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "724f2dfef1787e7cb3d458608795429c",
-      "tool": "kubelinter",
-      "ruleId": "unset-cpu-requirements",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "Deployment",
-        "name": "nginx-deployment",
-        "namespace": ""
-      },
-      "message": {
-        "Message": "container \"nginx\" has cpu request 0"
-      },
-      "location": {
-        "file": "/scan/13.nginx_privileged_deployment.yaml",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubelinter_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "1a5c77f0ae0b04fdca6ff639fc562bf6",
-      "tool": "kubelinter",
-      "ruleId": "unset-memory-requirements",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "Deployment",
-        "name": "nginx-deployment",
-        "namespace": ""
-      },
-      "message": {
-        "Message": "container \"nginx\" has memory limit 0"
-      },
-      "location": {
-        "file": "/scan/13.nginx_privileged_deployment.yaml",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubelinter_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "f990ef8d63bb495461df55157faac36e",
-      "tool": "kubeaudit",
-      "ruleId": "kubeaudit",
-      "severity": "HIGH",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": "kubeaudit",
-      "location": {
-        "file": "",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubeaudit_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "06eb5738dafd9bd892c7951b026058ee",
-      "tool": "polaris",
-      "ruleId": "metadataAndInstanceMismatched",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "Deployment",
-        "name": "nginx-deployment",
-        "namespace": ""
-      },
-      "message": "Label app.kubernetes.io/instance must match metadata.name",
-      "location": {
-        "file": "",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\polaris_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "3a956b9fb97a88be915f987a3ca9ad1d",
-      "tool": "polaris",
-      "ruleId": "missingPodDisruptionBudget",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "Deployment",
-        "name": "nginx-deployment",
-        "namespace": ""
-      },
-      "message": "Should have a PodDisruptionBudget",
-      "location": {
-        "file": "",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\polaris_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "69b7ad45f43deeb4ce32de2a779084e5",
-      "tool": "polaris",
-      "ruleId": "automountServiceAccountToken",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "Deployment",
-        "name": "nginx-deployment",
-        "namespace": ""
-      },
-      "message": "The ServiceAccount will be automounted",
-      "location": {
-        "file": "",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\polaris_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "1062099811b16130199a422660a57c4f",
-      "tool": "polaris",
-      "ruleId": "missingNetworkPolicy",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "Deployment",
-        "name": "nginx-deployment",
-        "namespace": ""
-      },
-      "message": "A NetworkPolicy should match pod labels and contain applied egress and ingress rules",
-      "location": {
-        "file": "",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\polaris_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "508b1af1855d9237ac41abe514d1e86e",
-      "tool": "polaris",
-      "ruleId": "priorityClassNotSet",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "Deployment",
-        "name": "nginx-deployment",
-        "namespace": ""
-      },
-      "message": "Priority class should be set",
-      "location": {
-        "file": "",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\polaris_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "4f89267f363c2b25c2bdbdf91772d960",
-      "tool": "polaris",
-      "ruleId": "topologySpreadConstraint",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "Deployment",
-        "name": "nginx-deployment",
-        "namespace": ""
-      },
-      "message": "Pod should be configured with a valid topology spread constraint",
-      "location": {
-        "file": "",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\polaris_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "e18f22bbe93f2b1b2de4d645bb0577c0",
-      "tool": "trivy-config",
-      "ruleId": "KSV001",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": "Container 'nginx' of Deployment 'nginx-deployment' should set 'securityContext.allowPrivilegeEscalation' to false",
-      "location": {
-        "file": "13.nginx_privileged_deployment.yaml",
-        "line": null
-      },
-      "labels": {
-        "url": "https://avd.aquasec.com/misconfig/ksv001"
-      },
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\trivy_config_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "c391cbf07309a13d70129ae25d1c92e4",
-      "tool": "trivy-config",
-      "ruleId": "KSV003",
-      "severity": "LOW",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": "Container 'nginx' of Deployment 'nginx-deployment' should add 'ALL' to 'securityContext.capabilities.drop'",
-      "location": {
-        "file": "13.nginx_privileged_deployment.yaml",
-        "line": null
-      },
-      "labels": {
-        "url": "https://avd.aquasec.com/misconfig/ksv003"
-      },
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\trivy_config_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "e926905e0abec88cb3ff24edfaffae15",
-      "tool": "trivy-config",
-      "ruleId": "KSV004",
-      "severity": "LOW",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": "Container 'nginx' of 'deployment' 'nginx-deployment' in 'default' namespace should set securityContext.capabilities.drop",
-      "location": {
-        "file": "13.nginx_privileged_deployment.yaml",
-        "line": null
-      },
-      "labels": {
-        "url": "https://avd.aquasec.com/misconfig/ksv004"
-      },
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\trivy_config_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "7462ffc7fe5673ccfad62bd3af12e0b4",
-      "tool": "trivy-config",
-      "ruleId": "KSV011",
-      "severity": "LOW",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": "Container 'nginx' of Deployment 'nginx-deployment' should set 'resources.limits.cpu'",
-      "location": {
-        "file": "13.nginx_privileged_deployment.yaml",
-        "line": null
-      },
-      "labels": {
-        "url": "https://avd.aquasec.com/misconfig/ksv011"
-      },
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\trivy_config_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "418596f586095b605c32c17997532568",
-      "tool": "trivy-config",
-      "ruleId": "KSV012",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": "Container 'nginx' of Deployment 'nginx-deployment' should set 'securityContext.runAsNonRoot' to true",
-      "location": {
-        "file": "13.nginx_privileged_deployment.yaml",
-        "line": null
-      },
-      "labels": {
-        "url": "https://avd.aquasec.com/misconfig/ksv012"
-      },
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\trivy_config_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "a6182c5a587a3d43eadda34289425eca",
-      "tool": "trivy-config",
-      "ruleId": "KSV013",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": "Container 'nginx' of Deployment 'nginx-deployment' should specify an image tag",
-      "location": {
-        "file": "13.nginx_privileged_deployment.yaml",
-        "line": null
-      },
-      "labels": {
-        "url": "https://avd.aquasec.com/misconfig/ksv013"
-      },
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\trivy_config_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "531bb8f3fefd6c20ac7aca07080ae54c",
-      "tool": "trivy-config",
-      "ruleId": "KSV014",
-      "severity": "HIGH",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": "Container 'nginx' of Deployment 'nginx-deployment' should set 'securityContext.readOnlyRootFilesystem' to true",
-      "location": {
-        "file": "13.nginx_privileged_deployment.yaml",
-        "line": null
-      },
-      "labels": {
-        "url": "https://avd.aquasec.com/misconfig/ksv014"
-      },
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\trivy_config_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "4bbca629482c9c9c982241677075e614",
-      "tool": "trivy-config",
-      "ruleId": "KSV015",
-      "severity": "LOW",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": "Container 'nginx' of Deployment 'nginx-deployment' should set 'resources.requests.cpu'",
-      "location": {
-        "file": "13.nginx_privileged_deployment.yaml",
-        "line": null
-      },
-      "labels": {
-        "url": "https://avd.aquasec.com/misconfig/ksv015"
-      },
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\trivy_config_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "61eda02a2e5feb1f50fad5a7d0c996d5",
-      "tool": "trivy-config",
-      "ruleId": "KSV016",
-      "severity": "LOW",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": "Container 'nginx' of Deployment 'nginx-deployment' should set 'resources.requests.memory'",
-      "location": {
-        "file": "13.nginx_privileged_deployment.yaml",
-        "line": null
-      },
-      "labels": {
-        "url": "https://avd.aquasec.com/misconfig/ksv016"
-      },
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\trivy_config_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "adec46db507056ec8298cdcfde81bcf4",
-      "tool": "trivy-config",
-      "ruleId": "KSV017",
-      "severity": "HIGH",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": "Container 'nginx' of Deployment 'nginx-deployment' should set 'securityContext.privileged' to false",
-      "location": {
-        "file": "13.nginx_privileged_deployment.yaml",
-        "line": null
-      },
-      "labels": {
-        "url": "https://avd.aquasec.com/misconfig/ksv017"
-      },
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\trivy_config_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "a55b20162d6de0213046f7eab172ca63",
-      "tool": "trivy-config",
-      "ruleId": "KSV018",
-      "severity": "LOW",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": "Container 'nginx' of Deployment 'nginx-deployment' should set 'resources.limits.memory'",
-      "location": {
-        "file": "13.nginx_privileged_deployment.yaml",
-        "line": null
-      },
-      "labels": {
-        "url": "https://avd.aquasec.com/misconfig/ksv018"
-      },
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\trivy_config_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "7110b2492d482df3931a897c536a6cbc",
-      "tool": "trivy-config",
-      "ruleId": "KSV020",
-      "severity": "LOW",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": "Container 'nginx' of Deployment 'nginx-deployment' should set 'securityContext.runAsUser' > 10000",
-      "location": {
-        "file": "13.nginx_privileged_deployment.yaml",
-        "line": null
-      },
-      "labels": {
-        "url": "https://avd.aquasec.com/misconfig/ksv020"
-      },
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\trivy_config_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "7eca54b03b277b196f1b139797dfb5fd",
-      "tool": "trivy-config",
-      "ruleId": "KSV021",
-      "severity": "LOW",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": "Container 'nginx' of Deployment 'nginx-deployment' should set 'securityContext.runAsGroup' > 10000",
-      "location": {
-        "file": "13.nginx_privileged_deployment.yaml",
-        "line": null
-      },
-      "labels": {
-        "url": "https://avd.aquasec.com/misconfig/ksv021"
-      },
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\trivy_config_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "278236a7b9d338a7b280ac0c33b6d15c",
-      "tool": "trivy-config",
-      "ruleId": "KSV030",
-      "severity": "LOW",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": "Either Pod or Container should set 'securityContext.seccompProfile.type' to 'RuntimeDefault'",
-      "location": {
-        "file": "13.nginx_privileged_deployment.yaml",
-        "line": null
-      },
-      "labels": {
-        "url": "https://avd.aquasec.com/misconfig/ksv030"
-      },
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\trivy_config_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "c7ee05c3bcf29bae989dfc2459225dc2",
-      "tool": "trivy-config",
-      "ruleId": "KSV104",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": "container \"nginx\" of deployment \"nginx-deployment\" in \"default\" namespace should specify a seccomp profile",
-      "location": {
-        "file": "13.nginx_privileged_deployment.yaml",
-        "line": null
-      },
-      "labels": {
-        "url": "https://avd.aquasec.com/misconfig/ksv104"
-      },
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\trivy_config_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "588ec699a77ed43a0e1f43efc020c7ad",
-      "tool": "trivy-config",
-      "ruleId": "KSV106",
-      "severity": "LOW",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": "container should drop all",
-      "location": {
-        "file": "13.nginx_privileged_deployment.yaml",
-        "line": null
-      },
-      "labels": {
-        "url": "https://avd.aquasec.com/misconfig/ksv106"
-      },
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\trivy_config_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "a991e1463b42c9ffcaa589b54de92904",
-      "tool": "trivy-config",
-      "ruleId": "KSV110",
-      "severity": "LOW",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": "deployment nginx-deployment in default namespace should set metadata.namespace to a non-default namespace",
-      "location": {
-        "file": "13.nginx_privileged_deployment.yaml",
-        "line": null
-      },
-      "labels": {
-        "url": "https://avd.aquasec.com/misconfig/ksv110"
-      },
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\trivy_config_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "1ef1d519955c9252393590c80188c7b9",
-      "tool": "trivy-config",
-      "ruleId": "KSV118",
-      "severity": "HIGH",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": "deployment nginx-deployment in default namespace is using the default security context, which allows root privileges",
-      "location": {
-        "file": "13.nginx_privileged_deployment.yaml",
-        "line": null
-      },
-      "labels": {
-        "url": "https://avd.aquasec.com/misconfig/ksv118"
-      },
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\trivy_config_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "6874a9327cfdd1342e07b6ffb41267e5",
-      "tool": "kube-score",
-      "ruleId": "stable-version",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": {
-        "check": {
-          "name": "Stable version",
-          "id": "stable-version",
-          "target_type": "all",
-          "comment": "Checks if the object is using a deprecated apiVersion",
-          "optional": false
-        },
-        "grade": 10,
-        "skipped": false,
-        "comments": null
-      },
-      "location": {
-        "file": "",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescore_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "b2a6de4695662361ee30161cbaea32b5",
-      "tool": "kube-score",
-      "ruleId": "label-values",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": {
-        "check": {
-          "name": "Label values",
-          "id": "label-values",
-          "target_type": "all",
-          "comment": "Validates label values",
-          "optional": false
-        },
-        "grade": 10,
-        "skipped": false,
-        "comments": null
-      },
-      "location": {
-        "file": "",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescore_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "a16fb926aba902943110b7cd2570e9c6",
-      "tool": "kube-score",
-      "ruleId": "container-ephemeral-storage-request-equals-limit",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": [
-        {
-          "path": "",
-          "summary": "Skipped because container-ephemeral-storage-request-equals-limit is ignored",
-          "description": ""
-        }
+      "file": "(unknown)",
+      "category": "CAP_SYS_ADMIN",
+      "is_security": true,
+      "support_count": 2,
+      "tools": [
+        "KubeLinter",
+        "Kubescape"
       ],
-      "location": {
-        "file": "",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescore_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "ebcb5528b90d8ce76626f420a7f70a01",
-      "tool": "kube-score",
-      "ruleId": "pod-networkpolicy",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": [
-        {
-          "path": "",
-          "summary": "The pod does not have a matching NetworkPolicy",
-          "description": "Create a NetworkPolicy that targets this pod to control who/what can communicate with this pod. Note, this feature needs to be supported by the CNI implementation used in the Kubernetes cluster to have an effect."
-        }
+      "rule_ids": [],
+      "examples": [
+        "drop-net-raw-capability",
+        "insecure-capabilities"
       ],
-      "location": {
-        "file": "",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescore_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "ef9b832e96beeedf1a0bd3326a28e717",
-      "tool": "kube-score",
-      "ruleId": "container-security-context-user-group-id",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": [
-        {
-          "path": "nginx",
-          "summary": "The container is running with a low user ID",
-          "description": "A userid above 10 000 is recommended to avoid conflicts with the host. Set securityContext.runAsUser to a value > 10000"
-        },
-        {
-          "path": "nginx",
-          "summary": "The container running with a low group ID",
-          "description": "A groupid above 10 000 is recommended to avoid conflicts with the host. Set securityContext.runAsGroup to a value > 10000"
-        }
+      "occurrences": 2,
+      "sources": [
+        "original"
       ],
-      "location": {
-        "file": "",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescore_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "05161b25d13911e8289c00c955efceb2",
-      "tool": "kube-score",
-      "ruleId": "pod-topology-spread-constraints",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": [
-        {
-          "path": "",
-          "summary": "Pod Topology Spread Constraints",
-          "description": "No Pod Topology Spread Constraints set, kube-scheduler defaults assumed"
-        }
+      "file": "(unknown)",
+      "category": "DEPRECATED_API",
+      "is_security": false,
+      "support_count": 1,
+      "tools": [
+        "KubeLinter"
       ],
-      "location": {
-        "file": "",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescore_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "c85693a70dfa662400a1a34a9a68a988",
-      "tool": "kube-score",
-      "ruleId": "container-memory-requests-equal-limits",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": [
-        {
-          "path": "",
-          "summary": "Skipped because container-memory-requests-equal-limits is ignored",
-          "description": ""
-        }
+      "rule_ids": [],
+      "examples": [
+        "no-extensions-v1beta"
       ],
-      "location": {
-        "file": "",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescore_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "66c232ba8c365f227f831398ba085e9a",
-      "tool": "kube-score",
-      "ruleId": "container-image-tag",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": [
-        {
-          "path": "nginx",
-          "summary": "Image with latest tag",
-          "description": "Using a fixed tag is recommended to avoid accidental upgrades"
-        }
+      "occurrences": 1,
+      "sources": [
+        "original"
       ],
-      "location": {
-        "file": "",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescore_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "confidence": 2,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "f448d31a5c1bc63e873bf0e3595777ca",
-      "tool": "kube-score",
-      "ruleId": "container-ports-check",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": [
-        {
-          "path": "",
-          "summary": "Skipped because container-ports-check is ignored",
-          "description": ""
-        }
+      "file": "(unknown)",
+      "category": "HARD_CODED_CREDS",
+      "is_security": true,
+      "support_count": 2,
+      "tools": [
+        "KubeLinter",
+        "Kubescape"
       ],
-      "location": {
-        "file": "",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescore_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "98ec570cebf61b2c3d0487834e351839",
-      "tool": "kube-score",
-      "ruleId": "container-seccomp-profile",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": [
-        {
-          "path": "",
-          "summary": "Skipped because container-seccomp-profile is ignored",
-          "description": ""
-        }
+      "rule_ids": [],
+      "examples": [
+        "env-var-secret",
+        "Add Checkov, Conftest, and Gitleaks integration\nIntroduces Checkov, Conftest, and Gitleaks as new detectors in the scanning pipeline. Updates orchestration functions to include these tools, adds configuration files for Checkov, Kube-Linter, and Polaris, and implements HTML vulnerability matrix output. Also improves normalization logic for kube-score findings and removes obsolete test and log files."
       ],
-      "location": {
-        "file": "",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescore_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "4081638d0a294dc6d0d8d586f4f2fa21",
-      "tool": "kube-score",
-      "ruleId": "container-resources",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": [
-        {
-          "path": "nginx",
-          "summary": "CPU limit is not set",
-          "description": "Resource limits are recommended to avoid resource DDOS. Set resources.limits.cpu"
-        },
-        {
-          "path": "nginx",
-          "summary": "Memory limit is not set",
-          "description": "Resource limits are recommended to avoid resource DDOS. Set resources.limits.memory"
-        },
-        {
-          "path": "nginx",
-          "summary": "CPU request is not set",
-          "description": "Resource requests are recommended to make sure that the application can start and run without crashing. Set resources.requests.cpu"
-        },
-        {
-          "path": "nginx",
-          "summary": "Memory request is not set",
-          "description": "Resource requests are recommended to make sure that the application can start and run without crashing. Set resources.requests.memory"
-        }
+      "occurrences": 2,
+      "sources": [
+        "original"
       ],
-      "location": {
-        "file": "",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescore_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "5e1e1d2db8a6c97377fcb17f89e19d9a",
-      "tool": "kube-score",
-      "ruleId": "container-image-pull-policy",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": {
-        "check": {
-          "name": "Container Image Pull Policy",
-          "id": "container-image-pull-policy",
-          "target_type": "Pod",
-          "comment": "Makes sure that the pullPolicy is set to Always. This makes sure that imagePullSecrets are always validated.",
-          "optional": false
-        },
-        "grade": 10,
-        "skipped": false,
-        "comments": null
-      },
-      "location": {
-        "file": "",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescore_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "853133f7007e08e053c7cc802aed5960",
-      "tool": "kube-score",
-      "ruleId": "container-ephemeral-storage-request-and-limit",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": [
-        {
-          "path": "nginx",
-          "summary": "Ephemeral Storage limit is not set",
-          "description": "Resource limits are recommended to avoid resource DDOS. Set resources.limits.ephemeral-storage"
-        },
-        {
-          "path": "nginx",
-          "summary": "Ephemeral Storage request is not set",
-          "description": "Resource requests are recommended to make sure the application can start and run without crashing. Set resource.requests.ephemeral-storage"
-        }
+      "file": "(unknown)",
+      "category": "HOSTPATH",
+      "is_security": true,
+      "support_count": 2,
+      "tools": [
+        "KubeLinter",
+        "Kubescape"
       ],
-      "location": {
-        "file": "",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescore_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "c9b380c4493e2b44383a55f24adabae4",
-      "tool": "kube-score",
-      "ruleId": "pod-probes-identical",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": {
-        "check": {
-          "name": "Pod Probes Identical",
-          "id": "pod-probes-identical",
-          "target_type": "Pod",
-          "comment": "Container has the same readiness and liveness probe",
-          "optional": false
-        },
-        "grade": 10,
-        "skipped": false,
-        "comments": null
-      },
-      "location": {
-        "file": "",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescore_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "e6479446cf34569a74704726d7324659",
-      "tool": "kube-score",
-      "ruleId": "container-security-context-privileged",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": [
-        {
-          "path": "nginx",
-          "summary": "The container is privileged",
-          "description": "Set securityContext.privileged to false. Privileged containers can access all devices on the host, and grants almost the same access as non-containerized processes on the host."
-        }
+      "rule_ids": [],
+      "examples": [
+        "docker-sock",
+        "host system directory \"/var/run/docker.sock\" is mounted on container \"jenkins-agent\"",
+        "docker-sock"
       ],
-      "location": {
-        "file": "",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescore_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "10be2f3c2620a4789636ce1ff8757784",
-      "tool": "kube-score",
-      "ruleId": "container-resource-requests-equal-limits",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": [
-        {
-          "path": "",
-          "summary": "Skipped because container-resource-requests-equal-limits is ignored",
-          "description": ""
-        }
+      "occurrences": 5,
+      "sources": [
+        "original"
       ],
-      "location": {
-        "file": "",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescore_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "confidence": 7,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "65c95cc20aa257ff307265e6cb7fb6de",
-      "tool": "kube-score",
-      "ruleId": "container-cpu-requests-equal-limits",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": [
-        {
-          "path": "",
-          "summary": "Skipped because container-cpu-requests-equal-limits is ignored",
-          "description": ""
-        }
+      "file": "(unknown)",
+      "category": "IMAGE_LATEST",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeLinter"
       ],
-      "location": {
-        "file": "",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescore_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "a86d08977d08a0a540b37b42f8ff18da",
-      "tool": "kube-score",
-      "ruleId": "environment-variable-key-duplication",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": {
-        "check": {
-          "name": "Environment Variable Key Duplication",
-          "id": "environment-variable-key-duplication",
-          "target_type": "Pod",
-          "comment": "Makes sure that duplicated environment variable keys are not duplicated",
-          "optional": false
-        },
-        "grade": 10,
-        "skipped": false,
-        "comments": null
-      },
-      "location": {
-        "file": "",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescore_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "6f8cd0c6f05dd1f5dfa0f295ab04aca8",
-      "tool": "kube-score",
-      "ruleId": "pod-probes",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": [
-        {
-          "path": "",
-          "summary": "The pod is not targeted by a service, skipping probe checks.",
-          "description": ""
-        }
+      "rule_ids": [],
+      "examples": [
+        "The container \"jenkins-agent\" is using an invalid container image, \"jenkins/inbound-agent:latest\". Please use images that are not blocked by the `BlockList` criteria : [\".*:(latest)$\" \"^[^:]*$\" \"(.*/[^:]+)$\"]",
+        "The container \"nginx\" is using an invalid container image, \"nginx:latest\". Please use images that are not blocked by the `BlockList` criteria : [\".*:(latest)$\" \"^[^:]*$\" \"(.*/[^:]+)$\"]",
+        "The container \"app-container\" is using an invalid container image, \"myimage:latest\". Please use images that are not blocked by the `BlockList` criteria : [\".*:(latest)$\" \"^[^:]*$\" \"(.*/[^:]+)$\"]"
       ],
-      "location": {
-        "file": "",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescore_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "396eb5ab4cad2c1cfaa3262ec61f563a",
-      "tool": "kube-score",
-      "ruleId": "container-security-context-readonlyrootfilesystem",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": [
-        {
-          "path": "nginx",
-          "summary": "The pod has a container with a writable root filesystem",
-          "description": "Set securityContext.readOnlyRootFilesystem to true"
-        }
+      "occurrences": 3,
+      "sources": [
+        "original"
       ],
-      "location": {
-        "file": "",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescore_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "confidence": 6,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "a916c3b62ec8cabb6cd6b54addb72a9c",
-      "tool": "kube-score",
-      "ruleId": "deployment-strategy",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": [
-        {
-          "path": "",
-          "summary": "Skipped as the Deployment is not targeted by a service",
-          "description": ""
-        }
+      "file": "(unknown)",
+      "category": "PRIVILEGED",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeLinter"
       ],
-      "location": {
-        "file": "",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescore_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "05d53163de6d30d99eaa10765b7d64e6",
-      "tool": "kube-score",
-      "ruleId": "deployment-replicas",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": [
-        {
-          "path": "",
-          "summary": "Skipped as the Deployment is not targeted by service",
-          "description": ""
-        }
+      "rule_ids": [],
+      "examples": [
+        "privileged-container"
       ],
-      "location": {
-        "file": "",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescore_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "9cc57bd1178ff0b7052cba2f7270879e",
-      "tool": "kube-score",
-      "ruleId": "deployment-has-poddisruptionbudget",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": [
-        {
-          "path": "",
-          "summary": "No matching PodDisruptionBudget was found",
-          "description": "It's recommended to define a PodDisruptionBudget to avoid unexpected downtime during Kubernetes maintenance operations, such as when draining a node. "
-        }
+      "occurrences": 1,
+      "sources": [
+        "original"
       ],
-      "location": {
-        "file": "",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescore_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "confidence": 2,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "5cf3708c3815174ff49618c333e7628e",
-      "tool": "kube-score",
-      "ruleId": "deployment-has-host-podantiaffinity",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": [
-        {
-          "path": "",
-          "summary": "Deployment does not have a host podAntiAffinity set",
-          "description": "It's recommended to set a podAntiAffinity that stops multiple pods from a deployment from being scheduled on the same node. This increases availability in case the node becomes unavailable."
-        }
+      "file": "(unknown)",
+      "category": "PRIV_ESCALATION",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "Kubescape"
       ],
-      "location": {
-        "file": "",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescore_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "49aa801292f7f2f27188e758063e230f",
-      "tool": "kube-score",
-      "ruleId": "deployment-targeted-by-hpa-does-not-have-replicas-configured",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": [
-        {
-          "path": "",
-          "summary": "Skipped because the deployment is not targeted by a HorizontalPodAutoscaler",
-          "description": ""
-        }
+      "rule_ids": [],
+      "examples": [
+        "rule-allow-privilege-escalation"
       ],
-      "location": {
-        "file": "",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescore_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "7561137220b901e31f5d4797f4e801f4",
-      "tool": "kube-score",
-      "ruleId": "deployment-pod-selector-labels-match-template-metadata-labels",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": [
-        {
-          "path": "",
-          "summary": "Deployment selector labels not matching template metadata labels",
-          "description": "Deployment require `.spec.selector` to match `.spec.template.metadata.labels`. https://kubernetes.io/docs/concepts/workloads/controllers/deployment/"
-        }
+      "occurrences": 1,
+      "sources": [
+        "original"
       ],
-      "location": {
-        "file": "",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescore_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "confidence": 1,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "9cc7f00a6772d41a72b778a498767794",
-      "tool": "kube-score",
-      "ruleId": "container-image-tag",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": [
-        {
-          "path": "jenkins-agent",
-          "summary": "Image with latest tag",
-          "description": "Using a fixed tag is recommended to avoid accidental upgrades"
-        }
+      "file": "(unknown)",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeLinter"
       ],
-      "location": {
-        "file": "",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescore_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "0775168443ee2f58d043224301fe76eb",
-      "tool": "kube-score",
-      "ruleId": "container-security-context-privileged",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": {
-        "check": {
-          "name": "Container Security Context Privileged",
-          "id": "container-security-context-privileged",
-          "target_type": "Pod",
-          "comment": "Makes sure that all pods have a unprivileged security context set",
-          "optional": false
-        },
-        "grade": 10,
-        "skipped": false,
-        "comments": null
-      },
-      "location": {
-        "file": "",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescore_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "a85b3b3878c42aed114582ed71359e29",
-      "tool": "kube-score",
-      "ruleId": "container-resources",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": [
-        {
-          "path": "jenkins-agent",
-          "summary": "CPU limit is not set",
-          "description": "Resource limits are recommended to avoid resource DDOS. Set resources.limits.cpu"
-        },
-        {
-          "path": "jenkins-agent",
-          "summary": "Memory limit is not set",
-          "description": "Resource limits are recommended to avoid resource DDOS. Set resources.limits.memory"
-        },
-        {
-          "path": "jenkins-agent",
-          "summary": "CPU request is not set",
-          "description": "Resource requests are recommended to make sure that the application can start and run without crashing. Set resources.requests.cpu"
-        },
-        {
-          "path": "jenkins-agent",
-          "summary": "Memory request is not set",
-          "description": "Resource requests are recommended to make sure that the application can start and run without crashing. Set resources.requests.memory"
-        }
+      "rule_ids": [],
+      "examples": [
+        "run-as-non-root",
+        "container \"jenkins-agent\" is not set to runAsNonRoot",
+        "container \"nginx\" is not set to runAsNonRoot"
       ],
-      "location": {
-        "file": "",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescore_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "de2604160d4f4fca2876c195ed767210",
-      "tool": "kube-score",
-      "ruleId": "container-ephemeral-storage-request-and-limit",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": [
-        {
-          "path": "jenkins-agent",
-          "summary": "Ephemeral Storage limit is not set",
-          "description": "Resource limits are recommended to avoid resource DDOS. Set resources.limits.ephemeral-storage"
-        },
-        {
-          "path": "jenkins-agent",
-          "summary": "Ephemeral Storage request is not set",
-          "description": "Resource requests are recommended to make sure the application can start and run without crashing. Set resource.requests.ephemeral-storage"
-        }
+      "occurrences": 9,
+      "sources": [
+        "original"
       ],
-      "location": {
-        "file": "",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescore_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "confidence": 18,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "828a7a9bf9e1ea876ac5b726e477cfb5",
-      "tool": "kube-score",
-      "ruleId": "container-security-context-readonlyrootfilesystem",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": [
-        {
-          "path": "jenkins-agent",
-          "summary": "Container has no configured security context",
-          "description": "Set securityContext to run the container in a more secure context."
-        }
+      "file": "(unknown)",
+      "category": "SERVICEACCOUNT_TOKEN_AUTO",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeLinter"
       ],
-      "location": {
-        "file": "",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescore_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
-    },
-    {
-      "findingId": "6971c9acbf623de478249f038c8a2f80",
-      "tool": "kube-score",
-      "ruleId": "container-security-context-user-group-id",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": [
-        {
-          "path": "jenkins-agent",
-          "summary": "Container has no configured security context",
-          "description": "Set securityContext to run the container in a more secure context."
-        }
+      "rule_ids": [],
+      "examples": [
+        "deprecated-service-account-field"
       ],
-      "location": {
-        "file": "",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescore_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 2,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "bda43cab3fc19c000e2758e7f88da355",
-      "tool": "yamllint",
-      "ruleId": "yaml-lint",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "YAML",
-        "name": "13.jenkins_agent_pod.yaml",
-        "namespace": ""
-      },
-      "message": "missing document start \"---\" (document-start)",
-      "location": {
-        "file": "/scan/13.jenkins_agent_pod.yaml",
-        "line": 1
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\yamllint_raw.txt",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "(unknown)",
+      "category": "YAML_FORMATTING",
+      "is_security": false,
+      "support_count": 1,
+      "tools": [
+        "KubeLinter"
+      ],
+      "rule_ids": [],
+      "examples": [
+        "duplicate-env-var"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 2,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "8d0bd65588c3889bb2971656b68255a8",
-      "tool": "yamllint",
-      "ruleId": "yaml-lint",
-      "severity": "HIGH",
-      "resourceRef": {
-        "kind": "YAML",
-        "name": "13.jenkins_agent_pod.yaml",
-        "namespace": ""
-      },
-      "message": "wrong indentation: expected 4 but found 2 (indentation)",
-      "location": {
-        "file": "/scan/13.jenkins_agent_pod.yaml",
-        "line": 5
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\yamllint_raw.txt",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "13.jenkins_agent_pod.yaml",
+      "category": "CAP_SYS_ADMIN",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeAudit"
+      ],
+      "rule_ids": [
+        "CapabilityOrSecurityContextMissing"
+      ],
+      "examples": [
+        "CapabilityOrSecurityContextMissing"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "c0e130b1619a1acbf584bbb45158b364",
-      "tool": "yamllint",
-      "ruleId": "yaml-lint",
-      "severity": "HIGH",
-      "resourceRef": {
-        "kind": "YAML",
-        "name": "13.jenkins_agent_pod.yaml",
-        "namespace": ""
-      },
-      "message": "wrong indentation: expected 6 but found 4 (indentation)",
-      "location": {
-        "file": "/scan/13.jenkins_agent_pod.yaml",
-        "line": 10
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\yamllint_raw.txt",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "13.jenkins_agent_pod.yaml",
+      "category": "HARD_CODED_CREDS",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeAudit"
+      ],
+      "rule_ids": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "examples": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "52208809f42015ddc6aeab8f75804fab",
-      "tool": "yamllint",
-      "ruleId": "yaml-lint",
-      "severity": "HIGH",
-      "resourceRef": {
-        "kind": "YAML",
-        "name": "13.jenkins_agent_pod.yaml",
-        "namespace": ""
-      },
-      "message": "wrong indentation: expected 4 but found 2 (indentation)",
-      "location": {
-        "file": "/scan/13.jenkins_agent_pod.yaml",
-        "line": 13
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\yamllint_raw.txt",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "13.jenkins_agent_pod.yaml",
+      "category": "HOSTPATH",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeAudit"
+      ],
+      "rule_ids": [
+        "SensitivePathsMounted"
+      ],
+      "examples": [
+        "SensitivePathsMounted"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "347bc12cf7e738f10ecbb8e657217ac9",
-      "tool": "yamllint",
-      "ruleId": "yaml-lint",
-      "severity": "HIGH",
-      "resourceRef": {
-        "kind": "YAML",
-        "name": "13.jenkins_agent_pod.yaml",
-        "namespace": ""
-      },
-      "message": "no new line character at the end of file (new-line-at-end-of-file)",
-      "location": {
-        "file": "/scan/13.jenkins_agent_pod.yaml",
-        "line": 15
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\yamllint_raw.txt",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "13.jenkins_agent_pod.yaml",
+      "category": "NO_APPARMOR",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeAudit"
+      ],
+      "rule_ids": [
+        "AppArmorAnnotationMissing"
+      ],
+      "examples": [
+        "AppArmorAnnotationMissing"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "016c06955e83e744ab77ae79b7827009",
-      "tool": "yamllint",
-      "ruleId": "yaml-lint",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "YAML",
-        "name": "13.nginx_privileged_deployment.yaml",
-        "namespace": ""
-      },
-      "message": "missing document start \"---\" (document-start)",
-      "location": {
-        "file": "/scan/13.nginx_privileged_deployment.yaml",
-        "line": 1
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\yamllint_raw.txt",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "13.jenkins_agent_pod.yaml",
+      "category": "NO_SECCOMP",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeAudit"
+      ],
+      "rule_ids": [
+        "SeccompProfileMissing"
+      ],
+      "examples": [
+        "SeccompProfileMissing"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "1b37d3fb0a5eb4f670ed9d9a3c4f250d",
-      "tool": "yamllint",
-      "ruleId": "yaml-lint",
-      "severity": "HIGH",
-      "resourceRef": {
-        "kind": "YAML",
-        "name": "13.nginx_privileged_deployment.yaml",
-        "namespace": ""
-      },
-      "message": "wrong indentation: expected 8 but found 6 (indentation)",
-      "location": {
-        "file": "/scan/13.nginx_privileged_deployment.yaml",
-        "line": 10
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\yamllint_raw.txt",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "13.jenkins_agent_pod.yaml",
+      "category": "PRIV_ESCALATION",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeAudit"
+      ],
+      "rule_ids": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "examples": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "6a0270826b48fea07eeb3c9b0243abba",
-      "tool": "yamllint",
-      "ruleId": "yaml-lint",
-      "severity": "HIGH",
-      "resourceRef": {
-        "kind": "YAML",
-        "name": "13.nginx_privileged_deployment.yaml",
-        "namespace": ""
-      },
-      "message": "no new line character at the end of file (new-line-at-end-of-file)",
-      "location": {
-        "file": "/scan/13.nginx_privileged_deployment.yaml",
-        "line": 13
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\yamllint_raw.txt",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "13.jenkins_agent_pod.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeAudit"
+      ],
+      "rule_ids": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "examples": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "c253b9164becb0b00d6b02f188889e2a",
-      "tool": "kubescape",
-      "ruleId": "C-0056",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "Pod",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": "Configured liveness probe",
-      "location": {
-        "file": "tests/13.jenkins_agent_pod.yaml",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescape_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "13.jenkins_agent_pod.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeAudit"
+      ],
+      "rule_ids": [
+        "RunAsNonRootPSCNilCSCNil"
+      ],
+      "examples": [
+        "RunAsNonRootPSCNilCSCNil"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "c80f777a253700241d53e34e53247e4a",
-      "tool": "kubescape",
-      "ruleId": "C-0018",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "Pod",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": "Configured readiness probe",
-      "location": {
-        "file": "tests/13.jenkins_agent_pod.yaml",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescape_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "13.nginx_privileged_deployment.yaml",
+      "category": "CAP_SYS_ADMIN",
+      "is_security": true,
+      "support_count": 3,
+      "tools": [
+        "Checkov",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "rule_ids": [
+        "CKV_K8S_37",
+        "CapabilityOrSecurityContextMissing",
+        "KSV003",
+        "KSV004",
+        "KSV106"
+      ],
+      "examples": [
+        "Minimize the admission of containers with capabilities assigned",
+        "CapabilityOrSecurityContextMissing",
+        "Default capabilities: some containers do not drop all"
+      ],
+      "occurrences": 5,
+      "sources": [
+        "original"
+      ],
+      "confidence": 15,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "85980fa3227b51b264bb2468545e4f61",
-      "tool": "kubescape",
-      "ruleId": "C-0271",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "Pod",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": "Ensure memory limits are set",
-      "location": {
-        "file": "tests/13.jenkins_agent_pod.yaml",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescape_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "13.nginx_privileged_deployment.yaml",
+      "category": "DEFAULT_NAMESPACE",
+      "is_security": true,
+      "support_count": 2,
+      "tools": [
+        "Conftest",
+        "Trivy"
+      ],
+      "rule_ids": [
+        "KSV110",
+        "KSV118"
+      ],
+      "examples": [
+        "Conftest",
+        "Workloads in the default namespace",
+        "Default security context configured"
+      ],
+      "occurrences": 3,
+      "sources": [
+        "original"
+      ],
+      "confidence": 9,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "4bc1488439f256eb2ae4da6b16b6fb99",
-      "tool": "kubescape",
-      "ruleId": "C-0270",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "Pod",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": "Ensure CPU limits are set",
-      "location": {
-        "file": "tests/13.jenkins_agent_pod.yaml",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescape_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "13.nginx_privileged_deployment.yaml",
+      "category": "HARD_CODED_CREDS",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeAudit"
+      ],
+      "rule_ids": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "examples": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "f73e90b377de198b8b8945b728ce50f9",
-      "tool": "kubescape",
-      "ruleId": "C-0076",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "Deployment",
-        "name": "nginx-deployment",
-        "namespace": ""
-      },
-      "message": "Label usage for resources",
-      "location": {
-        "file": "tests/13.nginx_privileged_deployment.yaml",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescape_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "13.nginx_privileged_deployment.yaml",
+      "category": "IMAGE_LATEST",
+      "is_security": true,
+      "support_count": 2,
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "rule_ids": [
+        "CKV_K8S_14",
+        "KSV013"
+      ],
+      "examples": [
+        "Image Tag should be fixed - not latest or blank",
+        "Image tag \":latest\" used"
+      ],
+      "occurrences": 2,
+      "sources": [
+        "original"
+      ],
+      "confidence": 6,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "5c4c3ccc18a92651a1a5ad3c9e25f649",
-      "tool": "kubescape",
-      "ruleId": "C-0055",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "Deployment",
-        "name": "nginx-deployment",
-        "namespace": ""
-      },
-      "message": "Linux hardening",
-      "location": {
-        "file": "tests/13.nginx_privileged_deployment.yaml",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescape_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "13.nginx_privileged_deployment.yaml",
+      "category": "NO_APPARMOR",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeAudit"
+      ],
+      "rule_ids": [
+        "AppArmorAnnotationMissing"
+      ],
+      "examples": [
+        "AppArmorAnnotationMissing"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "09ec8517562ffca62e15d879cc2fd50f",
-      "tool": "kubescape",
-      "ruleId": "C-0057",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "Deployment",
-        "name": "nginx-deployment",
-        "namespace": ""
-      },
-      "message": "Privileged container",
-      "location": {
-        "file": "tests/13.nginx_privileged_deployment.yaml",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescape_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "13.nginx_privileged_deployment.yaml",
+      "category": "NO_PROBES",
+      "is_security": false,
+      "support_count": 1,
+      "tools": [
+        "Checkov"
+      ],
+      "rule_ids": [
+        "CKV_K8S_8"
+      ],
+      "examples": [
+        "Liveness Probe Should be Configured"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "71acd79656c9be672961c4a0df5e93bd",
-      "tool": "kubescape",
-      "ruleId": "C-0056",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "Deployment",
-        "name": "nginx-deployment",
-        "namespace": ""
-      },
-      "message": "Configured liveness probe",
-      "location": {
-        "file": "tests/13.nginx_privileged_deployment.yaml",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescape_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "13.nginx_privileged_deployment.yaml",
+      "category": "NO_RES_LIMITS",
+      "is_security": false,
+      "support_count": 1,
+      "tools": [
+        "Checkov"
+      ],
+      "rule_ids": [
+        "CKV_K8S_10",
+        "CKV_K8S_11",
+        "CKV_K8S_12",
+        "CKV_K8S_13"
+      ],
+      "examples": [
+        "CPU requests should be set",
+        "CPU limits should be set",
+        "Memory limits should be set"
+      ],
+      "occurrences": 4,
+      "sources": [
+        "original"
+      ],
+      "confidence": 12,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "e21dba9f3d04a991c2de6af80e20da82",
-      "tool": "kubescape",
-      "ruleId": "C-0018",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "Deployment",
-        "name": "nginx-deployment",
-        "namespace": ""
-      },
-      "message": "Configured readiness probe",
-      "location": {
-        "file": "tests/13.nginx_privileged_deployment.yaml",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescape_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "13.nginx_privileged_deployment.yaml",
+      "category": "NO_SECCOMP",
+      "is_security": true,
+      "support_count": 3,
+      "tools": [
+        "Checkov",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "rule_ids": [
+        "CKV_K8S_31",
+        "KSV104",
+        "SeccompProfileMissing"
+      ],
+      "examples": [
+        "Ensure that the seccomp profile is set to docker/default or runtime/default",
+        "SeccompProfileMissing",
+        "Seccomp policies disabled"
+      ],
+      "occurrences": 3,
+      "sources": [
+        "original"
+      ],
+      "confidence": 9,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "38886c2fd8cdde96a38ffcea5b99fdbe",
-      "tool": "kubescape",
-      "ruleId": "C-0061",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "Deployment",
-        "name": "nginx-deployment",
-        "namespace": ""
-      },
-      "message": "Pods in default namespace",
-      "location": {
-        "file": "tests/13.nginx_privileged_deployment.yaml",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescape_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "13.nginx_privileged_deployment.yaml",
+      "category": "PRIVILEGED",
+      "is_security": true,
+      "support_count": 3,
+      "tools": [
+        "Checkov",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "rule_ids": [
+        "CKV_K8S_22",
+        "KSV017",
+        "PrivilegedTrue"
+      ],
+      "examples": [
+        "Use read-only filesystem for containers where possible",
+        "PrivilegedTrue",
+        "Privileged"
+      ],
+      "occurrences": 3,
+      "sources": [
+        "original"
+      ],
+      "confidence": 9,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "323da550dc2d30f0ea64cdafa67c9194",
-      "tool": "kubescape",
-      "ruleId": "C-0016",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "Deployment",
-        "name": "nginx-deployment",
-        "namespace": ""
-      },
-      "message": "Allow privilege escalation",
-      "location": {
-        "file": "tests/13.nginx_privileged_deployment.yaml",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescape_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "13.nginx_privileged_deployment.yaml",
+      "category": "PRIV_ESCALATION",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeAudit"
+      ],
+      "rule_ids": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "examples": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "487099171d5dea5aad734eeb061c0598",
-      "tool": "kubescape",
-      "ruleId": "C-0260",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "Deployment",
-        "name": "nginx-deployment",
-        "namespace": ""
-      },
-      "message": "Missing network policy",
-      "location": {
-        "file": "tests/13.nginx_privileged_deployment.yaml",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescape_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "13.nginx_privileged_deployment.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeAudit"
+      ],
+      "rule_ids": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "examples": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "5abab82cd81bd764b0853bded7025ea3",
-      "tool": "kubescape",
-      "ruleId": "C-0017",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "Deployment",
-        "name": "nginx-deployment",
-        "namespace": ""
-      },
-      "message": "Immutable container filesystem",
-      "location": {
-        "file": "tests/13.nginx_privileged_deployment.yaml",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescape_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "13.nginx_privileged_deployment.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "is_security": true,
+      "support_count": 3,
+      "tools": [
+        "Conftest",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "rule_ids": [
+        "KSV012",
+        "RunAsNonRootPSCNilCSCNil"
+      ],
+      "examples": [
+        "Conftest",
+        "RunAsNonRootPSCNilCSCNil",
+        "Runs as root user"
+      ],
+      "occurrences": 3,
+      "sources": [
+        "original"
+      ],
+      "confidence": 9,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "db85e85bd54ae23c64498fea8853d815",
-      "tool": "kubescape",
-      "ruleId": "C-0271",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "Deployment",
-        "name": "nginx-deployment",
-        "namespace": ""
-      },
-      "message": "Ensure memory limits are set",
-      "location": {
-        "file": "tests/13.nginx_privileged_deployment.yaml",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescape_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "13.nginx_privileged_deployment.yaml",
+      "category": "SCHEMA_INVALID",
+      "is_security": false,
+      "support_count": 1,
+      "tools": [
+        "KubeConform"
+      ],
+      "rule_ids": [],
+      "examples": [
+        "nginx-deployment"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 2,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "eb9881b01165fc63f557c4ab6da5f42b",
-      "tool": "kubescape",
-      "ruleId": "C-0030",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "Deployment",
-        "name": "nginx-deployment",
-        "namespace": ""
-      },
-      "message": "Ingress and Egress blocked",
-      "location": {
-        "file": "tests/13.nginx_privileged_deployment.yaml",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescape_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "14.deployment_single_replica.yaml",
+      "category": "CAP_SYS_ADMIN",
+      "is_security": true,
+      "support_count": 3,
+      "tools": [
+        "Checkov",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "rule_ids": [
+        "CKV_K8S_37",
+        "CapabilityOrSecurityContextMissing",
+        "KSV003",
+        "KSV004",
+        "KSV106"
+      ],
+      "examples": [
+        "Minimize the admission of containers with capabilities assigned",
+        "CapabilityOrSecurityContextMissing",
+        "Default capabilities: some containers do not drop all"
+      ],
+      "occurrences": 5,
+      "sources": [
+        "original"
+      ],
+      "confidence": 15,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "4609d3608b0669411f2ec09674985531",
-      "tool": "kubescape",
-      "ruleId": "C-0013",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "Deployment",
-        "name": "nginx-deployment",
-        "namespace": ""
-      },
-      "message": "Non-root containers",
-      "location": {
-        "file": "tests/13.nginx_privileged_deployment.yaml",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescape_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "14.deployment_single_replica.yaml",
+      "category": "DEFAULT_NAMESPACE",
+      "is_security": true,
+      "support_count": 2,
+      "tools": [
+        "Conftest",
+        "Trivy"
+      ],
+      "rule_ids": [
+        "KSV110",
+        "KSV118"
+      ],
+      "examples": [
+        "Conftest",
+        "Workloads in the default namespace",
+        "Default security context configured"
+      ],
+      "occurrences": 4,
+      "sources": [
+        "original"
+      ],
+      "confidence": 12,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "bc2962e4ca4888189809f3e04885249e",
-      "tool": "kubescape",
-      "ruleId": "C-0077",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "Deployment",
-        "name": "nginx-deployment",
-        "namespace": ""
-      },
-      "message": "K8s common labels usage",
-      "location": {
-        "file": "tests/13.nginx_privileged_deployment.yaml",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescape_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "14.deployment_single_replica.yaml",
+      "category": "HARD_CODED_CREDS",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeAudit"
+      ],
+      "rule_ids": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "examples": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "2d3fa9bdd98295549e84e07c2f94fcab",
-      "tool": "kubescape",
-      "ruleId": "C-0270",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "Deployment",
-        "name": "nginx-deployment",
-        "namespace": ""
-      },
-      "message": "Ensure CPU limits are set",
-      "location": {
-        "file": "tests/13.nginx_privileged_deployment.yaml",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubescape_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "14.deployment_single_replica.yaml",
+      "category": "IMAGE_LATEST",
+      "is_security": true,
+      "support_count": 2,
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "rule_ids": [
+        "CKV_K8S_14",
+        "KSV013"
+      ],
+      "examples": [
+        "Image Tag should be fixed - not latest or blank",
+        "Image tag \":latest\" used"
+      ],
+      "occurrences": 2,
+      "sources": [
+        "original"
+      ],
+      "confidence": 6,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "343ffd4d51a44eaaec4a76a1b35fd745",
-      "tool": "kubeconform",
-      "ruleId": "schema-validation-failed",
-      "severity": "HIGH",
-      "resourceRef": {
-        "kind": "Deployment",
-        "name": "nginx-deployment",
-        "namespace": ""
-      },
-      "message": "problem validating schema. Check JSON formatting: jsonschema validation failed with 'https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/master-standalone-strict/deployment-apps-v1.json#' - at '/spec': missing property 'selector' - Path: /spec, Error: missing property 'selector'",
-      "location": {
-        "file": "/scan/13.nginx_privileged_deployment.yaml",
-        "line": null
-      },
-      "labels": {
-        "apiVersion": "apps/v1",
-        "status": "statusInvalid"
-      },
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\kubeconform_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "14.deployment_single_replica.yaml",
+      "category": "NO_APPARMOR",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeAudit"
+      ],
+      "rule_ids": [
+        "AppArmorAnnotationMissing"
+      ],
+      "examples": [
+        "AppArmorAnnotationMissing"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "fbceae9e1d29c83c933ddc30834b6189",
-      "tool": "checkov",
-      "ruleId": "CKV_K8S_20",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "Deployment.default.nginx-deployment",
-        "namespace": ""
-      },
-      "message": "Containers should not run with allowPrivilegeEscalation",
-      "location": {
-        "file": "/13.nginx_privileged_deployment.yaml",
-        "line": 1
-      },
-      "labels": {
-        "guideline": "https://docs.prismacloud.io/en/enterprise-edition/policy-reference/kubernetes-policies/kubernetes-policy-index/bc-k8s-19"
-      },
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\checkov_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "14.deployment_single_replica.yaml",
+      "category": "NO_PROBES",
+      "is_security": false,
+      "support_count": 1,
+      "tools": [
+        "Checkov"
+      ],
+      "rule_ids": [
+        "CKV_K8S_8"
+      ],
+      "examples": [
+        "Liveness Probe Should be Configured"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "861b83d01d2eba3da53417fd30d8a5b1",
-      "tool": "checkov",
-      "ruleId": "CKV_K8S_11",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "Deployment.default.nginx-deployment",
-        "namespace": ""
-      },
-      "message": "CPU limits should be set",
-      "location": {
-        "file": "/13.nginx_privileged_deployment.yaml",
-        "line": 1
-      },
-      "labels": {
-        "guideline": "https://docs.prismacloud.io/en/enterprise-edition/policy-reference/kubernetes-policies/kubernetes-policy-index/bc-k8s-10"
-      },
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\checkov_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "14.deployment_single_replica.yaml",
+      "category": "NO_RES_LIMITS",
+      "is_security": false,
+      "support_count": 1,
+      "tools": [
+        "Checkov"
+      ],
+      "rule_ids": [
+        "CKV_K8S_10",
+        "CKV_K8S_11",
+        "CKV_K8S_12",
+        "CKV_K8S_13"
+      ],
+      "examples": [
+        "CPU requests should be set",
+        "CPU limits should be set",
+        "Memory limits should be set"
+      ],
+      "occurrences": 4,
+      "sources": [
+        "original"
+      ],
+      "confidence": 12,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "f5ae839cfe1e699a6d4c8df607f22934",
-      "tool": "checkov",
-      "ruleId": "CKV_K8S_10",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "Deployment.default.nginx-deployment",
-        "namespace": ""
-      },
-      "message": "CPU requests should be set",
-      "location": {
-        "file": "/13.nginx_privileged_deployment.yaml",
-        "line": 1
-      },
-      "labels": {
-        "guideline": "https://docs.prismacloud.io/en/enterprise-edition/policy-reference/kubernetes-policies/kubernetes-policy-index/bc-k8s-9"
-      },
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\checkov_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "14.deployment_single_replica.yaml",
+      "category": "NO_SECCOMP",
+      "is_security": true,
+      "support_count": 3,
+      "tools": [
+        "Checkov",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "rule_ids": [
+        "CKV_K8S_31",
+        "KSV104",
+        "SeccompProfileMissing"
+      ],
+      "examples": [
+        "Ensure that the seccomp profile is set to docker/default or runtime/default",
+        "SeccompProfileMissing",
+        "Seccomp policies disabled"
+      ],
+      "occurrences": 3,
+      "sources": [
+        "original"
+      ],
+      "confidence": 9,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "9436237df5cb4051576f44162d804742",
-      "tool": "checkov",
-      "ruleId": "CKV_K8S_21",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "Deployment.default.nginx-deployment",
-        "namespace": ""
-      },
-      "message": "The default namespace should not be used",
-      "location": {
-        "file": "/13.nginx_privileged_deployment.yaml",
-        "line": 1
-      },
-      "labels": {
-        "guideline": "https://docs.prismacloud.io/en/enterprise-edition/policy-reference/kubernetes-policies/kubernetes-policy-index/bc-k8s-20"
-      },
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\checkov_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "14.deployment_single_replica.yaml",
+      "category": "PRIVILEGED",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "Checkov"
+      ],
+      "rule_ids": [
+        "CKV_K8S_22"
+      ],
+      "examples": [
+        "Use read-only filesystem for containers where possible"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "e98eab7cae5711a5f12dc541184dfdc6",
-      "tool": "checkov",
-      "ruleId": "CKV_K8S_28",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "Deployment.default.nginx-deployment",
-        "namespace": ""
-      },
-      "message": "Minimize the admission of containers with the NET_RAW capability",
-      "location": {
-        "file": "/13.nginx_privileged_deployment.yaml",
-        "line": 1
-      },
-      "labels": {
-        "guideline": "https://docs.prismacloud.io/en/enterprise-edition/policy-reference/kubernetes-policies/kubernetes-policy-index/bc-k8s-27"
-      },
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\checkov_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "14.deployment_single_replica.yaml",
+      "category": "PRIV_ESCALATION",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeAudit"
+      ],
+      "rule_ids": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "examples": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "6a7fdd0271712b3f365d71176357ea4e",
-      "tool": "checkov",
-      "ruleId": "CKV_K8S_43",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "Deployment.default.nginx-deployment",
-        "namespace": ""
-      },
-      "message": "Image should use digest",
-      "location": {
-        "file": "/13.nginx_privileged_deployment.yaml",
-        "line": 1
-      },
-      "labels": {
-        "guideline": "https://docs.prismacloud.io/en/enterprise-edition/policy-reference/kubernetes-policies/kubernetes-policy-index/bc-k8s-39"
-      },
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\checkov_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "14.deployment_single_replica.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeAudit"
+      ],
+      "rule_ids": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "examples": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "78f05e55b87d52667510b12c3a68f9da",
-      "tool": "checkov",
-      "ruleId": "CKV_K8S_14",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "Deployment.default.nginx-deployment",
-        "namespace": ""
-      },
-      "message": "Image Tag should be fixed - not latest or blank",
-      "location": {
-        "file": "/13.nginx_privileged_deployment.yaml",
-        "line": 1
-      },
-      "labels": {
-        "guideline": "https://docs.prismacloud.io/en/enterprise-edition/policy-reference/kubernetes-policies/kubernetes-policy-index/bc-k8s-13"
-      },
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\checkov_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "14.deployment_single_replica.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "is_security": true,
+      "support_count": 3,
+      "tools": [
+        "Conftest",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "rule_ids": [
+        "KSV012",
+        "RunAsNonRootPSCNilCSCNil"
+      ],
+      "examples": [
+        "Conftest",
+        "RunAsNonRootPSCNilCSCNil",
+        "Runs as root user"
+      ],
+      "occurrences": 3,
+      "sources": [
+        "original"
+      ],
+      "confidence": 9,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "faae01578f8fab041d34ccf7450bb7f0",
-      "tool": "checkov",
-      "ruleId": "CKV_K8S_8",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "Deployment.default.nginx-deployment",
-        "namespace": ""
-      },
-      "message": "Liveness Probe Should be Configured",
-      "location": {
-        "file": "/13.nginx_privileged_deployment.yaml",
-        "line": 1
-      },
-      "labels": {
-        "guideline": "https://docs.prismacloud.io/en/enterprise-edition/policy-reference/kubernetes-policies/kubernetes-policy-index/bc-k8s-7"
-      },
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\checkov_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "14.deployment_single_replica.yaml",
+      "category": "SCHEMA_INVALID",
+      "is_security": false,
+      "support_count": 1,
+      "tools": [
+        "KubeConform"
+      ],
+      "rule_ids": [],
+      "examples": [
+        "single-replica-deployment"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 2,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "f5cb7fd60c5fe90da1de4b11836a2504",
-      "tool": "checkov",
-      "ruleId": "CKV_K8S_13",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "Deployment.default.nginx-deployment",
-        "namespace": ""
-      },
-      "message": "Memory limits should be set",
-      "location": {
-        "file": "/13.nginx_privileged_deployment.yaml",
-        "line": 1
-      },
-      "labels": {
-        "guideline": "https://docs.prismacloud.io/en/enterprise-edition/policy-reference/kubernetes-policies/kubernetes-policy-index/bc-k8s-12"
-      },
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\checkov_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "14.genkubesec_privileged_pod.yaml",
+      "category": "CAP_SYS_ADMIN",
+      "is_security": true,
+      "support_count": 3,
+      "tools": [
+        "Checkov",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "rule_ids": [
+        "CKV_K8S_37",
+        "CapabilityOrSecurityContextMissing",
+        "KSV003",
+        "KSV004",
+        "KSV106"
+      ],
+      "examples": [
+        "Minimize the admission of containers with capabilities assigned",
+        "CapabilityOrSecurityContextMissing",
+        "Default capabilities: some containers do not drop all"
+      ],
+      "occurrences": 5,
+      "sources": [
+        "original"
+      ],
+      "confidence": 15,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "b35249dff4f769acb5b244bcb5d6e3fc",
-      "tool": "checkov",
-      "ruleId": "CKV_K8S_12",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "Deployment.default.nginx-deployment",
-        "namespace": ""
-      },
-      "message": "Memory requests should be set",
-      "location": {
-        "file": "/13.nginx_privileged_deployment.yaml",
-        "line": 1
-      },
-      "labels": {
-        "guideline": "https://docs.prismacloud.io/en/enterprise-edition/policy-reference/kubernetes-policies/kubernetes-policy-index/bc-k8s-11"
-      },
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\checkov_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "14.genkubesec_privileged_pod.yaml",
+      "category": "DEFAULT_NAMESPACE",
+      "is_security": true,
+      "support_count": 2,
+      "tools": [
+        "Conftest",
+        "Trivy"
+      ],
+      "rule_ids": [
+        "KSV110",
+        "KSV118"
+      ],
+      "examples": [
+        "Conftest",
+        "Workloads in the default namespace",
+        "Default security context configured"
+      ],
+      "occurrences": 3,
+      "sources": [
+        "original"
+      ],
+      "confidence": 9,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "4be4abc35556411be8ad082f4368f0a4",
-      "tool": "checkov",
-      "ruleId": "CKV_K8S_37",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "Deployment.default.nginx-deployment",
-        "namespace": ""
-      },
-      "message": "Minimize the admission of containers with capabilities assigned",
-      "location": {
-        "file": "/13.nginx_privileged_deployment.yaml",
-        "line": 1
-      },
-      "labels": {
-        "guideline": "https://docs.prismacloud.io/en/enterprise-edition/policy-reference/kubernetes-policies/kubernetes-policy-index/bc-k8s-34"
-      },
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\checkov_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "14.genkubesec_privileged_pod.yaml",
+      "category": "HARD_CODED_CREDS",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeAudit"
+      ],
+      "rule_ids": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "examples": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "7f5d24f59c7c9a8568e70bf07481fa42",
-      "tool": "checkov",
-      "ruleId": "CKV_K8S_29",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "Deployment.default.nginx-deployment",
-        "namespace": ""
-      },
-      "message": "Apply security context to your pods and containers",
-      "location": {
-        "file": "/13.nginx_privileged_deployment.yaml",
-        "line": 1
-      },
-      "labels": {
-        "guideline": "https://docs.prismacloud.io/en/enterprise-edition/policy-reference/kubernetes-policies/kubernetes-policy-index/ensure-securitycontext-is-applied-to-pods-and-containers"
-      },
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\checkov_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "14.genkubesec_privileged_pod.yaml",
+      "category": "IMAGE_LATEST",
+      "is_security": true,
+      "support_count": 2,
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "rule_ids": [
+        "CKV_K8S_14",
+        "KSV013"
+      ],
+      "examples": [
+        "Image Tag should be fixed - not latest or blank",
+        "Image tag \":latest\" used"
+      ],
+      "occurrences": 2,
+      "sources": [
+        "original"
+      ],
+      "confidence": 6,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "5f5d9722b6ab2f59b3791061b3fdf2c8",
-      "tool": "checkov",
-      "ruleId": "CKV_K8S_16",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "Deployment.default.nginx-deployment",
-        "namespace": ""
-      },
-      "message": "Container should not be privileged",
-      "location": {
-        "file": "/13.nginx_privileged_deployment.yaml",
-        "line": 1
-      },
-      "labels": {
-        "guideline": "https://docs.prismacloud.io/en/enterprise-edition/policy-reference/kubernetes-policies/kubernetes-policy-index/bc-k8s-15"
-      },
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\checkov_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "14.genkubesec_privileged_pod.yaml",
+      "category": "NO_APPARMOR",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeAudit"
+      ],
+      "rule_ids": [
+        "AppArmorAnnotationMissing"
+      ],
+      "examples": [
+        "AppArmorAnnotationMissing"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "8d90a6ddd1caec5afad8f6f9df6de298",
-      "tool": "checkov",
-      "ruleId": "CKV_K8S_9",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "Deployment.default.nginx-deployment",
-        "namespace": ""
-      },
-      "message": "Readiness Probe Should be Configured",
-      "location": {
-        "file": "/13.nginx_privileged_deployment.yaml",
-        "line": 1
-      },
-      "labels": {
-        "guideline": "https://docs.prismacloud.io/en/enterprise-edition/policy-reference/kubernetes-policies/kubernetes-policy-index/bc-k8s-8"
-      },
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\checkov_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "14.genkubesec_privileged_pod.yaml",
+      "category": "NO_PROBES",
+      "is_security": false,
+      "support_count": 1,
+      "tools": [
+        "Checkov"
+      ],
+      "rule_ids": [
+        "CKV_K8S_8"
+      ],
+      "examples": [
+        "Liveness Probe Should be Configured"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "eadaef9bac42ada971c7b9260e0052fd",
-      "tool": "checkov",
-      "ruleId": "CKV_K8S_22",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "Deployment.default.nginx-deployment",
-        "namespace": ""
-      },
-      "message": "Use read-only filesystem for containers where possible",
-      "location": {
-        "file": "/13.nginx_privileged_deployment.yaml",
-        "line": 1
-      },
-      "labels": {
-        "guideline": "https://docs.prismacloud.io/en/enterprise-edition/policy-reference/kubernetes-policies/kubernetes-policy-index/bc-k8s-21"
-      },
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\checkov_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "14.genkubesec_privileged_pod.yaml",
+      "category": "NO_RES_LIMITS",
+      "is_security": false,
+      "support_count": 1,
+      "tools": [
+        "Checkov"
+      ],
+      "rule_ids": [
+        "CKV_K8S_10",
+        "CKV_K8S_11",
+        "CKV_K8S_12",
+        "CKV_K8S_13"
+      ],
+      "examples": [
+        "CPU requests should be set",
+        "CPU limits should be set",
+        "Memory limits should be set"
+      ],
+      "occurrences": 4,
+      "sources": [
+        "original"
+      ],
+      "confidence": 12,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "ab49f2e769c5af35fb661ac37334ebad",
-      "tool": "checkov",
-      "ruleId": "CKV_K8S_23",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "Deployment.default.nginx-deployment",
-        "namespace": ""
-      },
-      "message": "Minimize the admission of root containers",
-      "location": {
-        "file": "/13.nginx_privileged_deployment.yaml",
-        "line": 1
-      },
-      "labels": {
-        "guideline": "https://docs.prismacloud.io/en/enterprise-edition/policy-reference/kubernetes-policies/kubernetes-policy-index/bc-k8s-22"
-      },
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\checkov_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "14.genkubesec_privileged_pod.yaml",
+      "category": "NO_SECCOMP",
+      "is_security": true,
+      "support_count": 4,
+      "tools": [
+        "Checkov",
+        "Conftest",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "rule_ids": [
+        "CKV_K8S_31",
+        "KSV104",
+        "SeccompProfileMissing"
+      ],
+      "examples": [
+        "Ensure that the seccomp profile is set to docker/default or runtime/default",
+        "Conftest",
+        "SeccompProfileMissing"
+      ],
+      "occurrences": 4,
+      "sources": [
+        "original"
+      ],
+      "confidence": 12,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "9b7664c00c8a90a9ef769437770f5f78",
-      "tool": "checkov",
-      "ruleId": "CKV_K8S_40",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "Deployment.default.nginx-deployment",
-        "namespace": ""
-      },
-      "message": "Containers should run as a high UID to avoid host conflict",
-      "location": {
-        "file": "/13.nginx_privileged_deployment.yaml",
-        "line": 1
-      },
-      "labels": {
-        "guideline": "https://docs.prismacloud.io/en/enterprise-edition/policy-reference/kubernetes-policies/kubernetes-policy-index/bc-k8s-37"
-      },
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\checkov_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "14.genkubesec_privileged_pod.yaml",
+      "category": "PRIVILEGED",
+      "is_security": true,
+      "support_count": 3,
+      "tools": [
+        "Checkov",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "rule_ids": [
+        "CKV_K8S_22",
+        "KSV017",
+        "PrivilegedTrue"
+      ],
+      "examples": [
+        "Use read-only filesystem for containers where possible",
+        "PrivilegedTrue",
+        "Privileged"
+      ],
+      "occurrences": 3,
+      "sources": [
+        "original"
+      ],
+      "confidence": 9,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "99f3ccb28ffb6f63e06a9ecd58317c68",
-      "tool": "checkov",
-      "ruleId": "CKV_K8S_31",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "Deployment.default.nginx-deployment",
-        "namespace": ""
-      },
-      "message": "Ensure that the seccomp profile is set to docker/default or runtime/default",
-      "location": {
-        "file": "/13.nginx_privileged_deployment.yaml",
-        "line": 1
-      },
-      "labels": {
-        "guideline": "https://docs.prismacloud.io/en/enterprise-edition/policy-reference/kubernetes-policies/kubernetes-policy-index/bc-k8s-29"
-      },
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\checkov_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "14.genkubesec_privileged_pod.yaml",
+      "category": "PRIV_ESCALATION",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeAudit"
+      ],
+      "rule_ids": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "examples": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "0f323d00a903d7ba2393a915089df687",
-      "tool": "checkov",
-      "ruleId": "CKV_K8S_38",
-      "severity": "INFO",
-      "resourceRef": {
-        "kind": "Object",
-        "name": "Deployment.default.nginx-deployment",
-        "namespace": ""
-      },
-      "message": "Ensure that Service Account Tokens are only mounted where necessary",
-      "location": {
-        "file": "/13.nginx_privileged_deployment.yaml",
-        "line": 1
-      },
-      "labels": {
-        "guideline": "https://docs.prismacloud.io/en/enterprise-edition/policy-reference/kubernetes-policies/kubernetes-policy-index/bc-k8s-35"
-      },
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\checkov_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "14.genkubesec_privileged_pod.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeAudit"
+      ],
+      "rule_ids": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "examples": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     },
     {
-      "findingId": "e152bf58b62ab9219f1f771c186e2551",
-      "tool": "rbac-police",
-      "ruleId": "rbac-overly-permissive",
-      "severity": "MEDIUM",
-      "resourceRef": {
-        "kind": "RBAC",
-        "name": "unknown",
-        "namespace": ""
-      },
-      "message": "Overly permissive RBAC configuration",
-      "location": {
-        "file": "",
-        "line": null
-      },
-      "labels": {},
-      "rawFile": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw\\rbacpolice_raw.json",
-      "toolsAgreeCount": 1,
-      "confirmed": false
+      "file": "14.genkubesec_privileged_pod.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "is_security": true,
+      "support_count": 3,
+      "tools": [
+        "Conftest",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "rule_ids": [
+        "KSV012",
+        "RunAsNonRootPSCNilCSCNil"
+      ],
+      "examples": [
+        "Conftest",
+        "RunAsNonRootPSCNilCSCNil",
+        "Runs as root user"
+      ],
+      "occurrences": 3,
+      "sources": [
+        "original"
+      ],
+      "confidence": 9,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "14.genkubesec_privileged_pod.yaml",
+      "category": "SCHEMA_INVALID",
+      "is_security": false,
+      "support_count": 1,
+      "tools": [
+        "KubeConform"
+      ],
+      "rule_ids": [],
+      "examples": [
+        "pod-name"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 2,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "14.ingress_deprecated_api.yaml",
+      "category": "DEFAULT_NAMESPACE",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "Conftest"
+      ],
+      "rule_ids": [],
+      "examples": [
+        "Conftest"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "14.ingress_deprecated_api.yaml",
+      "category": "SCHEMA_INVALID",
+      "is_security": false,
+      "support_count": 1,
+      "tools": [
+        "KubeConform"
+      ],
+      "rule_ids": [],
+      "examples": [
+        "gateway-ingress"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 2,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "15.pod_privilege_escalation.yaml",
+      "category": "CAP_SYS_ADMIN",
+      "is_security": true,
+      "support_count": 3,
+      "tools": [
+        "Checkov",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "rule_ids": [
+        "CKV_K8S_37",
+        "CapabilityOrSecurityContextMissing",
+        "KSV003",
+        "KSV004",
+        "KSV106"
+      ],
+      "examples": [
+        "Minimize the admission of containers with capabilities assigned",
+        "CapabilityOrSecurityContextMissing",
+        "Default capabilities: some containers do not drop all"
+      ],
+      "occurrences": 5,
+      "sources": [
+        "original"
+      ],
+      "confidence": 15,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "15.pod_privilege_escalation.yaml",
+      "category": "DEFAULT_NAMESPACE",
+      "is_security": true,
+      "support_count": 2,
+      "tools": [
+        "Conftest",
+        "Trivy"
+      ],
+      "rule_ids": [
+        "KSV110",
+        "KSV118"
+      ],
+      "examples": [
+        "Conftest",
+        "Workloads in the default namespace",
+        "Default security context configured"
+      ],
+      "occurrences": 3,
+      "sources": [
+        "original"
+      ],
+      "confidence": 9,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "15.pod_privilege_escalation.yaml",
+      "category": "HARD_CODED_CREDS",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeAudit"
+      ],
+      "rule_ids": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "examples": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "15.pod_privilege_escalation.yaml",
+      "category": "IMAGE_LATEST",
+      "is_security": true,
+      "support_count": 2,
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "rule_ids": [
+        "CKV_K8S_14",
+        "KSV013"
+      ],
+      "examples": [
+        "Image Tag should be fixed - not latest or blank",
+        "Image tag \":latest\" used"
+      ],
+      "occurrences": 2,
+      "sources": [
+        "original"
+      ],
+      "confidence": 6,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "15.pod_privilege_escalation.yaml",
+      "category": "NO_APPARMOR",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeAudit"
+      ],
+      "rule_ids": [
+        "AppArmorAnnotationMissing"
+      ],
+      "examples": [
+        "AppArmorAnnotationMissing"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "15.pod_privilege_escalation.yaml",
+      "category": "NO_PROBES",
+      "is_security": false,
+      "support_count": 1,
+      "tools": [
+        "Checkov"
+      ],
+      "rule_ids": [
+        "CKV_K8S_8"
+      ],
+      "examples": [
+        "Liveness Probe Should be Configured"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "15.pod_privilege_escalation.yaml",
+      "category": "NO_RES_LIMITS",
+      "is_security": false,
+      "support_count": 1,
+      "tools": [
+        "Checkov"
+      ],
+      "rule_ids": [
+        "CKV_K8S_10",
+        "CKV_K8S_11",
+        "CKV_K8S_12",
+        "CKV_K8S_13"
+      ],
+      "examples": [
+        "CPU requests should be set",
+        "CPU limits should be set",
+        "Memory limits should be set"
+      ],
+      "occurrences": 4,
+      "sources": [
+        "original"
+      ],
+      "confidence": 12,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "15.pod_privilege_escalation.yaml",
+      "category": "NO_SECCOMP",
+      "is_security": true,
+      "support_count": 4,
+      "tools": [
+        "Checkov",
+        "Conftest",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "rule_ids": [
+        "CKV_K8S_31",
+        "KSV104",
+        "SeccompProfileMissing"
+      ],
+      "examples": [
+        "Ensure that the seccomp profile is set to docker/default or runtime/default",
+        "Conftest",
+        "SeccompProfileMissing"
+      ],
+      "occurrences": 4,
+      "sources": [
+        "original"
+      ],
+      "confidence": 12,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "15.pod_privilege_escalation.yaml",
+      "category": "PRIVILEGED",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "Checkov"
+      ],
+      "rule_ids": [
+        "CKV_K8S_22"
+      ],
+      "examples": [
+        "Use read-only filesystem for containers where possible"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "15.pod_privilege_escalation.yaml",
+      "category": "PRIV_ESCALATION",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeAudit"
+      ],
+      "rule_ids": [
+        "AllowPrivilegeEscalationTrue"
+      ],
+      "examples": [
+        "AllowPrivilegeEscalationTrue"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "15.pod_privilege_escalation.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeAudit"
+      ],
+      "rule_ids": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "examples": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "15.pod_privilege_escalation.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "is_security": true,
+      "support_count": 3,
+      "tools": [
+        "Conftest",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "rule_ids": [
+        "KSV012",
+        "RunAsNonRootPSCNilCSCNil"
+      ],
+      "examples": [
+        "Conftest",
+        "RunAsNonRootPSCNilCSCNil",
+        "Runs as root user"
+      ],
+      "occurrences": 3,
+      "sources": [
+        "original"
+      ],
+      "confidence": 9,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "15.pod_privilege_escalation.yaml",
+      "category": "SCHEMA_INVALID",
+      "is_security": false,
+      "support_count": 1,
+      "tools": [
+        "KubeConform"
+      ],
+      "rule_ids": [],
+      "examples": [
+        "example-pod"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 2,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "16.busybox_pod_missing_memory.yaml",
+      "category": "CAP_SYS_ADMIN",
+      "is_security": true,
+      "support_count": 3,
+      "tools": [
+        "Checkov",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "rule_ids": [
+        "CKV_K8S_37",
+        "CapabilityOrSecurityContextMissing",
+        "KSV003",
+        "KSV004",
+        "KSV106"
+      ],
+      "examples": [
+        "Minimize the admission of containers with capabilities assigned",
+        "CapabilityOrSecurityContextMissing",
+        "Default capabilities: some containers do not drop all"
+      ],
+      "occurrences": 5,
+      "sources": [
+        "original"
+      ],
+      "confidence": 15,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "16.busybox_pod_missing_memory.yaml",
+      "category": "DEFAULT_NAMESPACE",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "Trivy"
+      ],
+      "rule_ids": [
+        "KSV118"
+      ],
+      "examples": [
+        "Default security context configured",
+        "Default security context configured"
+      ],
+      "occurrences": 2,
+      "sources": [
+        "original"
+      ],
+      "confidence": 6,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "16.busybox_pod_missing_memory.yaml",
+      "category": "HARD_CODED_CREDS",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeAudit"
+      ],
+      "rule_ids": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "examples": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "16.busybox_pod_missing_memory.yaml",
+      "category": "NO_APPARMOR",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeAudit"
+      ],
+      "rule_ids": [
+        "AppArmorAnnotationMissing"
+      ],
+      "examples": [
+        "AppArmorAnnotationMissing"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "16.busybox_pod_missing_memory.yaml",
+      "category": "NO_PROBES",
+      "is_security": false,
+      "support_count": 1,
+      "tools": [
+        "Checkov"
+      ],
+      "rule_ids": [
+        "CKV_K8S_8"
+      ],
+      "examples": [
+        "Liveness Probe Should be Configured"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "16.busybox_pod_missing_memory.yaml",
+      "category": "NO_RES_LIMITS",
+      "is_security": false,
+      "support_count": 1,
+      "tools": [
+        "Checkov"
+      ],
+      "rule_ids": [
+        "CKV_K8S_11",
+        "CKV_K8S_12",
+        "CKV_K8S_13"
+      ],
+      "examples": [
+        "CPU limits should be set",
+        "Memory limits should be set",
+        "Memory requests should be set"
+      ],
+      "occurrences": 3,
+      "sources": [
+        "original"
+      ],
+      "confidence": 9,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "16.busybox_pod_missing_memory.yaml",
+      "category": "NO_SECCOMP",
+      "is_security": true,
+      "support_count": 4,
+      "tools": [
+        "Checkov",
+        "Conftest",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "rule_ids": [
+        "CKV_K8S_31",
+        "KSV104",
+        "SeccompProfileMissing"
+      ],
+      "examples": [
+        "Ensure that the seccomp profile is set to docker/default or runtime/default",
+        "Conftest",
+        "SeccompProfileMissing"
+      ],
+      "occurrences": 4,
+      "sources": [
+        "original"
+      ],
+      "confidence": 12,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "16.busybox_pod_missing_memory.yaml",
+      "category": "PRIVILEGED",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "Checkov"
+      ],
+      "rule_ids": [
+        "CKV_K8S_22"
+      ],
+      "examples": [
+        "Use read-only filesystem for containers where possible"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "16.busybox_pod_missing_memory.yaml",
+      "category": "PRIV_ESCALATION",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeAudit"
+      ],
+      "rule_ids": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "examples": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "16.busybox_pod_missing_memory.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeAudit"
+      ],
+      "rule_ids": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "examples": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "16.busybox_pod_missing_memory.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "is_security": true,
+      "support_count": 3,
+      "tools": [
+        "Conftest",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "rule_ids": [
+        "KSV012",
+        "RunAsNonRootPSCNilCSCNil"
+      ],
+      "examples": [
+        "Conftest",
+        "RunAsNonRootPSCNilCSCNil",
+        "Runs as root user"
+      ],
+      "occurrences": 3,
+      "sources": [
+        "original"
+      ],
+      "confidence": 9,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "16.busybox_pod_missing_memory.yaml",
+      "category": "SCHEMA_INVALID",
+      "is_security": false,
+      "support_count": 1,
+      "tools": [
+        "KubeConform"
+      ],
+      "rule_ids": [],
+      "examples": [
+        "busybox-pod"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 2,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "20.wordpress_mariadb_compose.yaml",
+      "category": "SCHEMA_INVALID",
+      "is_security": false,
+      "support_count": 1,
+      "tools": [
+        "KubeConform"
+      ],
+      "rule_ids": [],
+      "examples": [
+        "error while parsing: missing 'kind' key"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 2,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "26.flink_port_mismatch.yaml",
+      "category": "CAP_SYS_ADMIN",
+      "is_security": true,
+      "support_count": 3,
+      "tools": [
+        "Checkov",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "rule_ids": [
+        "CKV_K8S_37",
+        "CapabilityOrSecurityContextMissing",
+        "KSV003",
+        "KSV004",
+        "KSV106"
+      ],
+      "examples": [
+        "Minimize the admission of containers with capabilities assigned",
+        "CapabilityOrSecurityContextMissing",
+        "Default capabilities: some containers do not drop all"
+      ],
+      "occurrences": 5,
+      "sources": [
+        "original"
+      ],
+      "confidence": 15,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "26.flink_port_mismatch.yaml",
+      "category": "DEFAULT_NAMESPACE",
+      "is_security": true,
+      "support_count": 2,
+      "tools": [
+        "Conftest",
+        "Trivy"
+      ],
+      "rule_ids": [
+        "KSV0125",
+        "KSV110",
+        "KSV118"
+      ],
+      "examples": [
+        "Conftest",
+        "Workloads in the default namespace",
+        "Default security context configured"
+      ],
+      "occurrences": 5,
+      "sources": [
+        "original"
+      ],
+      "confidence": 15,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "26.flink_port_mismatch.yaml",
+      "category": "HARD_CODED_CREDS",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeAudit"
+      ],
+      "rule_ids": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "examples": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "26.flink_port_mismatch.yaml",
+      "category": "IMAGE_LATEST",
+      "is_security": true,
+      "support_count": 2,
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "rule_ids": [
+        "CKV_K8S_14",
+        "KSV013"
+      ],
+      "examples": [
+        "Image Tag should be fixed - not latest or blank",
+        "Image tag \":latest\" used"
+      ],
+      "occurrences": 2,
+      "sources": [
+        "original"
+      ],
+      "confidence": 6,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "26.flink_port_mismatch.yaml",
+      "category": "NO_APPARMOR",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeAudit"
+      ],
+      "rule_ids": [
+        "AppArmorAnnotationMissing"
+      ],
+      "examples": [
+        "AppArmorAnnotationMissing"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "26.flink_port_mismatch.yaml",
+      "category": "NO_PROBES",
+      "is_security": false,
+      "support_count": 1,
+      "tools": [
+        "Checkov"
+      ],
+      "rule_ids": [
+        "CKV_K8S_8"
+      ],
+      "examples": [
+        "Liveness Probe Should be Configured"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "26.flink_port_mismatch.yaml",
+      "category": "NO_RES_LIMITS",
+      "is_security": false,
+      "support_count": 1,
+      "tools": [
+        "Checkov"
+      ],
+      "rule_ids": [
+        "CKV_K8S_10",
+        "CKV_K8S_11",
+        "CKV_K8S_12",
+        "CKV_K8S_13"
+      ],
+      "examples": [
+        "CPU requests should be set",
+        "CPU limits should be set",
+        "Memory limits should be set"
+      ],
+      "occurrences": 4,
+      "sources": [
+        "original"
+      ],
+      "confidence": 12,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "26.flink_port_mismatch.yaml",
+      "category": "NO_SECCOMP",
+      "is_security": true,
+      "support_count": 3,
+      "tools": [
+        "Checkov",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "rule_ids": [
+        "CKV_K8S_31",
+        "KSV104",
+        "SeccompProfileMissing"
+      ],
+      "examples": [
+        "Ensure that the seccomp profile is set to docker/default or runtime/default",
+        "SeccompProfileMissing",
+        "Seccomp policies disabled"
+      ],
+      "occurrences": 3,
+      "sources": [
+        "original"
+      ],
+      "confidence": 9,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "26.flink_port_mismatch.yaml",
+      "category": "PRIVILEGED",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "Checkov"
+      ],
+      "rule_ids": [
+        "CKV_K8S_22"
+      ],
+      "examples": [
+        "Use read-only filesystem for containers where possible"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "26.flink_port_mismatch.yaml",
+      "category": "PRIV_ESCALATION",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeAudit"
+      ],
+      "rule_ids": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "examples": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "26.flink_port_mismatch.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeAudit"
+      ],
+      "rule_ids": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "examples": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "26.flink_port_mismatch.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "is_security": true,
+      "support_count": 3,
+      "tools": [
+        "Conftest",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "rule_ids": [
+        "KSV012",
+        "RunAsNonRootPSCNilCSCNil"
+      ],
+      "examples": [
+        "Conftest",
+        "RunAsNonRootPSCNilCSCNil",
+        "Runs as root user"
+      ],
+      "occurrences": 3,
+      "sources": [
+        "original"
+      ],
+      "confidence": 9,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "26.flink_port_mismatch.yaml",
+      "category": "SCHEMA_INVALID",
+      "is_security": false,
+      "support_count": 1,
+      "tools": [
+        "KubeConform"
+      ],
+      "rule_ids": [],
+      "examples": [
+        "flink"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 2,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "27.kubeteus_misconfigured_policy.yaml",
+      "category": "SCHEMA_INVALID",
+      "is_security": false,
+      "support_count": 1,
+      "tools": [
+        "KubeConform"
+      ],
+      "rule_ids": [],
+      "examples": [
+        "egress-product"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 2,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "28.role_overly_permissive.yaml",
+      "category": "RBAC_OVER_PERMISSIVE",
+      "is_security": true,
+      "support_count": 2,
+      "tools": [
+        "Conftest",
+        "KubeConform"
+      ],
+      "rule_ids": [],
+      "examples": [
+        "Conftest",
+        "frontend-role"
+      ],
+      "occurrences": 2,
+      "sources": [
+        "original"
+      ],
+      "confidence": 5,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "29.helm_rabbitmq_hardcoded_credentials.yaml",
+      "category": "SCHEMA_INVALID",
+      "is_security": false,
+      "support_count": 1,
+      "tools": [
+        "KubeConform"
+      ],
+      "rule_ids": [],
+      "examples": [
+        "error while parsing: missing 'kind' key"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 2,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "CAP_SYS_ADMIN",
+      "is_security": true,
+      "support_count": 3,
+      "tools": [
+        "Checkov",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "rule_ids": [
+        "CKV_K8S_37",
+        "CapabilityOrSecurityContextMissing",
+        "KSV003",
+        "KSV004",
+        "KSV106"
+      ],
+      "examples": [
+        "Minimize the admission of containers with capabilities assigned",
+        "CapabilityOrSecurityContextMissing",
+        "Default capabilities: some containers do not drop all"
+      ],
+      "occurrences": 5,
+      "sources": [
+        "original"
+      ],
+      "confidence": 15,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "DEFAULT_NAMESPACE",
+      "is_security": true,
+      "support_count": 2,
+      "tools": [
+        "Conftest",
+        "Trivy"
+      ],
+      "rule_ids": [
+        "KSV0125",
+        "KSV110",
+        "KSV118"
+      ],
+      "examples": [
+        "Conftest",
+        "Workloads in the default namespace",
+        "Default security context configured"
+      ],
+      "occurrences": 4,
+      "sources": [
+        "original"
+      ],
+      "confidence": 12,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "HARD_CODED_CREDS",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeAudit"
+      ],
+      "rule_ids": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "examples": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "IMAGE_LATEST",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "Checkov"
+      ],
+      "rule_ids": [
+        "CKV_K8S_15"
+      ],
+      "examples": [
+        "Image Pull Policy should be Always"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "NO_APPARMOR",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeAudit"
+      ],
+      "rule_ids": [
+        "AppArmorAnnotationMissing"
+      ],
+      "examples": [
+        "AppArmorAnnotationMissing"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "NO_PROBES",
+      "is_security": false,
+      "support_count": 1,
+      "tools": [
+        "Checkov"
+      ],
+      "rule_ids": [
+        "CKV_K8S_8"
+      ],
+      "examples": [
+        "Liveness Probe Should be Configured"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "NO_RES_LIMITS",
+      "is_security": false,
+      "support_count": 1,
+      "tools": [
+        "Checkov"
+      ],
+      "rule_ids": [
+        "CKV_K8S_10",
+        "CKV_K8S_11",
+        "CKV_K8S_12",
+        "CKV_K8S_13"
+      ],
+      "examples": [
+        "CPU requests should be set",
+        "CPU limits should be set",
+        "Memory limits should be set"
+      ],
+      "occurrences": 4,
+      "sources": [
+        "original"
+      ],
+      "confidence": 12,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "NO_SECCOMP",
+      "is_security": true,
+      "support_count": 4,
+      "tools": [
+        "Checkov",
+        "Conftest",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "rule_ids": [
+        "CKV_K8S_31",
+        "KSV104",
+        "SeccompProfileMissing"
+      ],
+      "examples": [
+        "Ensure that the seccomp profile is set to docker/default or runtime/default",
+        "Conftest",
+        "SeccompProfileMissing"
+      ],
+      "occurrences": 4,
+      "sources": [
+        "original"
+      ],
+      "confidence": 12,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "PRIVILEGED",
+      "is_security": true,
+      "support_count": 3,
+      "tools": [
+        "Checkov",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "rule_ids": [
+        "CKV_K8S_22",
+        "KSV017",
+        "PrivilegedTrue"
+      ],
+      "examples": [
+        "Use read-only filesystem for containers where possible",
+        "PrivilegedTrue",
+        "Privileged"
+      ],
+      "occurrences": 3,
+      "sources": [
+        "original"
+      ],
+      "confidence": 9,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "PRIV_ESCALATION",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeAudit"
+      ],
+      "rule_ids": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "examples": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeAudit"
+      ],
+      "rule_ids": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "examples": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "is_security": true,
+      "support_count": 3,
+      "tools": [
+        "Conftest",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "rule_ids": [
+        "KSV012",
+        "RunAsNonRootPSCNilCSCNil"
+      ],
+      "examples": [
+        "Conftest",
+        "RunAsNonRootPSCNilCSCNil",
+        "Runs as root user"
+      ],
+      "occurrences": 3,
+      "sources": [
+        "original"
+      ],
+      "confidence": 9,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "SCHEMA_INVALID",
+      "is_security": false,
+      "support_count": 1,
+      "tools": [
+        "KubeConform"
+      ],
+      "rule_ids": [],
+      "examples": [
+        "efs-plugin"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 2,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "3.multus_cni_misconfig.yaml",
+      "category": "CNI_EMBEDDED_PRIVILEGED",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "Conftest"
+      ],
+      "rule_ids": [],
+      "examples": [
+        "Conftest",
+        "Conftest"
+      ],
+      "occurrences": 2,
+      "sources": [
+        "original"
+      ],
+      "confidence": 6,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "3.multus_cni_misconfig.yaml",
+      "category": "SCHEMA_INVALID",
+      "is_security": false,
+      "support_count": 1,
+      "tools": [
+        "KubeConform"
+      ],
+      "rule_ids": [],
+      "examples": [
+        "multus-cni-config"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 2,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "CAP_SYS_ADMIN",
+      "is_security": true,
+      "support_count": 3,
+      "tools": [
+        "Checkov",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "rule_ids": [
+        "CKV_K8S_37",
+        "CapabilityOrSecurityContextMissing",
+        "KSV003",
+        "KSV004",
+        "KSV106"
+      ],
+      "examples": [
+        "Minimize the admission of containers with capabilities assigned",
+        "CapabilityOrSecurityContextMissing",
+        "Default capabilities: some containers do not drop all"
+      ],
+      "occurrences": 5,
+      "sources": [
+        "original"
+      ],
+      "confidence": 15,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "DEFAULT_NAMESPACE",
+      "is_security": true,
+      "support_count": 2,
+      "tools": [
+        "Conftest",
+        "Trivy"
+      ],
+      "rule_ids": [
+        "KSV110",
+        "KSV118"
+      ],
+      "examples": [
+        "Conftest",
+        "Workloads in the default namespace",
+        "Default security context configured"
+      ],
+      "occurrences": 4,
+      "sources": [
+        "original"
+      ],
+      "confidence": 12,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "HARD_CODED_CREDS",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeAudit"
+      ],
+      "rule_ids": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "examples": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "IMAGE_LATEST",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "Checkov"
+      ],
+      "rule_ids": [
+        "CKV_K8S_15"
+      ],
+      "examples": [
+        "Image Pull Policy should be Always"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "NO_APPARMOR",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeAudit"
+      ],
+      "rule_ids": [
+        "AppArmorAnnotationMissing"
+      ],
+      "examples": [
+        "AppArmorAnnotationMissing"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "NO_PROBES",
+      "is_security": false,
+      "support_count": 1,
+      "tools": [
+        "Checkov"
+      ],
+      "rule_ids": [
+        "CKV_K8S_8"
+      ],
+      "examples": [
+        "Liveness Probe Should be Configured"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "NO_RES_LIMITS",
+      "is_security": false,
+      "support_count": 1,
+      "tools": [
+        "Checkov"
+      ],
+      "rule_ids": [
+        "CKV_K8S_10",
+        "CKV_K8S_11",
+        "CKV_K8S_12",
+        "CKV_K8S_13"
+      ],
+      "examples": [
+        "CPU requests should be set",
+        "CPU limits should be set",
+        "Memory limits should be set"
+      ],
+      "occurrences": 4,
+      "sources": [
+        "original"
+      ],
+      "confidence": 12,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "NO_SECCOMP",
+      "is_security": true,
+      "support_count": 4,
+      "tools": [
+        "Checkov",
+        "Conftest",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "rule_ids": [
+        "CKV_K8S_31",
+        "KSV104",
+        "SeccompProfileMissing"
+      ],
+      "examples": [
+        "Ensure that the seccomp profile is set to docker/default or runtime/default",
+        "Conftest",
+        "SeccompProfileMissing"
+      ],
+      "occurrences": 4,
+      "sources": [
+        "original"
+      ],
+      "confidence": 12,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "PRIVILEGED",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "Checkov"
+      ],
+      "rule_ids": [
+        "CKV_K8S_22"
+      ],
+      "examples": [
+        "Use read-only filesystem for containers where possible"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "PRIV_ESCALATION",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeAudit"
+      ],
+      "rule_ids": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "examples": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeAudit"
+      ],
+      "rule_ids": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "examples": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "is_security": true,
+      "support_count": 3,
+      "tools": [
+        "Conftest",
+        "KubeAudit",
+        "Trivy"
+      ],
+      "rule_ids": [
+        "KSV012",
+        "RunAsNonRootPSCNilCSCNil"
+      ],
+      "examples": [
+        "Conftest",
+        "RunAsNonRootPSCNilCSCNil",
+        "Runs as root user"
+      ],
+      "occurrences": 3,
+      "sources": [
+        "original"
+      ],
+      "confidence": 9,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "SCHEMA_INVALID",
+      "is_security": false,
+      "support_count": 1,
+      "tools": [
+        "KubeConform"
+      ],
+      "rule_ids": [],
+      "examples": [
+        "nginx"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 2,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "34.unencrypted_secret.yaml",
+      "category": "HARD_CODED_CREDS",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "Conftest"
+      ],
+      "rule_ids": [],
+      "examples": [
+        "Conftest",
+        "Conftest"
+      ],
+      "occurrences": 2,
+      "sources": [
+        "original"
+      ],
+      "confidence": 6,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "34.unencrypted_secret.yaml",
+      "category": "SCHEMA_INVALID",
+      "is_security": false,
+      "support_count": 1,
+      "tools": [
+        "KubeConform"
+      ],
+      "rule_ids": [],
+      "examples": [
+        "mysecret"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 2,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/detection/C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/14.ingress_deprecated_api.yaml",
+      "category": "DEPRECATED_API",
+      "is_security": false,
+      "support_count": 1,
+      "tools": [
+        "Pluto"
+      ],
+      "rule_ids": [
+        "extensions/v1beta1"
+      ],
+      "examples": [
+        "Ingress extensions/v1beta1"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 2,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/34.unencrypted_secret.yaml",
+      "category": "HARD_CODED_CREDS",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "Gitleaks"
+      ],
+      "rule_ids": [
+        "kubernetes-secret-yaml"
+      ],
+      "examples": [
+        "kubernetes-secret-yaml"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 3,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
+    },
+    {
+      "file": "Deployment/apps/v1/flink",
+      "category": "NO_RES_LIMITS",
+      "is_security": false,
+      "support_count": 1,
+      "tools": [
+        "KubeScore"
+      ],
+      "rule_ids": [],
+      "examples": [
+        "container-resources"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 1,
+      "suggested_classification": "Needs corroboration",
+      "is_true_positive": false
+    },
+    {
+      "file": "Deployment/apps/v1/flink",
+      "category": "NO_SECCOMP",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeScore"
+      ],
+      "rule_ids": [],
+      "examples": [
+        "container-seccomp-profile"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 1,
+      "suggested_classification": "Needs corroboration",
+      "is_true_positive": false
+    },
+    {
+      "file": "Deployment/apps/v1/nginx-deployment",
+      "category": "NO_RES_LIMITS",
+      "is_security": false,
+      "support_count": 1,
+      "tools": [
+        "KubeScore"
+      ],
+      "rule_ids": [],
+      "examples": [
+        "container-resources"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 1,
+      "suggested_classification": "Needs corroboration",
+      "is_true_positive": false
+    },
+    {
+      "file": "Deployment/apps/v1/nginx-deployment",
+      "category": "NO_SECCOMP",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeScore"
+      ],
+      "rule_ids": [],
+      "examples": [
+        "container-seccomp-profile"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 1,
+      "suggested_classification": "Needs corroboration",
+      "is_true_positive": false
+    },
+    {
+      "file": "Deployment/apps/v1/single-replica-deployment",
+      "category": "NO_RES_LIMITS",
+      "is_security": false,
+      "support_count": 1,
+      "tools": [
+        "KubeScore"
+      ],
+      "rule_ids": [],
+      "examples": [
+        "container-resources"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 1,
+      "suggested_classification": "Needs corroboration",
+      "is_true_positive": false
+    },
+    {
+      "file": "Deployment/apps/v1/single-replica-deployment",
+      "category": "NO_SECCOMP",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeScore"
+      ],
+      "rule_ids": [],
+      "examples": [
+        "container-seccomp-profile"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 1,
+      "suggested_classification": "Needs corroboration",
+      "is_true_positive": false
+    },
+    {
+      "file": "Pod/v1",
+      "category": "NO_RES_LIMITS",
+      "is_security": false,
+      "support_count": 1,
+      "tools": [
+        "KubeScore"
+      ],
+      "rule_ids": [],
+      "examples": [
+        "container-resources"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 1,
+      "suggested_classification": "Needs corroboration",
+      "is_true_positive": false
+    },
+    {
+      "file": "Pod/v1",
+      "category": "NO_SECCOMP",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeScore"
+      ],
+      "rule_ids": [],
+      "examples": [
+        "container-seccomp-profile"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 1,
+      "suggested_classification": "Needs corroboration",
+      "is_true_positive": false
+    },
+    {
+      "file": "Pod/v1/busybox-namespace/busybox-pod",
+      "category": "NO_RES_LIMITS",
+      "is_security": false,
+      "support_count": 1,
+      "tools": [
+        "KubeScore"
+      ],
+      "rule_ids": [],
+      "examples": [
+        "container-resources"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 1,
+      "suggested_classification": "Needs corroboration",
+      "is_true_positive": false
+    },
+    {
+      "file": "Pod/v1/busybox-namespace/busybox-pod",
+      "category": "NO_SECCOMP",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeScore"
+      ],
+      "rule_ids": [],
+      "examples": [
+        "container-seccomp-profile"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 1,
+      "suggested_classification": "Needs corroboration",
+      "is_true_positive": false
+    },
+    {
+      "file": "Pod/v1/efs-plugin",
+      "category": "NO_RES_LIMITS",
+      "is_security": false,
+      "support_count": 1,
+      "tools": [
+        "KubeScore"
+      ],
+      "rule_ids": [],
+      "examples": [
+        "container-resources"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 1,
+      "suggested_classification": "Needs corroboration",
+      "is_true_positive": false
+    },
+    {
+      "file": "Pod/v1/efs-plugin",
+      "category": "NO_SECCOMP",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeScore"
+      ],
+      "rule_ids": [],
+      "examples": [
+        "container-seccomp-profile"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 1,
+      "suggested_classification": "Needs corroboration",
+      "is_true_positive": false
+    },
+    {
+      "file": "Pod/v1/example-pod",
+      "category": "NO_RES_LIMITS",
+      "is_security": false,
+      "support_count": 1,
+      "tools": [
+        "KubeScore"
+      ],
+      "rule_ids": [],
+      "examples": [
+        "container-resources"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 1,
+      "suggested_classification": "Needs corroboration",
+      "is_true_positive": false
+    },
+    {
+      "file": "Pod/v1/example-pod",
+      "category": "NO_SECCOMP",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeScore"
+      ],
+      "rule_ids": [],
+      "examples": [
+        "container-seccomp-profile"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 1,
+      "suggested_classification": "Needs corroboration",
+      "is_true_positive": false
+    },
+    {
+      "file": "Pod/v1/nginx",
+      "category": "NO_RES_LIMITS",
+      "is_security": false,
+      "support_count": 1,
+      "tools": [
+        "KubeScore"
+      ],
+      "rule_ids": [],
+      "examples": [
+        "container-resources"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 1,
+      "suggested_classification": "Needs corroboration",
+      "is_true_positive": false
+    },
+    {
+      "file": "Pod/v1/nginx",
+      "category": "NO_SECCOMP",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeScore"
+      ],
+      "rule_ids": [],
+      "examples": [
+        "container-seccomp-profile"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 1,
+      "suggested_classification": "Needs corroboration",
+      "is_true_positive": false
+    },
+    {
+      "file": "Pod/v1/pod-name",
+      "category": "NO_RES_LIMITS",
+      "is_security": false,
+      "support_count": 1,
+      "tools": [
+        "KubeScore"
+      ],
+      "rule_ids": [],
+      "examples": [
+        "container-resources"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 1,
+      "suggested_classification": "Needs corroboration",
+      "is_true_positive": false
+    },
+    {
+      "file": "Pod/v1/pod-name",
+      "category": "NO_SECCOMP",
+      "is_security": true,
+      "support_count": 1,
+      "tools": [
+        "KubeScore"
+      ],
+      "rule_ids": [],
+      "examples": [
+        "container-seccomp-profile"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 1,
+      "suggested_classification": "Needs corroboration",
+      "is_true_positive": false
+    },
+    {
+      "file": "spec",
+      "category": "SCHEMA_INVALID",
+      "is_security": false,
+      "support_count": 1,
+      "tools": [
+        "KubeConform"
+      ],
+      "rule_ids": [],
+      "examples": [
+        "missing property 'selector'"
+      ],
+      "occurrences": 1,
+      "sources": [
+        "original"
+      ],
+      "confidence": 2,
+      "suggested_classification": "Actual (Correct)",
+      "is_true_positive": true
     }
   ]
 }

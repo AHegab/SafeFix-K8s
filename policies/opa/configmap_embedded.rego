@@ -1,60 +1,20 @@
-package kubernetes.configmap_embedded
+package k8s.configmap_embedded
 
-# set of risky keys we want to catch anywhere inside parsed data blobs
-bad_keys = {"privileged", "allowPrivilegeEscalation"}
-
-# ---- YAML path ---------------------------------------------------------------
-
-deny[msg] {
+deny contains msg if {
   input.kind == "ConfigMap"
+  not allow_embedded
   some k
   v := input.data[k]
-  parsed := yaml.unmarshal(v)
-  is_object(parsed)
-  walk(parsed, [p, val])
-  some i
-  key := p[i]
-  bad_keys[key]
-  val == true
-  msg := sprintf("ConfigMap %q data[%q] contains %q: true (YAML)", [input.metadata.name, k, key])
+  suspicious(v)
+  msg := sprintf("ConfigMap %q embeds potential secret in key %q (value redacted)", [input.metadata.name, k])
 }
 
-# ---- JSON path ---------------------------------------------------------------
-
-deny[msg] {
-  input.kind == "ConfigMap"
-  some k
-  v := input.data[k]
-  parsed := json.unmarshal(v)
-  is_object(parsed)
-  walk(parsed, [p, val])
-  some i
-  key := p[i]
-  bad_keys[key]
-  val == true
-  msg := sprintf("ConfigMap %q data[%q] contains %q: true (JSON)", [input.metadata.name, k, key])
+allow_embedded if {
+  ann := input.metadata.annotations
+  ann != null
+  ann["safefixk8s.io/allow-embedded"] == "true"
 }
 
-# ---- Optional: flag embedded hostPath anywhere in the blob -------------------
-
-deny[msg] {
-  input.kind == "ConfigMap"
-  some k
-  v := input.data[k]
-  parsed := yaml.unmarshal(v)
-  is_object(parsed)
-  walk(parsed, [p, _])
-  "hostPath" == p[_]
-  msg := sprintf("ConfigMap %q data[%q] embeds a hostPath volume (YAML)", [input.metadata.name, k])
-}
-
-deny[msg] {
-  input.kind == "ConfigMap"
-  some k
-  v := input.data[k]
-  parsed := json.unmarshal(v)
-  is_object(parsed)
-  walk(parsed, [p, _])
-  "hostPath" == p[_]
-  msg := sprintf("ConfigMap %q data[%q] embeds a hostPath volume (JSON)", [input.metadata.name, k])
+suspicious(v) if {
+  regex.match("(?i)(password|token|secret|apikey|api_key|access[_-]?key|private[_-]?key|credential)", sprintf("%v", [v]))
 }

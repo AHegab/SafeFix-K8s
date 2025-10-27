@@ -1,0 +1,15 @@
+# Example of an Ingress resource using a deprecated API version and missing a namespace
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: gateway-ingress
+  # Note: namespace intentionally omitted; default namespace is used.
+spec:
+  rules:
+  - host: example.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: my-service
+          servicePort: 80
