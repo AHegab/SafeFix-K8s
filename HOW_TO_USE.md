@@ -44,7 +44,6 @@ That's it! Results will be saved in `detection/output/raw/`.
 ## Detailed Usage
 
 ### Loading the Detectors
-
 Before running any scans, you must load the detector functions into your PowerShell session:
 
 ```powershell
@@ -131,13 +130,11 @@ Det-KubeAudit "..\tests"
 
 #### KubeLinter
 ```powershell
-Det-KubeLinter "..\tests"
 ```
 - Fast static analysis
 - Built-in checks
 - Output: `kubelinter_raw.json`
 
-#### Polaris
 ```powershell
 Det-Polaris "..\tests"
 ```

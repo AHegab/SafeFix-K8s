@@ -48,9 +48,9 @@
         "hostPathSet"
       ],
       "examples": [
-        "alert-rw-hostpath",
         "alert-any-hostpath",
-        "alert-rw-hostpath"
+        "alert-rw-hostpath",
+        "alert-any-hostpath"
       ],
       "occurrences": 6
     },

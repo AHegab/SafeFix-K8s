@@ -191,7 +191,7 @@ function Det-Checkov {
   param([string]$Path=".",[string]$Out="$OutDir\checkov_raw.json")
   try {
     $abs = Resolve-ScanPath -Path $Path
-    $checksDir = Join-Path $RepoRoot "policies\checkov"
+  $checksDir = Join-Path $RepoRoot "Detection\policies\checkov"
     $local = $null
     try { $local = (Get-Command checkov -ErrorAction Stop).Source } catch { }
     $args = @("-d", $abs, "--framework", "kubernetes", "--quiet", "--compact", "-o", "json")
@@ -328,7 +328,7 @@ function Det-KubeAudit {
 
 # --- Conftest (OPA) -----------------------------------------------------------
 function Det-Conftest {
-  param([string]$Path=".", [string]$Out="$OutDir\conftest_raw.json", [string]$PolicyDir="$RepoRoot\policies\opa")
+  param([string]$Path=".", [string]$Out="$OutDir\conftest_raw.json", [string]$PolicyDir="$RepoRoot\Validations\policies\opa")
   try {
     $abs = Resolve-ScanPath -Path $Path
     if (-not (Test-Path $PolicyDir)) { _WrapPlaceholder $Out "conftest" "Policy dir not found"; return }
@@ -559,7 +559,7 @@ function Det-Gitleaks {
     $gitleaksCmd = Get-Command gitleaks -ErrorAction SilentlyContinue
     if ($gitleaksCmd) {
       $abs = Resolve-ScanPath -Path $Path
-      $rulesPath = Join-Path $RepoRoot "policies\gitleaks-rules.toml"
+  $rulesPath = Join-Path $RepoRoot "Detection\policies\gitleaks-rules.toml"
       & gitleaks detect --source $abs --no-git --report-path $Out --report-format json --config $rulesPath 2>$null
 
       if (!(Test-Path $Out)) { '[]' | Set-Content -Encoding UTF8 -Path $Out }

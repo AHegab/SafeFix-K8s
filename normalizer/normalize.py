@@ -3,12 +3,9 @@
 """
 SafeFix-K8s LLM Payload Builder (v8.0)
 
-Purpose
--------
-Build a minimal, high-signal payload for LLM auto-fixes directly from
-detector raw outputs. It consolidates findings by (file, category), adds
-contextual snippet + span, and a best-effort jsonpath to the target
-section (e.g., container securityContext).
+This copy lives under Normalizer/ and defaults to reading detector raw
+outputs from Detection/output/raw. For backward compatibility, it will
+fall back to detection/output/raw if the new path doesn't exist.
 
 Outputs (default ./output)
 --------------------------
@@ -16,15 +13,15 @@ Outputs (default ./output)
 
 Usage
 -----
-python normalizer/normalize.py --raw detection/output/raw --out output \
-       [--min-support 1] [--only-security 1] [--emit-normalized 0]
+python Normalizer/normalize.py --raw Detection/output/raw --out output \
+             [--min-support 1] [--only-security 1] [--emit-normalized 0]
 
 Notes
 -----
 - PyYAML is optional. If missing, the builder still emits snippet/span
-  using regex and omits jsonpath.
+    using regex and omits jsonpath.
 - We intentionally skip items whose file cannot be resolved to a YAML
-  file under the workspace (e.g., "(unknown)" or pure resource IDs).
+    file under the workspace (e.g., "(unknown)" or pure resource IDs).
 """
 
 import argparse, json, re, sys, os
@@ -40,7 +37,7 @@ except ImportError:  # pragma: no cover
 # ---------------- CLI ----------------
 def parse_args():
     p = argparse.ArgumentParser("SafeFix-K8s LLM payload builder (v8.0)")
-    p.add_argument("--raw", default="detection/output/raw", help="Folder containing *raw* tool outputs")
+    p.add_argument("--raw", default="Detection/output/raw", help="Folder containing *raw* tool outputs (prefers Detection/output/raw; falls back to detection/output/raw)")
     p.add_argument("--out", default="output", help="Folder to write outputs (llm_payload.json)")
     p.add_argument("--min-support", type=int, default=1, help="Minimum number of distinct tools to keep a (file,category)")
     p.add_argument("--only-security", type=int, default=1, help="If 1, exclude quality-only categories (probes/limits/schema/yaml)")
@@ -418,6 +415,11 @@ def main():
     args = parse_args()
     repo_root = Path(os.getcwd()).resolve()
     raw_dir = Path(args.raw).resolve()
+    # Back-compat fallback to old layout
+    if not raw_dir.exists():
+        legacy = (repo_root / "detection/output/raw").resolve()
+        if legacy.exists():
+            raw_dir = legacy
     out_dir = Path(args.out).resolve(); out_dir.mkdir(parents=True, exist_ok=True)
     if not raw_dir.exists():
         print(f"[!] Raw directory not found: {raw_dir}", file=sys.stderr)

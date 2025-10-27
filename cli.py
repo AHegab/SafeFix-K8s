@@ -6,9 +6,14 @@ from rich.table import Table
 console = Console()
 
 REPO_ROOT = Path(__file__).parent
-DETECTION_DIR = REPO_ROOT / "detection"
+# Prefer capitalized canonical folders with legacy fallbacks
+DETECTION_DIR = REPO_ROOT / ("Detection" if (REPO_ROOT / "Detection").exists() else "detection")
 DETECTORS_SCRIPT = DETECTION_DIR / "detectors.ps1"
-NORMALIZER_SCRIPT = REPO_ROOT / "normalizer" / "normalize_all.py"
+
+# Normalizer entrypoint (normalize.py)
+_norm_cap = REPO_ROOT / "Normalizer" / "normalize.py"
+_norm_legacy = REPO_ROOT / "normalizer" / "normalize.py"
+NORMALIZER_SCRIPT = _norm_cap if _norm_cap.exists() else _norm_legacy
 
 @click.group()
 def cli():
@@ -45,13 +50,14 @@ def detect(path, tool):
         if rc != 0:
             console.print(f"[red]✗ Detection failed (exit {rc})[/red]"); sys.exit(rc)
         console.print("\n[green]✓ Detection completed[/green]")
-        console.print("[cyan]Raw results:[/cyan] detection/output/raw/")
+        rel_det = DETECTION_DIR.relative_to(REPO_ROOT)
+        console.print(f"[cyan]Raw results:[/cyan] {rel_det}\\output\\raw\\")
     except Exception as e:
         console.print(f"[red]Error running detection:[/red] {e}"); sys.exit(1)
 
 @cli.command()
 def normalize():
-    """Normalize all detection results into a unified format + Excel"""
+    """Normalize detection results into a unified LLM-ready payload"""
     if not NORMALIZER_SCRIPT.exists():
         console.print(f"[red]Error: normalizer not found at:[/red] {NORMALIZER_SCRIPT}")
         sys.exit(1)

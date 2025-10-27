@@ -1,0 +1,40 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: restrict-dangerous-rbac
+spec:
+  validationFailureAction: Audit
+  background: true
+  rules:
+  - name: forbid-wildcard-and-delete-verbs
+    match:
+      any:
+      - resources:
+          kinds: ["Role", "ClusterRole"]
+    validate:
+      message: "Use of wildcard '*' or 'delete' permissions in RBAC roles is not allowed."
+      deny:
+        conditions:
+          any:
+          - key: "{{ contains(to_array(request.object.rules[].verbs[]), '*') }}"
+            operator: Equals
+            value: true
+          - key: "{{ contains(to_array(request.object.rules[].verbs[]), 'delete') }}"
+            operator: Equals
+            value: true
+          - key: "{{ contains(to_array(request.object.rules[].resources[]), '*') }}"
+            operator: Equals
+            value: true
+  - name: forbid-secret-read-access
+    match:
+      any:
+      - resources:
+          kinds: ["Role", "ClusterRole"]
+    validate:
+      message: "RBAC roles granting read access to Secrets are not allowed."
+      deny:
+        conditions:
+          any:
+          - key: ["get", "list", "watch"]
+            operator: AnyIn
+            value: "{{ request.object.rules[?resources.contains(@, 'secrets')].verbs[] }}"
