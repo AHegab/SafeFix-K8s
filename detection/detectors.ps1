@@ -559,7 +559,9 @@ function Det-Gitleaks {
     $gitleaksCmd = Get-Command gitleaks -ErrorAction SilentlyContinue
     if ($gitleaksCmd) {
       $abs = Resolve-ScanPath -Path $Path
-      & gitleaks detect --source $abs --no-git --report-path $Out --report-format json 2>$null
+      $rulesPath = Join-Path $RepoRoot "policies\gitleaks-rules.toml"
+      & gitleaks detect --source $abs --no-git --report-path $Out --report-format json --config $rulesPath 2>$null
+
       if (!(Test-Path $Out)) { '[]' | Set-Content -Encoding UTF8 -Path $Out }
     } else {
       '[{"note":"Gitleaks not installed. Install locally for secret scanning."}]' |

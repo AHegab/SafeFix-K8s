@@ -1,3533 +1,484 @@
 {
-  "generated_at": "2025-10-27T09:15:55Z",
-  "source": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\detection\\output\\raw",
-  "total_raw_findings": 1572,
-  "normalized_count": 152,
-  "findings": [
+  "aggregate": [
     {
       "file": "(unknown)",
       "category": "CAP_SYS_ADMIN",
-      "is_security": true,
-      "support_count": 2,
       "tools": [
-        "KubeLinter",
-        "Kubescape"
+        "kubescape_raw.json",
+        "polaris_raw.json"
       ],
-      "rule_ids": [],
+      "support_count": 2,
+      "rule_ids": [
+        "dangerousCapabilities",
+        "insecureCapabilities",
+        "linuxHardening"
+      ],
       "examples": [
-        "drop-net-raw-capability",
-        "insecure-capabilities"
+        "insecure-capabilities",
+        "insecure-capabilities",
+        "dangerousCapabilities"
       ],
-      "occurrences": 2,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
+      "occurrences": 8
     },
     {
       "file": "(unknown)",
       "category": "DEPRECATED_API",
-      "is_security": false,
+      "tools": [
+        "kubescore_raw.json"
+      ],
       "support_count": 1,
-      "tools": [
-        "KubeLinter"
+      "rule_ids": [
+        "stable-version"
       ],
-      "rule_ids": [],
       "examples": [
-        "no-extensions-v1beta"
+        "Stable version",
+        "Stable version"
       ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 2,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "(unknown)",
-      "category": "HARD_CODED_CREDS",
-      "is_security": true,
-      "support_count": 2,
-      "tools": [
-        "KubeLinter",
-        "Kubescape"
-      ],
-      "rule_ids": [],
-      "examples": [
-        "env-var-secret",
-        "Add Checkov, Conftest, and Gitleaks integration\nIntroduces Checkov, Conftest, and Gitleaks as new detectors in the scanning pipeline. Updates orchestration functions to include these tools, adds configuration files for Checkov, Kube-Linter, and Polaris, and implements HTML vulnerability matrix output. Also improves normalization logic for kube-score findings and removes obsolete test and log files."
-      ],
-      "occurrences": 2,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
+      "occurrences": 2
     },
     {
       "file": "(unknown)",
       "category": "HOSTPATH",
-      "is_security": true,
+      "tools": [
+        "kubescape_raw.json",
+        "polaris_raw.json"
+      ],
       "support_count": 2,
-      "tools": [
-        "KubeLinter",
-        "Kubescape"
+      "rule_ids": [
+        "hostPathSet"
       ],
-      "rule_ids": [],
       "examples": [
-        "docker-sock",
-        "host system directory \"/var/run/docker.sock\" is mounted on container \"jenkins-agent\"",
-        "docker-sock"
+        "alert-rw-hostpath",
+        "alert-any-hostpath",
+        "alert-rw-hostpath"
       ],
-      "occurrences": 5,
-      "sources": [
-        "original"
-      ],
-      "confidence": 7,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
+      "occurrences": 6
     },
     {
       "file": "(unknown)",
-      "category": "IMAGE_LATEST",
-      "is_security": true,
-      "support_count": 1,
+      "category": "NO_RES_LIMITS",
       "tools": [
-        "KubeLinter"
+        "kubescore_raw.json",
+        "polaris_raw.json"
       ],
-      "rule_ids": [],
+      "support_count": 2,
+      "rule_ids": [
+        "container-resources",
+        "cpuLimitsMissing",
+        "cpuRequestsMissing",
+        "memoryLimitsMissing",
+        "memoryRequestsMissing"
+      ],
       "examples": [
-        "The container \"jenkins-agent\" is using an invalid container image, \"jenkins/inbound-agent:latest\". Please use images that are not blocked by the `BlockList` criteria : [\".*:(latest)$\" \"^[^:]*$\" \"(.*/[^:]+)$\"]",
-        "The container \"nginx\" is using an invalid container image, \"nginx:latest\". Please use images that are not blocked by the `BlockList` criteria : [\".*:(latest)$\" \"^[^:]*$\" \"(.*/[^:]+)$\"]",
-        "The container \"app-container\" is using an invalid container image, \"myimage:latest\". Please use images that are not blocked by the `BlockList` criteria : [\".*:(latest)$\" \"^[^:]*$\" \"(.*/[^:]+)$\"]"
+        "Container Resources",
+        "Container Resources",
+        "cpuLimitsMissing"
       ],
-      "occurrences": 3,
-      "sources": [
-        "original"
-      ],
-      "confidence": 6,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
+      "occurrences": 10
     },
     {
       "file": "(unknown)",
-      "category": "PRIVILEGED",
-      "is_security": true,
-      "support_count": 1,
+      "category": "NO_SECCOMP",
       "tools": [
-        "KubeLinter"
+        "kubescore_raw.json"
       ],
-      "rule_ids": [],
+      "support_count": 1,
+      "rule_ids": [
+        "container-seccomp-profile"
+      ],
       "examples": [
-        "privileged-container"
+        "Container Seccomp Profile",
+        "Skipped because container-seccomp-profile is ignored",
+        "Container Seccomp Profile"
       ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 2,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
+      "occurrences": 4
     },
     {
-      "file": "(unknown)",
-      "category": "PRIV_ESCALATION",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "Kubescape"
-      ],
-      "rule_ids": [],
-      "examples": [
-        "rule-allow-privilege-escalation"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 1,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "(unknown)",
-      "category": "RUN_AS_NONROOT_FALSE",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "KubeLinter"
-      ],
-      "rule_ids": [],
-      "examples": [
-        "run-as-non-root",
-        "container \"jenkins-agent\" is not set to runAsNonRoot",
-        "container \"nginx\" is not set to runAsNonRoot"
-      ],
-      "occurrences": 9,
-      "sources": [
-        "original"
-      ],
-      "confidence": 18,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "(unknown)",
-      "category": "SERVICEACCOUNT_TOKEN_AUTO",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "KubeLinter"
-      ],
-      "rule_ids": [],
-      "examples": [
-        "deprecated-service-account-field"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 2,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "(unknown)",
-      "category": "YAML_FORMATTING",
-      "is_security": false,
-      "support_count": 1,
-      "tools": [
-        "KubeLinter"
-      ],
-      "rule_ids": [],
-      "examples": [
-        "duplicate-env-var"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 2,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "13.jenkins_agent_pod.yaml",
+      "file": "3.efs_plugin_misconfig.yaml",
       "category": "CAP_SYS_ADMIN",
-      "is_security": true,
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_37",
+        "KSV003",
+        "KSV004",
+        "KSV106"
+      ],
+      "examples": [
+        "Minimize the admission of containers with capabilities assigned",
+        "Default capabilities: some containers do not drop all",
+        "Default capabilities: some containers do not drop any"
+      ],
+      "occurrences": 4
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "NO_PROBES",
+      "tools": [
+        "Checkov"
+      ],
       "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_8"
+      ],
+      "examples": [
+        "Liveness Probe Should be Configured"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "NO_RES_LIMITS",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_10",
+        "CKV_K8S_11",
+        "CKV_K8S_12",
+        "CKV_K8S_13"
+      ],
+      "examples": [
+        "CPU requests should be set",
+        "CPU limits should be set",
+        "Memory limits should be set"
+      ],
+      "occurrences": 4
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "NO_SECCOMP",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_31",
+        "KSV104"
+      ],
+      "examples": [
+        "Ensure that the seccomp profile is set to docker/default or runtime/default",
+        "Seccomp policies disabled"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "PRIVILEGED",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_22"
+      ],
+      "examples": [
+        "Use read-only filesystem for containers where possible"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "CAP_SYS_ADMIN",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_37",
+        "KSV003",
+        "KSV004",
+        "KSV106"
+      ],
+      "examples": [
+        "Minimize the admission of containers with capabilities assigned",
+        "Default capabilities: some containers do not drop all",
+        "Default capabilities: some containers do not drop any"
+      ],
+      "occurrences": 4
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "NO_PROBES",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_8"
+      ],
+      "examples": [
+        "Liveness Probe Should be Configured"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "NO_RES_LIMITS",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_10",
+        "CKV_K8S_11",
+        "CKV_K8S_12",
+        "CKV_K8S_13"
+      ],
+      "examples": [
+        "CPU requests should be set",
+        "CPU limits should be set",
+        "Memory limits should be set"
+      ],
+      "occurrences": 4
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "NO_SECCOMP",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_31",
+        "KSV104"
+      ],
+      "examples": [
+        "Ensure that the seccomp profile is set to docker/default or runtime/default",
+        "Seccomp policies disabled"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "PRIVILEGED",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_22"
+      ],
+      "examples": [
+        "Use read-only filesystem for containers where possible"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/3.efs_plugin_misconfig.yaml",
+      "category": "CAP_SYS_ADMIN",
       "tools": [
         "KubeAudit"
       ],
+      "support_count": 1,
       "rule_ids": [
         "CapabilityOrSecurityContextMissing"
       ],
       "examples": [
         "CapabilityOrSecurityContextMissing"
       ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
+      "occurrences": 1
     },
     {
-      "file": "13.jenkins_agent_pod.yaml",
+      "file": "scan/3.efs_plugin_misconfig.yaml",
       "category": "HARD_CODED_CREDS",
-      "is_security": true,
-      "support_count": 1,
       "tools": [
         "KubeAudit"
       ],
+      "support_count": 1,
       "rule_ids": [
         "AutomountServiceAccountTokenTrueAndDefaultSA"
       ],
       "examples": [
         "AutomountServiceAccountTokenTrueAndDefaultSA"
       ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
+      "occurrences": 1
     },
     {
-      "file": "13.jenkins_agent_pod.yaml",
-      "category": "HOSTPATH",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "KubeAudit"
-      ],
-      "rule_ids": [
-        "SensitivePathsMounted"
-      ],
-      "examples": [
-        "SensitivePathsMounted"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "13.jenkins_agent_pod.yaml",
+      "file": "scan/3.efs_plugin_misconfig.yaml",
       "category": "NO_APPARMOR",
-      "is_security": true,
-      "support_count": 1,
       "tools": [
         "KubeAudit"
       ],
+      "support_count": 1,
       "rule_ids": [
         "AppArmorAnnotationMissing"
       ],
       "examples": [
         "AppArmorAnnotationMissing"
       ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
+      "occurrences": 1
     },
     {
-      "file": "13.jenkins_agent_pod.yaml",
+      "file": "scan/3.efs_plugin_misconfig.yaml",
       "category": "NO_SECCOMP",
-      "is_security": true,
-      "support_count": 1,
       "tools": [
         "KubeAudit"
       ],
+      "support_count": 1,
       "rule_ids": [
         "SeccompProfileMissing"
       ],
       "examples": [
         "SeccompProfileMissing"
       ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
+      "occurrences": 1
     },
     {
-      "file": "13.jenkins_agent_pod.yaml",
-      "category": "PRIV_ESCALATION",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "KubeAudit"
-      ],
-      "rule_ids": [
-        "AllowPrivilegeEscalationNil"
-      ],
-      "examples": [
-        "AllowPrivilegeEscalationNil"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "13.jenkins_agent_pod.yaml",
-      "category": "READONLY_ROOTFS_FALSE",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "KubeAudit"
-      ],
-      "rule_ids": [
-        "ReadOnlyRootFilesystemNil"
-      ],
-      "examples": [
-        "ReadOnlyRootFilesystemNil"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "13.jenkins_agent_pod.yaml",
-      "category": "RUN_AS_NONROOT_FALSE",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "KubeAudit"
-      ],
-      "rule_ids": [
-        "RunAsNonRootPSCNilCSCNil"
-      ],
-      "examples": [
-        "RunAsNonRootPSCNilCSCNil"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "13.nginx_privileged_deployment.yaml",
-      "category": "CAP_SYS_ADMIN",
-      "is_security": true,
-      "support_count": 3,
-      "tools": [
-        "Checkov",
-        "KubeAudit",
-        "Trivy"
-      ],
-      "rule_ids": [
-        "CKV_K8S_37",
-        "CapabilityOrSecurityContextMissing",
-        "KSV003",
-        "KSV004",
-        "KSV106"
-      ],
-      "examples": [
-        "Minimize the admission of containers with capabilities assigned",
-        "CapabilityOrSecurityContextMissing",
-        "Default capabilities: some containers do not drop all"
-      ],
-      "occurrences": 5,
-      "sources": [
-        "original"
-      ],
-      "confidence": 15,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "13.nginx_privileged_deployment.yaml",
-      "category": "DEFAULT_NAMESPACE",
-      "is_security": true,
-      "support_count": 2,
-      "tools": [
-        "Conftest",
-        "Trivy"
-      ],
-      "rule_ids": [
-        "KSV110",
-        "KSV118"
-      ],
-      "examples": [
-        "Conftest",
-        "Workloads in the default namespace",
-        "Default security context configured"
-      ],
-      "occurrences": 3,
-      "sources": [
-        "original"
-      ],
-      "confidence": 9,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "13.nginx_privileged_deployment.yaml",
-      "category": "HARD_CODED_CREDS",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "KubeAudit"
-      ],
-      "rule_ids": [
-        "AutomountServiceAccountTokenTrueAndDefaultSA"
-      ],
-      "examples": [
-        "AutomountServiceAccountTokenTrueAndDefaultSA"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "13.nginx_privileged_deployment.yaml",
-      "category": "IMAGE_LATEST",
-      "is_security": true,
-      "support_count": 2,
-      "tools": [
-        "Checkov",
-        "Trivy"
-      ],
-      "rule_ids": [
-        "CKV_K8S_14",
-        "KSV013"
-      ],
-      "examples": [
-        "Image Tag should be fixed - not latest or blank",
-        "Image tag \":latest\" used"
-      ],
-      "occurrences": 2,
-      "sources": [
-        "original"
-      ],
-      "confidence": 6,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "13.nginx_privileged_deployment.yaml",
-      "category": "NO_APPARMOR",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "KubeAudit"
-      ],
-      "rule_ids": [
-        "AppArmorAnnotationMissing"
-      ],
-      "examples": [
-        "AppArmorAnnotationMissing"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "13.nginx_privileged_deployment.yaml",
-      "category": "NO_PROBES",
-      "is_security": false,
-      "support_count": 1,
-      "tools": [
-        "Checkov"
-      ],
-      "rule_ids": [
-        "CKV_K8S_8"
-      ],
-      "examples": [
-        "Liveness Probe Should be Configured"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "13.nginx_privileged_deployment.yaml",
-      "category": "NO_RES_LIMITS",
-      "is_security": false,
-      "support_count": 1,
-      "tools": [
-        "Checkov"
-      ],
-      "rule_ids": [
-        "CKV_K8S_10",
-        "CKV_K8S_11",
-        "CKV_K8S_12",
-        "CKV_K8S_13"
-      ],
-      "examples": [
-        "CPU requests should be set",
-        "CPU limits should be set",
-        "Memory limits should be set"
-      ],
-      "occurrences": 4,
-      "sources": [
-        "original"
-      ],
-      "confidence": 12,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "13.nginx_privileged_deployment.yaml",
-      "category": "NO_SECCOMP",
-      "is_security": true,
-      "support_count": 3,
-      "tools": [
-        "Checkov",
-        "KubeAudit",
-        "Trivy"
-      ],
-      "rule_ids": [
-        "CKV_K8S_31",
-        "KSV104",
-        "SeccompProfileMissing"
-      ],
-      "examples": [
-        "Ensure that the seccomp profile is set to docker/default or runtime/default",
-        "SeccompProfileMissing",
-        "Seccomp policies disabled"
-      ],
-      "occurrences": 3,
-      "sources": [
-        "original"
-      ],
-      "confidence": 9,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "13.nginx_privileged_deployment.yaml",
+      "file": "scan/3.efs_plugin_misconfig.yaml",
       "category": "PRIVILEGED",
-      "is_security": true,
-      "support_count": 3,
       "tools": [
-        "Checkov",
-        "KubeAudit",
-        "Trivy"
+        "KubeAudit"
       ],
+      "support_count": 1,
       "rule_ids": [
-        "CKV_K8S_22",
-        "KSV017",
         "PrivilegedTrue"
       ],
       "examples": [
-        "Use read-only filesystem for containers where possible",
-        "PrivilegedTrue",
-        "Privileged"
-      ],
-      "occurrences": 3,
-      "sources": [
-        "original"
-      ],
-      "confidence": 9,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "13.nginx_privileged_deployment.yaml",
-      "category": "PRIV_ESCALATION",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "KubeAudit"
-      ],
-      "rule_ids": [
-        "AllowPrivilegeEscalationNil"
-      ],
-      "examples": [
-        "AllowPrivilegeEscalationNil"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "13.nginx_privileged_deployment.yaml",
-      "category": "READONLY_ROOTFS_FALSE",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "KubeAudit"
-      ],
-      "rule_ids": [
-        "ReadOnlyRootFilesystemNil"
-      ],
-      "examples": [
-        "ReadOnlyRootFilesystemNil"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "13.nginx_privileged_deployment.yaml",
-      "category": "RUN_AS_NONROOT_FALSE",
-      "is_security": true,
-      "support_count": 3,
-      "tools": [
-        "Conftest",
-        "KubeAudit",
-        "Trivy"
-      ],
-      "rule_ids": [
-        "KSV012",
-        "RunAsNonRootPSCNilCSCNil"
-      ],
-      "examples": [
-        "Conftest",
-        "RunAsNonRootPSCNilCSCNil",
-        "Runs as root user"
-      ],
-      "occurrences": 3,
-      "sources": [
-        "original"
-      ],
-      "confidence": 9,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "13.nginx_privileged_deployment.yaml",
-      "category": "SCHEMA_INVALID",
-      "is_security": false,
-      "support_count": 1,
-      "tools": [
-        "KubeConform"
-      ],
-      "rule_ids": [],
-      "examples": [
-        "nginx-deployment"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 2,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "14.deployment_single_replica.yaml",
-      "category": "CAP_SYS_ADMIN",
-      "is_security": true,
-      "support_count": 3,
-      "tools": [
-        "Checkov",
-        "KubeAudit",
-        "Trivy"
-      ],
-      "rule_ids": [
-        "CKV_K8S_37",
-        "CapabilityOrSecurityContextMissing",
-        "KSV003",
-        "KSV004",
-        "KSV106"
-      ],
-      "examples": [
-        "Minimize the admission of containers with capabilities assigned",
-        "CapabilityOrSecurityContextMissing",
-        "Default capabilities: some containers do not drop all"
-      ],
-      "occurrences": 5,
-      "sources": [
-        "original"
-      ],
-      "confidence": 15,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "14.deployment_single_replica.yaml",
-      "category": "DEFAULT_NAMESPACE",
-      "is_security": true,
-      "support_count": 2,
-      "tools": [
-        "Conftest",
-        "Trivy"
-      ],
-      "rule_ids": [
-        "KSV110",
-        "KSV118"
-      ],
-      "examples": [
-        "Conftest",
-        "Workloads in the default namespace",
-        "Default security context configured"
-      ],
-      "occurrences": 4,
-      "sources": [
-        "original"
-      ],
-      "confidence": 12,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "14.deployment_single_replica.yaml",
-      "category": "HARD_CODED_CREDS",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "KubeAudit"
-      ],
-      "rule_ids": [
-        "AutomountServiceAccountTokenTrueAndDefaultSA"
-      ],
-      "examples": [
-        "AutomountServiceAccountTokenTrueAndDefaultSA"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "14.deployment_single_replica.yaml",
-      "category": "IMAGE_LATEST",
-      "is_security": true,
-      "support_count": 2,
-      "tools": [
-        "Checkov",
-        "Trivy"
-      ],
-      "rule_ids": [
-        "CKV_K8S_14",
-        "KSV013"
-      ],
-      "examples": [
-        "Image Tag should be fixed - not latest or blank",
-        "Image tag \":latest\" used"
-      ],
-      "occurrences": 2,
-      "sources": [
-        "original"
-      ],
-      "confidence": 6,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "14.deployment_single_replica.yaml",
-      "category": "NO_APPARMOR",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "KubeAudit"
-      ],
-      "rule_ids": [
-        "AppArmorAnnotationMissing"
-      ],
-      "examples": [
-        "AppArmorAnnotationMissing"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "14.deployment_single_replica.yaml",
-      "category": "NO_PROBES",
-      "is_security": false,
-      "support_count": 1,
-      "tools": [
-        "Checkov"
-      ],
-      "rule_ids": [
-        "CKV_K8S_8"
-      ],
-      "examples": [
-        "Liveness Probe Should be Configured"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "14.deployment_single_replica.yaml",
-      "category": "NO_RES_LIMITS",
-      "is_security": false,
-      "support_count": 1,
-      "tools": [
-        "Checkov"
-      ],
-      "rule_ids": [
-        "CKV_K8S_10",
-        "CKV_K8S_11",
-        "CKV_K8S_12",
-        "CKV_K8S_13"
-      ],
-      "examples": [
-        "CPU requests should be set",
-        "CPU limits should be set",
-        "Memory limits should be set"
-      ],
-      "occurrences": 4,
-      "sources": [
-        "original"
-      ],
-      "confidence": 12,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "14.deployment_single_replica.yaml",
-      "category": "NO_SECCOMP",
-      "is_security": true,
-      "support_count": 3,
-      "tools": [
-        "Checkov",
-        "KubeAudit",
-        "Trivy"
-      ],
-      "rule_ids": [
-        "CKV_K8S_31",
-        "KSV104",
-        "SeccompProfileMissing"
-      ],
-      "examples": [
-        "Ensure that the seccomp profile is set to docker/default or runtime/default",
-        "SeccompProfileMissing",
-        "Seccomp policies disabled"
-      ],
-      "occurrences": 3,
-      "sources": [
-        "original"
-      ],
-      "confidence": 9,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "14.deployment_single_replica.yaml",
-      "category": "PRIVILEGED",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "Checkov"
-      ],
-      "rule_ids": [
-        "CKV_K8S_22"
-      ],
-      "examples": [
-        "Use read-only filesystem for containers where possible"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "14.deployment_single_replica.yaml",
-      "category": "PRIV_ESCALATION",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "KubeAudit"
-      ],
-      "rule_ids": [
-        "AllowPrivilegeEscalationNil"
-      ],
-      "examples": [
-        "AllowPrivilegeEscalationNil"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "14.deployment_single_replica.yaml",
-      "category": "READONLY_ROOTFS_FALSE",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "KubeAudit"
-      ],
-      "rule_ids": [
-        "ReadOnlyRootFilesystemNil"
-      ],
-      "examples": [
-        "ReadOnlyRootFilesystemNil"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "14.deployment_single_replica.yaml",
-      "category": "RUN_AS_NONROOT_FALSE",
-      "is_security": true,
-      "support_count": 3,
-      "tools": [
-        "Conftest",
-        "KubeAudit",
-        "Trivy"
-      ],
-      "rule_ids": [
-        "KSV012",
-        "RunAsNonRootPSCNilCSCNil"
-      ],
-      "examples": [
-        "Conftest",
-        "RunAsNonRootPSCNilCSCNil",
-        "Runs as root user"
-      ],
-      "occurrences": 3,
-      "sources": [
-        "original"
-      ],
-      "confidence": 9,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "14.deployment_single_replica.yaml",
-      "category": "SCHEMA_INVALID",
-      "is_security": false,
-      "support_count": 1,
-      "tools": [
-        "KubeConform"
-      ],
-      "rule_ids": [],
-      "examples": [
-        "single-replica-deployment"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 2,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "14.genkubesec_privileged_pod.yaml",
-      "category": "CAP_SYS_ADMIN",
-      "is_security": true,
-      "support_count": 3,
-      "tools": [
-        "Checkov",
-        "KubeAudit",
-        "Trivy"
-      ],
-      "rule_ids": [
-        "CKV_K8S_37",
-        "CapabilityOrSecurityContextMissing",
-        "KSV003",
-        "KSV004",
-        "KSV106"
-      ],
-      "examples": [
-        "Minimize the admission of containers with capabilities assigned",
-        "CapabilityOrSecurityContextMissing",
-        "Default capabilities: some containers do not drop all"
-      ],
-      "occurrences": 5,
-      "sources": [
-        "original"
-      ],
-      "confidence": 15,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "14.genkubesec_privileged_pod.yaml",
-      "category": "DEFAULT_NAMESPACE",
-      "is_security": true,
-      "support_count": 2,
-      "tools": [
-        "Conftest",
-        "Trivy"
-      ],
-      "rule_ids": [
-        "KSV110",
-        "KSV118"
-      ],
-      "examples": [
-        "Conftest",
-        "Workloads in the default namespace",
-        "Default security context configured"
-      ],
-      "occurrences": 3,
-      "sources": [
-        "original"
-      ],
-      "confidence": 9,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "14.genkubesec_privileged_pod.yaml",
-      "category": "HARD_CODED_CREDS",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "KubeAudit"
-      ],
-      "rule_ids": [
-        "AutomountServiceAccountTokenTrueAndDefaultSA"
-      ],
-      "examples": [
-        "AutomountServiceAccountTokenTrueAndDefaultSA"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "14.genkubesec_privileged_pod.yaml",
-      "category": "IMAGE_LATEST",
-      "is_security": true,
-      "support_count": 2,
-      "tools": [
-        "Checkov",
-        "Trivy"
-      ],
-      "rule_ids": [
-        "CKV_K8S_14",
-        "KSV013"
-      ],
-      "examples": [
-        "Image Tag should be fixed - not latest or blank",
-        "Image tag \":latest\" used"
-      ],
-      "occurrences": 2,
-      "sources": [
-        "original"
-      ],
-      "confidence": 6,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "14.genkubesec_privileged_pod.yaml",
-      "category": "NO_APPARMOR",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "KubeAudit"
-      ],
-      "rule_ids": [
-        "AppArmorAnnotationMissing"
-      ],
-      "examples": [
-        "AppArmorAnnotationMissing"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "14.genkubesec_privileged_pod.yaml",
-      "category": "NO_PROBES",
-      "is_security": false,
-      "support_count": 1,
-      "tools": [
-        "Checkov"
-      ],
-      "rule_ids": [
-        "CKV_K8S_8"
-      ],
-      "examples": [
-        "Liveness Probe Should be Configured"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "14.genkubesec_privileged_pod.yaml",
-      "category": "NO_RES_LIMITS",
-      "is_security": false,
-      "support_count": 1,
-      "tools": [
-        "Checkov"
-      ],
-      "rule_ids": [
-        "CKV_K8S_10",
-        "CKV_K8S_11",
-        "CKV_K8S_12",
-        "CKV_K8S_13"
-      ],
-      "examples": [
-        "CPU requests should be set",
-        "CPU limits should be set",
-        "Memory limits should be set"
-      ],
-      "occurrences": 4,
-      "sources": [
-        "original"
-      ],
-      "confidence": 12,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "14.genkubesec_privileged_pod.yaml",
-      "category": "NO_SECCOMP",
-      "is_security": true,
-      "support_count": 4,
-      "tools": [
-        "Checkov",
-        "Conftest",
-        "KubeAudit",
-        "Trivy"
-      ],
-      "rule_ids": [
-        "CKV_K8S_31",
-        "KSV104",
-        "SeccompProfileMissing"
-      ],
-      "examples": [
-        "Ensure that the seccomp profile is set to docker/default or runtime/default",
-        "Conftest",
-        "SeccompProfileMissing"
-      ],
-      "occurrences": 4,
-      "sources": [
-        "original"
-      ],
-      "confidence": 12,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "14.genkubesec_privileged_pod.yaml",
-      "category": "PRIVILEGED",
-      "is_security": true,
-      "support_count": 3,
-      "tools": [
-        "Checkov",
-        "KubeAudit",
-        "Trivy"
-      ],
-      "rule_ids": [
-        "CKV_K8S_22",
-        "KSV017",
         "PrivilegedTrue"
       ],
-      "examples": [
-        "Use read-only filesystem for containers where possible",
-        "PrivilegedTrue",
-        "Privileged"
-      ],
-      "occurrences": 3,
-      "sources": [
-        "original"
-      ],
-      "confidence": 9,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
+      "occurrences": 1
     },
     {
-      "file": "14.genkubesec_privileged_pod.yaml",
+      "file": "scan/3.efs_plugin_misconfig.yaml",
       "category": "PRIV_ESCALATION",
-      "is_security": true,
-      "support_count": 1,
       "tools": [
         "KubeAudit"
       ],
+      "support_count": 1,
       "rule_ids": [
         "AllowPrivilegeEscalationNil"
       ],
       "examples": [
         "AllowPrivilegeEscalationNil"
       ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
+      "occurrences": 1
     },
     {
-      "file": "14.genkubesec_privileged_pod.yaml",
+      "file": "scan/3.efs_plugin_misconfig.yaml",
       "category": "READONLY_ROOTFS_FALSE",
-      "is_security": true,
-      "support_count": 1,
       "tools": [
         "KubeAudit"
       ],
+      "support_count": 1,
       "rule_ids": [
         "ReadOnlyRootFilesystemNil"
       ],
       "examples": [
         "ReadOnlyRootFilesystemNil"
       ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
+      "occurrences": 1
     },
     {
-      "file": "14.genkubesec_privileged_pod.yaml",
-      "category": "RUN_AS_NONROOT_FALSE",
-      "is_security": true,
-      "support_count": 3,
-      "tools": [
-        "Conftest",
-        "KubeAudit",
-        "Trivy"
-      ],
-      "rule_ids": [
-        "KSV012",
-        "RunAsNonRootPSCNilCSCNil"
-      ],
-      "examples": [
-        "Conftest",
-        "RunAsNonRootPSCNilCSCNil",
-        "Runs as root user"
-      ],
-      "occurrences": 3,
-      "sources": [
-        "original"
-      ],
-      "confidence": 9,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "14.genkubesec_privileged_pod.yaml",
-      "category": "SCHEMA_INVALID",
-      "is_security": false,
-      "support_count": 1,
-      "tools": [
-        "KubeConform"
-      ],
-      "rule_ids": [],
-      "examples": [
-        "pod-name"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 2,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "14.ingress_deprecated_api.yaml",
-      "category": "DEFAULT_NAMESPACE",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "Conftest"
-      ],
-      "rule_ids": [],
-      "examples": [
-        "Conftest"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "14.ingress_deprecated_api.yaml",
-      "category": "SCHEMA_INVALID",
-      "is_security": false,
-      "support_count": 1,
-      "tools": [
-        "KubeConform"
-      ],
-      "rule_ids": [],
-      "examples": [
-        "gateway-ingress"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 2,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "15.pod_privilege_escalation.yaml",
-      "category": "CAP_SYS_ADMIN",
-      "is_security": true,
-      "support_count": 3,
-      "tools": [
-        "Checkov",
-        "KubeAudit",
-        "Trivy"
-      ],
-      "rule_ids": [
-        "CKV_K8S_37",
-        "CapabilityOrSecurityContextMissing",
-        "KSV003",
-        "KSV004",
-        "KSV106"
-      ],
-      "examples": [
-        "Minimize the admission of containers with capabilities assigned",
-        "CapabilityOrSecurityContextMissing",
-        "Default capabilities: some containers do not drop all"
-      ],
-      "occurrences": 5,
-      "sources": [
-        "original"
-      ],
-      "confidence": 15,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "15.pod_privilege_escalation.yaml",
-      "category": "DEFAULT_NAMESPACE",
-      "is_security": true,
-      "support_count": 2,
-      "tools": [
-        "Conftest",
-        "Trivy"
-      ],
-      "rule_ids": [
-        "KSV110",
-        "KSV118"
-      ],
-      "examples": [
-        "Conftest",
-        "Workloads in the default namespace",
-        "Default security context configured"
-      ],
-      "occurrences": 3,
-      "sources": [
-        "original"
-      ],
-      "confidence": 9,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "15.pod_privilege_escalation.yaml",
-      "category": "HARD_CODED_CREDS",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "KubeAudit"
-      ],
-      "rule_ids": [
-        "AutomountServiceAccountTokenTrueAndDefaultSA"
-      ],
-      "examples": [
-        "AutomountServiceAccountTokenTrueAndDefaultSA"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "15.pod_privilege_escalation.yaml",
-      "category": "IMAGE_LATEST",
-      "is_security": true,
-      "support_count": 2,
-      "tools": [
-        "Checkov",
-        "Trivy"
-      ],
-      "rule_ids": [
-        "CKV_K8S_14",
-        "KSV013"
-      ],
-      "examples": [
-        "Image Tag should be fixed - not latest or blank",
-        "Image tag \":latest\" used"
-      ],
-      "occurrences": 2,
-      "sources": [
-        "original"
-      ],
-      "confidence": 6,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "15.pod_privilege_escalation.yaml",
-      "category": "NO_APPARMOR",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "KubeAudit"
-      ],
-      "rule_ids": [
-        "AppArmorAnnotationMissing"
-      ],
-      "examples": [
-        "AppArmorAnnotationMissing"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "15.pod_privilege_escalation.yaml",
-      "category": "NO_PROBES",
-      "is_security": false,
-      "support_count": 1,
-      "tools": [
-        "Checkov"
-      ],
-      "rule_ids": [
-        "CKV_K8S_8"
-      ],
-      "examples": [
-        "Liveness Probe Should be Configured"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "15.pod_privilege_escalation.yaml",
-      "category": "NO_RES_LIMITS",
-      "is_security": false,
-      "support_count": 1,
-      "tools": [
-        "Checkov"
-      ],
-      "rule_ids": [
-        "CKV_K8S_10",
-        "CKV_K8S_11",
-        "CKV_K8S_12",
-        "CKV_K8S_13"
-      ],
-      "examples": [
-        "CPU requests should be set",
-        "CPU limits should be set",
-        "Memory limits should be set"
-      ],
-      "occurrences": 4,
-      "sources": [
-        "original"
-      ],
-      "confidence": 12,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "15.pod_privilege_escalation.yaml",
-      "category": "NO_SECCOMP",
-      "is_security": true,
-      "support_count": 4,
-      "tools": [
-        "Checkov",
-        "Conftest",
-        "KubeAudit",
-        "Trivy"
-      ],
-      "rule_ids": [
-        "CKV_K8S_31",
-        "KSV104",
-        "SeccompProfileMissing"
-      ],
-      "examples": [
-        "Ensure that the seccomp profile is set to docker/default or runtime/default",
-        "Conftest",
-        "SeccompProfileMissing"
-      ],
-      "occurrences": 4,
-      "sources": [
-        "original"
-      ],
-      "confidence": 12,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "15.pod_privilege_escalation.yaml",
-      "category": "PRIVILEGED",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "Checkov"
-      ],
-      "rule_ids": [
-        "CKV_K8S_22"
-      ],
-      "examples": [
-        "Use read-only filesystem for containers where possible"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "15.pod_privilege_escalation.yaml",
-      "category": "PRIV_ESCALATION",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "KubeAudit"
-      ],
-      "rule_ids": [
-        "AllowPrivilegeEscalationTrue"
-      ],
-      "examples": [
-        "AllowPrivilegeEscalationTrue"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "15.pod_privilege_escalation.yaml",
-      "category": "READONLY_ROOTFS_FALSE",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "KubeAudit"
-      ],
-      "rule_ids": [
-        "ReadOnlyRootFilesystemNil"
-      ],
-      "examples": [
-        "ReadOnlyRootFilesystemNil"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "15.pod_privilege_escalation.yaml",
-      "category": "RUN_AS_NONROOT_FALSE",
-      "is_security": true,
-      "support_count": 3,
-      "tools": [
-        "Conftest",
-        "KubeAudit",
-        "Trivy"
-      ],
-      "rule_ids": [
-        "KSV012",
-        "RunAsNonRootPSCNilCSCNil"
-      ],
-      "examples": [
-        "Conftest",
-        "RunAsNonRootPSCNilCSCNil",
-        "Runs as root user"
-      ],
-      "occurrences": 3,
-      "sources": [
-        "original"
-      ],
-      "confidence": 9,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "15.pod_privilege_escalation.yaml",
-      "category": "SCHEMA_INVALID",
-      "is_security": false,
-      "support_count": 1,
-      "tools": [
-        "KubeConform"
-      ],
-      "rule_ids": [],
-      "examples": [
-        "example-pod"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 2,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "16.busybox_pod_missing_memory.yaml",
-      "category": "CAP_SYS_ADMIN",
-      "is_security": true,
-      "support_count": 3,
-      "tools": [
-        "Checkov",
-        "KubeAudit",
-        "Trivy"
-      ],
-      "rule_ids": [
-        "CKV_K8S_37",
-        "CapabilityOrSecurityContextMissing",
-        "KSV003",
-        "KSV004",
-        "KSV106"
-      ],
-      "examples": [
-        "Minimize the admission of containers with capabilities assigned",
-        "CapabilityOrSecurityContextMissing",
-        "Default capabilities: some containers do not drop all"
-      ],
-      "occurrences": 5,
-      "sources": [
-        "original"
-      ],
-      "confidence": 15,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "16.busybox_pod_missing_memory.yaml",
-      "category": "DEFAULT_NAMESPACE",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "Trivy"
-      ],
-      "rule_ids": [
-        "KSV118"
-      ],
-      "examples": [
-        "Default security context configured",
-        "Default security context configured"
-      ],
-      "occurrences": 2,
-      "sources": [
-        "original"
-      ],
-      "confidence": 6,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "16.busybox_pod_missing_memory.yaml",
-      "category": "HARD_CODED_CREDS",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "KubeAudit"
-      ],
-      "rule_ids": [
-        "AutomountServiceAccountTokenTrueAndDefaultSA"
-      ],
-      "examples": [
-        "AutomountServiceAccountTokenTrueAndDefaultSA"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "16.busybox_pod_missing_memory.yaml",
-      "category": "NO_APPARMOR",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "KubeAudit"
-      ],
-      "rule_ids": [
-        "AppArmorAnnotationMissing"
-      ],
-      "examples": [
-        "AppArmorAnnotationMissing"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "16.busybox_pod_missing_memory.yaml",
-      "category": "NO_PROBES",
-      "is_security": false,
-      "support_count": 1,
-      "tools": [
-        "Checkov"
-      ],
-      "rule_ids": [
-        "CKV_K8S_8"
-      ],
-      "examples": [
-        "Liveness Probe Should be Configured"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "16.busybox_pod_missing_memory.yaml",
-      "category": "NO_RES_LIMITS",
-      "is_security": false,
-      "support_count": 1,
-      "tools": [
-        "Checkov"
-      ],
-      "rule_ids": [
-        "CKV_K8S_11",
-        "CKV_K8S_12",
-        "CKV_K8S_13"
-      ],
-      "examples": [
-        "CPU limits should be set",
-        "Memory limits should be set",
-        "Memory requests should be set"
-      ],
-      "occurrences": 3,
-      "sources": [
-        "original"
-      ],
-      "confidence": 9,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "16.busybox_pod_missing_memory.yaml",
-      "category": "NO_SECCOMP",
-      "is_security": true,
-      "support_count": 4,
-      "tools": [
-        "Checkov",
-        "Conftest",
-        "KubeAudit",
-        "Trivy"
-      ],
-      "rule_ids": [
-        "CKV_K8S_31",
-        "KSV104",
-        "SeccompProfileMissing"
-      ],
-      "examples": [
-        "Ensure that the seccomp profile is set to docker/default or runtime/default",
-        "Conftest",
-        "SeccompProfileMissing"
-      ],
-      "occurrences": 4,
-      "sources": [
-        "original"
-      ],
-      "confidence": 12,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "16.busybox_pod_missing_memory.yaml",
-      "category": "PRIVILEGED",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "Checkov"
-      ],
-      "rule_ids": [
-        "CKV_K8S_22"
-      ],
-      "examples": [
-        "Use read-only filesystem for containers where possible"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "16.busybox_pod_missing_memory.yaml",
-      "category": "PRIV_ESCALATION",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "KubeAudit"
-      ],
-      "rule_ids": [
-        "AllowPrivilegeEscalationNil"
-      ],
-      "examples": [
-        "AllowPrivilegeEscalationNil"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "16.busybox_pod_missing_memory.yaml",
-      "category": "READONLY_ROOTFS_FALSE",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "KubeAudit"
-      ],
-      "rule_ids": [
-        "ReadOnlyRootFilesystemNil"
-      ],
-      "examples": [
-        "ReadOnlyRootFilesystemNil"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "16.busybox_pod_missing_memory.yaml",
-      "category": "RUN_AS_NONROOT_FALSE",
-      "is_security": true,
-      "support_count": 3,
-      "tools": [
-        "Conftest",
-        "KubeAudit",
-        "Trivy"
-      ],
-      "rule_ids": [
-        "KSV012",
-        "RunAsNonRootPSCNilCSCNil"
-      ],
-      "examples": [
-        "Conftest",
-        "RunAsNonRootPSCNilCSCNil",
-        "Runs as root user"
-      ],
-      "occurrences": 3,
-      "sources": [
-        "original"
-      ],
-      "confidence": 9,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "16.busybox_pod_missing_memory.yaml",
-      "category": "SCHEMA_INVALID",
-      "is_security": false,
-      "support_count": 1,
-      "tools": [
-        "KubeConform"
-      ],
-      "rule_ids": [],
-      "examples": [
-        "busybox-pod"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 2,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "20.wordpress_mariadb_compose.yaml",
-      "category": "SCHEMA_INVALID",
-      "is_security": false,
-      "support_count": 1,
-      "tools": [
-        "KubeConform"
-      ],
-      "rule_ids": [],
-      "examples": [
-        "error while parsing: missing 'kind' key"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 2,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "26.flink_port_mismatch.yaml",
-      "category": "CAP_SYS_ADMIN",
-      "is_security": true,
-      "support_count": 3,
-      "tools": [
-        "Checkov",
-        "KubeAudit",
-        "Trivy"
-      ],
-      "rule_ids": [
-        "CKV_K8S_37",
-        "CapabilityOrSecurityContextMissing",
-        "KSV003",
-        "KSV004",
-        "KSV106"
-      ],
-      "examples": [
-        "Minimize the admission of containers with capabilities assigned",
-        "CapabilityOrSecurityContextMissing",
-        "Default capabilities: some containers do not drop all"
-      ],
-      "occurrences": 5,
-      "sources": [
-        "original"
-      ],
-      "confidence": 15,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "26.flink_port_mismatch.yaml",
-      "category": "DEFAULT_NAMESPACE",
-      "is_security": true,
-      "support_count": 2,
-      "tools": [
-        "Conftest",
-        "Trivy"
-      ],
-      "rule_ids": [
-        "KSV0125",
-        "KSV110",
-        "KSV118"
-      ],
-      "examples": [
-        "Conftest",
-        "Workloads in the default namespace",
-        "Default security context configured"
-      ],
-      "occurrences": 5,
-      "sources": [
-        "original"
-      ],
-      "confidence": 15,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "26.flink_port_mismatch.yaml",
-      "category": "HARD_CODED_CREDS",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "KubeAudit"
-      ],
-      "rule_ids": [
-        "AutomountServiceAccountTokenTrueAndDefaultSA"
-      ],
-      "examples": [
-        "AutomountServiceAccountTokenTrueAndDefaultSA"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "26.flink_port_mismatch.yaml",
-      "category": "IMAGE_LATEST",
-      "is_security": true,
-      "support_count": 2,
-      "tools": [
-        "Checkov",
-        "Trivy"
-      ],
-      "rule_ids": [
-        "CKV_K8S_14",
-        "KSV013"
-      ],
-      "examples": [
-        "Image Tag should be fixed - not latest or blank",
-        "Image tag \":latest\" used"
-      ],
-      "occurrences": 2,
-      "sources": [
-        "original"
-      ],
-      "confidence": 6,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "26.flink_port_mismatch.yaml",
-      "category": "NO_APPARMOR",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "KubeAudit"
-      ],
-      "rule_ids": [
-        "AppArmorAnnotationMissing"
-      ],
-      "examples": [
-        "AppArmorAnnotationMissing"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "26.flink_port_mismatch.yaml",
-      "category": "NO_PROBES",
-      "is_security": false,
-      "support_count": 1,
-      "tools": [
-        "Checkov"
-      ],
-      "rule_ids": [
-        "CKV_K8S_8"
-      ],
-      "examples": [
-        "Liveness Probe Should be Configured"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "26.flink_port_mismatch.yaml",
-      "category": "NO_RES_LIMITS",
-      "is_security": false,
-      "support_count": 1,
-      "tools": [
-        "Checkov"
-      ],
-      "rule_ids": [
-        "CKV_K8S_10",
-        "CKV_K8S_11",
-        "CKV_K8S_12",
-        "CKV_K8S_13"
-      ],
-      "examples": [
-        "CPU requests should be set",
-        "CPU limits should be set",
-        "Memory limits should be set"
-      ],
-      "occurrences": 4,
-      "sources": [
-        "original"
-      ],
-      "confidence": 12,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "26.flink_port_mismatch.yaml",
-      "category": "NO_SECCOMP",
-      "is_security": true,
-      "support_count": 3,
-      "tools": [
-        "Checkov",
-        "KubeAudit",
-        "Trivy"
-      ],
-      "rule_ids": [
-        "CKV_K8S_31",
-        "KSV104",
-        "SeccompProfileMissing"
-      ],
-      "examples": [
-        "Ensure that the seccomp profile is set to docker/default or runtime/default",
-        "SeccompProfileMissing",
-        "Seccomp policies disabled"
-      ],
-      "occurrences": 3,
-      "sources": [
-        "original"
-      ],
-      "confidence": 9,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "26.flink_port_mismatch.yaml",
-      "category": "PRIVILEGED",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "Checkov"
-      ],
-      "rule_ids": [
-        "CKV_K8S_22"
-      ],
-      "examples": [
-        "Use read-only filesystem for containers where possible"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "26.flink_port_mismatch.yaml",
-      "category": "PRIV_ESCALATION",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "KubeAudit"
-      ],
-      "rule_ids": [
-        "AllowPrivilegeEscalationNil"
-      ],
-      "examples": [
-        "AllowPrivilegeEscalationNil"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "26.flink_port_mismatch.yaml",
-      "category": "READONLY_ROOTFS_FALSE",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "KubeAudit"
-      ],
-      "rule_ids": [
-        "ReadOnlyRootFilesystemNil"
-      ],
-      "examples": [
-        "ReadOnlyRootFilesystemNil"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "26.flink_port_mismatch.yaml",
-      "category": "RUN_AS_NONROOT_FALSE",
-      "is_security": true,
-      "support_count": 3,
-      "tools": [
-        "Conftest",
-        "KubeAudit",
-        "Trivy"
-      ],
-      "rule_ids": [
-        "KSV012",
-        "RunAsNonRootPSCNilCSCNil"
-      ],
-      "examples": [
-        "Conftest",
-        "RunAsNonRootPSCNilCSCNil",
-        "Runs as root user"
-      ],
-      "occurrences": 3,
-      "sources": [
-        "original"
-      ],
-      "confidence": 9,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "26.flink_port_mismatch.yaml",
-      "category": "SCHEMA_INVALID",
-      "is_security": false,
-      "support_count": 1,
-      "tools": [
-        "KubeConform"
-      ],
-      "rule_ids": [],
-      "examples": [
-        "flink"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 2,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "27.kubeteus_misconfigured_policy.yaml",
-      "category": "SCHEMA_INVALID",
-      "is_security": false,
-      "support_count": 1,
-      "tools": [
-        "KubeConform"
-      ],
-      "rule_ids": [],
-      "examples": [
-        "egress-product"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 2,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "28.role_overly_permissive.yaml",
-      "category": "RBAC_OVER_PERMISSIVE",
-      "is_security": true,
-      "support_count": 2,
-      "tools": [
-        "Conftest",
-        "KubeConform"
-      ],
-      "rule_ids": [],
-      "examples": [
-        "Conftest",
-        "frontend-role"
-      ],
-      "occurrences": 2,
-      "sources": [
-        "original"
-      ],
-      "confidence": 5,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "29.helm_rabbitmq_hardcoded_credentials.yaml",
-      "category": "SCHEMA_INVALID",
-      "is_security": false,
-      "support_count": 1,
-      "tools": [
-        "KubeConform"
-      ],
-      "rule_ids": [],
-      "examples": [
-        "error while parsing: missing 'kind' key"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 2,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "3.efs_plugin_misconfig.yaml",
-      "category": "CAP_SYS_ADMIN",
-      "is_security": true,
-      "support_count": 3,
-      "tools": [
-        "Checkov",
-        "KubeAudit",
-        "Trivy"
-      ],
-      "rule_ids": [
-        "CKV_K8S_37",
-        "CapabilityOrSecurityContextMissing",
-        "KSV003",
-        "KSV004",
-        "KSV106"
-      ],
-      "examples": [
-        "Minimize the admission of containers with capabilities assigned",
-        "CapabilityOrSecurityContextMissing",
-        "Default capabilities: some containers do not drop all"
-      ],
-      "occurrences": 5,
-      "sources": [
-        "original"
-      ],
-      "confidence": 15,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "3.efs_plugin_misconfig.yaml",
-      "category": "DEFAULT_NAMESPACE",
-      "is_security": true,
-      "support_count": 2,
-      "tools": [
-        "Conftest",
-        "Trivy"
-      ],
-      "rule_ids": [
-        "KSV0125",
-        "KSV110",
-        "KSV118"
-      ],
-      "examples": [
-        "Conftest",
-        "Workloads in the default namespace",
-        "Default security context configured"
-      ],
-      "occurrences": 4,
-      "sources": [
-        "original"
-      ],
-      "confidence": 12,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "3.efs_plugin_misconfig.yaml",
-      "category": "HARD_CODED_CREDS",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "KubeAudit"
-      ],
-      "rule_ids": [
-        "AutomountServiceAccountTokenTrueAndDefaultSA"
-      ],
-      "examples": [
-        "AutomountServiceAccountTokenTrueAndDefaultSA"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "3.efs_plugin_misconfig.yaml",
-      "category": "IMAGE_LATEST",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "Checkov"
-      ],
-      "rule_ids": [
-        "CKV_K8S_15"
-      ],
-      "examples": [
-        "Image Pull Policy should be Always"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "3.efs_plugin_misconfig.yaml",
-      "category": "NO_APPARMOR",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "KubeAudit"
-      ],
-      "rule_ids": [
-        "AppArmorAnnotationMissing"
-      ],
-      "examples": [
-        "AppArmorAnnotationMissing"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "3.efs_plugin_misconfig.yaml",
-      "category": "NO_PROBES",
-      "is_security": false,
-      "support_count": 1,
-      "tools": [
-        "Checkov"
-      ],
-      "rule_ids": [
-        "CKV_K8S_8"
-      ],
-      "examples": [
-        "Liveness Probe Should be Configured"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "3.efs_plugin_misconfig.yaml",
-      "category": "NO_RES_LIMITS",
-      "is_security": false,
-      "support_count": 1,
-      "tools": [
-        "Checkov"
-      ],
-      "rule_ids": [
-        "CKV_K8S_10",
-        "CKV_K8S_11",
-        "CKV_K8S_12",
-        "CKV_K8S_13"
-      ],
-      "examples": [
-        "CPU requests should be set",
-        "CPU limits should be set",
-        "Memory limits should be set"
-      ],
-      "occurrences": 4,
-      "sources": [
-        "original"
-      ],
-      "confidence": 12,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "3.efs_plugin_misconfig.yaml",
-      "category": "NO_SECCOMP",
-      "is_security": true,
-      "support_count": 4,
-      "tools": [
-        "Checkov",
-        "Conftest",
-        "KubeAudit",
-        "Trivy"
-      ],
-      "rule_ids": [
-        "CKV_K8S_31",
-        "KSV104",
-        "SeccompProfileMissing"
-      ],
-      "examples": [
-        "Ensure that the seccomp profile is set to docker/default or runtime/default",
-        "Conftest",
-        "SeccompProfileMissing"
-      ],
-      "occurrences": 4,
-      "sources": [
-        "original"
-      ],
-      "confidence": 12,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "3.efs_plugin_misconfig.yaml",
-      "category": "PRIVILEGED",
-      "is_security": true,
-      "support_count": 3,
-      "tools": [
-        "Checkov",
-        "KubeAudit",
-        "Trivy"
-      ],
-      "rule_ids": [
-        "CKV_K8S_22",
-        "KSV017",
-        "PrivilegedTrue"
-      ],
-      "examples": [
-        "Use read-only filesystem for containers where possible",
-        "PrivilegedTrue",
-        "Privileged"
-      ],
-      "occurrences": 3,
-      "sources": [
-        "original"
-      ],
-      "confidence": 9,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "3.efs_plugin_misconfig.yaml",
-      "category": "PRIV_ESCALATION",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "KubeAudit"
-      ],
-      "rule_ids": [
-        "AllowPrivilegeEscalationNil"
-      ],
-      "examples": [
-        "AllowPrivilegeEscalationNil"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "3.efs_plugin_misconfig.yaml",
-      "category": "READONLY_ROOTFS_FALSE",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "KubeAudit"
-      ],
-      "rule_ids": [
-        "ReadOnlyRootFilesystemNil"
-      ],
-      "examples": [
-        "ReadOnlyRootFilesystemNil"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "3.efs_plugin_misconfig.yaml",
-      "category": "RUN_AS_NONROOT_FALSE",
-      "is_security": true,
-      "support_count": 3,
-      "tools": [
-        "Conftest",
-        "KubeAudit",
-        "Trivy"
-      ],
-      "rule_ids": [
-        "KSV012",
-        "RunAsNonRootPSCNilCSCNil"
-      ],
-      "examples": [
-        "Conftest",
-        "RunAsNonRootPSCNilCSCNil",
-        "Runs as root user"
-      ],
-      "occurrences": 3,
-      "sources": [
-        "original"
-      ],
-      "confidence": 9,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "3.efs_plugin_misconfig.yaml",
-      "category": "SCHEMA_INVALID",
-      "is_security": false,
-      "support_count": 1,
-      "tools": [
-        "KubeConform"
-      ],
-      "rule_ids": [],
-      "examples": [
-        "efs-plugin"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 2,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "3.multus_cni_misconfig.yaml",
+      "file": "scan/3.multus_cni_misconfig.yaml",
       "category": "CNI_EMBEDDED_PRIVILEGED",
-      "is_security": true,
-      "support_count": 1,
       "tools": [
         "Conftest"
       ],
+      "support_count": 1,
       "rule_ids": [],
       "examples": [
         "Conftest",
         "Conftest"
       ],
-      "occurrences": 2,
-      "sources": [
-        "original"
-      ],
-      "confidence": 6,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
+      "occurrences": 2
     },
     {
-      "file": "3.multus_cni_misconfig.yaml",
-      "category": "SCHEMA_INVALID",
-      "is_security": false,
-      "support_count": 1,
-      "tools": [
-        "KubeConform"
-      ],
-      "rule_ids": [],
-      "examples": [
-        "multus-cni-config"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 2,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "3.nginx_pod_example.yaml",
+      "file": "scan/3.nginx_pod_example.yaml",
       "category": "CAP_SYS_ADMIN",
-      "is_security": true,
-      "support_count": 3,
-      "tools": [
-        "Checkov",
-        "KubeAudit",
-        "Trivy"
-      ],
-      "rule_ids": [
-        "CKV_K8S_37",
-        "CapabilityOrSecurityContextMissing",
-        "KSV003",
-        "KSV004",
-        "KSV106"
-      ],
-      "examples": [
-        "Minimize the admission of containers with capabilities assigned",
-        "CapabilityOrSecurityContextMissing",
-        "Default capabilities: some containers do not drop all"
-      ],
-      "occurrences": 5,
-      "sources": [
-        "original"
-      ],
-      "confidence": 15,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "3.nginx_pod_example.yaml",
-      "category": "DEFAULT_NAMESPACE",
-      "is_security": true,
-      "support_count": 2,
-      "tools": [
-        "Conftest",
-        "Trivy"
-      ],
-      "rule_ids": [
-        "KSV110",
-        "KSV118"
-      ],
-      "examples": [
-        "Conftest",
-        "Workloads in the default namespace",
-        "Default security context configured"
-      ],
-      "occurrences": 4,
-      "sources": [
-        "original"
-      ],
-      "confidence": 12,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "3.nginx_pod_example.yaml",
-      "category": "HARD_CODED_CREDS",
-      "is_security": true,
-      "support_count": 1,
       "tools": [
         "KubeAudit"
       ],
-      "rule_ids": [
-        "AutomountServiceAccountTokenTrueAndDefaultSA"
-      ],
-      "examples": [
-        "AutomountServiceAccountTokenTrueAndDefaultSA"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "3.nginx_pod_example.yaml",
-      "category": "IMAGE_LATEST",
-      "is_security": true,
       "support_count": 1,
-      "tools": [
-        "Checkov"
-      ],
       "rule_ids": [
-        "CKV_K8S_15"
+        "CapabilityOrSecurityContextMissing"
       ],
       "examples": [
-        "Image Pull Policy should be Always"
+        "CapabilityOrSecurityContextMissing"
       ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
+      "occurrences": 1
     },
     {
-      "file": "3.nginx_pod_example.yaml",
+      "file": "scan/3.nginx_pod_example.yaml",
+      "category": "HARD_CODED_CREDS",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "examples": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/3.nginx_pod_example.yaml",
       "category": "NO_APPARMOR",
-      "is_security": true,
-      "support_count": 1,
       "tools": [
         "KubeAudit"
       ],
+      "support_count": 1,
       "rule_ids": [
         "AppArmorAnnotationMissing"
       ],
       "examples": [
         "AppArmorAnnotationMissing"
       ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
+      "occurrences": 1
     },
     {
-      "file": "3.nginx_pod_example.yaml",
-      "category": "NO_PROBES",
-      "is_security": false,
-      "support_count": 1,
-      "tools": [
-        "Checkov"
-      ],
-      "rule_ids": [
-        "CKV_K8S_8"
-      ],
-      "examples": [
-        "Liveness Probe Should be Configured"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "3.nginx_pod_example.yaml",
-      "category": "NO_RES_LIMITS",
-      "is_security": false,
-      "support_count": 1,
-      "tools": [
-        "Checkov"
-      ],
-      "rule_ids": [
-        "CKV_K8S_10",
-        "CKV_K8S_11",
-        "CKV_K8S_12",
-        "CKV_K8S_13"
-      ],
-      "examples": [
-        "CPU requests should be set",
-        "CPU limits should be set",
-        "Memory limits should be set"
-      ],
-      "occurrences": 4,
-      "sources": [
-        "original"
-      ],
-      "confidence": 12,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "3.nginx_pod_example.yaml",
+      "file": "scan/3.nginx_pod_example.yaml",
       "category": "NO_SECCOMP",
-      "is_security": true,
-      "support_count": 4,
       "tools": [
-        "Checkov",
-        "Conftest",
-        "KubeAudit",
-        "Trivy"
+        "KubeAudit"
       ],
-      "rule_ids": [
-        "CKV_K8S_31",
-        "KSV104",
-        "SeccompProfileMissing"
-      ],
-      "examples": [
-        "Ensure that the seccomp profile is set to docker/default or runtime/default",
-        "Conftest",
-        "SeccompProfileMissing"
-      ],
-      "occurrences": 4,
-      "sources": [
-        "original"
-      ],
-      "confidence": 12,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "3.nginx_pod_example.yaml",
-      "category": "PRIVILEGED",
-      "is_security": true,
       "support_count": 1,
-      "tools": [
-        "Checkov"
-      ],
       "rule_ids": [
-        "CKV_K8S_22"
+        "SeccompProfileMissing"
       ],
       "examples": [
-        "Use read-only filesystem for containers where possible"
+        "SeccompProfileMissing"
       ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
+      "occurrences": 1
     },
     {
-      "file": "3.nginx_pod_example.yaml",
+      "file": "scan/3.nginx_pod_example.yaml",
       "category": "PRIV_ESCALATION",
-      "is_security": true,
-      "support_count": 1,
       "tools": [
         "KubeAudit"
       ],
+      "support_count": 1,
       "rule_ids": [
         "AllowPrivilegeEscalationNil"
       ],
       "examples": [
         "AllowPrivilegeEscalationNil"
       ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
+      "occurrences": 1
     },
     {
-      "file": "3.nginx_pod_example.yaml",
+      "file": "scan/3.nginx_pod_example.yaml",
       "category": "READONLY_ROOTFS_FALSE",
-      "is_security": true,
-      "support_count": 1,
       "tools": [
         "KubeAudit"
       ],
+      "support_count": 1,
       "rule_ids": [
         "ReadOnlyRootFilesystemNil"
       ],
       "examples": [
         "ReadOnlyRootFilesystemNil"
       ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "3.nginx_pod_example.yaml",
-      "category": "RUN_AS_NONROOT_FALSE",
-      "is_security": true,
-      "support_count": 3,
-      "tools": [
-        "Conftest",
-        "KubeAudit",
-        "Trivy"
-      ],
-      "rule_ids": [
-        "KSV012",
-        "RunAsNonRootPSCNilCSCNil"
-      ],
-      "examples": [
-        "Conftest",
-        "RunAsNonRootPSCNilCSCNil",
-        "Runs as root user"
-      ],
-      "occurrences": 3,
-      "sources": [
-        "original"
-      ],
-      "confidence": 9,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "3.nginx_pod_example.yaml",
-      "category": "SCHEMA_INVALID",
-      "is_security": false,
-      "support_count": 1,
-      "tools": [
-        "KubeConform"
-      ],
-      "rule_ids": [],
-      "examples": [
-        "nginx"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 2,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "34.unencrypted_secret.yaml",
-      "category": "HARD_CODED_CREDS",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "Conftest"
-      ],
-      "rule_ids": [],
-      "examples": [
-        "Conftest",
-        "Conftest"
-      ],
-      "occurrences": 2,
-      "sources": [
-        "original"
-      ],
-      "confidence": 6,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "34.unencrypted_secret.yaml",
-      "category": "SCHEMA_INVALID",
-      "is_security": false,
-      "support_count": 1,
-      "tools": [
-        "KubeConform"
-      ],
-      "rule_ids": [],
-      "examples": [
-        "mysecret"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 2,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/detection/C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/14.ingress_deprecated_api.yaml",
-      "category": "DEPRECATED_API",
-      "is_security": false,
-      "support_count": 1,
-      "tools": [
-        "Pluto"
-      ],
-      "rule_ids": [
-        "extensions/v1beta1"
-      ],
-      "examples": [
-        "Ingress extensions/v1beta1"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 2,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/34.unencrypted_secret.yaml",
-      "category": "HARD_CODED_CREDS",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "Gitleaks"
-      ],
-      "rule_ids": [
-        "kubernetes-secret-yaml"
-      ],
-      "examples": [
-        "kubernetes-secret-yaml"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 3,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
-    },
-    {
-      "file": "Deployment/apps/v1/flink",
-      "category": "NO_RES_LIMITS",
-      "is_security": false,
-      "support_count": 1,
-      "tools": [
-        "KubeScore"
-      ],
-      "rule_ids": [],
-      "examples": [
-        "container-resources"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 1,
-      "suggested_classification": "Needs corroboration",
-      "is_true_positive": false
-    },
-    {
-      "file": "Deployment/apps/v1/flink",
-      "category": "NO_SECCOMP",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "KubeScore"
-      ],
-      "rule_ids": [],
-      "examples": [
-        "container-seccomp-profile"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 1,
-      "suggested_classification": "Needs corroboration",
-      "is_true_positive": false
-    },
-    {
-      "file": "Deployment/apps/v1/nginx-deployment",
-      "category": "NO_RES_LIMITS",
-      "is_security": false,
-      "support_count": 1,
-      "tools": [
-        "KubeScore"
-      ],
-      "rule_ids": [],
-      "examples": [
-        "container-resources"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 1,
-      "suggested_classification": "Needs corroboration",
-      "is_true_positive": false
-    },
-    {
-      "file": "Deployment/apps/v1/nginx-deployment",
-      "category": "NO_SECCOMP",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "KubeScore"
-      ],
-      "rule_ids": [],
-      "examples": [
-        "container-seccomp-profile"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 1,
-      "suggested_classification": "Needs corroboration",
-      "is_true_positive": false
-    },
-    {
-      "file": "Deployment/apps/v1/single-replica-deployment",
-      "category": "NO_RES_LIMITS",
-      "is_security": false,
-      "support_count": 1,
-      "tools": [
-        "KubeScore"
-      ],
-      "rule_ids": [],
-      "examples": [
-        "container-resources"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 1,
-      "suggested_classification": "Needs corroboration",
-      "is_true_positive": false
-    },
-    {
-      "file": "Deployment/apps/v1/single-replica-deployment",
-      "category": "NO_SECCOMP",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "KubeScore"
-      ],
-      "rule_ids": [],
-      "examples": [
-        "container-seccomp-profile"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 1,
-      "suggested_classification": "Needs corroboration",
-      "is_true_positive": false
-    },
-    {
-      "file": "Pod/v1",
-      "category": "NO_RES_LIMITS",
-      "is_security": false,
-      "support_count": 1,
-      "tools": [
-        "KubeScore"
-      ],
-      "rule_ids": [],
-      "examples": [
-        "container-resources"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 1,
-      "suggested_classification": "Needs corroboration",
-      "is_true_positive": false
-    },
-    {
-      "file": "Pod/v1",
-      "category": "NO_SECCOMP",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "KubeScore"
-      ],
-      "rule_ids": [],
-      "examples": [
-        "container-seccomp-profile"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 1,
-      "suggested_classification": "Needs corroboration",
-      "is_true_positive": false
-    },
-    {
-      "file": "Pod/v1/busybox-namespace/busybox-pod",
-      "category": "NO_RES_LIMITS",
-      "is_security": false,
-      "support_count": 1,
-      "tools": [
-        "KubeScore"
-      ],
-      "rule_ids": [],
-      "examples": [
-        "container-resources"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 1,
-      "suggested_classification": "Needs corroboration",
-      "is_true_positive": false
-    },
-    {
-      "file": "Pod/v1/busybox-namespace/busybox-pod",
-      "category": "NO_SECCOMP",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "KubeScore"
-      ],
-      "rule_ids": [],
-      "examples": [
-        "container-seccomp-profile"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 1,
-      "suggested_classification": "Needs corroboration",
-      "is_true_positive": false
-    },
-    {
-      "file": "Pod/v1/efs-plugin",
-      "category": "NO_RES_LIMITS",
-      "is_security": false,
-      "support_count": 1,
-      "tools": [
-        "KubeScore"
-      ],
-      "rule_ids": [],
-      "examples": [
-        "container-resources"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 1,
-      "suggested_classification": "Needs corroboration",
-      "is_true_positive": false
-    },
-    {
-      "file": "Pod/v1/efs-plugin",
-      "category": "NO_SECCOMP",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "KubeScore"
-      ],
-      "rule_ids": [],
-      "examples": [
-        "container-seccomp-profile"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 1,
-      "suggested_classification": "Needs corroboration",
-      "is_true_positive": false
-    },
-    {
-      "file": "Pod/v1/example-pod",
-      "category": "NO_RES_LIMITS",
-      "is_security": false,
-      "support_count": 1,
-      "tools": [
-        "KubeScore"
-      ],
-      "rule_ids": [],
-      "examples": [
-        "container-resources"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 1,
-      "suggested_classification": "Needs corroboration",
-      "is_true_positive": false
-    },
-    {
-      "file": "Pod/v1/example-pod",
-      "category": "NO_SECCOMP",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "KubeScore"
-      ],
-      "rule_ids": [],
-      "examples": [
-        "container-seccomp-profile"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 1,
-      "suggested_classification": "Needs corroboration",
-      "is_true_positive": false
-    },
-    {
-      "file": "Pod/v1/nginx",
-      "category": "NO_RES_LIMITS",
-      "is_security": false,
-      "support_count": 1,
-      "tools": [
-        "KubeScore"
-      ],
-      "rule_ids": [],
-      "examples": [
-        "container-resources"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 1,
-      "suggested_classification": "Needs corroboration",
-      "is_true_positive": false
-    },
-    {
-      "file": "Pod/v1/nginx",
-      "category": "NO_SECCOMP",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "KubeScore"
-      ],
-      "rule_ids": [],
-      "examples": [
-        "container-seccomp-profile"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 1,
-      "suggested_classification": "Needs corroboration",
-      "is_true_positive": false
-    },
-    {
-      "file": "Pod/v1/pod-name",
-      "category": "NO_RES_LIMITS",
-      "is_security": false,
-      "support_count": 1,
-      "tools": [
-        "KubeScore"
-      ],
-      "rule_ids": [],
-      "examples": [
-        "container-resources"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 1,
-      "suggested_classification": "Needs corroboration",
-      "is_true_positive": false
-    },
-    {
-      "file": "Pod/v1/pod-name",
-      "category": "NO_SECCOMP",
-      "is_security": true,
-      "support_count": 1,
-      "tools": [
-        "KubeScore"
-      ],
-      "rule_ids": [],
-      "examples": [
-        "container-seccomp-profile"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 1,
-      "suggested_classification": "Needs corroboration",
-      "is_true_positive": false
-    },
-    {
-      "file": "spec",
-      "category": "SCHEMA_INVALID",
-      "is_security": false,
-      "support_count": 1,
-      "tools": [
-        "KubeConform"
-      ],
-      "rule_ids": [],
-      "examples": [
-        "missing property 'selector'"
-      ],
-      "occurrences": 1,
-      "sources": [
-        "original"
-      ],
-      "confidence": 2,
-      "suggested_classification": "Actual (Correct)",
-      "is_true_positive": true
+      "occurrences": 1
     }
   ]
 }
