@@ -12,8 +12,11 @@ from jsonschema import validate, ValidationError
 LLM_TIMEOUT_SECONDS = 25
 RETRIES             = 2
 SMALL_DELAY_SECONDS = 0.20
-MODELS: List[str]   = ["groq", "openrouter", "gemini", "ollama"]
+# Prefer OpenRouter first so we can control exact models, others are fallback
+MODELS: List[str]   = ["openrouter", "groq", "gemini", "ollama"]
+PROVIDER_PRIORITY: List[str] = ["openrouter", "groq", "gemini", "ollama"]
 
+# Optional single-model override kept for backward compatibility
 OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "google/gemma-2-9b-it:free")
 GROQ_MODEL_SINGLE = os.getenv("GROQ_MODEL", "").strip()
 GROQ_MODELS_FALLBACK = (
@@ -21,6 +24,14 @@ GROQ_MODELS_FALLBACK = (
     ["llama-3.1-70b-versatile", "llama-3.1-8b-instant", "gemma2-9b-it"]
 )
 OLLAMA_MODEL     = os.getenv("OLLAMA_MODEL", "llama3.1:8b-instruct")
+
+# Default ordered list of OpenRouter models for this use-case (K8s YAML + JSON discipline)
+DEFAULT_OPENROUTER_MODELS: List[str] = [
+    "meta-llama/llama-3.3-70b-instruct:free",  # strong instruction following
+    "mistralai/mistral-7b-instruct:free",      # light + fast fallback
+    "deepseek/deepseek-r1-distill-llama-70b:free",  # reasoning-leaning fallback
+    "qwen/qwen3-vl-32b-instruct",             # VLM fallback (not required but allowed)
+]
 
 RESPONSE_SCHEMA: Dict[str, Any] = {
     "type": "object",
@@ -52,6 +63,27 @@ def system_prompt() -> str:
         "- Ensure the resulting YAML is syntactically valid. If you cannot produce a correct patch, return 'needs_review' and explain why in 'rationale'.\n"
         "JSON Schema:" + json.dumps(RESPONSE_SCHEMA, separators=(',', ':'))
     )
+
+def load_dotenv_from_file(path: str = ".env") -> None:
+    p = Path(path)
+    if not p.exists():
+        return
+    try:
+        for raw in p.read_text(encoding="utf-8").splitlines():
+            line = raw.strip()
+            if not line or line.startswith("#"):
+                continue
+            if "=" not in line:
+                continue
+            k, v = line.split("=", 1)
+            k = k.strip()
+            v = v.strip().strip('"').strip("'")
+            # Don't clobber already-set env vars
+            if k and (k not in os.environ or not os.environ.get(k)):
+                os.environ[k] = v
+    except Exception:
+        # best-effort; keep silent to avoid breaking runtime
+        pass
 
 def make_user_prompt(item: Dict[str, Any]) -> str:
     acceptance = {
@@ -187,6 +219,94 @@ def _yaml_is_valid(text: str) -> bool:
     except yaml.YAMLError:  # type: ignore[attr-defined]
         return False
 
+def _semantic_check(category: str, text: str) -> tuple[bool, str | None]:
+    """Lightweight category-aware guardrails to avoid obvious unsafe remnants.
+    Returns (ok, reason_if_fail).
+    """
+    cat = (category or "").upper()
+    # Generic privilege checks
+    if "PRIVILEG" in cat:
+        # Reject if any privileged: true remains
+        if re.search(r"(?m)^\s*privileged:\s*true\b", text):
+            return False, "semantic_violation: privileged:true present"
+    if "ESCALATION" in cat or "PRIV_ESC" in cat:
+        if re.search(r"(?m)^\s*allowPrivilegeEscalation:\s*true\b", text):
+            return False, "semantic_violation: allowPrivilegeEscalation:true present"
+    return True, None
+
+def _validate_and_write_patch(file_path: str, patch: str, idx: int, apply_dir: str, validate_mode: str, category: str = "", autofix: bool = False) -> Dict[str, str]:
+    """Try to apply a unified diff patch to file_path and optionally YAML-validate.
+    Returns a dict like {status: pass|fail|skipped, reason: <text>} and writes the patched file into apply_dir/idx/ on success.
+    """
+    if validate_mode == "none":
+        # No validation requested
+        return {"status": "skipped", "reason": "validation disabled"}
+
+    if not patch:
+        return {"status": "fail", "reason": "empty_patch"}
+    if not _is_unified_diff(patch):
+        return {"status": "fail", "reason": "not_unified_diff"}
+
+    target = _extract_diff_target(patch) or ""
+    norm_target = target.replace("\\", "/")
+    norm_file = file_path.replace("\\", "/")
+    if not target or not (norm_target.endswith(norm_file) or norm_file.endswith(norm_target)):
+        return {"status": "fail", "reason": f"diff_target_mismatch: diff={target} item={file_path}"}
+
+    src = Path(file_path)
+    if not src.exists():
+        return {"status": "fail", "reason": f"file_not_found: {file_path}"}
+
+    try:
+        orig = src.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError) as e:
+        return {"status": "fail", "reason": f"read_error: {type(e).__name__}: {e}"}
+
+    new_text = _apply_unified_diff_to_text(orig, patch)
+    if new_text is None:
+        return {"status": "fail", "reason": "patch_apply_failed"}
+
+    if validate_mode == "yaml" and not _yaml_is_valid(new_text):
+        return {"status": "fail", "reason": "yaml_invalid_after_patch"}
+
+    # Category-aware semantic checks to avoid accepting unsafe patches
+    ok, why = _semantic_check(category, new_text)
+    autofix_status: Optional[str] = None
+    if not ok:
+        # Try a conservative auto-fix if enabled: flip true -> false for obvious risky flags
+        if autofix:
+            fixed_text = new_text
+            fixed_text = re.sub(r"(?m)^(\s*privileged:\s*)true(\s*(#.*)?)$", r"\1false\2", fixed_text)
+            fixed_text = re.sub(r"(?m)^(\s*allowPrivilegeEscalation:\s*)true(\s*(#.*)?)$", r"\1false\2", fixed_text)
+            if fixed_text != new_text:
+                # Re-validate YAML if requested
+                if validate_mode == "yaml" and not _yaml_is_valid(fixed_text):
+                    return {"status": "fail", "reason": "yaml_invalid_after_autofix"}
+                ok2, why2 = _semantic_check(category, fixed_text)
+                if ok2:
+                    new_text = fixed_text
+                    autofix_status = "applied"
+                else:
+                    return {"status": "fail", "reason": why2 or why or "semantic_violation"}
+            else:
+                return {"status": "fail", "reason": why or "semantic_violation"}
+        else:
+            return {"status": "fail", "reason": why or "semantic_violation"}
+
+    # Write to sandbox
+    try:
+        sandbox = Path(apply_dir) / str(idx)
+        dst = sandbox / file_path
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        dst.write_text(new_text, encoding="utf-8")
+    except (OSError, UnicodeDecodeError) as e:
+        return {"status": "fail", "reason": f"write_error: {type(e).__name__}: {e}"}
+
+    res: Dict[str, str] = {"status": "pass", "reason": "ok"}
+    if autofix_status:
+        res["autofix"] = autofix_status
+    return res
+
 def load_payload() -> List[Dict[str, Any]]:
     candidates = [
         Path("output/llm_payload.json"),
@@ -219,6 +339,10 @@ def _err_with_body(prefix: str, e: Exception) -> str:
         return f"{prefix}: {e} :: {body}"
     return f"{prefix}: {e}"
 
+class ProviderSkipVote(Exception):
+    """Internal signal to skip counting a provider's vote (e.g., rate-limited)."""
+    pass
+
 async def call_groq(client: httpx.AsyncClient, prompt: str, timeout_seconds: int) -> str:
     url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {"Authorization": f"Bearer {os.getenv('GROQ_API_KEY','')}"}
@@ -243,30 +367,63 @@ async def call_groq(client: httpx.AsyncClient, prompt: str, timeout_seconds: int
 
 async def call_openrouter(client: httpx.AsyncClient, prompt: str, timeout_seconds: int) -> str:
     url = "https://openrouter.ai/api/v1/chat/completions"
+    referer = os.getenv("OPENROUTER_SITE_URL", "https://safefixk8s.local")
+    app_title = os.getenv("OPENROUTER_APP_TITLE", "SafeFixK8s")
     headers = {
         "Authorization": f"Bearer {os.getenv('OPENROUTER_API_KEY','')}",
-        "HTTP-Referer": "https://safefixk8s.local",
-        "X-Title": "SafeFixK8s",
+        "HTTP-Referer": referer,
+        "X-Title": app_title,
     }
-    combined = system_prompt() + "\n" + prompt
-    model = os.getenv("OPENROUTER_MODEL", "google/gemma-2-9b-it:free")
-    body = {
-        "model": model,
-        "messages": [{"role": "user", "content": combined}],
-        "temperature": 0,
-        "response_format": {"type": "json_object"}
-    }
-    try:
-        r = await _post_json(client, url, timeout_seconds, headers=headers, json=body)
-        r.raise_for_status()
-        return r.json()["choices"][0]["message"]["content"]
-    except httpx.HTTPStatusError as e:
-        if e.response is not None and e.response.status_code in (400, 415, 422):
-            body.pop("response_format", None)
-            r2 = await _post_json(client, url, timeout_seconds, headers=headers, json=body)
-            r2.raise_for_status()
-            return r2.json()["choices"][0]["message"]["content"]
-        raise
+    # Allow comma-separated override via env; else use curated defaults
+    cfg = os.getenv("OPENROUTER_MODELS", "").strip()
+    model_candidates = [m.strip() for m in cfg.split(',') if m.strip()] or DEFAULT_OPENROUTER_MODELS
+    # Back-compat single-model override takes precedence if explicitly set
+    single = os.getenv("OPENROUTER_MODEL", "").strip()
+    if single:
+        model_candidates = [single]
+
+    last_err: Optional[str] = None
+    last_code: Optional[int] = None
+    for model in model_candidates:
+        body = {
+            "model": model,
+            "messages": [
+                {"role": "system", "content": system_prompt()},
+                {"role": "user", "content": prompt}
+            ],
+            "temperature": 0,
+            "response_format": {"type": "json_object"}
+        }
+        try:
+            r = await _post_json(client, url, timeout_seconds, headers=headers, json=body)
+            r.raise_for_status()
+            return r.json()["choices"][0]["message"]["content"]
+        except httpx.HTTPStatusError as e:
+            code = e.response.status_code if e.response is not None else None
+            last_code = code
+            # Some models don't support forced JSON; retry without it
+            if code in (400, 415, 422):
+                try:
+                    body.pop("response_format", None)
+                    r2 = await _post_json(client, url, timeout_seconds, headers=headers, json=body)
+                    r2.raise_for_status()
+                    return r2.json()["choices"][0]["message"]["content"]
+                except httpx.HTTPError as e2:
+                    last_err = _err_with_body(f"openrouter ({model})", e2)
+                    continue
+            # Rate limit or auth issues: move to next candidate
+            if code in (401, 403, 429):
+                last_err = _err_with_body(f"openrouter ({model})", e)
+                continue
+            last_err = _err_with_body(f"openrouter ({model})", e)
+            continue
+        except httpx.HTTPError as e:
+            last_err = _err_with_body(f"openrouter ({model})", e)
+            continue
+    if last_code == 429:
+        # Signal the caller to SKIP counting this vote entirely
+        raise ProviderSkipVote(last_err or "openrouter rate limited (429)")
+    raise RuntimeError(last_err or "openrouter unknown error")
 
 async def call_gemini(client: httpx.AsyncClient, prompt: str, timeout_seconds: int) -> str:
     key = os.getenv("GEMINI_API_KEY", "").strip()
@@ -353,6 +510,9 @@ async def ask_one(adapter_name: str, fn, client: httpx.AsyncClient, prompt: str,
         try:
             txt = await fn(client, prompt, timeout_seconds)
             return validate_response(adapter_name, txt)
+        except ProviderSkipVote:
+            # Special-case: instruct caller to ignore this provider
+            return {"__skip": True}
         except (httpx.HTTPError, RuntimeError, json.JSONDecodeError, KeyError) as e:
             last_err = _err_with_body(adapter_name, e)
             await asyncio.sleep(0.8)
@@ -365,6 +525,9 @@ async def ask_all(models: List[str], prompt: str, retries: int, timeout_seconds:
         tasks = [ask_one(m, ADAPTERS[m], client, prompt, retries, timeout_seconds) for m in enabled]
         results = await asyncio.gather(*tasks)
     for m, res in zip(enabled, results):
+        # Skip providers that explicitly signaled to be ignored (e.g., 429)
+        if isinstance(res, dict) and res.get("__skip") is True:
+            continue
         out[m] = res
     return out
 
@@ -402,6 +565,7 @@ def parse_args():
                     help="Post-patch validator: none|yaml (apply diff in-memory and YAML-parse)")
     ap.add_argument("--apply-dir", type=str, default="output/patch_sandbox",
                     help="Directory to write patched files for inspection (created if missing)")
+    ap.add_argument("--autofix", action="store_true", help="Conservatively flip privileged:true and allowPrivilegeEscalation:true to false if still present after patch")
     return ap.parse_args()
 
 def _mask(s): 
@@ -418,6 +582,9 @@ async def self_test(which: str):
 
 async def main():
     args = parse_args()
+
+    # Load API keys and model preferences from .env early
+    load_dotenv_from_file(".env")
 
     if args.selftest:
         if args.selftest not in ADAPTERS:
@@ -452,43 +619,43 @@ async def main():
         votes = await ask_all(models, prompt, retries, timeout_seconds)
         merged = merge_consensus(votes)
 
-        validation = {"status": "skipped", "reason": "validation disabled"}
-        if merged.get("final_classification") == "fix" and args.validate != "none":
-            patch = merged.get("final_patch", "")
-            file_path = str(item.get("file", "")).strip()
-            if not patch:
-                validation = {"status": "fail", "reason": "empty_patch"}
-            elif not _is_unified_diff(patch):
-                validation = {"status": "fail", "reason": "not_unified_diff"}
-            else:
-                target = _extract_diff_target(patch) or ""
-                norm_target = target.replace("\\", "/")
-                norm_file = file_path.replace("\\", "/")
-                if not target or not (norm_target.endswith(norm_file) or norm_file.endswith(norm_target)):
-                    validation = {"status": "fail", "reason": f"diff_target_mismatch: diff={target} item={file_path}"}
-                else:
-                    try:
-                        src = Path(file_path)
-                        if not src.exists():
-                            validation = {"status": "fail", "reason": f"file_not_found: {file_path}"}
-                        else:
-                            orig = src.read_text(encoding="utf-8")
-                            new_text = _apply_unified_diff_to_text(orig, patch)
-                            if new_text is None:
-                                validation = {"status": "fail", "reason": "patch_apply_failed"}
-                            else:
-                                if args.validate == "yaml" and not _yaml_is_valid(new_text):
-                                    validation = {"status": "fail", "reason": "yaml_invalid_after_patch"}
-                                else:
-                                    sandbox = Path(args.apply_dir) / str(idx)
-                                    dst = sandbox / file_path
-                                    dst.parent.mkdir(parents=True, exist_ok=True)
-                                    dst.write_text(new_text, encoding="utf-8")
-                                    validation = {"status": "pass", "reason": "ok"}
-                    except (OSError, UnicodeDecodeError, ValueError) as e:
-                        validation = {"status": "fail", "reason": f"exception: {type(e).__name__}: {e}"}
+        # Build candidate fix patches from votes and try them in provider priority order.
+        file_path = str(item.get("file", "")).strip()
+        fix_candidates: List[tuple[str, str]] = [(m, v.get("patch", "")) for m, v in votes.items() if v.get("classification") == "fix" and v.get("patch")]
+        def _prio(name: str) -> int:
+            return PROVIDER_PRIORITY.index(name) if name in PROVIDER_PRIORITY else 99
 
-        if validation.get("status") == "fail":
+        validation = {"status": "skipped", "reason": "validation disabled"}
+        chosen_model = None
+        chosen_patch = None
+
+        if fix_candidates:
+            # Sort by provider priority, then by patch length desc (as a tie-breaker)
+            fix_candidates.sort(key=lambda t: (_prio(t[0]), -len(t[1])))
+
+            if args.validate == "none":
+                # No validation requested; just pick the top-priority patch
+                chosen_model, chosen_patch = fix_candidates[0]
+                validation = {"status": "skipped", "reason": "validation disabled"}
+            else:
+                last_reason = None
+                for model_name, patch_text in fix_candidates:
+                    vres = _validate_and_write_patch(file_path, patch_text, idx, args.apply_dir, args.validate, str(item.get("category", "")), autofix=args.autofix)
+                    if vres.get("status") == "pass":
+                        chosen_model, chosen_patch = model_name, patch_text
+                        validation = vres
+                        break
+                    else:
+                        last_reason = vres.get("reason")
+                if chosen_patch is None:
+                    validation = {"status": "fail", "reason": last_reason or "patch_apply_failed_all"}
+
+        # Update merged result based on validation outcome
+        if chosen_patch is not None and validation.get("status") == "pass":
+            merged["final_classification"] = "fix"
+            merged["final_patch"] = chosen_patch
+            merged["from_model"] = chosen_model or merged.get("from_model") or ""
+        elif merged.get("final_classification") == "fix" and validation.get("status") == "fail":
             merged["final_classification"] = "needs_review"
             merged["final_patch"] = ""
 
