@@ -1,6 +1,484 @@
 {
-  "version": "1.0",
-  "generatedAt": "2025-10-16T10:50:52.084824Z",
-  "source": "SafeFixK8s/Normalizer",
-  "findings": []
+  "aggregate": [
+    {
+      "file": "(unknown)",
+      "category": "CAP_SYS_ADMIN",
+      "tools": [
+        "kubescape_raw.json",
+        "polaris_raw.json"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "dangerousCapabilities",
+        "insecureCapabilities",
+        "linuxHardening"
+      ],
+      "examples": [
+        "insecure-capabilities",
+        "insecure-capabilities",
+        "dangerousCapabilities"
+      ],
+      "occurrences": 8
+    },
+    {
+      "file": "(unknown)",
+      "category": "DEPRECATED_API",
+      "tools": [
+        "kubescore_raw.json"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "stable-version"
+      ],
+      "examples": [
+        "Stable version",
+        "Stable version"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "(unknown)",
+      "category": "HOSTPATH",
+      "tools": [
+        "kubescape_raw.json",
+        "polaris_raw.json"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "hostPathSet"
+      ],
+      "examples": [
+        "alert-rw-hostpath",
+        "alert-any-hostpath",
+        "alert-rw-hostpath"
+      ],
+      "occurrences": 6
+    },
+    {
+      "file": "(unknown)",
+      "category": "NO_RES_LIMITS",
+      "tools": [
+        "kubescore_raw.json",
+        "polaris_raw.json"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "container-resources",
+        "cpuLimitsMissing",
+        "cpuRequestsMissing",
+        "memoryLimitsMissing",
+        "memoryRequestsMissing"
+      ],
+      "examples": [
+        "Container Resources",
+        "Container Resources",
+        "cpuLimitsMissing"
+      ],
+      "occurrences": 10
+    },
+    {
+      "file": "(unknown)",
+      "category": "NO_SECCOMP",
+      "tools": [
+        "kubescore_raw.json"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-seccomp-profile"
+      ],
+      "examples": [
+        "Container Seccomp Profile",
+        "Skipped because container-seccomp-profile is ignored",
+        "Container Seccomp Profile"
+      ],
+      "occurrences": 4
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "CAP_SYS_ADMIN",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_37",
+        "KSV003",
+        "KSV004",
+        "KSV106"
+      ],
+      "examples": [
+        "Minimize the admission of containers with capabilities assigned",
+        "Default capabilities: some containers do not drop all",
+        "Default capabilities: some containers do not drop any"
+      ],
+      "occurrences": 4
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "NO_PROBES",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_8"
+      ],
+      "examples": [
+        "Liveness Probe Should be Configured"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "NO_RES_LIMITS",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_10",
+        "CKV_K8S_11",
+        "CKV_K8S_12",
+        "CKV_K8S_13"
+      ],
+      "examples": [
+        "CPU requests should be set",
+        "CPU limits should be set",
+        "Memory limits should be set"
+      ],
+      "occurrences": 4
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "NO_SECCOMP",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_31",
+        "KSV104"
+      ],
+      "examples": [
+        "Ensure that the seccomp profile is set to docker/default or runtime/default",
+        "Seccomp policies disabled"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "PRIVILEGED",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_22"
+      ],
+      "examples": [
+        "Use read-only filesystem for containers where possible"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "CAP_SYS_ADMIN",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_37",
+        "KSV003",
+        "KSV004",
+        "KSV106"
+      ],
+      "examples": [
+        "Minimize the admission of containers with capabilities assigned",
+        "Default capabilities: some containers do not drop all",
+        "Default capabilities: some containers do not drop any"
+      ],
+      "occurrences": 4
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "NO_PROBES",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_8"
+      ],
+      "examples": [
+        "Liveness Probe Should be Configured"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "NO_RES_LIMITS",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_10",
+        "CKV_K8S_11",
+        "CKV_K8S_12",
+        "CKV_K8S_13"
+      ],
+      "examples": [
+        "CPU requests should be set",
+        "CPU limits should be set",
+        "Memory limits should be set"
+      ],
+      "occurrences": 4
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "NO_SECCOMP",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_31",
+        "KSV104"
+      ],
+      "examples": [
+        "Ensure that the seccomp profile is set to docker/default or runtime/default",
+        "Seccomp policies disabled"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "PRIVILEGED",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_22"
+      ],
+      "examples": [
+        "Use read-only filesystem for containers where possible"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/3.efs_plugin_misconfig.yaml",
+      "category": "CAP_SYS_ADMIN",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CapabilityOrSecurityContextMissing"
+      ],
+      "examples": [
+        "CapabilityOrSecurityContextMissing"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/3.efs_plugin_misconfig.yaml",
+      "category": "HARD_CODED_CREDS",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "examples": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/3.efs_plugin_misconfig.yaml",
+      "category": "NO_APPARMOR",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AppArmorAnnotationMissing"
+      ],
+      "examples": [
+        "AppArmorAnnotationMissing"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/3.efs_plugin_misconfig.yaml",
+      "category": "NO_SECCOMP",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "SeccompProfileMissing"
+      ],
+      "examples": [
+        "SeccompProfileMissing"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/3.efs_plugin_misconfig.yaml",
+      "category": "PRIVILEGED",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "PrivilegedTrue"
+      ],
+      "examples": [
+        "PrivilegedTrue"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/3.efs_plugin_misconfig.yaml",
+      "category": "PRIV_ESCALATION",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "examples": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/3.efs_plugin_misconfig.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "examples": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/3.multus_cni_misconfig.yaml",
+      "category": "CNI_EMBEDDED_PRIVILEGED",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "examples": [
+        "Conftest",
+        "Conftest"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "scan/3.nginx_pod_example.yaml",
+      "category": "CAP_SYS_ADMIN",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CapabilityOrSecurityContextMissing"
+      ],
+      "examples": [
+        "CapabilityOrSecurityContextMissing"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/3.nginx_pod_example.yaml",
+      "category": "HARD_CODED_CREDS",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "examples": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/3.nginx_pod_example.yaml",
+      "category": "NO_APPARMOR",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AppArmorAnnotationMissing"
+      ],
+      "examples": [
+        "AppArmorAnnotationMissing"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/3.nginx_pod_example.yaml",
+      "category": "NO_SECCOMP",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "SeccompProfileMissing"
+      ],
+      "examples": [
+        "SeccompProfileMissing"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/3.nginx_pod_example.yaml",
+      "category": "PRIV_ESCALATION",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "examples": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/3.nginx_pod_example.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "examples": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "occurrences": 1
+    }
+  ]
 }

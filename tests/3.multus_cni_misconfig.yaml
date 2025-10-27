@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: multus-cni-config
+  namespace: kube-system
+data:
+  # The "cni" block below configures the Multus CNI plugin used in a
+  # Kubernetes cluster.  It illustrates how a privileged setting can
+  # unintentionally weaken isolation.
+  cni.conf: |
+    cni:
+      cniBinDir: /var/lib/cni/bin
+      cniConfDir: /etc/cni/multus/net.d
+      chained: false
+      cniConfFileName: "istio-cni.conf"
+      excludeNamespaces:
+        - istio-system
+        - kube-system
+      logLevel: info
+      # WARNING: setting privileged to true grants the CNI plugin root
+      # capabilities on the host and undermines the "least privilege" model.
+      privileged: true

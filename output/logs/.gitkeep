@@ -1,2 +1,0 @@
-# This file ensures the output/logs directory is tracked in git
-# Log files are gitignored but the directory structure is preserved

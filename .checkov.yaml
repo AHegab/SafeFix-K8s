@@ -1,0 +1,6 @@
+framework: ["kubernetes"]
+skip-check: []
+soft-fail: false
+quiet: true
+download-external-modules: false
+

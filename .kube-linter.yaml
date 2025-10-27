@@ -1,0 +1,17 @@
+checks:
+  include:
+    - no_latest_tag
+    - no_readiness_probe
+    - no_liveness_probe
+    - automount-service-account-token
+    - writable-rootfs
+    - host-path-volume
+    - privilege-escalation-container
+    - privileged-container
+    - run-as-non-root
+    - seccomp-profile
+config:
+  failures:
+    thresholds:
+      error: 0
+      warning: 0

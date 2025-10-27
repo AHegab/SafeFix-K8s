@@ -1,0 +1,2 @@
+# This file ensures the images directory is tracked by Git
+# Docker images cache (contents ignored, but directory preserved)
