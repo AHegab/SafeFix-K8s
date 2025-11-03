@@ -39,6 +39,12 @@ RESPONSE_SCHEMA: Dict[str, Any] = {
         "classification": {"type": "string", "enum": ["fix", "ignore", "needs_review"]},
         "patch": {"type": "string"},
         "rationale": {"type": "string"},
+        # Optional enrichments for better downstream hygiene
+        "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+        "rule_ids": {"type": "array", "items": {"type": "string"}},
+        "edits": {"type": "array", "items": {"type": "string"}},
+        "line_hints": {"type": "array", "items": {"type": "integer", "minimum": 1}},
+        "notes": {"type": "string"}
     },
     "required": ["classification", "rationale"],
     "additionalProperties": False,
@@ -61,6 +67,7 @@ def system_prompt() -> str:
         "- The diff must contain '---' and '+++' headers and at least one '@@' hunk. No extra files, no renames, no adds/deletes.\n"
         "- The patch MUST be minimal: only lines necessary for the fix. Preserve unrelated content and formatting.\n"
         "- Ensure the resulting YAML is syntactically valid. If you cannot produce a correct patch, return 'needs_review' and explain why in 'rationale'.\n"
+        "- Include optional 'confidence' in [0,1], 'rule_ids' (e.g., CKV_*/KSV*/OPA), 'edits' summary, and 'line_hints' when known.\n"
         "JSON Schema:" + json.dumps(RESPONSE_SCHEMA, separators=(',', ':'))
     )
 
@@ -81,9 +88,9 @@ def load_dotenv_from_file(path: str = ".env") -> None:
             # Don't clobber already-set env vars
             if k and (k not in os.environ or not os.environ.get(k)):
                 os.environ[k] = v
-    except Exception:
+    except (OSError, UnicodeDecodeError):
         # best-effort; keep silent to avoid breaking runtime
-        pass
+        return
 
 def make_user_prompt(item: Dict[str, Any]) -> str:
     acceptance = {
@@ -91,6 +98,7 @@ def make_user_prompt(item: Dict[str, Any]) -> str:
         "format": "git-style unified diff (---/+++/@@)",
         "valid_yaml": True,
         "minimal": True,
+        "optional_fields": ["confidence (0..1)", "rule_ids", "edits", "line_hints"],
     }
     enriched = dict(item)
     enriched["acceptance"] = acceptance
@@ -219,6 +227,117 @@ def _yaml_is_valid(text: str) -> bool:
     except yaml.YAMLError:  # type: ignore[attr-defined]
         return False
 
+def _apply_hygiene(text: str, _category: str = "") -> tuple[str, List[str]]:
+    """Apply conservative hygiene hardening to K8s YAML while preserving intent.
+    Returns (new_text, applied_rule_names). If PyYAML is not available or YAML invalid, returns input unchanged.
+    Rules (applied only when fields are missing/unsafe):
+      - Flip privileged: true -> false
+      - For pod.spec and all (init)containers securityContext:
+          * allowPrivilegeEscalation: false (if missing)
+          * readOnlyRootFilesystem: true (if missing)
+          * runAsNonRoot: true (if missing)
+          * capabilities.drop includes ALL (if missing)
+    """
+    try:
+        import yaml  # type: ignore
+    except ImportError:
+        return text, []
+
+    applied: List[str] = []
+    try:
+        docs = list(yaml.safe_load_all(text))
+    except yaml.YAMLError:  # type: ignore[attr-defined]
+        return text, []
+
+    def ensure_sc(sc: dict) -> List[str]:
+        local: List[str] = []
+        if sc.get("allowPrivilegeEscalation") is None:
+            sc["allowPrivilegeEscalation"] = False
+            local.append("allowPrivilegeEscalation:false")
+        if sc.get("readOnlyRootFilesystem") is None:
+            sc["readOnlyRootFilesystem"] = True
+            local.append("readOnlyRootFilesystem:true")
+        if sc.get("runAsNonRoot") is None:
+            sc["runAsNonRoot"] = True
+            local.append("runAsNonRoot:true")
+        caps = sc.get("capabilities")
+        if caps is None:
+            caps = {}
+            sc["capabilities"] = caps
+        drop = caps.get("drop")
+        if not isinstance(drop, list):
+            drop = [] if drop is None else ([drop] if isinstance(drop, str) else [])
+            caps["drop"] = drop
+        if "ALL" not in [str(x).upper() for x in drop]:
+            drop.append("ALL")
+            local.append("capabilities.drop+=ALL")
+        return local
+
+    changed = False
+
+    def walk_flip_priv(d: Any) -> None:
+        nonlocal changed
+        if isinstance(d, dict):
+            if d.get("privileged") is True:
+                d["privileged"] = False
+                applied.append("privileged:false")
+                changed = True
+            for v in d.values():
+                walk_flip_priv(v)
+        elif isinstance(d, list):
+            for v in d:
+                walk_flip_priv(v)
+
+    for doc in docs:
+        if not isinstance(doc, dict):
+            continue
+        # Walk spec
+        spec = doc.get("spec")
+        # Support workload controllers with template.spec
+        if isinstance(spec, dict) and "template" in spec and isinstance(spec.get("template"), dict):
+            podspec = spec["template"].get("spec")
+        else:
+            podspec = spec if isinstance(spec, dict) else None
+
+        # Flip privileged: true at any level
+        walk_flip_priv(doc)
+
+        # Pod-level securityContext
+        if isinstance(podspec, dict):
+            psc = podspec.get("securityContext")
+            if psc is None:
+                psc = {}
+                podspec["securityContext"] = psc
+            local = ensure_sc(psc)
+            if local:
+                applied.extend([f"pod.securityContext:{x}" for x in local])
+                changed = True
+
+            for key in ("initContainers", "containers"):
+                arr = podspec.get(key)
+                if not isinstance(arr, list):
+                    continue
+                for idx2, c in enumerate(arr):
+                    if not isinstance(c, dict):
+                        continue
+                    sc = c.get("securityContext")
+                    if sc is None:
+                        sc = {}
+                        c["securityContext"] = sc
+                    local2 = ensure_sc(sc)
+                    if local2:
+                        applied.extend([f"{key}[{idx2}].securityContext:{x}" for x in local2])
+                        changed = True
+
+    if not changed:
+        return text, []
+
+    try:
+        new_text = yaml.safe_dump_all(docs, sort_keys=False)
+        return new_text, applied
+    except yaml.YAMLError:  # type: ignore[attr-defined]
+        return text, []
+
 def _semantic_check(category: str, text: str) -> tuple[bool, str | None]:
     """Lightweight category-aware guardrails to avoid obvious unsafe remnants.
     Returns (ok, reason_if_fail).
@@ -234,7 +353,7 @@ def _semantic_check(category: str, text: str) -> tuple[bool, str | None]:
             return False, "semantic_violation: allowPrivilegeEscalation:true present"
     return True, None
 
-def _validate_and_write_patch(file_path: str, patch: str, idx: int, apply_dir: str, validate_mode: str, category: str = "", autofix: bool = False) -> Dict[str, str]:
+def _validate_and_write_patch(file_path: str, patch: str, idx: int, apply_dir: str, validate_mode: str, category: str = "", autofix: bool = False, hygiene: bool = False) -> Dict[str, Any]:
     """Try to apply a unified diff patch to file_path and optionally YAML-validate.
     Returns a dict like {status: pass|fail|skipped, reason: <text>} and writes the patched file into apply_dir/idx/ on success.
     """
@@ -293,6 +412,13 @@ def _validate_and_write_patch(file_path: str, patch: str, idx: int, apply_dir: s
         else:
             return {"status": "fail", "reason": why or "semantic_violation"}
 
+    # Optional hygiene pass (after basic semantic checks)
+    applied_hygiene: List[str] = []
+    if hygiene:
+        new_text, applied_hygiene = _apply_hygiene(new_text, category)
+        if validate_mode == "yaml" and not _yaml_is_valid(new_text):
+            return {"status": "fail", "reason": "yaml_invalid_after_hygiene"}
+
     # Write to sandbox
     try:
         sandbox = Path(apply_dir) / str(idx)
@@ -302,9 +428,11 @@ def _validate_and_write_patch(file_path: str, patch: str, idx: int, apply_dir: s
     except (OSError, UnicodeDecodeError) as e:
         return {"status": "fail", "reason": f"write_error: {type(e).__name__}: {e}"}
 
-    res: Dict[str, str] = {"status": "pass", "reason": "ok"}
+    res: Dict[str, Any] = {"status": "pass", "reason": "ok", "sandbox_path": str(dst)}
     if autofix_status:
         res["autofix"] = autofix_status
+    if applied_hygiene:
+        res["hygiene"] = {"applied": applied_hygiene}
     return res
 
 def load_payload() -> List[Dict[str, Any]]:
@@ -340,8 +468,11 @@ def _err_with_body(prefix: str, e: Exception) -> str:
     return f"{prefix}: {e}"
 
 class ProviderSkipVote(Exception):
-    """Internal signal to skip counting a provider's vote (e.g., rate-limited)."""
-    pass
+    """Internal signal to skip counting a provider's vote (e.g., rate-limited).
+
+    Raised by a provider adapter to indicate the vote should be ignored
+    (for example due to rate limiting 429), without counting as failure.
+    """
 
 async def call_groq(client: httpx.AsyncClient, prompt: str, timeout_seconds: int) -> str:
     url = "https://api.groq.com/openai/v1/chat/completions"
@@ -531,6 +662,9 @@ async def ask_all(models: List[str], prompt: str, retries: int, timeout_seconds:
         out[m] = res
     return out
 
+def _provider_prio(name: str) -> int:
+    return PROVIDER_PRIORITY.index(name) if name in PROVIDER_PRIORITY else 99
+
 def merge_consensus(votes: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
     counts: Dict[str, int] = {}
     for v in votes.values():
@@ -546,9 +680,11 @@ def merge_consensus(votes: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
     chosen_patch = ""
     chosen_from: Optional[str] = None
     if final_cls == "fix":
-        patches = [(m, v.get("patch", "")) for m, v in votes.items() if v.get("patch")]
+        patches = [(m, v.get("patch", ""), float(v.get("confidence", 0.5))) for m, v in votes.items() if v.get("patch")]
         if patches:
-            chosen_from, chosen_patch = max(patches, key=lambda t: len(t[1]))
+            # Prefer higher confidence; tie-break by patch length
+            best = max(patches, key=lambda t: (t[2], len(t[1])))
+            chosen_from, chosen_patch, _ = best
 
     summary = "; ".join([f"{m}:{v.get('classification')}" for m, v in votes.items()])
     return {"final_classification": final_cls, "final_patch": chosen_patch, "from_model": chosen_from or "",
@@ -566,6 +702,7 @@ def parse_args():
     ap.add_argument("--apply-dir", type=str, default="output/patch_sandbox",
                     help="Directory to write patched files for inspection (created if missing)")
     ap.add_argument("--autofix", action="store_true", help="Conservatively flip privileged:true and allowPrivilegeEscalation:true to false if still present after patch")
+    ap.add_argument("--hygiene", action="store_true", help="After a patch is accepted, apply conservative hygiene (securityContext hardening) before writing")
     return ap.parse_args()
 
 def _mask(s): 
@@ -621,26 +758,27 @@ async def main():
 
         # Build candidate fix patches from votes and try them in provider priority order.
         file_path = str(item.get("file", "")).strip()
-        fix_candidates: List[tuple[str, str]] = [(m, v.get("patch", "")) for m, v in votes.items() if v.get("classification") == "fix" and v.get("patch")]
-        def _prio(name: str) -> int:
-            return PROVIDER_PRIORITY.index(name) if name in PROVIDER_PRIORITY else 99
+        fix_candidates: List[tuple[str, str, float]] = [
+            (m, v.get("patch", ""), float(v.get("confidence", 0.5)))
+            for m, v in votes.items() if v.get("classification") == "fix" and v.get("patch")
+        ]
 
         validation = {"status": "skipped", "reason": "validation disabled"}
         chosen_model = None
         chosen_patch = None
 
         if fix_candidates:
-            # Sort by provider priority, then by patch length desc (as a tie-breaker)
-            fix_candidates.sort(key=lambda t: (_prio(t[0]), -len(t[1])))
+            # Sort by provider priority, then by confidence desc, then patch length desc
+            fix_candidates.sort(key=lambda t: (_provider_prio(t[0]), -t[2], -len(t[1])))
 
             if args.validate == "none":
                 # No validation requested; just pick the top-priority patch
-                chosen_model, chosen_patch = fix_candidates[0]
+                chosen_model, chosen_patch, _ = fix_candidates[0]
                 validation = {"status": "skipped", "reason": "validation disabled"}
             else:
                 last_reason = None
-                for model_name, patch_text in fix_candidates:
-                    vres = _validate_and_write_patch(file_path, patch_text, idx, args.apply_dir, args.validate, str(item.get("category", "")), autofix=args.autofix)
+                for model_name, patch_text, _conf in fix_candidates:
+                    vres = _validate_and_write_patch(file_path, patch_text, idx, args.apply_dir, args.validate, str(item.get("category", "")), autofix=args.autofix, hygiene=args.hygiene)
                     if vres.get("status") == "pass":
                         chosen_model, chosen_patch = model_name, patch_text
                         validation = vres
@@ -650,11 +788,33 @@ async def main():
                 if chosen_patch is None:
                     validation = {"status": "fail", "reason": last_reason or "patch_apply_failed_all"}
 
+        # If no patch was accepted but hygiene is requested, try hygiene-only write for this file
+        if (chosen_patch is None) and args.hygiene and args.validate != "none" and isinstance(file_path, str) and file_path:
+            srcp = Path(file_path)
+            if srcp.exists():
+                try:
+                    orig_text = srcp.read_text(encoding="utf-8")
+                    new_text, applied_hyg = _apply_hygiene(orig_text, str(item.get("category", "")))
+                    if applied_hyg and (not args.validate == "yaml" or _yaml_is_valid(new_text)):
+                        sandbox = Path(args.apply_dir) / str(idx)
+                        dst = sandbox / file_path
+                        dst.parent.mkdir(parents=True, exist_ok=True)
+                        dst.write_text(new_text, encoding="utf-8")
+                        validation = {"status": "pass", "reason": "hygiene_only", "sandbox_path": str(dst), "hygiene": {"applied": applied_hyg}}
+                except (OSError, UnicodeDecodeError):
+                    # ignore hygiene-only attempt errors; keep original validation
+                    pass
+
         # Update merged result based on validation outcome
         if chosen_patch is not None and validation.get("status") == "pass":
             merged["final_classification"] = "fix"
             merged["final_patch"] = chosen_patch
             merged["from_model"] = chosen_model or merged.get("from_model") or ""
+            if chosen_model and chosen_model in votes:
+                try:
+                    merged["confidence"] = float(votes[chosen_model].get("confidence", 0.5))
+                except (TypeError, ValueError):
+                    merged["confidence"] = 0.5
         elif merged.get("final_classification") == "fix" and validation.get("status") == "fail":
             merged["final_classification"] = "needs_review"
             merged["final_patch"] = ""

@@ -1,0 +1,27 @@
+﻿[
+	{
+		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\26.flink_port_mismatch.yaml",
+		"namespace": "main",
+		"successes": 23,
+		"failures": [
+			{
+				"msg": "container \"flink\" must set readOnlyRootFilesystem=true",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "image \"bitnami/flink\" has no tag (use immutable tag or digest)",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "workload must set runAsNonRoot=true at podSecurityContext or container securityContext",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			}
+		]
+	}
+]

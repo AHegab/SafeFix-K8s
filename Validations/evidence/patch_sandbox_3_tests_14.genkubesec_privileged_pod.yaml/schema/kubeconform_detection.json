@@ -1,0 +1,8 @@
+{
+    "filename":  "/scan/14.genkubesec_privileged_pod.yaml",
+    "kind":  "Pod",
+    "name":  "pod-name",
+    "version":  "v1",
+    "status":  "statusError",
+    "msg":  "failed downloading schema at https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/master-standalone-strict/pod-v1.json: Get \"https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/master-standalone-strict/pod-v1.json\": GET https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/master-standalone-strict/pod-v1.json giving up after 1 attempt(s): Get \"https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/master-standalone-strict/pod-v1.json\": tls: failed to verify certificate: x509: certificate signed by unknown authority"
+}

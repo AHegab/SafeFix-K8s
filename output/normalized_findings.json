@@ -1,16 +1,4045 @@
 {
+  "generated_at": "2025-11-03T10:57:17Z",
+  "raw_findings": 1336,
   "aggregate": [
     {
-      "file": "scan/3.multus_cni_misconfig.yaml",
-      "category": "CNI_EMBEDDED_PRIVILEGED",
+      "file": "13.nginx_privileged_deployment.yaml",
+      "category": "CAP_SYS_ADMIN",
+      "severity": "CRITICAL",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_37",
+        "KSV003",
+        "KSV004",
+        "KSV106"
+      ],
+      "examples": [
+        "Minimize the admission of containers with capabilities assigned",
+        "Default capabilities: some containers do not drop all",
+        "Default capabilities: some containers do not drop any"
+      ],
+      "occurrences": 4
+    },
+    {
+      "file": "14.deployment_single_replica.yaml",
+      "category": "CAP_SYS_ADMIN",
+      "severity": "CRITICAL",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_37",
+        "KSV003",
+        "KSV004",
+        "KSV106"
+      ],
+      "examples": [
+        "Minimize the admission of containers with capabilities assigned",
+        "Default capabilities: some containers do not drop all",
+        "Default capabilities: some containers do not drop any"
+      ],
+      "occurrences": 4
+    },
+    {
+      "file": "14.genkubesec_privileged_pod.yaml",
+      "category": "CAP_SYS_ADMIN",
+      "severity": "CRITICAL",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_37",
+        "KSV003",
+        "KSV004",
+        "KSV106"
+      ],
+      "examples": [
+        "Minimize the admission of containers with capabilities assigned",
+        "Default capabilities: some containers do not drop all",
+        "Default capabilities: some containers do not drop any"
+      ],
+      "occurrences": 4
+    },
+    {
+      "file": "15.pod_privilege_escalation.yaml",
+      "category": "CAP_SYS_ADMIN",
+      "severity": "CRITICAL",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_37",
+        "KSV003",
+        "KSV004",
+        "KSV106"
+      ],
+      "examples": [
+        "Minimize the admission of containers with capabilities assigned",
+        "Default capabilities: some containers do not drop all",
+        "Default capabilities: some containers do not drop any"
+      ],
+      "occurrences": 4
+    },
+    {
+      "file": "16.busybox_pod_missing_memory.yaml",
+      "category": "CAP_SYS_ADMIN",
+      "severity": "CRITICAL",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_37",
+        "KSV003",
+        "KSV004",
+        "KSV106"
+      ],
+      "examples": [
+        "Minimize the admission of containers with capabilities assigned",
+        "Default capabilities: some containers do not drop all",
+        "Default capabilities: some containers do not drop any"
+      ],
+      "occurrences": 4
+    },
+    {
+      "file": "26.flink_port_mismatch.yaml",
+      "category": "CAP_SYS_ADMIN",
+      "severity": "CRITICAL",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_37",
+        "KSV003",
+        "KSV004",
+        "KSV106"
+      ],
+      "examples": [
+        "Minimize the admission of containers with capabilities assigned",
+        "Default capabilities: some containers do not drop all",
+        "Default capabilities: some containers do not drop any"
+      ],
+      "occurrences": 4
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "CAP_SYS_ADMIN",
+      "severity": "CRITICAL",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_37",
+        "KSV003",
+        "KSV004",
+        "KSV106"
+      ],
+      "examples": [
+        "Minimize the admission of containers with capabilities assigned",
+        "Default capabilities: some containers do not drop all",
+        "Default capabilities: some containers do not drop any"
+      ],
+      "occurrences": 4
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "CAP_SYS_ADMIN",
+      "severity": "CRITICAL",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_37",
+        "KSV003",
+        "KSV004",
+        "KSV106"
+      ],
+      "examples": [
+        "Minimize the admission of containers with capabilities assigned",
+        "Default capabilities: some containers do not drop all",
+        "Default capabilities: some containers do not drop any"
+      ],
+      "occurrences": 4
+    },
+    {
+      "file": "scan/13.jenkins_agent_pod.yaml",
+      "category": "CAP_SYS_ADMIN",
+      "severity": "CRITICAL",
+      "tools": [
+        "Conftest",
+        "KubeAudit"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CapabilityOrSecurityContextMissing"
+      ],
+      "examples": [
+        "Conftest",
+        "CapabilityOrSecurityContextMissing"
+      ],
+      "occurrences": 3
+    },
+    {
+      "file": "scan/13.jenkins_agent_pod.yaml",
+      "category": "HOSTPATH",
+      "severity": "CRITICAL",
+      "tools": [
+        "Conftest",
+        "KubeAudit"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "SensitivePathsMounted"
+      ],
+      "examples": [
+        "Conftest",
+        "SensitivePathsMounted"
+      ],
+      "occurrences": 4
+    },
+    {
+      "file": "scan/13.nginx_privileged_deployment.yaml",
+      "category": "CAP_SYS_ADMIN",
+      "severity": "CRITICAL",
+      "tools": [
+        "Conftest",
+        "KubeAudit"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CapabilityOrSecurityContextMissing"
+      ],
+      "examples": [
+        "Conftest",
+        "CapabilityOrSecurityContextMissing"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "scan/14.deployment_single_replica.yaml",
+      "category": "CAP_SYS_ADMIN",
+      "severity": "CRITICAL",
+      "tools": [
+        "Conftest",
+        "KubeAudit"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CapabilityOrSecurityContextMissing"
+      ],
+      "examples": [
+        "Conftest",
+        "CapabilityOrSecurityContextMissing"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "scan/14.genkubesec_privileged_pod.yaml",
+      "category": "CAP_SYS_ADMIN",
+      "severity": "CRITICAL",
+      "tools": [
+        "Conftest",
+        "KubeAudit"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CapabilityOrSecurityContextMissing"
+      ],
+      "examples": [
+        "Conftest",
+        "CapabilityOrSecurityContextMissing"
+      ],
+      "occurrences": 3
+    },
+    {
+      "file": "scan/15.pod_privilege_escalation.yaml",
+      "category": "CAP_SYS_ADMIN",
+      "severity": "CRITICAL",
+      "tools": [
+        "Conftest",
+        "KubeAudit"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CapabilityOrSecurityContextMissing"
+      ],
+      "examples": [
+        "Conftest",
+        "CapabilityOrSecurityContextMissing"
+      ],
+      "occurrences": 3
+    },
+    {
+      "file": "scan/16.busybox_pod_missing_memory.yaml",
+      "category": "CAP_SYS_ADMIN",
+      "severity": "CRITICAL",
+      "tools": [
+        "Conftest",
+        "KubeAudit"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CapabilityOrSecurityContextMissing"
+      ],
+      "examples": [
+        "Conftest",
+        "CapabilityOrSecurityContextMissing"
+      ],
+      "occurrences": 3
+    },
+    {
+      "file": "scan/26.flink_port_mismatch.yaml",
+      "category": "CAP_SYS_ADMIN",
+      "severity": "CRITICAL",
+      "tools": [
+        "Conftest",
+        "KubeAudit"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CapabilityOrSecurityContextMissing"
+      ],
+      "examples": [
+        "Conftest",
+        "CapabilityOrSecurityContextMissing"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "scan/3.efs_plugin_misconfig.yaml",
+      "category": "CAP_SYS_ADMIN",
+      "severity": "CRITICAL",
+      "tools": [
+        "Conftest",
+        "KubeAudit"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CapabilityOrSecurityContextMissing"
+      ],
+      "examples": [
+        "Conftest",
+        "CapabilityOrSecurityContextMissing"
+      ],
+      "occurrences": 3
+    },
+    {
+      "file": "scan/3.nginx_pod_example.yaml",
+      "category": "CAP_SYS_ADMIN",
+      "severity": "CRITICAL",
+      "tools": [
+        "Conftest",
+        "KubeAudit"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CapabilityOrSecurityContextMissing"
+      ],
+      "examples": [
+        "Conftest",
+        "CapabilityOrSecurityContextMissing"
+      ],
+      "occurrences": 3
+    },
+    {
+      "file": "13.nginx_privileged_deployment.yaml",
+      "category": "PRIVILEGED",
+      "severity": "CRITICAL",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_22"
+      ],
+      "examples": [
+        "Use read-only filesystem for containers where possible"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "14.deployment_single_replica.yaml",
+      "category": "PRIVILEGED",
+      "severity": "CRITICAL",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_22"
+      ],
+      "examples": [
+        "Use read-only filesystem for containers where possible"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "14.genkubesec_privileged_pod.yaml",
+      "category": "PRIVILEGED",
+      "severity": "CRITICAL",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_22"
+      ],
+      "examples": [
+        "Use read-only filesystem for containers where possible"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "15.pod_privilege_escalation.yaml",
+      "category": "PRIVILEGED",
+      "severity": "CRITICAL",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_22"
+      ],
+      "examples": [
+        "Use read-only filesystem for containers where possible"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "16.busybox_pod_missing_memory.yaml",
+      "category": "PRIVILEGED",
+      "severity": "CRITICAL",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_22"
+      ],
+      "examples": [
+        "Use read-only filesystem for containers where possible"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "26.flink_port_mismatch.yaml",
+      "category": "PRIVILEGED",
+      "severity": "CRITICAL",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_22"
+      ],
+      "examples": [
+        "Use read-only filesystem for containers where possible"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "PRIVILEGED",
+      "severity": "CRITICAL",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_22"
+      ],
+      "examples": [
+        "Use read-only filesystem for containers where possible"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "PRIVILEGED",
+      "severity": "CRITICAL",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_22"
+      ],
+      "examples": [
+        "Use read-only filesystem for containers where possible"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "Deployment/flink",
+      "category": "CAP_SYS_ADMIN",
+      "severity": "CRITICAL",
+      "tools": [
+        "Polaris"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "insecureCapabilities",
+        "linuxHardening"
+      ],
+      "examples": [
+        "insecureCapabilities",
+        "linuxHardening"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "Deployment/nginx-deployment",
+      "category": "CAP_SYS_ADMIN",
+      "severity": "CRITICAL",
+      "tools": [
+        "Polaris"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "insecureCapabilities",
+        "linuxHardening"
+      ],
+      "examples": [
+        "insecureCapabilities",
+        "linuxHardening"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "Deployment/single-replica-deployment",
+      "category": "CAP_SYS_ADMIN",
+      "severity": "CRITICAL",
+      "tools": [
+        "Polaris"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "insecureCapabilities",
+        "linuxHardening"
+      ],
+      "examples": [
+        "insecureCapabilities",
+        "linuxHardening"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "Pod/efs-plugin",
+      "category": "CAP_SYS_ADMIN",
+      "severity": "CRITICAL",
+      "tools": [
+        "Polaris"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "insecureCapabilities",
+        "linuxHardening"
+      ],
+      "examples": [
+        "insecureCapabilities",
+        "linuxHardening"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "Pod/example-pod",
+      "category": "CAP_SYS_ADMIN",
+      "severity": "CRITICAL",
+      "tools": [
+        "Polaris"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "insecureCapabilities",
+        "linuxHardening"
+      ],
+      "examples": [
+        "insecureCapabilities",
+        "linuxHardening"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "Pod/nginx",
+      "category": "CAP_SYS_ADMIN",
+      "severity": "CRITICAL",
+      "tools": [
+        "Polaris"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "insecureCapabilities",
+        "linuxHardening"
+      ],
+      "examples": [
+        "insecureCapabilities",
+        "linuxHardening"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "Pod/pod-name",
+      "category": "CAP_SYS_ADMIN",
+      "severity": "CRITICAL",
+      "tools": [
+        "Polaris"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "insecureCapabilities",
+        "linuxHardening"
+      ],
+      "examples": [
+        "insecureCapabilities",
+        "linuxHardening"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "busybox-namespace/Pod/busybox-pod",
+      "category": "CAP_SYS_ADMIN",
+      "severity": "CRITICAL",
+      "tools": [
+        "Polaris"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "insecureCapabilities",
+        "linuxHardening"
+      ],
+      "examples": [
+        "insecureCapabilities",
+        "linuxHardening"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "busybox-pod",
+      "category": "PRIV_ESCALATION",
+      "severity": "CRITICAL",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0016"
+      ],
+      "examples": [
+        "C-0016"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "efs-plugin",
+      "category": "PRIVILEGED",
+      "severity": "CRITICAL",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0057"
+      ],
+      "examples": [
+        "C-0057"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "efs-plugin",
+      "category": "PRIV_ESCALATION",
+      "severity": "CRITICAL",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0016"
+      ],
+      "examples": [
+        "C-0016"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "example-pod",
+      "category": "PRIV_ESCALATION",
+      "severity": "CRITICAL",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0016"
+      ],
+      "examples": [
+        "C-0016"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "flink",
+      "category": "PRIV_ESCALATION",
+      "severity": "CRITICAL",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0016"
+      ],
+      "examples": [
+        "C-0016"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "nginx",
+      "category": "PRIV_ESCALATION",
+      "severity": "CRITICAL",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0016"
+      ],
+      "examples": [
+        "C-0016"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "nginx-deployment",
+      "category": "PRIVILEGED",
+      "severity": "CRITICAL",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0057"
+      ],
+      "examples": [
+        "C-0057"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "nginx-deployment",
+      "category": "PRIV_ESCALATION",
+      "severity": "CRITICAL",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0016"
+      ],
+      "examples": [
+        "C-0016"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "pod-name",
+      "category": "PRIVILEGED",
+      "severity": "CRITICAL",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0057"
+      ],
+      "examples": [
+        "C-0057"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "pod-name",
+      "category": "PRIV_ESCALATION",
+      "severity": "CRITICAL",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0016"
+      ],
+      "examples": [
+        "C-0016"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/13.jenkins_agent_pod.yaml",
+      "category": "PRIV_ESCALATION",
+      "severity": "CRITICAL",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "examples": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/13.nginx_privileged_deployment.yaml",
+      "category": "PRIVILEGED",
+      "severity": "CRITICAL",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "PrivilegedTrue"
+      ],
+      "examples": [
+        "PrivilegedTrue"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/13.nginx_privileged_deployment.yaml",
+      "category": "PRIV_ESCALATION",
+      "severity": "CRITICAL",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "examples": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/14.deployment_single_replica.yaml",
+      "category": "PRIV_ESCALATION",
+      "severity": "CRITICAL",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "examples": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/14.genkubesec_privileged_pod.yaml",
+      "category": "PRIVILEGED",
+      "severity": "CRITICAL",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "PrivilegedTrue"
+      ],
+      "examples": [
+        "PrivilegedTrue"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/14.genkubesec_privileged_pod.yaml",
+      "category": "PRIV_ESCALATION",
+      "severity": "CRITICAL",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "examples": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/15.pod_privilege_escalation.yaml",
+      "category": "PRIV_ESCALATION",
+      "severity": "CRITICAL",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AllowPrivilegeEscalationTrue"
+      ],
+      "examples": [
+        "AllowPrivilegeEscalationTrue"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/16.busybox_pod_missing_memory.yaml",
+      "category": "PRIV_ESCALATION",
+      "severity": "CRITICAL",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "examples": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/26.flink_port_mismatch.yaml",
+      "category": "PRIV_ESCALATION",
+      "severity": "CRITICAL",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "examples": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/3.efs_plugin_misconfig.yaml",
+      "category": "PRIVILEGED",
+      "severity": "CRITICAL",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "PrivilegedTrue"
+      ],
+      "examples": [
+        "PrivilegedTrue"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/3.efs_plugin_misconfig.yaml",
+      "category": "PRIV_ESCALATION",
+      "severity": "CRITICAL",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "examples": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/3.nginx_pod_example.yaml",
+      "category": "PRIV_ESCALATION",
+      "severity": "CRITICAL",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "examples": [
+        "AllowPrivilegeEscalationNil"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "single-replica-deployment",
+      "category": "PRIV_ESCALATION",
+      "severity": "CRITICAL",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0016"
+      ],
+      "examples": [
+        "C-0016"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "13.nginx_privileged_deployment.yaml",
+      "category": "NO_SECCOMP",
+      "severity": "HIGH",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_31",
+        "KSV104"
+      ],
+      "examples": [
+        "Ensure that the seccomp profile is set to docker/default or runtime/default",
+        "Seccomp policies disabled"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "14.deployment_single_replica.yaml",
+      "category": "NO_SECCOMP",
+      "severity": "HIGH",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_30",
+        "CKV_K8S_31",
+        "KSV104"
+      ],
+      "examples": [
+        "Apply security context to your containers",
+        "Ensure that the seccomp profile is set to docker/default or runtime/default",
+        "Seccomp policies disabled"
+      ],
+      "occurrences": 3
+    },
+    {
+      "file": "14.genkubesec_privileged_pod.yaml",
+      "category": "NO_SECCOMP",
+      "severity": "HIGH",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_31",
+        "KSV104"
+      ],
+      "examples": [
+        "Ensure that the seccomp profile is set to docker/default or runtime/default",
+        "Seccomp policies disabled"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "15.pod_privilege_escalation.yaml",
+      "category": "NO_SECCOMP",
+      "severity": "HIGH",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_31",
+        "KSV104"
+      ],
+      "examples": [
+        "Ensure that the seccomp profile is set to docker/default or runtime/default",
+        "Seccomp policies disabled"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "16.busybox_pod_missing_memory.yaml",
+      "category": "NO_SECCOMP",
+      "severity": "HIGH",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_30",
+        "CKV_K8S_31",
+        "KSV104"
+      ],
+      "examples": [
+        "Apply security context to your containers",
+        "Ensure that the seccomp profile is set to docker/default or runtime/default",
+        "Seccomp policies disabled"
+      ],
+      "occurrences": 3
+    },
+    {
+      "file": "26.flink_port_mismatch.yaml",
+      "category": "NO_SECCOMP",
+      "severity": "HIGH",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_30",
+        "CKV_K8S_31",
+        "KSV104"
+      ],
+      "examples": [
+        "Apply security context to your containers",
+        "Ensure that the seccomp profile is set to docker/default or runtime/default",
+        "Seccomp policies disabled"
+      ],
+      "occurrences": 3
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "NO_SECCOMP",
+      "severity": "HIGH",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_31",
+        "KSV104"
+      ],
+      "examples": [
+        "Ensure that the seccomp profile is set to docker/default or runtime/default",
+        "Seccomp policies disabled"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "NO_SECCOMP",
+      "severity": "HIGH",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_30",
+        "CKV_K8S_31",
+        "KSV104"
+      ],
+      "examples": [
+        "Apply security context to your containers",
+        "Ensure that the seccomp profile is set to docker/default or runtime/default",
+        "Seccomp policies disabled"
+      ],
+      "occurrences": 3
+    },
+    {
+      "file": "scan/13.jenkins_agent_pod.yaml",
+      "category": "HARD_CODED_CREDS",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest",
+        "KubeAudit"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "examples": [
+        "Conftest",
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "scan/13.nginx_privileged_deployment.yaml",
+      "category": "HARD_CODED_CREDS",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest",
+        "KubeAudit"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "examples": [
+        "Conftest",
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "scan/14.deployment_single_replica.yaml",
+      "category": "HARD_CODED_CREDS",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest",
+        "KubeAudit"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "examples": [
+        "Conftest",
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "scan/14.genkubesec_privileged_pod.yaml",
+      "category": "HARD_CODED_CREDS",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest",
+        "KubeAudit"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "examples": [
+        "Conftest",
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "scan/15.pod_privilege_escalation.yaml",
+      "category": "HARD_CODED_CREDS",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest",
+        "KubeAudit"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "examples": [
+        "Conftest",
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "scan/16.busybox_pod_missing_memory.yaml",
+      "category": "HARD_CODED_CREDS",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest",
+        "KubeAudit"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "examples": [
+        "Conftest",
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "scan/26.flink_port_mismatch.yaml",
+      "category": "HARD_CODED_CREDS",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest",
+        "KubeAudit"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "examples": [
+        "Conftest",
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "scan/3.efs_plugin_misconfig.yaml",
+      "category": "HARD_CODED_CREDS",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest",
+        "KubeAudit"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "examples": [
+        "Conftest",
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "scan/3.nginx_pod_example.yaml",
+      "category": "HARD_CODED_CREDS",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest",
+        "KubeAudit"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "examples": [
+        "Conftest",
+        "AutomountServiceAccountTokenTrueAndDefaultSA"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "(unknown)",
+      "category": "NO_SECCOMP",
+      "severity": "HIGH",
+      "tools": [
+        "kubescore_raw.json"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-seccomp-profile"
+      ],
+      "examples": [
+        "Container Seccomp Profile",
+        "Skipped because container-seccomp-profile is ignored"
+      ],
+      "occurrences": 18
+    },
+    {
+      "file": "13.nginx_privileged_deployment.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_23"
+      ],
+      "examples": [
+        "Minimize the admission of root containers"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "13.nginx_privileged_deployment.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_16"
+      ],
+      "examples": [
+        "Container should not be privileged"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "14.deployment_single_replica.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_23"
+      ],
+      "examples": [
+        "Minimize the admission of root containers"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "14.genkubesec_privileged_pod.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_23"
+      ],
+      "examples": [
+        "Minimize the admission of root containers"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "14.genkubesec_privileged_pod.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_16"
+      ],
+      "examples": [
+        "Container should not be privileged"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "15.pod_privilege_escalation.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_23"
+      ],
+      "examples": [
+        "Minimize the admission of root containers"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "16.busybox_pod_missing_memory.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_23"
+      ],
+      "examples": [
+        "Minimize the admission of root containers"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "26.flink_port_mismatch.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_23"
+      ],
+      "examples": [
+        "Minimize the admission of root containers"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_23"
+      ],
+      "examples": [
+        "Minimize the admission of root containers"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_16"
+      ],
+      "examples": [
+        "Container should not be privileged"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_23"
+      ],
+      "examples": [
+        "Minimize the admission of root containers"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/20.wordpress_mariadb_compose.yaml",
+      "category": "HARD_CODED_CREDS",
+      "severity": "HIGH",
+      "tools": [
+        "Gitleaks"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "plaintext-password-key"
+      ],
+      "examples": [
+        "plaintext-password-key"
+      ],
+      "occurrences": 3
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/29.helm_rabbitmq_hardcoded_credentials.yaml",
+      "category": "HARD_CODED_CREDS",
+      "severity": "HIGH",
+      "tools": [
+        "Gitleaks"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "plaintext-password-key"
+      ],
+      "examples": [
+        "plaintext-password-key"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/34.unencrypted_secret.yaml",
+      "category": "HARD_CODED_CREDS",
+      "severity": "HIGH",
+      "tools": [
+        "Gitleaks"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "plaintext-password-key"
+      ],
+      "examples": [
+        "plaintext-password-key"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "busybox-pod",
+      "category": "NO_SECCOMP",
+      "severity": "HIGH",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0055"
+      ],
+      "examples": [
+        "C-0055"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "busybox-pod",
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0017"
+      ],
+      "examples": [
+        "C-0017"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "busybox-pod",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0013"
+      ],
+      "examples": [
+        "C-0013"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "efs-plugin",
+      "category": "NO_SECCOMP",
+      "severity": "HIGH",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0055"
+      ],
+      "examples": [
+        "C-0055"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "efs-plugin",
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0017"
+      ],
+      "examples": [
+        "C-0017"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "efs-plugin",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0013"
+      ],
+      "examples": [
+        "C-0013"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "example-pod",
+      "category": "NO_SECCOMP",
+      "severity": "HIGH",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0055"
+      ],
+      "examples": [
+        "C-0055"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "example-pod",
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0017"
+      ],
+      "examples": [
+        "C-0017"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "example-pod",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0013"
+      ],
+      "examples": [
+        "C-0013"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "flink",
+      "category": "NO_SECCOMP",
+      "severity": "HIGH",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0055"
+      ],
+      "examples": [
+        "C-0055"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "flink",
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0017"
+      ],
+      "examples": [
+        "C-0017"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "flink",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0013"
+      ],
+      "examples": [
+        "C-0013"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "nginx",
+      "category": "NO_SECCOMP",
+      "severity": "HIGH",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0055"
+      ],
+      "examples": [
+        "C-0055"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "nginx",
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0017"
+      ],
+      "examples": [
+        "C-0017"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "nginx",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0013"
+      ],
+      "examples": [
+        "C-0013"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "nginx-deployment",
+      "category": "NO_SECCOMP",
+      "severity": "HIGH",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0055"
+      ],
+      "examples": [
+        "C-0055"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "nginx-deployment",
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0017"
+      ],
+      "examples": [
+        "C-0017"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "nginx-deployment",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0013"
+      ],
+      "examples": [
+        "C-0013"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "pod-name",
+      "category": "NO_SECCOMP",
+      "severity": "HIGH",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0055"
+      ],
+      "examples": [
+        "C-0055"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "pod-name",
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0017"
+      ],
+      "examples": [
+        "C-0017"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "pod-name",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0013"
+      ],
+      "examples": [
+        "C-0013"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/13.jenkins_agent_pod.yaml",
+      "category": "NO_APPARMOR",
+      "severity": "HIGH",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AppArmorAnnotationMissing"
+      ],
+      "examples": [
+        "AppArmorAnnotationMissing"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/13.jenkins_agent_pod.yaml",
+      "category": "NO_SECCOMP",
+      "severity": "HIGH",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "SeccompProfileMissing"
+      ],
+      "examples": [
+        "SeccompProfileMissing"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/13.jenkins_agent_pod.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "examples": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/13.nginx_privileged_deployment.yaml",
+      "category": "NO_APPARMOR",
+      "severity": "HIGH",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AppArmorAnnotationMissing"
+      ],
+      "examples": [
+        "AppArmorAnnotationMissing"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/13.nginx_privileged_deployment.yaml",
+      "category": "NO_SECCOMP",
+      "severity": "HIGH",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "SeccompProfileMissing"
+      ],
+      "examples": [
+        "SeccompProfileMissing"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/13.nginx_privileged_deployment.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "examples": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/14.deployment_single_replica.yaml",
+      "category": "NO_APPARMOR",
+      "severity": "HIGH",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AppArmorAnnotationMissing"
+      ],
+      "examples": [
+        "AppArmorAnnotationMissing"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/14.deployment_single_replica.yaml",
+      "category": "NO_SECCOMP",
+      "severity": "HIGH",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "SeccompProfileMissing"
+      ],
+      "examples": [
+        "SeccompProfileMissing"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/14.deployment_single_replica.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "examples": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/14.genkubesec_privileged_pod.yaml",
+      "category": "NO_APPARMOR",
+      "severity": "HIGH",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AppArmorAnnotationMissing"
+      ],
+      "examples": [
+        "AppArmorAnnotationMissing"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/14.genkubesec_privileged_pod.yaml",
+      "category": "NO_SECCOMP",
+      "severity": "HIGH",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "SeccompProfileMissing"
+      ],
+      "examples": [
+        "SeccompProfileMissing"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/14.genkubesec_privileged_pod.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "examples": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/15.pod_privilege_escalation.yaml",
+      "category": "NO_APPARMOR",
+      "severity": "HIGH",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AppArmorAnnotationMissing"
+      ],
+      "examples": [
+        "AppArmorAnnotationMissing"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/15.pod_privilege_escalation.yaml",
+      "category": "NO_SECCOMP",
+      "severity": "HIGH",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "SeccompProfileMissing"
+      ],
+      "examples": [
+        "SeccompProfileMissing"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/15.pod_privilege_escalation.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "examples": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/16.busybox_pod_missing_memory.yaml",
+      "category": "NO_APPARMOR",
+      "severity": "HIGH",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AppArmorAnnotationMissing"
+      ],
+      "examples": [
+        "AppArmorAnnotationMissing"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/16.busybox_pod_missing_memory.yaml",
+      "category": "NO_SECCOMP",
+      "severity": "HIGH",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "SeccompProfileMissing"
+      ],
+      "examples": [
+        "SeccompProfileMissing"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/16.busybox_pod_missing_memory.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "examples": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/26.flink_port_mismatch.yaml",
+      "category": "NO_APPARMOR",
+      "severity": "HIGH",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AppArmorAnnotationMissing"
+      ],
+      "examples": [
+        "AppArmorAnnotationMissing"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/26.flink_port_mismatch.yaml",
+      "category": "NO_SECCOMP",
+      "severity": "HIGH",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "SeccompProfileMissing"
+      ],
+      "examples": [
+        "SeccompProfileMissing"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/26.flink_port_mismatch.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "examples": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/3.efs_plugin_misconfig.yaml",
+      "category": "NO_APPARMOR",
+      "severity": "HIGH",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AppArmorAnnotationMissing"
+      ],
+      "examples": [
+        "AppArmorAnnotationMissing"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/3.efs_plugin_misconfig.yaml",
+      "category": "NO_SECCOMP",
+      "severity": "HIGH",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "SeccompProfileMissing"
+      ],
+      "examples": [
+        "SeccompProfileMissing"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/3.efs_plugin_misconfig.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "examples": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/3.nginx_pod_example.yaml",
+      "category": "NO_APPARMOR",
+      "severity": "HIGH",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "AppArmorAnnotationMissing"
+      ],
+      "examples": [
+        "AppArmorAnnotationMissing"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/3.nginx_pod_example.yaml",
+      "category": "NO_SECCOMP",
+      "severity": "HIGH",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "SeccompProfileMissing"
+      ],
+      "examples": [
+        "SeccompProfileMissing"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/3.nginx_pod_example.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "KubeAudit"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "examples": [
+        "ReadOnlyRootFilesystemNil"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/34.unencrypted_secret.yaml",
+      "category": "HARD_CODED_CREDS",
+      "severity": "HIGH",
       "tools": [
         "Conftest"
       ],
       "support_count": 1,
       "rule_ids": [],
       "examples": [
-        "Conftest",
         "Conftest"
+      ],
+      "occurrences": 4
+    },
+    {
+      "file": "single-replica-deployment",
+      "category": "NO_SECCOMP",
+      "severity": "HIGH",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0055"
+      ],
+      "examples": [
+        "C-0055"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "single-replica-deployment",
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0017"
+      ],
+      "examples": [
+        "C-0017"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "single-replica-deployment",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0013"
+      ],
+      "examples": [
+        "C-0013"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "13.nginx_privileged_deployment.yaml",
+      "category": "IMAGE_LATEST",
+      "severity": "MEDIUM",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_14",
+        "KSV013"
+      ],
+      "examples": [
+        "Image Tag should be fixed - not latest or blank",
+        "Image tag \":latest\" used"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "13.nginx_privileged_deployment.yaml",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "MEDIUM",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_21",
+        "KSV110",
+        "KSV118"
+      ],
+      "examples": [
+        "The default namespace should not be used",
+        "Workloads in the default namespace",
+        "Default security context configured"
+      ],
+      "occurrences": 3
+    },
+    {
+      "file": "14.deployment_single_replica.yaml",
+      "category": "IMAGE_LATEST",
+      "severity": "MEDIUM",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_14",
+        "KSV013"
+      ],
+      "examples": [
+        "Image Tag should be fixed - not latest or blank",
+        "Image tag \":latest\" used"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "14.deployment_single_replica.yaml",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "MEDIUM",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_21",
+        "KSV110",
+        "KSV118"
+      ],
+      "examples": [
+        "The default namespace should not be used",
+        "Workloads in the default namespace",
+        "Default security context configured"
+      ],
+      "occurrences": 4
+    },
+    {
+      "file": "14.genkubesec_privileged_pod.yaml",
+      "category": "IMAGE_LATEST",
+      "severity": "MEDIUM",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_14",
+        "KSV013"
+      ],
+      "examples": [
+        "Image Tag should be fixed - not latest or blank",
+        "Image tag \":latest\" used"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "14.genkubesec_privileged_pod.yaml",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "MEDIUM",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_21",
+        "KSV110",
+        "KSV118"
+      ],
+      "examples": [
+        "The default namespace should not be used",
+        "Workloads in the default namespace",
+        "Default security context configured"
+      ],
+      "occurrences": 3
+    },
+    {
+      "file": "15.pod_privilege_escalation.yaml",
+      "category": "IMAGE_LATEST",
+      "severity": "MEDIUM",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_14",
+        "KSV013"
+      ],
+      "examples": [
+        "Image Tag should be fixed - not latest or blank",
+        "Image tag \":latest\" used"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "15.pod_privilege_escalation.yaml",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "MEDIUM",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_21",
+        "KSV110",
+        "KSV118"
+      ],
+      "examples": [
+        "The default namespace should not be used",
+        "Workloads in the default namespace",
+        "Default security context configured"
+      ],
+      "occurrences": 3
+    },
+    {
+      "file": "26.flink_port_mismatch.yaml",
+      "category": "IMAGE_LATEST",
+      "severity": "MEDIUM",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_14",
+        "KSV013"
+      ],
+      "examples": [
+        "Image Tag should be fixed - not latest or blank",
+        "Image tag \":latest\" used"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "26.flink_port_mismatch.yaml",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "MEDIUM",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_21",
+        "KSV110",
+        "KSV118"
+      ],
+      "examples": [
+        "The default namespace should not be used",
+        "Workloads in the default namespace",
+        "Default security context configured"
+      ],
+      "occurrences": 4
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "MEDIUM",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_21",
+        "KSV110",
+        "KSV118"
+      ],
+      "examples": [
+        "The default namespace should not be used",
+        "Workloads in the default namespace",
+        "Default security context configured"
+      ],
+      "occurrences": 3
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "MEDIUM",
+      "tools": [
+        "Checkov",
+        "Trivy"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "CKV_K8S_21",
+        "KSV110",
+        "KSV117",
+        "KSV118"
+      ],
+      "examples": [
+        "The default namespace should not be used",
+        "Workloads in the default namespace",
+        "Prevent binding to privileged ports"
+      ],
+      "occurrences": 5
+    },
+    {
+      "file": "13.nginx_privileged_deployment.yaml",
+      "category": "SERVICEACCOUNT_TOKEN_AUTO",
+      "severity": "MEDIUM",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_20"
+      ],
+      "examples": [
+        "Containers should not run with allowPrivilegeEscalation"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "14.deployment_single_replica.yaml",
+      "category": "SERVICEACCOUNT_TOKEN_AUTO",
+      "severity": "MEDIUM",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_20"
+      ],
+      "examples": [
+        "Containers should not run with allowPrivilegeEscalation"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "14.genkubesec_privileged_pod.yaml",
+      "category": "SERVICEACCOUNT_TOKEN_AUTO",
+      "severity": "MEDIUM",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_20"
+      ],
+      "examples": [
+        "Containers should not run with allowPrivilegeEscalation"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "14.ingress_deprecated_api.yaml",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "MEDIUM",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_21"
+      ],
+      "examples": [
+        "The default namespace should not be used"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "15.pod_privilege_escalation.yaml",
+      "category": "SERVICEACCOUNT_TOKEN_AUTO",
+      "severity": "MEDIUM",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_20"
+      ],
+      "examples": [
+        "Containers should not run with allowPrivilegeEscalation"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "16.busybox_pod_missing_memory.yaml",
+      "category": "SERVICEACCOUNT_TOKEN_AUTO",
+      "severity": "MEDIUM",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_20"
+      ],
+      "examples": [
+        "Containers should not run with allowPrivilegeEscalation"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "26.flink_port_mismatch.yaml",
+      "category": "SERVICEACCOUNT_TOKEN_AUTO",
+      "severity": "MEDIUM",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_20"
+      ],
+      "examples": [
+        "Containers should not run with allowPrivilegeEscalation"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "27.kubeteus_misconfigured_policy.yaml",
+      "category": "NETWORK_POLICY_MISSING",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV038"
+      ],
+      "examples": [
+        "Selector usage in network policies"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "28.role_overly_permissive.yaml",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "MEDIUM",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_21"
+      ],
+      "examples": [
+        "The default namespace should not be used"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "SERVICEACCOUNT_TOKEN_AUTO",
+      "severity": "MEDIUM",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_20"
+      ],
+      "examples": [
+        "Containers should not run with allowPrivilegeEscalation"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "SERVICEACCOUNT_TOKEN_AUTO",
+      "severity": "MEDIUM",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_20"
+      ],
+      "examples": [
+        "Containers should not run with allowPrivilegeEscalation"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "34.unencrypted_secret.yaml",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "MEDIUM",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_21"
+      ],
+      "examples": [
+        "The default namespace should not be used"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "busybox-pod",
+      "category": "NETWORK_POLICY_MISSING",
+      "severity": "MEDIUM",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0030",
+        "C-0260"
+      ],
+      "examples": [
+        "C-0030",
+        "C-0260"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "efs-plugin",
+      "category": "NETWORK_POLICY_MISSING",
+      "severity": "MEDIUM",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0030",
+        "C-0260"
+      ],
+      "examples": [
+        "C-0030",
+        "C-0260"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "efs-plugin",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "MEDIUM",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0061"
+      ],
+      "examples": [
+        "C-0061"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "example-pod",
+      "category": "NETWORK_POLICY_MISSING",
+      "severity": "MEDIUM",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0030",
+        "C-0260"
+      ],
+      "examples": [
+        "C-0030",
+        "C-0260"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "example-pod",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "MEDIUM",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0061"
+      ],
+      "examples": [
+        "C-0061"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "flink",
+      "category": "NETWORK_POLICY_MISSING",
+      "severity": "MEDIUM",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0030",
+        "C-0260"
+      ],
+      "examples": [
+        "C-0030",
+        "C-0260"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "flink",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "MEDIUM",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0061"
+      ],
+      "examples": [
+        "C-0061"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "nginx",
+      "category": "NETWORK_POLICY_MISSING",
+      "severity": "MEDIUM",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0030",
+        "C-0260"
+      ],
+      "examples": [
+        "C-0030",
+        "C-0260"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "nginx",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "MEDIUM",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0061"
+      ],
+      "examples": [
+        "C-0061"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "nginx-deployment",
+      "category": "NETWORK_POLICY_MISSING",
+      "severity": "MEDIUM",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0030",
+        "C-0260"
+      ],
+      "examples": [
+        "C-0030",
+        "C-0260"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "nginx-deployment",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "MEDIUM",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0061"
+      ],
+      "examples": [
+        "C-0061"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "pod-name",
+      "category": "NETWORK_POLICY_MISSING",
+      "severity": "MEDIUM",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0030",
+        "C-0260"
+      ],
+      "examples": [
+        "C-0030",
+        "C-0260"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "pod-name",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "MEDIUM",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0061"
+      ],
+      "examples": [
+        "C-0061"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/13.jenkins_agent_pod.yaml",
+      "category": "IMAGE_LATEST",
+      "severity": "MEDIUM",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "examples": [
+        "Conftest"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/13.nginx_privileged_deployment.yaml",
+      "category": "IMAGE_LATEST",
+      "severity": "MEDIUM",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "examples": [
+        "Conftest"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/13.nginx_privileged_deployment.yaml",
+      "category": "NETWORK_POLICY_MISSING",
+      "severity": "MEDIUM",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "examples": [
+        "Conftest"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/14.deployment_single_replica.yaml",
+      "category": "IMAGE_LATEST",
+      "severity": "MEDIUM",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "examples": [
+        "Conftest"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/14.deployment_single_replica.yaml",
+      "category": "NETWORK_POLICY_MISSING",
+      "severity": "MEDIUM",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "examples": [
+        "Conftest"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/26.flink_port_mismatch.yaml",
+      "category": "NETWORK_POLICY_MISSING",
+      "severity": "MEDIUM",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "examples": [
+        "Conftest"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/27.kubeteus_misconfigured_policy.yaml",
+      "category": "NETWORK_POLICY_MISSING",
+      "severity": "MEDIUM",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "examples": [
+        "Conftest"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/28.role_overly_permissive.yaml",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "MEDIUM",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "examples": [
+        "Conftest"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "scan/3.multus_cni_misconfig.yaml",
+      "category": "CNI_EMBEDDED_PRIVILEGED",
+      "severity": "MEDIUM",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "examples": [
+        "Conftest"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "scan/34.unencrypted_secret.yaml",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "MEDIUM",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [],
+      "examples": [
+        "Conftest"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "single-replica-deployment",
+      "category": "NETWORK_POLICY_MISSING",
+      "severity": "MEDIUM",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0030",
+        "C-0260"
+      ],
+      "examples": [
+        "C-0030",
+        "C-0260"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "single-replica-deployment",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "MEDIUM",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0061"
+      ],
+      "examples": [
+        "C-0061"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "(unknown)",
+      "category": "NO_RES_LIMITS",
+      "severity": "LOW",
+      "tools": [
+        "Kubescape",
+        "kubescore_raw.json"
+      ],
+      "support_count": 2,
+      "rule_ids": [
+        "C-0270",
+        "C-0271",
+        "container-resources"
+      ],
+      "examples": [
+        "C-0270",
+        "C-0271",
+        "Container Resources"
+      ],
+      "occurrences": 11
+    },
+    {
+      "file": "(unknown)",
+      "category": "DEPRECATED_API",
+      "severity": "LOW",
+      "tools": [
+        "kubescore_raw.json"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "stable-version"
+      ],
+      "examples": [
+        "Stable version"
+      ],
+      "occurrences": 10
+    },
+    {
+      "file": "(unknown)",
+      "category": "NO_PROBES",
+      "severity": "LOW",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0018",
+        "C-0056"
+      ],
+      "examples": [
+        "C-0056",
+        "C-0018"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "13.nginx_privileged_deployment.yaml",
+      "category": "NO_PROBES",
+      "severity": "LOW",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_8"
+      ],
+      "examples": [
+        "Liveness Probe Should be Configured"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "13.nginx_privileged_deployment.yaml",
+      "category": "NO_RES_LIMITS",
+      "severity": "LOW",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_10",
+        "CKV_K8S_11",
+        "CKV_K8S_12",
+        "CKV_K8S_13"
+      ],
+      "examples": [
+        "CPU requests should be set",
+        "CPU limits should be set",
+        "Memory limits should be set"
+      ],
+      "occurrences": 4
+    },
+    {
+      "file": "14.deployment_single_replica.yaml",
+      "category": "NO_PROBES",
+      "severity": "LOW",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_8"
+      ],
+      "examples": [
+        "Liveness Probe Should be Configured"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "14.deployment_single_replica.yaml",
+      "category": "NO_RES_LIMITS",
+      "severity": "LOW",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_10",
+        "CKV_K8S_11",
+        "CKV_K8S_12",
+        "CKV_K8S_13"
+      ],
+      "examples": [
+        "CPU requests should be set",
+        "CPU limits should be set",
+        "Memory limits should be set"
+      ],
+      "occurrences": 4
+    },
+    {
+      "file": "14.genkubesec_privileged_pod.yaml",
+      "category": "NO_PROBES",
+      "severity": "LOW",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_8"
+      ],
+      "examples": [
+        "Liveness Probe Should be Configured"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "14.genkubesec_privileged_pod.yaml",
+      "category": "NO_RES_LIMITS",
+      "severity": "LOW",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_10",
+        "CKV_K8S_11",
+        "CKV_K8S_12",
+        "CKV_K8S_13"
+      ],
+      "examples": [
+        "CPU requests should be set",
+        "CPU limits should be set",
+        "Memory limits should be set"
+      ],
+      "occurrences": 4
+    },
+    {
+      "file": "15.pod_privilege_escalation.yaml",
+      "category": "NO_PROBES",
+      "severity": "LOW",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_8"
+      ],
+      "examples": [
+        "Liveness Probe Should be Configured"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "15.pod_privilege_escalation.yaml",
+      "category": "NO_RES_LIMITS",
+      "severity": "LOW",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_10",
+        "CKV_K8S_11",
+        "CKV_K8S_12",
+        "CKV_K8S_13"
+      ],
+      "examples": [
+        "CPU requests should be set",
+        "CPU limits should be set",
+        "Memory limits should be set"
+      ],
+      "occurrences": 4
+    },
+    {
+      "file": "16.busybox_pod_missing_memory.yaml",
+      "category": "NO_PROBES",
+      "severity": "LOW",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_8"
+      ],
+      "examples": [
+        "Liveness Probe Should be Configured"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "16.busybox_pod_missing_memory.yaml",
+      "category": "NO_RES_LIMITS",
+      "severity": "LOW",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_11",
+        "CKV_K8S_12",
+        "CKV_K8S_13"
+      ],
+      "examples": [
+        "CPU limits should be set",
+        "Memory limits should be set",
+        "Memory requests should be set"
+      ],
+      "occurrences": 3
+    },
+    {
+      "file": "26.flink_port_mismatch.yaml",
+      "category": "NO_PROBES",
+      "severity": "LOW",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_8"
+      ],
+      "examples": [
+        "Liveness Probe Should be Configured"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "26.flink_port_mismatch.yaml",
+      "category": "NO_RES_LIMITS",
+      "severity": "LOW",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_10",
+        "CKV_K8S_11",
+        "CKV_K8S_12",
+        "CKV_K8S_13"
+      ],
+      "examples": [
+        "CPU requests should be set",
+        "CPU limits should be set",
+        "Memory limits should be set"
+      ],
+      "occurrences": 4
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "NO_PROBES",
+      "severity": "LOW",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_8"
+      ],
+      "examples": [
+        "Liveness Probe Should be Configured"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "NO_RES_LIMITS",
+      "severity": "LOW",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_10",
+        "CKV_K8S_11",
+        "CKV_K8S_12",
+        "CKV_K8S_13"
+      ],
+      "examples": [
+        "CPU requests should be set",
+        "CPU limits should be set",
+        "Memory limits should be set"
+      ],
+      "occurrences": 4
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "NO_PROBES",
+      "severity": "LOW",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_8"
+      ],
+      "examples": [
+        "Liveness Probe Should be Configured"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "NO_RES_LIMITS",
+      "severity": "LOW",
+      "tools": [
+        "Checkov"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "CKV_K8S_10",
+        "CKV_K8S_11",
+        "CKV_K8S_12",
+        "CKV_K8S_13"
+      ],
+      "examples": [
+        "CPU requests should be set",
+        "CPU limits should be set",
+        "Memory limits should be set"
+      ],
+      "occurrences": 4
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/Detection/C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/14.ingress_deprecated_api.yaml",
+      "category": "DEPRECATED_API",
+      "severity": "LOW",
+      "tools": [
+        "Pluto"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "extensions/v1beta1"
+      ],
+      "examples": [
+        "Ingress extensions/v1beta1"
+      ],
+      "occurrences": 1
+    },
+    {
+      "file": "Deployment/flink",
+      "category": "NO_RES_LIMITS",
+      "severity": "LOW",
+      "tools": [
+        "Polaris"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "cpuLimitsMissing",
+        "cpuRequestsMissing",
+        "memoryLimitsMissing",
+        "memoryRequestsMissing"
+      ],
+      "examples": [
+        "cpuLimitsMissing",
+        "cpuRequestsMissing",
+        "memoryLimitsMissing"
+      ],
+      "occurrences": 4
+    },
+    {
+      "file": "Deployment/nginx-deployment",
+      "category": "NO_RES_LIMITS",
+      "severity": "LOW",
+      "tools": [
+        "Polaris"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "cpuLimitsMissing",
+        "cpuRequestsMissing",
+        "memoryLimitsMissing",
+        "memoryRequestsMissing"
+      ],
+      "examples": [
+        "cpuLimitsMissing",
+        "cpuRequestsMissing",
+        "memoryLimitsMissing"
+      ],
+      "occurrences": 4
+    },
+    {
+      "file": "Deployment/single-replica-deployment",
+      "category": "NO_RES_LIMITS",
+      "severity": "LOW",
+      "tools": [
+        "Polaris"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "cpuLimitsMissing",
+        "cpuRequestsMissing",
+        "memoryLimitsMissing",
+        "memoryRequestsMissing"
+      ],
+      "examples": [
+        "cpuLimitsMissing",
+        "cpuRequestsMissing",
+        "memoryLimitsMissing"
+      ],
+      "occurrences": 4
+    },
+    {
+      "file": "Pod/efs-plugin",
+      "category": "NO_RES_LIMITS",
+      "severity": "LOW",
+      "tools": [
+        "Polaris"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "cpuLimitsMissing",
+        "cpuRequestsMissing",
+        "memoryLimitsMissing",
+        "memoryRequestsMissing"
+      ],
+      "examples": [
+        "cpuLimitsMissing",
+        "cpuRequestsMissing",
+        "memoryLimitsMissing"
+      ],
+      "occurrences": 4
+    },
+    {
+      "file": "Pod/example-pod",
+      "category": "NO_RES_LIMITS",
+      "severity": "LOW",
+      "tools": [
+        "Polaris"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "cpuLimitsMissing",
+        "cpuRequestsMissing",
+        "memoryLimitsMissing",
+        "memoryRequestsMissing"
+      ],
+      "examples": [
+        "cpuLimitsMissing",
+        "cpuRequestsMissing",
+        "memoryLimitsMissing"
+      ],
+      "occurrences": 4
+    },
+    {
+      "file": "Pod/nginx",
+      "category": "NO_RES_LIMITS",
+      "severity": "LOW",
+      "tools": [
+        "Polaris"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "cpuLimitsMissing",
+        "cpuRequestsMissing",
+        "memoryLimitsMissing",
+        "memoryRequestsMissing"
+      ],
+      "examples": [
+        "cpuLimitsMissing",
+        "cpuRequestsMissing",
+        "memoryLimitsMissing"
+      ],
+      "occurrences": 4
+    },
+    {
+      "file": "Pod/pod-name",
+      "category": "NO_RES_LIMITS",
+      "severity": "LOW",
+      "tools": [
+        "Polaris"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "cpuLimitsMissing",
+        "cpuRequestsMissing",
+        "memoryLimitsMissing",
+        "memoryRequestsMissing"
+      ],
+      "examples": [
+        "cpuLimitsMissing",
+        "cpuRequestsMissing",
+        "memoryLimitsMissing"
+      ],
+      "occurrences": 4
+    },
+    {
+      "file": "busybox-namespace/Pod/busybox-pod",
+      "category": "NO_RES_LIMITS",
+      "severity": "LOW",
+      "tools": [
+        "Polaris"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "cpuLimitsMissing",
+        "memoryLimitsMissing",
+        "memoryRequestsMissing"
+      ],
+      "examples": [
+        "cpuLimitsMissing",
+        "memoryLimitsMissing",
+        "memoryRequestsMissing"
+      ],
+      "occurrences": 3
+    },
+    {
+      "file": "busybox-pod",
+      "category": "NO_PROBES",
+      "severity": "LOW",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0018",
+        "C-0056"
+      ],
+      "examples": [
+        "C-0056",
+        "C-0018"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "busybox-pod",
+      "category": "NO_RES_LIMITS",
+      "severity": "LOW",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0270",
+        "C-0271"
+      ],
+      "examples": [
+        "C-0270",
+        "C-0271"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "efs-plugin",
+      "category": "NO_PROBES",
+      "severity": "LOW",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0018",
+        "C-0056"
+      ],
+      "examples": [
+        "C-0056",
+        "C-0018"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "efs-plugin",
+      "category": "NO_RES_LIMITS",
+      "severity": "LOW",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0270",
+        "C-0271"
+      ],
+      "examples": [
+        "C-0270",
+        "C-0271"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "example-pod",
+      "category": "NO_PROBES",
+      "severity": "LOW",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0018",
+        "C-0056"
+      ],
+      "examples": [
+        "C-0056",
+        "C-0018"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "example-pod",
+      "category": "NO_RES_LIMITS",
+      "severity": "LOW",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0270",
+        "C-0271"
+      ],
+      "examples": [
+        "C-0270",
+        "C-0271"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "flink",
+      "category": "NO_PROBES",
+      "severity": "LOW",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0018",
+        "C-0056"
+      ],
+      "examples": [
+        "C-0056",
+        "C-0018"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "flink",
+      "category": "NO_RES_LIMITS",
+      "severity": "LOW",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0270",
+        "C-0271"
+      ],
+      "examples": [
+        "C-0270",
+        "C-0271"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "nginx",
+      "category": "NO_PROBES",
+      "severity": "LOW",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0018",
+        "C-0056"
+      ],
+      "examples": [
+        "C-0056",
+        "C-0018"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "nginx",
+      "category": "NO_RES_LIMITS",
+      "severity": "LOW",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0270",
+        "C-0271"
+      ],
+      "examples": [
+        "C-0270",
+        "C-0271"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "nginx-deployment",
+      "category": "NO_PROBES",
+      "severity": "LOW",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0018",
+        "C-0056"
+      ],
+      "examples": [
+        "C-0056",
+        "C-0018"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "nginx-deployment",
+      "category": "NO_RES_LIMITS",
+      "severity": "LOW",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0270",
+        "C-0271"
+      ],
+      "examples": [
+        "C-0270",
+        "C-0271"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "pod-name",
+      "category": "NO_PROBES",
+      "severity": "LOW",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0018",
+        "C-0056"
+      ],
+      "examples": [
+        "C-0056",
+        "C-0018"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "pod-name",
+      "category": "NO_RES_LIMITS",
+      "severity": "LOW",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0270",
+        "C-0271"
+      ],
+      "examples": [
+        "C-0270",
+        "C-0271"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "single-replica-deployment",
+      "category": "NO_PROBES",
+      "severity": "LOW",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0018",
+        "C-0056"
+      ],
+      "examples": [
+        "C-0056",
+        "C-0018"
+      ],
+      "occurrences": 2
+    },
+    {
+      "file": "single-replica-deployment",
+      "category": "NO_RES_LIMITS",
+      "severity": "LOW",
+      "tools": [
+        "Kubescape"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "C-0270",
+        "C-0271"
+      ],
+      "examples": [
+        "C-0270",
+        "C-0271"
       ],
       "occurrences": 2
     }

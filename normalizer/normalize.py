@@ -1,27 +1,39 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-SafeFix-K8s LLM Payload Builder (v8.0)
+SafeFix-K8s LLM Payload Builder (v9.0 - PERFECT EDITION)
 
-This copy lives under Normalizer/ and defaults to reading detector raw
-outputs from Detection/output/raw. For backward compatibility, it will
-fall back to detection/output/raw if the new path doesn't exist.
+Enterprise-grade normalizer with comprehensive tool parsing, intelligent
+categorization, and robust error handling.
 
 Outputs (default ./output)
 --------------------------
-- llm_payload.json   (ONLY; lean and LLM-ready)
+- llm_payload.json   (Primary LLM-ready output)
+- normalized_findings.json (Optional debug output)
 
 Usage
 -----
 python Normalizer/normalize.py --raw Detection/output/raw --out output \
              [--min-support 1] [--only-security 1] [--emit-normalized 0]
 
-Notes
------
-- PyYAML is optional. If missing, the builder still emits snippet/span
-    using regex and omits jsonpath.
-- We intentionally skip items whose file cannot be resolved to a YAML
-    file under the workspace (e.g., "(unknown)" or pure resource IDs).
+Features
+--------
+- Universal tool parser with dedicated handlers for 13+ security tools
+- Smart categorization with 16+ security/quality categories  
+- Intelligent file resolution across workspace
+- Precise snippet extraction with context-aware window
+- JSONPath generation for pinpoint remediation
+- Resource identity extraction (apiVersion, kind, metadata)
+- Severity inference from rule IDs and control metadata
+- UTF-8 BOM handling and relaxed JSON parsing
+- Graceful degradation when PyYAML unavailable
+
+Architecture
+-----------
+1. parse_raw_dir() -> Raw finding extraction per tool
+2. aggregate() -> Deduplication and cross-tool correlation
+3. build_llm_items() -> Context enrichment with snippets/jsonpath
+4. main() -> CLI orchestration and output generation
 """
 
 import argparse, json, re, sys, os
@@ -44,28 +56,44 @@ def parse_args():
     p.add_argument("--emit-normalized", type=int, default=0, help="If 1, also emit normalized_findings.json for debugging")
     return p.parse_args()
 
-# ---------------- Canonical Categories & Regex ----------------
+# ---------------- Canonical Categories & Enhanced Regex ----------------
 CANONICAL = {
-    "PRIVILEGED":               [r"\bprivileged\s*:\s*true\b", r"\bPrivilegedTrue\b", r"\bprivileged-container\b"],
-    "PRIV_ESCALATION":          [r"\ballowPrivilegeEscalation\s*:\s*(true|nil)\b", r"\bAllowPrivilegeEscalation(True|Nil)\b"],
-    "CAP_SYS_ADMIN":            [r"\b(cap_sys_admin|SYS_ADMIN)\b", r"\bdrop-net-raw-capability\b", r"\bcapabilities\b"],
-    "RUN_AS_NONROOT_FALSE":     [r"\brunasnonroot\s*:\s*false\b", r"\brunasuser\s*:\s*0\b", r"\brun-as-non-root\b"],
-    "READONLY_ROOTFS_FALSE":    [r"\breadOnlyRootFilesystem\s*:\s*false\b", r"\bReadOnlyRootFilesystem(Nil|False)\b"],
-    "NO_SECCOMP":               [r"\bseccomp(Profile)?\b(?!.*RuntimeDefault)", r"\bSeccompProfileMissing\b"],
-    "NO_APPARMOR":              [r"\bAppArmorAnnotationMissing\b", r"\bAppArmor\b.*(unconfined|missing)"],
-    "HOSTPATH":                 [r"\bhostPath\b", r"/var/run/docker\.sock", r"\bdocker-sock\b"],
-    "IMAGE_LATEST":             [r":[Ll]atest\b", r"\bno-latest-image\b"],
-    "HARD_CODED_CREDS":         [r"\bGitleaks\b", r"\b(password|token|apikey|api[_-]?key|secret)\b.*(=|:|\"|\s)\w+"],
-    "PLAIN_SECRET":             [r"\bkind\s*:\s*Secret\b", r"\bOpaque\b", r"\bstringData\b"],
-    "SERVICEACCOUNT_TOKEN_AUTO":[r"\bAutomountServiceAccountToken(True|Nil)\b", r"\bdeprecated-service-account-field\b"],
-    "RBAC_OVER_PERMISSIVE":     [r"\bDangerousVerb\b|\bverbs\s*:\s*\[\s*\*\s*\]"],
-    "DEPRECATED_API":           [r"\bDeprecated apiVersion\b|\breplacement-api\b|\bremoved-in\b"],
-    "SCHEMA_INVALID":           [r"\bSchema invalid\b|\bKubeConform\b|\bmissing property\b"],
-    "NO_PROBES":                [r"\b(liveness|readiness|startup)Probe\b.*(missing|not set|absent|undefined)|\bno-(liveness|readiness)-probe\b"],
-    "NO_RES_LIMITS":            [r"\b(resources|limits|requests)\b.*(missing|not set|unset|absent)|\b(memory|cpu)-(limit|request)\b"],
+    # CRITICAL Security Issues
+    "PRIVILEGED":               [r"\bprivileged\s*:\s*true\b", r"\bPrivilegedTrue\b", r"\bprivileged-container\b", r"\bC-0057\b", r"\brule-privilege-escalation\b"],
+    "PRIV_ESCALATION":          [r"\ballowPrivilegeEscalation\s*:\s*(true|nil)\b", r"\bAllowPrivilegeEscalation(True|Nil)\b", r"\bC-0016\b"],
+    "CAP_SYS_ADMIN":            [r"\b(cap_sys_admin|SYS_ADMIN)\b", r"\bdrop-net-raw-capability\b", r"\bcapabilities\b", r"\bC-0046\b", r"\binsecure-capabilities\b"],
+    "HOSTPATH":                 [r"\bhostPath\b", r"/var/run/docker\.sock", r"\bdocker-sock\b", r"\bC-0048\b", r"\bC-0045\b", r"\bC-0074\b"],
+    
+    # HIGH Security Issues  
+    "RUN_AS_NONROOT_FALSE":     [r"\brunasnonroot\s*:\s*false\b", r"\brunasuser\s*:\s*0\b", r"\brun-as-non-root\b", r"\bC-0013\b", r"\bnon-root-containers\b"],
+    "READONLY_ROOTFS_FALSE":    [r"\breadOnlyRootFilesystem\s*:\s*false\b", r"\bReadOnlyRootFilesystem(Nil|False)\b", r"\bC-0017\b", r"\bimmutable-container-filesystem\b"],
+    "NO_SECCOMP":               [r"\bseccomp(Profile)?\b(?!.*RuntimeDefault)", r"\bSeccompProfileMissing\b", r"\bC-0055\b", r"\blinux-hardening\b"],
+    "NO_APPARMOR":              [r"\bAppArmorAnnotationMissing\b", r"\bAppArmor\b.*(unconfined|missing)", r"\bC-0055\b"],
+    "HARD_CODED_CREDS":         [r"\bGitleaks\b", r"\b(password|token|apikey|api[_-]?key|secret)\b.*(=|:|\"|\s)\w+", r"\bC-0012\b"],
+    "PLAIN_SECRET":             [r"\bkind\s*:\s*Secret\b", r"\bOpaque\b", r"\bstringData\b", r"\bunencrypted", r"\bC-0207\b"],
+    "SERVICEACCOUNT_TOKEN_AUTO":[r"\bAutomountServiceAccountToken(True|Nil)\b", r"\bdeprecated-service-account-field\b", r"\bC-0034\b"],
+    "RBAC_OVER_PERMISSIVE":     [r"\bDangerousVerb\b", r"\bverbs\s*:\s*\[\s*\*\s*\]", r"\bwildcard", r"\bcluster-admin\b"],
+    "NETWORK_POLICY_MISSING":   [r"\bnetwork\s*policy\b.*missing", r"\bC-0030\b", r"\bC-0260\b", r"\bingress.*egress\b"],
+    
+    # MEDIUM Security Issues
+    "IMAGE_LATEST":             [r":[Ll]atest\b", r"\bno-latest-image\b", r"\bC-0075\b"],
+    "HOST_NAMESPACE":           [r"\bhostPID\b", r"\bhostIPC\b", r"\bhostNetwork\b", r"\bC-0038\b", r"\bC-0041\b"],
     "CNI_EMBEDDED_PRIVILEGED":  [r"\bCNI config\b.*\bprivileged=true\b", r"\bcni\.conf\b.*\bprivileged\b.*\btrue\b"],
+    "POD_DEFAULT_NAMESPACE":    [r"\bdefault\s+namespace\b", r"\bC-0061\b", r"\bpods-in-default-namespace\b"],
+    
+    # Quality/DevOps Issues (LOW priority)
+    "NO_PROBES":                [r"\b(liveness|readiness|startup)Probe\b.*(missing|not set|absent|undefined)", r"\bno-(liveness|readiness)-probe\b", r"\bC-0056\b", r"\bC-0018\b"],
+    "NO_RES_LIMITS":            [r"\b(resources|limits|requests)\b.*(missing|not set|unset|absent)", r"\b(memory|cpu)-(limit|request)\b", r"\bC-0270\b", r"\bC-0271\b"],
+    "DEPRECATED_API":           [r"\bDeprecated apiVersion\b", r"\breplacement-api\b", r"\bremoved-in\b", r"\bPluto\b"],
+    "SCHEMA_INVALID":           [r"\bSchema invalid\b", r"\bKubeConform\b", r"\bmissing property\b", r"\binvalid\s+schema\b"],
+    "YAML_FORMATTING":          [r"\bYamllint\b", r"\bsyntax\s+error\b", r"\bindentation\b"],
 }
-QUALITY_ONLY = {"NO_PROBES","NO_RES_LIMITS","DEPRECATED_API","SCHEMA_INVALID","YAML_FORMATTING"}
+
+# Severity mappings
+QUALITY_ONLY = {"NO_PROBES", "NO_RES_LIMITS", "DEPRECATED_API", "SCHEMA_INVALID", "YAML_FORMATTING"}
+CRITICAL_CATEGORIES = {"PRIVILEGED", "PRIV_ESCALATION", "CAP_SYS_ADMIN", "HOSTPATH"}
+HIGH_CATEGORIES = {"RUN_AS_NONROOT_FALSE", "READONLY_ROOTFS_FALSE", "NO_SECCOMP", "NO_APPARMOR", "HARD_CODED_CREDS", "PLAIN_SECRET", "RBAC_OVER_PERMISSIVE"}
+MEDIUM_CATEGORIES = {"IMAGE_LATEST", "HOST_NAMESPACE", "NETWORK_POLICY_MISSING", "SERVICEACCOUNT_TOKEN_AUTO", "CNI_EMBEDDED_PRIVILEGED", "POD_DEFAULT_NAMESPACE"}
 
 TOOL_ALIASES = {
     "checkov":"Checkov","kubescape":"Kubescape","kubeaudit":"KubeAudit",
@@ -125,7 +153,104 @@ def load_json_relaxed(p: Path):
     if len(objs)==1: return objs[0]
     return objs or None
 
-# ---- Parsers
+# ---- Enhanced Parsers with Polaris & Kubescape Deep Parsing
+def parse_polaris(data):
+    """Parse Polaris Audit results with deep control extraction."""
+    hits = []
+    if not isinstance(data, dict):
+        return hits
+    
+    results = data.get("Results", [])
+    for item in results:
+        if not isinstance(item, dict):
+            continue
+        
+        name = item.get("Name", "")
+        namespace = item.get("Namespace", "")
+        kind = item.get("Kind", "")
+        
+        # Construct pseudo-file path from source if available
+        file_hint = f"{namespace}/{kind}/{name}" if namespace else f"{kind}/{name}"
+        
+        # Parse Results (for ConfigMaps, Secrets, etc.)
+        item_results = item.get("Results", {})
+        if isinstance(item_results, dict):
+            for check_id, check in item_results.items():
+                if not isinstance(check, dict):
+                    continue
+                if check.get("Success") is False:  # Only failures
+                    msg = check.get("Message", "")
+                    severity = check.get("Severity", "warning")
+                    category_hint = check.get("Category", "")
+                    hits.append(make_finding("Polaris", file_hint, check_id, f"[{severity.upper()}] {msg} (Category: {category_hint})", check_id))
+        
+        # Parse PodResult (for Pods/Deployments/etc.)
+        pod_result = item.get("PodResult", {})
+        if isinstance(pod_result, dict):
+            container_results = pod_result.get("ContainerResults", [])
+            for container in container_results:
+                if not isinstance(container, dict):
+                    continue
+                cname = container.get("Name", "")
+                for check_id, check in container.get("Results", {}).items():
+                    if not isinstance(check, dict):
+                        continue
+                    if check.get("Success") is False:
+                        msg = check.get("Message", "")
+                        severity = check.get("Severity", "warning")
+                        hits.append(make_finding("Polaris", file_hint, check_id, f"[{severity.upper()}] Container '{cname}': {msg}", check_id))
+    
+    return hits
+
+def parse_kubescape(data):
+    """Parse Kubescape JSON with control-level detail extraction."""
+    hits = []
+    if not isinstance(data, dict):
+        return hits
+    
+    results_list = data.get("results", [])
+    for result in results_list:
+        if not isinstance(result, dict):
+            continue
+        
+        resource_id = result.get("resourceID", "")
+        controls = result.get("controls", [])
+        
+        for control in controls:
+            if not isinstance(control, dict):
+                continue
+            
+            control_id = control.get("controlID", "")
+            control_name = control.get("name", "")
+            status = control.get("status", {})
+            
+            if isinstance(status, dict) and status.get("status") == "failed":
+                rules = control.get("rules", [])
+                for rule in rules:
+                    if not isinstance(rule, dict):
+                        continue
+                    
+                    rule_name = rule.get("name", "")
+                    rule_status = rule.get("status", "")
+                    
+                    if rule_status == "failed":
+                        paths = rule.get("paths", [])
+                        msg = f"{control_name} ({control_id}) - Rule: {rule_name}"
+                        
+                        # Try to extract file path from resourceID
+                        file_hint = resource_id.split("/")[-1] if "/" in resource_id else resource_id
+                        
+                        # Add path details if available
+                        if paths and isinstance(paths, list) and len(paths) > 0:
+                            fix_path = paths[0].get("fixPath", {})
+                            if isinstance(fix_path, dict):
+                                path_str = fix_path.get("path", "")
+                                if path_str:
+                                    msg += f" | Path: {path_str}"
+                        
+                        hits.append(make_finding("Kubescape", file_hint, control_id, msg, control_id))
+    
+    return hits
 def make_finding(tool, file, title, message, rule_id=""):
     file = sanitize_path(file or extract_file_hint(message) or "")
     return {"tool": norm_tool(tool), "file": file or "(unknown)",
@@ -151,8 +276,21 @@ def walk_json(obj, hits, prefer_file=""):
         for it in obj: walk_json(it, hits, prefer_file=prefer_file)
 
 def parse_by_name(name:str, parsed, hits):
-    if parsed is None: return
+    """Route parsing to specialized handlers based on tool name."""
+    if parsed is None: 
+        return
+    
     n=name.lower()
+    
+    # Dedicated parsers for complex tools
+    if "polaris" in n:
+        hits.extend(parse_polaris(parsed))
+        return
+    if "kubescape" in n:
+        hits.extend(parse_kubescape(parsed))
+        return
+    
+    # Existing specialized parsers
     if   "kubeconform" in n:
         items = parsed if isinstance(parsed, list) else (parsed.get("resources") or [])
         for it in items:
@@ -213,6 +351,7 @@ def parse_by_name(name:str, parsed, hits):
                 for f in it.get("failures",[]) or []:
                     hits.append(make_finding("Conftest", filep, "Conftest", f.get("msg","")))
         return
+    
     # Fallback generic walk
     walk_hits=[]; walk_json(parsed, walk_hits)
     for f,t,m,rid in walk_hits:
@@ -220,11 +359,45 @@ def parse_by_name(name:str, parsed, hits):
 
 # ---- Categorization
 COMPILED = {k:[re.compile(p, re.I) for p in pats] for k,pats in CANONICAL.items()}
+# Enhanced rule ID mappings with Kubescape, Polaris, etc.
 RULEID_MAP = {
+    # Checkov
     "CKV_K8S_22": "PRIVILEGED", "CKV_K8S_26": "PRIV_ESCALATION", "CKV_K8S_37": "CAP_SYS_ADMIN",
     "CKV_K8S_8":  "NO_PROBES",  "CKV_K8S_10": "NO_RES_LIMITS",  "CKV_K8S_11": "NO_RES_LIMITS",
     "CKV_K8S_12": "NO_RES_LIMITS","CKV_K8S_13": "NO_RES_LIMITS","CKV_K8S_14": "IMAGE_LATEST",
+    "CKV_K8S_16": "RUN_AS_NONROOT_FALSE", "CKV_K8S_23": "READONLY_ROOTFS_FALSE",
+    "CKV_K8S_30": "NO_SECCOMP", "CKV_K8S_20": "SERVICEACCOUNT_TOKEN_AUTO",
+    
+    # Kubescape Controls
+    "C-0057": "PRIVILEGED", "C-0016": "PRIV_ESCALATION", "C-0046": "CAP_SYS_ADMIN",
+    "C-0013": "RUN_AS_NONROOT_FALSE", "C-0017": "READONLY_ROOTFS_FALSE",
+    "C-0055": "NO_SECCOMP", "C-0048": "HOSTPATH", "C-0045": "HOSTPATH", "C-0074": "HOSTPATH",
+    "C-0075": "IMAGE_LATEST", "C-0034": "SERVICEACCOUNT_TOKEN_AUTO",
+    "C-0056": "NO_PROBES", "C-0018": "NO_PROBES",
+    "C-0270": "NO_RES_LIMITS", "C-0271": "NO_RES_LIMITS",
+    "C-0012": "HARD_CODED_CREDS", "C-0207": "PLAIN_SECRET",
+    "C-0030": "NETWORK_POLICY_MISSING", "C-0260": "NETWORK_POLICY_MISSING",
+    "C-0061": "POD_DEFAULT_NAMESPACE", "C-0038": "HOST_NAMESPACE", "C-0041": "HOST_NAMESPACE",
+    
+    # Polaris
+    "hostIPCSet": "HOST_NAMESPACE", "hostPIDSet": "HOST_NAMESPACE", "hostNetworkSet": "HOST_NAMESPACE",
+    "runAsRootAllowed": "RUN_AS_NONROOT_FALSE", "runAsPrivileged": "PRIVILEGED",
+    "notReadOnlyRootFilesystem": "READONLY_ROOTFS_FALSE", "cpuLimitsMissing": "NO_RES_LIMITS",
+    "memoryLimitsMissing": "NO_RES_LIMITS", "readinessProbeMissing": "NO_PROBES",
+    "livenessProbeMissing": "NO_PROBES",
 }
+
+def get_severity(category: str) -> str:
+    """Return severity level for a category."""
+    if category in CRITICAL_CATEGORIES:
+        return "CRITICAL"
+    elif category in HIGH_CATEGORIES:
+        return "HIGH"
+    elif category in MEDIUM_CATEGORIES:
+        return "MEDIUM"
+    elif category in QUALITY_ONLY:
+        return "LOW"
+    return "MEDIUM"  # Default
 def categorize(tool: str, title: str, message: str, rule_id: str):
     rid = (rule_id or "").strip().upper()
     if rid in RULEID_MAP: return RULEID_MAP[rid]
@@ -252,30 +425,52 @@ def parse_raw_dir(raw_dir: Path):
                 hits.append(make_finding("Yamllint", fpath, f"{level.upper()}:{rule}", f"L{ln}C{col} {msg}", rule))
     return hits
 
-# ---- Aggregation to (file, category)
+# ---- Enhanced Aggregation with Severity
 def aggregate(hits):
+    """Aggregate findings by (file, category) with tool correlation and severity."""
     by_key={}
     for h in hits:
         filep = sanitize_path(h.get("file",""))
         cat = categorize(h.get("tool",""), h.get("title",""), h.get("message",""), h.get("rule_id",""))
-        if not cat: continue
+        if not cat: 
+            continue
         k=(filep, cat)
-        rec = by_key.setdefault(k, {"file":filep, "category":cat, "tools":set(), "rule_ids":set(), "examples":[], "occ":0})
+        rec = by_key.setdefault(k, {
+            "file":filep, 
+            "category":cat, 
+            "severity": get_severity(cat),
+            "tools":set(), 
+            "rule_ids":set(), 
+            "examples":[], 
+            "occ":0
+        })
         rec["tools"].add(norm_tool(h.get("tool","")))
-        if h.get("rule_id"): rec["rule_ids"].add(h.get("rule_id",""))
+        if h.get("rule_id"): 
+            rec["rule_ids"].add(h.get("rule_id",""))
         if len(rec["examples"])<3:
             ex = h.get("title") or h.get("message") or ""
-            if ex: rec["examples"].append(ex)
+            if ex and ex not in rec["examples"]:  # Avoid duplicates
+                rec["examples"].append(ex)
         rec["occ"]+=1
-    # freeze
+    
+    # Freeze and sort by severity then support
     out=[]
     for (f,c),r in by_key.items():
         out.append({
-            "file": f, "category": c, "tools": sorted(r["tools"]),
-            "support_count": len(r["tools"]), "rule_ids": sorted([x for x in r["rule_ids"] if x]),
-            "examples": r["examples"], "occurrences": r["occ"],
+            "file": f, 
+            "category": c, 
+            "severity": r["severity"],
+            "tools": sorted(r["tools"]),
+            "support_count": len(r["tools"]), 
+            "rule_ids": sorted([x for x in r["rule_ids"] if x]),
+            "examples": r["examples"], 
+            "occurrences": r["occ"],
         })
-    return sorted(out, key=lambda x:(x["file"], x["category"]))
+    
+    # Sort: CRITICAL first, then by support count (descending)
+    severity_order = {"CRITICAL": 0, "HIGH": 1, "MEDIUM": 2, "LOW": 3}
+    out.sort(key=lambda x: (severity_order.get(x["severity"], 99), -x["support_count"], x["file"], x["category"]))
+    return out
 
 # ---- Context extractors
 CATEGORY_HINT_REGEX = {
@@ -376,6 +571,7 @@ def parse_yaml_doc(text: str):
         return None
 
 def build_llm_items(repo_root: Path, agg, min_support: int, only_security: bool):
+    """Build LLM payload with enhanced metadata, snippets, and remediation hints."""
     items=[]
     for r in agg:
         if not r["file"] or r["file"] == "(unknown)":
@@ -391,46 +587,112 @@ def build_llm_items(repo_root: Path, agg, min_support: int, only_security: bool)
         snippet, sline, eline = extract_snippet(text, r["category"]) 
         doc = parse_yaml_doc(text)
         jsonpath = best_effort_jsonpath(doc, r["category"]) if doc else ""
-        # resource identity (best effort)
+        
+        # Enhanced resource identity
         apiVersion = doc.get("apiVersion") if isinstance(doc, dict) else None
         kind = doc.get("kind") if isinstance(doc, dict) else None
         meta = doc.get("metadata") if isinstance(doc, dict) else {}
-        res = {"apiVersion": apiVersion or "", "kind": kind or "", "metadata": {"name": (meta or {}).get("name",""), "namespace": (meta or {}).get("namespace","")}}
+        res = {
+            "apiVersion": apiVersion or "", 
+            "kind": kind or "", 
+            "metadata": {
+                "name": (meta or {}).get("name",""), 
+                "namespace": (meta or {}).get("namespace","")
+            }
+        }
+        
+        # Calculate relative path properly
+        try:
+            rel_path = str(fpath.relative_to(repo_root))
+        except ValueError:
+            rel_path = str(fpath)
+        
         items.append({
-            "file": str(fpath.relative_to(repo_root)) if str(fpath).startswith(str(repo_root)) else str(fpath),
+            "file": rel_path,
             "category": r["category"],
+            "severity": r["severity"],
             "tools": r["tools"],
             "support_count": r["support_count"],
             "rule_ids": r["rule_ids"],
             "hints": r["examples"],
-            "policy": "least-privilege",
+            "policy": "least-privilege",  # Can be enhanced based on category
             "resource": res,
             "snippet": snippet,
             "span": {"start_line": sline, "end_line": eline},
             "jsonpath": jsonpath,
+            "occurrences": r.get("occurrences", 1),
         })
     return items
 
 def main():
+    """Main execution with comprehensive error handling and statistics."""
     args = parse_args()
     repo_root = Path(os.getcwd()).resolve()
     raw_dir = Path(args.raw).resolve()
+    
     # Back-compat fallback to old layout
     if not raw_dir.exists():
         legacy = (repo_root / "detection/output/raw").resolve()
         if legacy.exists():
+            print(f"[INFO] Using legacy path: {legacy}")
             raw_dir = legacy
-    out_dir = Path(args.out).resolve(); out_dir.mkdir(parents=True, exist_ok=True)
+    
+    out_dir = Path(args.out).resolve(); 
+    out_dir.mkdir(parents=True, exist_ok=True)
+    
     if not raw_dir.exists():
-        print(f"[!] Raw directory not found: {raw_dir}", file=sys.stderr)
+        print(f"[ERROR] Raw directory not found: {raw_dir}", file=sys.stderr)
+        sys.exit(1)
+    
+    print(f"[*] Parsing raw outputs from: {raw_dir}")
     hits = parse_raw_dir(raw_dir)
+    print(f"[*] Extracted {len(hits)} raw findings")
+    
+    print(f"[*] Aggregating and correlating findings...")
     agg = aggregate(hits)
+    print(f"[*] Aggregated to {len(agg)} unique (file, category) pairs")
+    
+    # Print severity distribution
+    severity_counts = {}
+    for item in agg:
+        sev = item.get("severity", "UNKNOWN")
+        severity_counts[sev] = severity_counts.get(sev, 0) + 1
+    
+    print(f"[*] Severity distribution:")
+    for sev in ["CRITICAL", "HIGH", "MEDIUM", "LOW"]:
+        if sev in severity_counts:
+            print(f"    {sev}: {severity_counts[sev]}")
+    
+    print(f"[*] Building LLM payload (min_support={args.min_support}, only_security={bool(args.only_security)})...")
     items = build_llm_items(repo_root, agg, min_support=int(args.min_support), only_security=bool(args.only_security))
-    payload = {"generated_at": now_iso(), "version": "sfk-v8.0-llm-payload", "items": items}
+    
+    payload = {
+        "generated_at": now_iso(), 
+        "version": "sfk-v9.0-perfect", 
+        "metadata": {
+            "raw_findings_count": len(hits),
+            "aggregated_count": len(agg),
+            "llm_items_count": len(items),
+            "severity_distribution": severity_counts,
+            "filters": {
+                "min_support": int(args.min_support),
+                "only_security": bool(args.only_security)
+            }
+        },
+        "items": items
+    }
+    
     (out_dir/"llm_payload.json").write_text(json.dumps(payload, indent=2), encoding="utf-8")
-    print(f"✅ Wrote {out_dir/'llm_payload.json'} | items={len(items)}")
+    print(f"✅ Wrote {out_dir/'llm_payload.json'} | LLM items={len(items)}")
+    
     if int(args.emit_normalized):
-        (out_dir/"normalized_findings.json").write_text(json.dumps({"aggregate": agg}, indent=2), encoding="utf-8")
+        normalized = {
+            "generated_at": now_iso(),
+            "raw_findings": len(hits),
+            "aggregate": agg
+        }
+        (out_dir/"normalized_findings.json").write_text(json.dumps(normalized, indent=2), encoding="utf-8")
+        print(f"✅ Wrote {out_dir/'normalized_findings.json'} (debug)")
 
 if __name__ == "__main__":
     main()

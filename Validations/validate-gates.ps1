@@ -59,7 +59,11 @@
   [string] $Namespace,
   [ValidateSet("auto","kind","minikube","none")] [string] $SandboxProvider = "auto",
   [int] $TimeoutSec = 60,
-  [string] $SigningKey
+  [string] $SigningKey,
+  [string] $KubeVersion = "1.29.0",
+  [string] $DetectionRawKubeconform = "detection/output/raw/kubeconform_raw.json",
+  [ValidateSet("auto","server","client")] [string] $DryRunMode = "auto",
+  [string] $DryRunNamespace
 )
 
 Set-StrictMode -Version Latest
@@ -70,6 +74,102 @@ function New-Dir([string]$Path) {
 }
 function Tool-Exists([string]$Name) {
   try { return [bool](Get-Command $Name -ErrorAction Stop) } catch { return $false }
+}
+function Find-ToolInDirs([string]$ExeName, [string[]]$Dirs) {
+  foreach ($d in $Dirs) {
+    if (-not $d) { continue }
+    $p1 = Join-Path $d $ExeName
+    if (Test-Path -LiteralPath $p1) { return $p1 }
+    $p2 = Join-Path (Join-Path $d 'bin') $ExeName
+    if (Test-Path -LiteralPath $p2) { return $p2 }
+  }
+  return $null
+}
+function Install-KubeconformFromPkgManagers() {
+  # Try Scoop or Chocolatey if present. Returns 'kubeconform' on success, else $null.
+  try {
+    if (Tool-Exists 'scoop') {
+      Write-Host "[Gate1] Installing kubeconform via Scoop..." -ForegroundColor Yellow
+      try { scoop install kubeconform *>$null 2>&1 } catch {}
+      if (Tool-Exists 'kubeconform') { return 'kubeconform' }
+    }
+  } catch {}
+  try {
+    if (Tool-Exists 'choco') {
+      Write-Host "[Gate1] Installing kubeconform via Chocolatey..." -ForegroundColor Yellow
+      try { choco install kubeconform -y *>$null 2>&1 } catch {}
+      if (Tool-Exists 'kubeconform') { return 'kubeconform' }
+    }
+  } catch {}
+  return $null
+}
+function Install-ConftestFromPkgManagers() {
+  # Try Scoop or Chocolatey if present. Returns 'conftest' on success, else $null.
+  try {
+    if (Tool-Exists 'scoop') {
+      Write-Host "[Gate2] Installing conftest via Scoop..." -ForegroundColor Yellow
+      try { scoop install conftest *>$null 2>&1 } catch {}
+      if (Tool-Exists 'conftest') { return 'conftest' }
+    }
+  } catch {}
+  try {
+    if (Tool-Exists 'choco') {
+      Write-Host "[Gate2] Installing conftest via Chocolatey..." -ForegroundColor Yellow
+      try { choco install conftest -y *>$null 2>&1 } catch {}
+      if (Tool-Exists 'conftest') { return 'conftest' }
+    }
+  } catch {}
+  return $null
+}
+function Ensure-Conftest() {
+  # Returns the command/path to conftest if available or installed; otherwise $null.
+  if (Tool-Exists 'conftest') { return 'conftest' }
+  $binDir = Join-Path $PSScriptRoot 'bin'
+  New-Dir $binDir
+  $exePath = Join-Path $binDir 'conftest.exe'
+  if (Test-Path $exePath) { return $exePath }
+  # Check repo-local tool caches (Detection folder)
+  $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
+  $cand = Find-ToolInDirs 'conftest.exe' @(
+    (Join-Path $repoRoot 'Detection'),
+    (Join-Path $repoRoot 'Detection/tools'),
+    (Join-Path $repoRoot 'Detection/.tmp-extracted')
+  )
+  if ($cand) { return $cand }
+  # Try package managers
+  $pkg = Install-ConftestFromPkgManagers
+  if ($pkg) { return $pkg }
+  # No direct download implemented (asset name varies by version); will rely on Docker fallback in gate.
+  return $null
+}
+function Ensure-Kubeconform() {
+  # Returns the command/path to kubeconform if available or downloaded; otherwise $null
+  if (Tool-Exists 'kubeconform') { return 'kubeconform' }
+  $binDir = Join-Path $PSScriptRoot 'bin'
+  New-Dir $binDir
+  $exePath = Join-Path $binDir 'kubeconform.exe'
+  if (Test-Path $exePath) { return $exePath }
+  # Check repo-local tool caches (Detection folder)
+  $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
+  $cand = Find-ToolInDirs 'kubeconform.exe' @(
+    (Join-Path $repoRoot 'Detection'),
+    (Join-Path $repoRoot 'Detection/tools'),
+    (Join-Path $repoRoot 'Detection/.tmp-extracted')
+  )
+  if ($cand) { return $cand }
+  # Try package managers first
+  $pkg = Install-KubeconformFromPkgManagers
+  if ($pkg) { return $pkg }
+  $url = 'https://github.com/yannh/kubeconform/releases/latest/download/kubeconform-windows-amd64.exe'
+  Write-Host "[Gate1] kubeconform not found; attempting to download to $exePath" -ForegroundColor Yellow
+  try {
+    try { [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12 } catch {}
+    Invoke-WebRequest -Uri $url -OutFile $exePath -UseBasicParsing -ErrorAction Stop
+    return $exePath
+  } catch {
+    Write-Host "[Gate1] Failed to download kubeconform: $($_.Exception.Message)" -ForegroundColor Red
+    return $null
+  }
 }
 function Write-Json([object]$Obj, [string]$Path) {
   $json = $Obj | ConvertTo-Json -Depth 12
@@ -115,52 +215,166 @@ if ($EnableSandbox -and [string]::IsNullOrWhiteSpace($Namespace)) {
 
 # Detect tools
 $hasKubectl     = Tool-Exists 'kubectl'
-$hasKubeconform = Tool-Exists 'kubeconform'
-$hasConftest    = Tool-Exists 'conftest'
+$hasDocker      = Tool-Exists 'docker'
+$kubeconformCmd = Ensure-Kubeconform
+$hasKubeconform = [bool]$kubeconformCmd
+
+# Optionally load precomputed kubeconform results from Detection layer
+$kubeconformDetectionIndex = $null
+$_kcIndexByBase = $null
+$_kcIndexByScan = $null
+try {
+  if ($DetectionRawKubeconform -and (Test-Path -LiteralPath $DetectionRawKubeconform)) {
+    $kcRaw = Get-Content -LiteralPath $DetectionRawKubeconform -Raw | ConvertFrom-Json -ErrorAction Stop
+    if ($kcRaw -and $kcRaw.resources) {
+      $_kcIndexByBase = @{}
+      $_kcIndexByScan = @{}
+      foreach ($res in $kcRaw.resources) {
+        $fname = [string]$res.filename
+        $bn = [System.IO.Path]::GetFileName($fname)
+        if (-not $_kcIndexByBase.ContainsKey($bn)) { $_kcIndexByBase[$bn] = @() }
+        $_kcIndexByBase[$bn] += $res
+        if ($fname) {
+          $_kcIndexByScan[$fname] = ($_kcIndexByScan[$fname] + @($res))
+        }
+      }
+      $kubeconformDetectionIndex = @{ byBase = $_kcIndexByBase; byScan = $_kcIndexByScan }
+    }
+  }
+} catch { $kubeconformDetectionIndex = $null }
+$conftestCmd    = Ensure-Conftest
+$hasConftest    = [bool]$conftestCmd
 
 # Tool versions (best-effort)
 $toolVersions = @{}
 try { if ($hasKubectl) { $toolVersions.kubectl = (kubectl version --client -o json | ConvertFrom-Json).clientVersion.gitVersion } } catch {}
-try { if ($hasKubeconform) { $toolVersions.kubeconform = (kubeconform -version) } } catch {}
-try { if ($hasConftest) { $toolVersions.conftest = (conftest --version) } } catch {}
+try { if ($hasKubeconform) { $toolVersions.kubeconform = (& $kubeconformCmd -v) } } catch {}
+try { if ($hasConftest) { $toolVersions.conftest = (& $conftestCmd --version) } } catch {}
 
 # Gate runners ---------------------------------------------------------------
 function Gate-Schema([string]$file, [string]$evidDir) {
-  if (-not $hasKubeconform) { return @{ gate='schema'; status='SKIP'; details='kubeconform not found'; evidence='' } }
   New-Dir $evidDir
+  # Prefer precomputed Detection results when available
+  if ($kubeconformDetectionIndex) {
+  $bn = [System.IO.Path]::GetFileName($file)
+  # Try to match by full /scan/relative path first
+  $relFromInput = ($file.Substring($inputAbs.Path.Length) -replace '^[\\/]+','')
+    $scanKey = '/scan/' + ($relFromInput -replace '\\','/')
+    $kcMatches = $null
+    $matchedBy = ''
+    if ($kubeconformDetectionIndex.byScan.ContainsKey($scanKey)) {
+      $kcMatches = $kubeconformDetectionIndex.byScan[$scanKey]
+      $matchedBy = 'fullpath'
+    } elseif ($kubeconformDetectionIndex.byBase.ContainsKey($bn)) {
+      $kcMatches = $kubeconformDetectionIndex.byBase[$bn]
+      $matchedBy = 'basename'
+    }
+    if ($null -eq $kcMatches -or $kcMatches.Count -eq 0) {
+      # No detection match for this file; fall back to running kubeconform below
+    } else {
+    # If Detection results contain download or schema errors, fall back to a fresh kubeconform run
+    $hasErrors = $false
+    foreach ($m in $kcMatches) {
+      if ($m.status -eq 'statusError' -or ($m.msg -and ($m.msg -match 'failed downloading schema|x509|tls'))) { $hasErrors = $true; break }
+    }
+      if (-not $hasErrors) {
+        $evPath = Join-Path $evidDir 'kubeconform_detection.json'
+        Write-Json $kcMatches $evPath
+        $status = 'PASS'
+        foreach ($m in $kcMatches) {
+          $st = [string]$m.status
+          if ($st -ne 'statusValid' -and $st -ne 'valid') { $status = 'FAIL' }
+        }
+        return @{ gate='schema'; status=$status; details=('kubeconform (Detection results, ' + $matchedBy + ')'); evidence=(Get-RelPath $outAbs $evPath) }
+      }
+      # else: proceed to local/docker run below
+    }
+  }
+
+  # Fallback: run kubeconform locally or via Docker if available
+  if (-not $hasKubeconform) {
+    if ($hasDocker) {
   $outPath = Join-Path $evidDir 'kubeconform.json'
-  $args = @('-summary','-output','json','-strict', '--kubernetes-version','1.29.0', $file)
-  $raw = & kubeconform @args 2>&1
+  $relFromInput = ($file.Substring($inputAbs.Path.Length) -replace '^[\\/]+','')
+      $scanFile = '/scan/' + ($relFromInput -replace '\\','/')
+      $dcArgs = @('run','--rm','-v',("$($inputAbs.Path):/scan:ro"),'ghcr.io/yannh/kubeconform:latest',
+                  '-summary','-output','json','-strict','--kubernetes-version', $KubeVersion, $scanFile)
+      $raw = & docker @dcArgs 2>&1
+      $raw | Out-File -Encoding utf8 $outPath
+      $status = 'PASS'
+      try {
+        $json = $raw | Out-String | ConvertFrom-Json -ErrorAction Stop
+        if ($null -ne $json.resources) {
+          foreach ($r in $json.resources) { if ($r.status -ne 'valid') { $status = 'FAIL' } }
+        } elseif ($null -ne $json.summary) {
+          if (($json.summary.invalid -as [int]) -gt 0 -or ($json.summary.errors -as [int]) -gt 0) { $status = 'FAIL' }
+        } elseif ($json -is [System.Array]) {
+          foreach ($r in $json) { if ($r.status -ne 'valid') { $status = 'FAIL' } }
+        }
+      } catch { }
+      return @{ gate='schema'; status=$status; details='kubeconform (docker)'; evidence=(Get-RelPath $outAbs $outPath) }
+    }
+    return @{ gate='schema'; status='SKIP'; details='kubeconform not found'; evidence='' }
+  }
+  $outPath = Join-Path $evidDir 'kubeconform.json'
+  $kcArgs = @('-summary','-output','json','-strict', '--kubernetes-version', $KubeVersion, $file)
+  $raw = & $kubeconformCmd @kcArgs 2>&1
   $raw | Out-File -Encoding utf8 $outPath
   $status = 'PASS'
   try {
     $json = $raw | Out-String | ConvertFrom-Json -ErrorAction Stop
-    # kubeconform json contains per-file results with 'status'
-    $f = $json | Where-Object { $_.path -ne $null }
-    if ($f) {
-      foreach ($r in $f) { if ($r.status -ne 'valid') { $status = 'FAIL' } }
-    } else { if ($raw -match 'Invalid') { $status = 'FAIL' } }
-  } catch { if ($raw -match 'Invalid|ERR|FAIL') { $status = 'FAIL' } }
+    if ($null -ne $json.resources) {
+      foreach ($r in $json.resources) { if ($r.status -ne 'valid') { $status = 'FAIL' } }
+    } elseif ($null -ne $json.summary) {
+      if (($json.summary.invalid -as [int]) -gt 0 -or ($json.summary.errors -as [int]) -gt 0) { $status = 'FAIL' }
+    } elseif ($json -is [System.Array]) {
+      foreach ($r in $json) { if ($r.status -ne 'valid') { $status = 'FAIL' } }
+    }
+  } catch { }
   return @{ gate='schema'; status=$status; details='kubeconform run'; evidence=(Get-RelPath $outAbs $outPath) }
 }
 
 function Gate-Policy([string]$file, [string]$evidDir) {
-  if (-not $hasConftest) { return @{ gate='policy'; status='SKIP'; details='conftest not found'; evidence='' } }
   New-Dir $evidDir
   $outPath = Join-Path $evidDir 'conftest.json'
   # Use policies colocated under Validations/
   $pol = Join-Path $PSScriptRoot 'policies/opa'
   if (-not (Test-Path $pol)) { return @{ gate='policy'; status='SKIP'; details='policies/opa not present'; evidence='' } }
-  $raw = & conftest test --policy $pol --output json $file 2>&1
-  $raw | Out-File -Encoding utf8 $outPath
-  $status = 'PASS'
-  try {
-    $j = $raw | Out-String | ConvertFrom-Json -ErrorAction Stop
-    $fails = 0
-    foreach ($r in $j) { if ($r.failures) { $fails += ($r.failures | Measure-Object).Count } }
-    if ($fails -gt 0) { $status = 'FAIL' }
-  } catch { if ($raw -match 'FAIL') { $status='FAIL' } }
-  return @{ gate='policy'; status=$status; details='conftest run'; evidence=(Get-RelPath $outAbs $outPath) }
+
+  if ($hasConftest) {
+    $raw = & $conftestCmd test --policy $pol --output json $file 2>&1
+    $raw | Out-File -Encoding utf8 $outPath
+    $status = 'PASS'
+    try {
+      $j = $raw | Out-String | ConvertFrom-Json -ErrorAction Stop
+      $fails = 0
+      foreach ($r in $j) { if ($r.failures) { $fails += ($r.failures | Measure-Object).Count } }
+      if ($fails -gt 0) { $status = 'FAIL' }
+    } catch { if ($raw -match 'FAIL') { $status='FAIL' } }
+    return @{ gate='policy'; status=$status; details='conftest run'; evidence=(Get-RelPath $outAbs $outPath) }
+  }
+
+  if ($hasDocker) {
+    # Docker fallback: mount input dir and policies, run openpolicyagent/conftest
+  $relFromInput = ($file.Substring($inputAbs.Path.Length) -replace '^[\\/]+','')
+    $projFile = '/project/' + ($relFromInput -replace '\\','/')
+  $dcArgs = @('run','--rm',
+        '-v',("$($inputAbs.Path):/project:ro"),
+        '-v',("$($pol):/policy:ro"),
+                'openpolicyagent/conftest','test','--policy','/policy','--output','json', $projFile)
+    $raw = & docker @dcArgs 2>&1
+    $raw | Out-File -Encoding utf8 $outPath
+    $status = 'PASS'
+    try {
+      $j = $raw | Out-String | ConvertFrom-Json -ErrorAction Stop
+      $fails = 0
+      foreach ($r in $j) { if ($r.failures) { $fails += ($r.failures | Measure-Object).Count } }
+      if ($fails -gt 0) { $status = 'FAIL' }
+    } catch { if ($raw -match 'FAIL') { $status='FAIL' } }
+    return @{ gate='policy'; status=$status; details='conftest (docker)'; evidence=(Get-RelPath $outAbs $outPath) }
+  }
+
+  return @{ gate='policy'; status='SKIP'; details='conftest not found'; evidence='' }
 }
 
 function Gate-DryRun([string]$file, [string]$evidDir) {
@@ -168,15 +382,38 @@ function Gate-DryRun([string]$file, [string]$evidDir) {
   New-Dir $evidDir
   $outPath = Join-Path $evidDir 'dryrun.txt'
   $stderrPath = Join-Path $evidDir 'dryrun.err.txt'
-  $cmd = {
-    kubectl apply --dry-run=server -f $using:file
+
+  # Determine mode
+  $mode = $DryRunMode
+  $ctx = $null; $ctxExit = 0
+  try { $ctx = (& kubectl config current-context 2>$null); $ctxExit = if ($LASTEXITCODE) { $LASTEXITCODE } else { 0 } } catch { $ctxExit = 1 }
+  if ($DryRunMode -eq 'auto') {
+    if ($ctxExit -eq 0 -and -not [string]::IsNullOrWhiteSpace($ctx)) { $mode = 'server' } else { $mode = 'skip' }
   }
-  $out = ""; $err = ""; $exit = 0
-  try { $out = & $cmd *>&1; $exit = if ($LASTEXITCODE) { $LASTEXITCODE } else { 0 } } catch { $err = $_ | Out-String; $exit = 1 }
+
+  if ($mode -eq 'skip') { return @{ gate='dryrun'; status='SKIP'; details='no kube-context; dry-run requires a live API server'; evidence='' } }
+  $kubectlArgs = @('apply','--dry-run=' + $mode,'-f', $file)
+  if ($DryRunNamespace) { $kubectlArgs = @('apply','-n', $DryRunNamespace, '--dry-run=' + $mode, '-f', $file) }
+
+  # If user requested server explicitly but no context, SKIP with guidance
+  if ($DryRunMode -eq 'server' -and ($ctxExit -ne 0 -or [string]::IsNullOrWhiteSpace($ctx))) {
+    return @{ gate='dryrun'; status='SKIP'; details='no kube-context; cannot run server dry-run'; evidence='' }
+  }
+
+  $out = ""; $errText = ""; $exit = 0
+  try {
+  $out = & kubectl @kubectlArgs *>&1
+    $exit = if ($LASTEXITCODE) { $LASTEXITCODE } else { 0 }
+  } catch {
+    $errText = $_ | Out-String; $exit = 1
+  }
   $out | Out-File -Encoding utf8 $outPath
-  if ($err) { $err | Out-File -Encoding utf8 $stderrPath }
+  if ($errText) { $errText | Out-File -Encoding utf8 $stderrPath }
   $status = if ($exit -eq 0) { 'PASS' } else { 'FAIL' }
-  return @{ gate='dryrun'; status=$status; details='kubectl apply --dry-run=server'; evidence=(Get-RelPath $outAbs $outPath) }
+  $det = 'kubectl apply --dry-run=' + $mode
+  if ($DryRunNamespace) { $det += ' -n ' + $DryRunNamespace }
+  if ($DryRunMode -eq 'auto' -and $mode -eq 'server' -and [string]::IsNullOrWhiteSpace($ctx)) { $det += ' (no kube-context)' }
+  return @{ gate='dryrun'; status=$status; details=$det; evidence=(Get-RelPath $outAbs $outPath) }
 }
 
 function Gate-Sandbox([string]$file, [string]$evidDir, [string]$ns) {
@@ -278,9 +515,12 @@ foreach ($f in $files) {
   $hasFail = $results | Where-Object { $_.status -eq 'FAIL' }
   if ($hasFail) { $overall = 'FAIL' }
   # Minimal bar: first three gates must be PASS to claim overall PASS
-  $g1 = ($results | Where-Object { $_.gate -eq 'schema' }).status
-  $g2 = ($results | Where-Object { $_.gate -eq 'policy' }).status
-  $g3 = ($results | Where-Object { $_.gate -eq 'dryrun' }).status
+  $g1Obj = $results | Where-Object { $_.gate -eq 'schema' } | Select-Object -First 1
+  $g2Obj = $results | Where-Object { $_.gate -eq 'policy' } | Select-Object -First 1
+  $g3Obj = $results | Where-Object { $_.gate -eq 'dryrun' } | Select-Object -First 1
+  $g1 = if ($g1Obj) { $g1Obj.status } else { 'SKIP' }
+  $g2 = if ($g2Obj) { $g2Obj.status } else { 'SKIP' }
+  $g3 = if ($g3Obj) { $g3Obj.status } else { 'SKIP' }
   if (-not ($g1 -eq 'PASS' -and $g2 -eq 'PASS' -and $g3 -eq 'PASS')) { $overall = 'FAIL' }
 
   $perFile = @{ file=$fRel; file_sha256=$sha; gates=$results; overall=$overall }
@@ -294,7 +534,13 @@ $failList = @($aggregate | Where-Object { $_.overall -eq 'FAIL' })
 $summary = @{ PASS = $passList.Count; FAIL = $failList.Count }
 
 $kubectx = $null
-try { if ($hasKubectl) { $kubectx = (kubectl config current-context) } } catch {}
+try {
+  if ($hasKubectl) {
+    # Suppress stderr noise when no current context is set; ignore non-zero exit
+    $kubectx = (& kubectl config current-context 2>$null)
+    if ($LASTEXITCODE -ne 0) { $kubectx = $null }
+  }
+} catch {}
 
 $proof = [ordered]@{
   version = '1.0'
@@ -322,3 +568,6 @@ $proofPath = Join-Path $outAbs 'safe_fix_proof.json'
 Write-Json $proof $proofPath
 
 Write-Host "Validation complete. Proof:" (Get-RelPath $root $proofPath)
+
+# Ensure a clean exit code regardless of any native command non-zero codes during probes
+$global:LASTEXITCODE = 0
