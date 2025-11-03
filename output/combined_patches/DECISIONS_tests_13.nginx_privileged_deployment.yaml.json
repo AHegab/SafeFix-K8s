@@ -1,0 +1,265 @@
+{
+  "original_file": "tests\\13.nginx_privileged_deployment.yaml",
+  "total_findings": 17,
+  "successful_patches": 1,
+  "models_used": [
+    "groq"
+  ],
+  "decisions": [
+    {
+      "finding": 1,
+      "category": "CAP_SYS_ADMIN",
+      "severity": "CRITICAL",
+      "models_voted": [
+        "groq"
+      ],
+      "selected_model": null,
+      "patch_applied": false,
+      "votes": {
+        "groq": {
+          "classification": "fix"
+        }
+      }
+    },
+    {
+      "finding": 2,
+      "category": "CAP_SYS_ADMIN",
+      "severity": "CRITICAL",
+      "models_voted": [
+        "groq"
+      ],
+      "selected_model": null,
+      "patch_applied": false,
+      "votes": {
+        "groq": {
+          "classification": "fix"
+        }
+      }
+    },
+    {
+      "finding": 3,
+      "category": "PRIVILEGED",
+      "severity": "CRITICAL",
+      "models_voted": [
+        "groq"
+      ],
+      "selected_model": null,
+      "patch_applied": false,
+      "votes": {
+        "groq": {
+          "classification": "fix"
+        }
+      }
+    },
+    {
+      "finding": 4,
+      "category": "PRIVILEGED",
+      "severity": "CRITICAL",
+      "models_voted": [
+        "groq"
+      ],
+      "selected_model": null,
+      "patch_applied": false,
+      "votes": {
+        "groq": {
+          "classification": "fix"
+        }
+      }
+    },
+    {
+      "finding": 5,
+      "category": "PRIV_ESCALATION",
+      "severity": "CRITICAL",
+      "models_voted": [
+        "groq"
+      ],
+      "selected_model": null,
+      "patch_applied": false,
+      "votes": {
+        "groq": {
+          "classification": "fix"
+        }
+      }
+    },
+    {
+      "finding": 6,
+      "category": "NO_SECCOMP",
+      "severity": "HIGH",
+      "models_voted": [
+        "groq"
+      ],
+      "selected_model": null,
+      "patch_applied": false,
+      "votes": {
+        "groq": {
+          "classification": "fix"
+        }
+      }
+    },
+    {
+      "finding": 7,
+      "category": "HARD_CODED_CREDS",
+      "severity": "HIGH",
+      "models_voted": [
+        "groq"
+      ],
+      "selected_model": null,
+      "patch_applied": false,
+      "votes": {
+        "groq": {
+          "classification": "fix"
+        }
+      }
+    },
+    {
+      "finding": 8,
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "models_voted": [
+        "groq"
+      ],
+      "selected_model": null,
+      "patch_applied": false,
+      "votes": {
+        "groq": {
+          "classification": "fix"
+        }
+      }
+    },
+    {
+      "finding": 9,
+      "category": "RUN_AS_NONROOT_FALSE",
+      "severity": "HIGH",
+      "models_voted": [
+        "groq"
+      ],
+      "selected_model": null,
+      "patch_applied": false,
+      "votes": {
+        "groq": {
+          "classification": "fix"
+        }
+      }
+    },
+    {
+      "finding": 10,
+      "category": "NO_APPARMOR",
+      "severity": "HIGH",
+      "models_voted": [
+        "groq"
+      ],
+      "selected_model": null,
+      "patch_applied": false,
+      "votes": {
+        "groq": {
+          "classification": "fix"
+        }
+      }
+    },
+    {
+      "finding": 11,
+      "category": "NO_SECCOMP",
+      "severity": "HIGH",
+      "models_voted": [
+        "groq"
+      ],
+      "selected_model": null,
+      "patch_applied": false,
+      "votes": {
+        "groq": {
+          "classification": "fix"
+        }
+      }
+    },
+    {
+      "finding": 12,
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "models_voted": [
+        "groq"
+      ],
+      "selected_model": null,
+      "patch_applied": false,
+      "votes": {
+        "groq": {
+          "classification": "fix"
+        }
+      }
+    },
+    {
+      "finding": 13,
+      "category": "IMAGE_LATEST",
+      "severity": "MEDIUM",
+      "models_voted": [
+        "groq"
+      ],
+      "selected_model": null,
+      "patch_applied": false,
+      "votes": {
+        "groq": {
+          "classification": "fix"
+        }
+      }
+    },
+    {
+      "finding": 14,
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "MEDIUM",
+      "models_voted": [
+        "groq"
+      ],
+      "selected_model": null,
+      "patch_applied": false,
+      "votes": {
+        "groq": {
+          "classification": "fix"
+        }
+      }
+    },
+    {
+      "finding": 15,
+      "category": "SERVICEACCOUNT_TOKEN_AUTO",
+      "severity": "MEDIUM",
+      "models_voted": [
+        "groq"
+      ],
+      "selected_model": null,
+      "patch_applied": false,
+      "votes": {
+        "groq": {
+          "classification": "fix"
+        }
+      }
+    },
+    {
+      "finding": 16,
+      "category": "IMAGE_LATEST",
+      "severity": "MEDIUM",
+      "models_voted": [
+        "groq"
+      ],
+      "selected_model": null,
+      "patch_applied": false,
+      "votes": {
+        "groq": {
+          "classification": "fix"
+        }
+      }
+    },
+    {
+      "finding": 17,
+      "category": "NETWORK_POLICY_MISSING",
+      "severity": "MEDIUM",
+      "models_voted": [
+        "groq"
+      ],
+      "selected_model": "groq",
+      "patch_applied": true,
+      "votes": {
+        "groq": {
+          "classification": "fix"
+        }
+      }
+    }
+  ]
+}

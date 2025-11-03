@@ -21,7 +21,7 @@ OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "google/gemma-2-9b-it:free")
 GROQ_MODEL_SINGLE = os.getenv("GROQ_MODEL", "").strip()
 GROQ_MODELS_FALLBACK = (
     [GROQ_MODEL_SINGLE] if GROQ_MODEL_SINGLE else
-    ["llama-3.1-70b-versatile", "llama-3.1-8b-instant", "gemma2-9b-it"]
+    ["llama-3.3-70b-versatile", "llama-3.1-70b-versatile", "llama-3.1-8b-instant"]
 )
 OLLAMA_MODEL     = os.getenv("OLLAMA_MODEL", "llama3.1:8b-instruct")
 

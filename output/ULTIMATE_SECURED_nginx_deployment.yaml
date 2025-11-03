@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  namespace: nginx-secure
+  annotations:
+    container.apparmor.security.beta.kubernetes.io/nginx: runtime/default
+  labels:
+    app: nginx
+    security: hardened
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+      annotations:
+        container.apparmor.security.beta.kubernetes.io/nginx: runtime/default
+    spec:
+      # Pod-level security context
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 3000
+        fsGroup: 2000
+        seccompProfile:
+          type: RuntimeDefault
+      
+      # Disable automatic service account token mounting
+      automountServiceAccountToken: false
+      
+      containers:
+      - name: nginx
+        image: nginx:1.25.3-alpine  # Specific version, no 'latest'
+        
+        # Container-level security context
+        securityContext:
+          privileged: false
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 1000
+          capabilities:
+            drop:
+              - ALL
+          seccompProfile:
+            type: RuntimeDefault
+        
+        # Resource limits and requests
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+        
+        # Health probes
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        
+        # Port configuration
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        
+        # Volume mounts for writable directories (since rootfs is read-only)
+        volumeMounts:
+        - name: cache
+          mountPath: /var/cache/nginx
+        - name: run
+          mountPath: /var/run
+      
+      # Volumes for writable directories
+      volumes:
+      - name: cache
+        emptyDir: {}
+      - name: run
+        emptyDir: {}

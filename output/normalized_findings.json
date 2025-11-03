@@ -1,6 +1,6 @@
 {
-  "generated_at": "2025-11-03T10:57:17Z",
-  "raw_findings": 1336,
+  "generated_at": "2025-11-03T12:03:15Z",
+  "raw_findings": 1338,
   "aggregate": [
     {
       "file": "13.nginx_privileged_deployment.yaml",
@@ -3237,8 +3237,8 @@
         "container-resources"
       ],
       "examples": [
-        "C-0270",
         "C-0271",
+        "C-0270",
         "Container Resources"
       ],
       "occurrences": 11
@@ -3786,8 +3786,8 @@
         "C-0271"
       ],
       "examples": [
-        "C-0270",
-        "C-0271"
+        "C-0271",
+        "C-0270"
       ],
       "occurrences": 2
     },
@@ -3822,8 +3822,8 @@
         "C-0271"
       ],
       "examples": [
-        "C-0270",
-        "C-0271"
+        "C-0271",
+        "C-0270"
       ],
       "occurrences": 2
     },
@@ -3858,8 +3858,8 @@
         "C-0271"
       ],
       "examples": [
-        "C-0270",
-        "C-0271"
+        "C-0271",
+        "C-0270"
       ],
       "occurrences": 2
     },
@@ -3894,8 +3894,8 @@
         "C-0271"
       ],
       "examples": [
-        "C-0270",
-        "C-0271"
+        "C-0271",
+        "C-0270"
       ],
       "occurrences": 2
     },
@@ -3930,8 +3930,8 @@
         "C-0271"
       ],
       "examples": [
-        "C-0270",
-        "C-0271"
+        "C-0271",
+        "C-0270"
       ],
       "occurrences": 2
     },
@@ -3966,8 +3966,8 @@
         "C-0271"
       ],
       "examples": [
-        "C-0270",
-        "C-0271"
+        "C-0271",
+        "C-0270"
       ],
       "occurrences": 2
     },
@@ -4002,8 +4002,8 @@
         "C-0271"
       ],
       "examples": [
-        "C-0270",
-        "C-0271"
+        "C-0271",
+        "C-0270"
       ],
       "occurrences": 2
     },
@@ -4038,8 +4038,8 @@
         "C-0271"
       ],
       "examples": [
-        "C-0270",
-        "C-0271"
+        "C-0271",
+        "C-0270"
       ],
       "occurrences": 2
     }
