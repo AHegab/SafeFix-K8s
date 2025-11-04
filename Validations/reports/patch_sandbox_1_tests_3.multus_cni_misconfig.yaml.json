@@ -1,0 +1,13 @@
+{
+    "gates":  [
+                  {
+                      "gate":  "schema",
+                      "evidence":  "",
+                      "details":  "kubeconform not found",
+                      "status":  "SKIP"
+                  }
+              ],
+    "overall":  "FAIL",
+    "file_sha256":  "e1a228a2a110d23123bfb4726910121fabf478a0e2bc2c4390c028166088de4a",
+    "file":  "SafeFixK8s/output/patch_sandbox/1/tests/3.multus_cni_misconfig.yaml"
+}

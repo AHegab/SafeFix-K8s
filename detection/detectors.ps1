@@ -4,11 +4,11 @@
 $ErrorActionPreference = "Stop"
 
 # --- paths --------------------------------------------------------------------
-$RepoRoot     = Split-Path -Parent $PSScriptRoot
+$RepoRoot = Split-Path -Parent $PSScriptRoot
 $DetectionDir = $PSScriptRoot
-$OutDir       = Join-Path $DetectionDir "output\raw"
-$LogsDir      = Join-Path $DetectionDir "output\logs"
-New-Item -ItemType Directory -Force -Path $OutDir,$LogsDir | Out-Null
+$OutDir = Join-Path $DetectionDir "output\raw"
+$LogsDir = Join-Path $DetectionDir "output\logs"
+New-Item -ItemType Directory -Force -Path $OutDir, $LogsDir | Out-Null
 
 # --- helpers ------------------------------------------------------------------
 function Write-NonEmpty($Path) {
@@ -18,8 +18,8 @@ function Write-NonEmpty($Path) {
 }
 
 function _WrapPlaceholder($Out, $tool, $msg) {
-  '[{"tool":"' + $tool + '","note":"' + ($msg -replace '"','''') + '"}]' |
-    Set-Content -Encoding UTF8 -Path $Out
+  '[{"tool":"' + $tool + '","note":"' + ($msg -replace '"', '''') + '"}]' |
+  Set-Content -Encoding UTF8 -Path $Out
   Write-Host "[$tool] -> $Out (placeholder)"
 }
 
@@ -42,8 +42,8 @@ function Resolve-ScanPath {
 # Normalize a path to a /scan/<relpath> (so tools keep relative paths in JSON)
 function To-ScanRel {
   param([string]$AbsRoot, [string]$AbsFile)
-  $rel = $AbsFile.Substring($AbsRoot.Length).TrimStart('\','/')
-  return "/scan/" + ($rel -replace '\\','/')
+  $rel = $AbsFile.Substring($AbsRoot.Length).TrimStart('\', '/')
+  return "/scan/" + ($rel -replace '\\', '/')
 }
 
 # --- image set (LEAN) ---------------------------------------------------------
@@ -102,12 +102,12 @@ function Ensure-ExtendedDetectorImages {
 # --- timing / progress --------------------------------------------------------
 $global:ToolTimings = New-Object System.Collections.ArrayList
 function Invoke-WithTiming {
-  param([string]$Name,[scriptblock]$Action)
-  $sw=[System.Diagnostics.Stopwatch]::StartNew()
-  $status="ok"
-  try { & $Action } catch { $status="error"; throw } finally {
+  param([string]$Name, [scriptblock]$Action)
+  $sw = [System.Diagnostics.Stopwatch]::StartNew()
+  $status = "ok"
+  try { & $Action } catch { $status = "error"; throw } finally {
     $sw.Stop()
-    [void]$global:ToolTimings.Add([pscustomobject]@{Tool=$Name;Seconds=[math]::Round($sw.Elapsed.TotalSeconds,2);Status=$status})
+    [void]$global:ToolTimings.Add([pscustomobject]@{Tool = $Name; Seconds = [math]::Round($sw.Elapsed.TotalSeconds, 2); Status = $status })
   }
 }
 
@@ -118,7 +118,7 @@ function Expand-EmbeddedConfigs {
   $out = Join-Path $DetectionDir ".tmp-extracted"
   New-Item -ItemType Directory -Force -Path $out | Out-Null
 
-  Get-ChildItem -Path $abs -Recurse -File -Include *.yaml,*.yml | ForEach-Object {
+  Get-ChildItem -Path $abs -Recurse -File -Include *.yaml, *.yml | ForEach-Object {
     $doc = Get-Content $_.FullName -Raw
     $objs = [System.Management.Automation.Language.Parser]::ParseInput($doc, [ref]$null, [ref]$null) > $null; # noop, just to be safe
     # naive split by '---'
@@ -133,9 +133,10 @@ function Expand-EmbeddedConfigs {
             $val = ($m.Groups[2].Value -replace '^\s{4}', '', 'Multiline')
             try {
               $parsed = ConvertFrom-Yaml $val
-              $file = Join-Path $out ("embedded__{0}__{1}.yaml" -f ($_.BaseName), $key.Replace(':','_'))
+              $file = Join-Path $out ("embedded__{0}__{1}.yaml" -f ($_.BaseName), $key.Replace(':', '_'))
               $val | Set-Content -Encoding UTF8 -Path $file
-            } catch { }
+            }
+            catch { }
           }
         }
       }
@@ -147,51 +148,55 @@ function Expand-EmbeddedConfigs {
 
 # --- detectors ----------------------------------------------------------------
 function Det-KubeConform {
-  param([string]$Path=".",[string]$Out="$OutDir\kubeconform_raw.json")
+  param([string]$Path = ".", [string]$Out = "$OutDir\kubeconform_raw.json")
   try {
     $abs = Resolve-ScanPath -Path $Path
     docker run --rm -v "${abs}:/scan:ro" ghcr.io/yannh/kubeconform:latest `
       -summary -output json -strict -ignore-missing-schemas -verbose /scan `
-      | Set-Content -Encoding UTF8 -Path $Out
+    | Set-Content -Encoding UTF8 -Path $Out
     Write-NonEmpty $Out; Write-Host "[kubeconform] -> $Out"
-  } catch { _WrapPlaceholder $Out "kubeconform" $_.Exception.Message }
+  }
+  catch { _WrapPlaceholder $Out "kubeconform" $_.Exception.Message }
 }
 
 function Det-KubeLinter {
   param(
-    [string]$Path=".",
-    [string]$Out="$OutDir\kubelinter_raw.json",
-    [string]$Cfg=(Join-Path $RepoRoot "policies\kubelinter-config.yaml")
+    [string]$Path = ".",
+    [string]$Out = "$OutDir\kubelinter_raw.json",
+    [string]$Cfg = (Join-Path $RepoRoot "policies\kubelinter-config.yaml")
   )
   try {
     $abs = Resolve-ScanPath -Path $Path
     if (Test-Path $Cfg) {
       docker run --rm -v "${abs}:/scan:ro" -v "${Cfg}:/cfg/kubelinter-config.yaml:ro" stackrox/kube-linter:latest `
         lint /scan --config /cfg/kubelinter-config.yaml --format json | Set-Content -Encoding UTF8 -Path $Out
-    } else {
+    }
+    else {
       docker run --rm -v "${abs}:/scan:ro" stackrox/kube-linter:latest `
         lint /scan --format json | Set-Content -Encoding UTF8 -Path $Out
     }
     Write-NonEmpty $Out; Write-Host "[kube-linter] -> $Out"
-  } catch { _WrapPlaceholder $Out "kubelinter" $_.Exception.Message }
+  }
+  catch { _WrapPlaceholder $Out "kubelinter" $_.Exception.Message }
 }
 
 function Det-Polaris {
-  param([string]$Path=".",[string]$Out="$OutDir\polaris_raw.json")
+  param([string]$Path = ".", [string]$Out = "$OutDir\polaris_raw.json")
   try {
     $abs = Resolve-ScanPath -Path $Path
     docker run --rm -v "${abs}:/scan:ro" quay.io/fairwinds/polaris:latest `
       polaris audit --audit-path /scan --format json `
-      | Set-Content -Encoding UTF8 -Path $Out
+    | Set-Content -Encoding UTF8 -Path $Out
     Write-NonEmpty $Out; Write-Host "[polaris] -> $Out"
-  } catch { _WrapPlaceholder $Out "polaris" $_.Exception.Message }
+  }
+  catch { _WrapPlaceholder $Out "polaris" $_.Exception.Message }
 }
 
 function Det-Checkov {
-  param([string]$Path=".",[string]$Out="$OutDir\checkov_raw.json")
+  param([string]$Path = ".", [string]$Out = "$OutDir\checkov_raw.json")
   try {
     $abs = Resolve-ScanPath -Path $Path
-    $checksDir = Join-Path $RepoRoot "policies\checkov"
+    $checksDir = Join-Path $RepoRoot "Detection\policies\checkov"
     $local = $null
     try { $local = (Get-Command checkov -ErrorAction Stop).Source } catch { }
     $args = @("-d", $abs, "--framework", "kubernetes", "--quiet", "--compact", "-o", "json")
@@ -201,7 +206,8 @@ function Det-Checkov {
       $prevEA = $ErrorActionPreference; $ErrorActionPreference = "Continue"
       & checkov @args 2>$null | Set-Content -Encoding UTF8 -Path $Out
       $ErrorActionPreference = $prevEA
-    } else {
+    }
+    else {
       # Build Docker command with proper arguments
       $dockerArgs = @("run", "--rm", "-v", "${abs}:/scan:ro")
       if (Test-Path $checksDir) { 
@@ -216,21 +222,23 @@ function Det-Checkov {
       docker @dockerArgs | Set-Content -Encoding UTF8 -Path $Out
     }
     Write-NonEmpty $Out; Write-Host "[checkov] -> $Out"
-  } catch { _WrapPlaceholder $Out "checkov" $_.Exception.Message }
+  }
+  catch { _WrapPlaceholder $Out "checkov" $_.Exception.Message }
 }
 
 function Det-TrivyConfig {
-  param([string]$Path=".",[string]$Out="$OutDir\trivy_config_raw.json")
+  param([string]$Path = ".", [string]$Out = "$OutDir\trivy_config_raw.json")
   try {
     $abs = Resolve-ScanPath -Path $Path
     docker run --rm -v "${abs}:/scan:ro" aquasec/trivy:latest `
       config --quiet --format json /scan | Set-Content -Encoding UTF8 -Path $Out
     Write-NonEmpty $Out; Write-Host "[trivy config] -> $Out"
-  } catch { _WrapPlaceholder $Out "trivy-config" $_.Exception.Message }
+  }
+  catch { _WrapPlaceholder $Out "trivy-config" $_.Exception.Message }
 }
 
 function Det-Kubescape {
-  param([string]$Path=".",[string]$Out="$OutDir\kubescape_raw.json")
+  param([string]$Path = ".", [string]$Out = "$OutDir\kubescape_raw.json")
   $abs = Resolve-ScanPath -Path $Path
   $env:KUBESCAPE_DISABLE_GIT_INFO = "true"
   $ks = $null; try { $ks = (Get-Command kubescape -ErrorAction Stop).Source } catch { }
@@ -242,11 +250,14 @@ function Det-Kubescape {
       $ErrorActionPreference = $prevEA
       if ((Test-Path $Out) -and ((Get-Item $Out).Length -gt 100)) {
         Write-Host "[kubescape] -> $Out"
-      } else {
+      }
+      else {
         _WrapPlaceholder $Out "kubescape" "failed: output file not created or too small"
       }
-    } catch { _WrapPlaceholder $Out "kubescape" $_.Exception.Message }
-  } else {
+    }
+    catch { _WrapPlaceholder $Out "kubescape" $_.Exception.Message }
+  }
+  else {
     try {
       $prevEA = $ErrorActionPreference
       $ErrorActionPreference = "Continue"
@@ -256,37 +267,40 @@ function Det-Kubescape {
       $tempOut = Join-Path $abs "kubescape_raw.json"
       if ((Test-Path $tempOut) -and ($tempOut -ne $Out)) { Move-Item -Force $tempOut $Out }
       Write-NonEmpty $Out; Write-Host "[kubescape] -> $Out"
-    } catch { _WrapPlaceholder $Out "kubescape" $_.Exception.Message }
+    }
+    catch { _WrapPlaceholder $Out "kubescape" $_.Exception.Message }
   }
 }
 
 function Det-KubeScore {
-  param([string]$Path=".",[string]$Out="$OutDir\kubescore_raw.json")
+  param([string]$Path = ".", [string]$Out = "$OutDir\kubescore_raw.json")
   try {
     $abs = Resolve-ScanPath -Path $Path
-    $files = Get-ChildItem -Path $abs -Recurse -File -Include *.yaml,*.yml |
-      ForEach-Object { To-ScanRel -AbsRoot $abs -AbsFile $_.FullName }
+    $files = Get-ChildItem -Path $abs -Recurse -File -Include *.yaml, *.yml |
+    ForEach-Object { To-ScanRel -AbsRoot $abs -AbsFile $_.FullName }
     if ($files.Count -eq 0) { '[]' | Set-Content -Encoding UTF8 -Path $Out; Write-Host "[kube-score] -> $Out (no YAML)"; return }
-    $cmd=@("run","--rm","-v","${abs}:/scan:ro","zegl/kube-score:latest","score","--output-format","json") + $files
+    $cmd = @("run", "--rm", "-v", "${abs}:/scan:ro", "zegl/kube-score:latest", "score", "--output-format", "json") + $files
     docker @cmd | Set-Content -Encoding UTF8 -Path $Out
     Write-NonEmpty $Out; Write-Host "[kube-score] -> $Out"
-  } catch { _WrapPlaceholder $Out "kube-score" $_.Exception.Message }
+  }
+  catch { _WrapPlaceholder $Out "kube-score" $_.Exception.Message }
 }
 
 function Det-Yamllint {
-  param([string]$Path=".",[string]$Out="$OutDir\yamllint_raw.txt")
+  param([string]$Path = ".", [string]$Out = "$OutDir\yamllint_raw.txt")
   try {
     $abs = Resolve-ScanPath -Path $Path
     docker run --rm -v "${abs}:/scan:ro" cytopia/yamllint:latest `
       -f parsable -s /scan | Set-Content -Encoding UTF8 -Path $Out
     Write-NonEmpty $Out; Write-Host "[yamllint] -> $Out"
-  } catch { _WrapPlaceholder $Out "yamllint" $_.Exception.Message }
+  }
+  catch { _WrapPlaceholder $Out "yamllint" $_.Exception.Message }
 }
 
 function Det-KubeAudit {
-  param([string]$Path=".", [string]$Out="$OutDir\kubeaudit_raw.json")
-  $abs   = Resolve-ScanPath -Path $Path
-  $files = Get-ChildItem -Path $abs -Recurse -File -Include *.yaml,*.yml
+  param([string]$Path = ".", [string]$Out = "$OutDir\kubeaudit_raw.json")
+  $abs = Resolve-ScanPath -Path $Path
+  $files = Get-ChildItem -Path $abs -Recurse -File -Include *.yaml, *.yml
   $accum = @()
   if ($files.Count -eq 0) {
     '[]' | Set-Content -Encoding UTF8 -Path $Out
@@ -303,10 +317,11 @@ function Det-KubeAudit {
       $raw = $null
       if ($local) {
         $raw = & kubeaudit all -f "$($f.FullName)" -p json 2>$null
-      } else {
+      }
+      else {
         $dir = $f.Directory.FullName
         $raw = docker run --rm -v "${dir}:/scan:ro" ghcr.io/shopify/kubeaudit:latest `
-                 all -f "/scan/$($f.Name)" -p json 2>$null
+          all -f "/scan/$($f.Name)" -p json 2>$null
       }
       if ($raw) {
         $jsonLines = $raw | Where-Object { $_ -match '^\s*\{' -and $_ -notmatch 'Deprecation' -and $_ -notmatch 'WARNING' }
@@ -316,10 +331,12 @@ function Det-KubeAudit {
             # Preserve full relative path under /scan for better normalization
             $obj | Add-Member -NotePropertyName "file" -NotePropertyValue (To-ScanRel -AbsRoot $abs -AbsFile $f.FullName) -Force
             $accum += $obj
-          } catch { continue }
+          }
+          catch { continue }
         }
       }
-    } catch { continue }
+    }
+    catch { continue }
   }
   $ErrorActionPreference = $prevEA
   if ($accum.Count -eq 0) { '[]' | Set-Content -Encoding UTF8 -Path $Out; Write-Host "[kubeaudit] -> $Out (no findings)" }
@@ -328,19 +345,20 @@ function Det-KubeAudit {
 
 # --- Conftest (OPA) -----------------------------------------------------------
 function Det-Conftest {
-  param([string]$Path=".", [string]$Out="$OutDir\conftest_raw.json", [string]$PolicyDir="$RepoRoot\policies\opa")
+  param([string]$Path = ".", [string]$Out = "$OutDir\conftest_raw.json", [string]$PolicyDir = "$RepoRoot\Validations\policies\opa")
   try {
     $abs = Resolve-ScanPath -Path $Path
     if (-not (Test-Path $PolicyDir)) { _WrapPlaceholder $Out "conftest" "Policy dir not found"; return }
     docker run --rm -v "${abs}:/scan:ro" -v "${PolicyDir}:/policy:ro" openpolicyagent/conftest:latest `
       test /scan --policy /policy --all-namespaces --output json | Set-Content -Encoding UTF8 -Path $Out
     Write-NonEmpty $Out; Write-Host "[conftest] -> $Out"
-  } catch { _WrapPlaceholder $Out "conftest" $_.Exception.Message }
+  }
+  catch { _WrapPlaceholder $Out "conftest" $_.Exception.Message }
 }
 
 # --- Pluto (API deprecations) -------------------------------------------------
 function Det-Pluto {
-  param([string]$Path=".",[string]$Out="$OutDir\pluto_raw.json")
+  param([string]$Path = ".", [string]$Out = "$OutDir\pluto_raw.json")
   $abs = Resolve-ScanPath -Path $Path
   $local = $null
   try { $local = (Get-Command pluto -ErrorAction Stop).Source } catch { }
@@ -357,36 +375,41 @@ function Det-Pluto {
           $parsed = $jsonContent | ConvertFrom-Json
           $parsed | ConvertTo-Json -Depth 10 | Set-Content -Encoding UTF8 -Path $Out
           Write-Host "[pluto] -> $Out"
-        } catch {
+        }
+        catch {
           $jsonContent | Set-Content -Encoding UTF8 -Path $Out
           Write-Host "[pluto] -> $Out"
         }
-      } else {
+      }
+      else {
         '{"items":[],"target-versions":{}}' | Set-Content -Encoding UTF8 -Path $Out
         Write-Host "[pluto] -> $Out (no deprecated APIs found)"
       }
-    } else {
+    }
+    else {
       '{"items":[],"target-versions":{},"note":"Pluto CLI not installed. Please install pluto locally for API deprecation scanning."}' |
-        Set-Content -Encoding UTF8 -Path $Out
+      Set-Content -Encoding UTF8 -Path $Out
       Write-Host "[pluto] -> $Out (placeholder - tool not installed)"
     }
-  } catch {
-    '{"items":[],"target-versions":{},"note":"' + ($_.Exception.Message -replace '"','\"') + '"}' |
-      Set-Content -Encoding UTF8 -Path $Out
+  }
+  catch {
+    '{"items":[],"target-versions":{},"note":"' + ($_.Exception.Message -replace '"', '\"') + '"}' |
+    Set-Content -Encoding UTF8 -Path $Out
     Write-Host "[pluto] -> $Out (placeholder - error)"
-  } finally { $ErrorActionPreference = $prevEA }
+  }
+  finally { $ErrorActionPreference = $prevEA }
 }
 
 # --- RBAC "police" (lightweight heuristic if real tool absent) ----------------
 function Det-RBACPolice {
-  param([string]$Path=".",[string]$Out="$OutDir\rbacpolice_raw.json")
+  param([string]$Path = ".", [string]$Out = "$OutDir\rbacpolice_raw.json")
   try {
     $abs = Resolve-ScanPath -Path $Path
-    $rbacFiles = Get-ChildItem -Path $abs -Recurse -File -Include *.yaml,*.yml |
-      Where-Object {
-        $content = Get-Content $_.FullName -Raw
-        $content -match 'kind:\s*(Role|ClusterRole|RoleBinding|ClusterRoleBinding)'
-      }
+    $rbacFiles = Get-ChildItem -Path $abs -Recurse -File -Include *.yaml, *.yml |
+    Where-Object {
+      $content = Get-Content $_.FullName -Raw
+      $content -match 'kind:\s*(Role|ClusterRole|RoleBinding|ClusterRoleBinding)'
+    }
     if ($rbacFiles.Count -eq 0) {
       '[{"tool":"rbac-police","note":"No RBAC manifests found"}]' | Set-Content -Encoding UTF8 -Path $Out
       Write-Host "[rbac-police] -> $Out (placeholder - no RBAC files)"; return
@@ -405,7 +428,7 @@ function Det-RBACPolice {
         $kind = if ($isClusterRole) { "ClusterRole" } else { "Role" }
         
         if (($text -match 'verbs:\s*\[\s*[''"]?\*[''"]?\s*\]') -or 
-            ($text -match 'verbs:\s*\n\s*-\s*[''"]?\*[''"]?')) {
+          ($text -match 'verbs:\s*\n\s*-\s*[''"]?\*[''"]?')) {
           $findings += [pscustomobject]@{
             rule     = "WildcardVerbs"
             severity = "HIGH"
@@ -416,7 +439,7 @@ function Det-RBACPolice {
           }
         }
         if (($text -match 'resources:\s*\[\s*[''"]?\*[''"]?\s*\]') -or 
-            ($text -match 'resources:\s*\n\s*-\s*[''"]?\*[''"]?')) {
+          ($text -match 'resources:\s*\n\s*-\s*[''"]?\*[''"]?')) {
           $findings += [pscustomobject]@{
             rule     = "WildcardResources"
             severity = "HIGH"
@@ -427,7 +450,7 @@ function Det-RBACPolice {
           }
         }
         if (($text -match 'apiGroups:\s*\[\s*[''"]?\*[''"]?\s*\]') -or 
-            ($text -match 'apiGroups:\s*\n\s*-\s*[''"]?\*[''"]?')) {
+          ($text -match 'apiGroups:\s*\n\s*-\s*[''"]?\*[''"]?')) {
           $findings += [pscustomobject]@{
             rule     = "WildcardAPIGroups"
             severity = "MEDIUM"
@@ -440,7 +463,7 @@ function Det-RBACPolice {
 
         foreach ($verb in $dangerousVerbs) {
           if (($text -match "verbs:\s*\[.*[''`"]?$verb[''`"]?.*\]") -or 
-              ($text -match "verbs:[\s\S]*?-\s*[''`"]?$verb[''`"]?")) {
+            ($text -match "verbs:[\s\S]*?-\s*[''`"]?$verb[''`"]?")) {
             $findings += [pscustomobject]@{
               rule     = "DangerousVerb_$verb"
               severity = "MEDIUM"
@@ -454,7 +477,7 @@ function Det-RBACPolice {
 
         foreach ($res in $sensitiveResources) {
           if (($text -match "resources:\s*\[.*[''`"]?$res[''`"]?.*\]") -or 
-              ($text -match "resources:[\s\S]*?-\s*[''`"]?$res[''`"]?")) {
+            ($text -match "resources:[\s\S]*?-\s*[''`"]?$res[''`"]?")) {
             $findings += [pscustomobject]@{
               rule     = "SensitiveResource_$res"
               severity = "MEDIUM"
@@ -492,7 +515,7 @@ function Det-RBACPolice {
         }
 
         if ((($text -match "verbs:[\s\S]*?-\s*delete") -or ($text -match "verbs:\s*\[.*delete.*\]")) -and
-            (($text -match "verbs:[\s\S]*?-\s*(create|update)") -or ($text -match "verbs:\s*\[.*(create|update).*\]"))) {
+          (($text -match "verbs:[\s\S]*?-\s*(create|update)") -or ($text -match "verbs:\s*\[.*(create|update).*\]"))) {
           $findings += [pscustomobject]@{
             rule     = "DeleteWithModifyPerms"
             severity = "MEDIUM"
@@ -534,23 +557,26 @@ function Det-RBACPolice {
     if ($findings.Count -eq 0) {
       '[]' | Set-Content -Encoding UTF8 -Path $Out
       Write-Host "[rbac-police] -> $Out (no findings)"
-    } else {
+    }
+    else {
       # Force array output even for single finding
       if ($findings.Count -eq 1) {
         # Wrap single object in array brackets, pretty-printed
         $json = $findings[0] | ConvertTo-Json -Depth 10
         "[$json]" | Set-Content -Encoding UTF8 -Path $Out
-      } else {
+      }
+      else {
         $findings | ConvertTo-Json -Depth 10 | Set-Content -Encoding UTF8 -Path $Out
       }
       Write-Host "[rbac-police] -> $Out ($($findings.Count) findings)"
     }
-  } catch { _WrapPlaceholder $Out "rbac-police" $_.Exception.Message }
+  }
+  catch { _WrapPlaceholder $Out "rbac-police" $_.Exception.Message }
 }
 
 # --- Gitleaks (secrets) -------------------------------------------------------
 function Det-Gitleaks {
-  param([string]$Path=".")
+  param([string]$Path = ".")
   $Out = Join-Path $OutDir "gitleaks_raw.json"
   $prevEA = $ErrorActionPreference
   $ErrorActionPreference = "Continue"
@@ -559,57 +585,60 @@ function Det-Gitleaks {
     $gitleaksCmd = Get-Command gitleaks -ErrorAction SilentlyContinue
     if ($gitleaksCmd) {
       $abs = Resolve-ScanPath -Path $Path
-      $rulesPath = Join-Path $RepoRoot "policies\gitleaks-rules.toml"
+      $rulesPath = Join-Path $RepoRoot "Detection\policies\gitleaks-rules.toml"
       & gitleaks detect --source $abs --no-git --report-path $Out --report-format json --config $rulesPath 2>$null
 
       if (!(Test-Path $Out)) { '[]' | Set-Content -Encoding UTF8 -Path $Out }
-    } else {
+    }
+    else {
       '[{"note":"Gitleaks not installed. Install locally for secret scanning."}]' |
-        Set-Content -Encoding UTF8 -Path $Out
+      Set-Content -Encoding UTF8 -Path $Out
       Write-Host "[gitleaks] -> $Out (placeholder - tool not installed)"
     }
-  } catch {
-    '[{"note":"' + ($_.Exception.Message -replace '"','\"') + '"}]' | Set-Content -Encoding UTF8 -Path $Out
-  } finally { $ErrorActionPreference = $prevEA }
+  }
+  catch {
+    '[{"note":"' + ($_.Exception.Message -replace '"', '\"') + '"}]' | Set-Content -Encoding UTF8 -Path $Out
+  }
+  finally { $ErrorActionPreference = $prevEA }
 }
 
 # --- orchestration ------------------------------------------------------------
 function Det-RunLean {
-  param([string]$Path=".")
+  param([string]$Path = ".")
   Ensure-DetectorImages
   $abs = Resolve-ScanPath -Path $Path
   Write-Host "Scanning: $abs" -ForegroundColor Cyan
 
-  $steps=@(
-    "KubeConform","KubeLinter","Polaris",
-    "Checkov","TrivyConfig","Kubescape","KubeScore",
-    "Yamllint","KubeAudit","Conftest"
+  $steps = @(
+    "KubeConform", "KubeLinter", "Polaris",
+    "Checkov", "TrivyConfig", "Kubescape", "KubeScore",
+    "Yamllint", "KubeAudit", "Conftest"
   )
 
   foreach ($s in $steps) {
     Invoke-WithTiming -Name $s {
       switch ($s) {
         "KubeConform" { Det-KubeConform -Path $abs }
-        "KubeLinter"  { Det-KubeLinter  -Path $abs }
-        "Polaris"     { Det-Polaris     -Path $abs }
-        "Checkov"     { Det-Checkov     -Path $abs }
+        "KubeLinter" { Det-KubeLinter  -Path $abs }
+        "Polaris" { Det-Polaris     -Path $abs }
+        "Checkov" { Det-Checkov     -Path $abs }
         "TrivyConfig" { Det-TrivyConfig -Path $abs }
-        "Kubescape"   { Det-Kubescape   -Path $abs }
-        "KubeScore"   { Det-KubeScore   -Path $abs }
-        "Yamllint"    { Det-Yamllint    -Path $abs }
-        "KubeAudit"   { Det-KubeAudit   -Path $abs }
-        "Conftest"    { Det-Conftest    -Path $abs }
+        "Kubescape" { Det-Kubescape   -Path $abs }
+        "KubeScore" { Det-KubeScore   -Path $abs }
+        "Yamllint" { Det-Yamllint    -Path $abs }
+        "KubeAudit" { Det-KubeAudit   -Path $abs }
+        "Conftest" { Det-Conftest    -Path $abs }
       }
     }
   }
 
   Write-Host "`n────────── Runtime summary ──────────"
   $global:ToolTimings | Sort-Object Seconds -Descending |
-    Format-Table Tool,Seconds,Status -Auto
+  Format-Table Tool, Seconds, Status -Auto
 }
 
 function Det-RunExtended {
-  param([string]$Path=".")
+  param([string]$Path = ".")
 
   Ensure-ExtendedDetectorImages
   $abs = Resolve-ScanPath -Path $Path
@@ -618,7 +647,7 @@ function Det-RunExtended {
   $extracted = Expand-EmbeddedConfigs -Path $Path
   $hasExtracted = $false
   if (Test-Path $extracted) {
-    $hasExtracted = ((Get-ChildItem -Path $extracted -Recurse -File -Include *.yaml,*.yml | Measure-Object).Count -gt 0)
+    $hasExtracted = ((Get-ChildItem -Path $extracted -Recurse -File -Include *.yaml, *.yml | Measure-Object).Count -gt 0)
   }
 
   Write-Host "Scanning: $abs (EXTENDED MODE)" -ForegroundColor Cyan
@@ -630,33 +659,33 @@ function Det-RunExtended {
   function New-EmbeddedOut([string]$defaultPath) {
     $dir = Split-Path $defaultPath -Parent
     $base = [IO.Path]::GetFileNameWithoutExtension($defaultPath)
-    $ext  = [IO.Path]::GetExtension($defaultPath)
+    $ext = [IO.Path]::GetExtension($defaultPath)
     return (Join-Path $dir ("{0}_embedded{1}" -f $base, $ext))
   }
 
   # ---------- First pass: scan ORIGINAL path ----------
   $steps = @(
-    "KubeConform","KubeLinter","Polaris",
-    "Checkov","TrivyConfig","Kubescape","KubeScore",
-    "Yamllint","KubeAudit","RBACPolice","Pluto","Gitleaks","Conftest"
+    "KubeConform", "KubeLinter", "Polaris",
+    "Checkov", "TrivyConfig", "Kubescape", "KubeScore",
+    "Yamllint", "KubeAudit", "RBACPolice", "Pluto", "Gitleaks", "Conftest"
   )
 
   foreach ($s in $steps) {
     Invoke-WithTiming -Name $s {
       switch ($s) {
         "KubeConform" { Det-KubeConform -Path $abs }
-        "KubeLinter"  { Det-KubeLinter  -Path $abs }
-        "Polaris"     { Det-Polaris     -Path $abs }
-        "Checkov"     { Det-Checkov     -Path $abs }
+        "KubeLinter" { Det-KubeLinter  -Path $abs }
+        "Polaris" { Det-Polaris     -Path $abs }
+        "Checkov" { Det-Checkov     -Path $abs }
         "TrivyConfig" { Det-TrivyConfig -Path $abs }
-        "Kubescape"   { Det-Kubescape   -Path $abs }
-        "KubeScore"   { Det-KubeScore   -Path $abs }
-        "Yamllint"    { Det-Yamllint    -Path $abs }
-        "KubeAudit"   { Det-KubeAudit   -Path $abs }
-        "RBACPolice"  { Det-RBACPolice  -Path $abs }
-        "Pluto"       { Det-Pluto       -Path $abs }
-        "Gitleaks"    { Det-Gitleaks    -Path $abs }
-        "Conftest"    { Det-Conftest    -Path $abs }
+        "Kubescape" { Det-Kubescape   -Path $abs }
+        "KubeScore" { Det-KubeScore   -Path $abs }
+        "Yamllint" { Det-Yamllint    -Path $abs }
+        "KubeAudit" { Det-KubeAudit   -Path $abs }
+        "RBACPolice" { Det-RBACPolice  -Path $abs }
+        "Pluto" { Det-Pluto       -Path $abs }
+        "Gitleaks" { Det-Gitleaks    -Path $abs }
+        "Conftest" { Det-Conftest    -Path $abs }
       }
     }
   }
@@ -683,9 +712,9 @@ function Det-RunExtended {
 
     # Tools that make sense to rescan on the extracted YAML (skip Gitleaks)
     $embeddedSteps = @(
-      "KubeConform","KubeLinter","Polaris",
-      "Checkov","TrivyConfig","Kubescape","KubeScore",
-      "Yamllint","KubeAudit","RBACPolice","Pluto","Conftest"
+      "KubeConform", "KubeLinter", "Polaris",
+      "Checkov", "TrivyConfig", "Kubescape", "KubeScore",
+      "Yamllint", "KubeAudit", "RBACPolice", "Pluto", "Conftest"
     )
 
     foreach ($s in $embeddedSteps) {
@@ -693,22 +722,48 @@ function Det-RunExtended {
       Invoke-WithTiming -Name ("{0} (embedded)" -f $s) {
         switch ($s) {
           "KubeConform" { Det-KubeConform -Path $extracted -Out $embeddedOut }
-          "KubeLinter"  { Det-KubeLinter  -Path $extracted -Out $embeddedOut }
-          "Polaris"     { Det-Polaris     -Path $extracted -Out $embeddedOut }
-          "Checkov"     { Det-Checkov     -Path $extracted -Out $embeddedOut }
+          "KubeLinter" { Det-KubeLinter  -Path $extracted -Out $embeddedOut }
+          "Polaris" { Det-Polaris     -Path $extracted -Out $embeddedOut }
+          "Checkov" { Det-Checkov     -Path $extracted -Out $embeddedOut }
           "TrivyConfig" { Det-TrivyConfig -Path $extracted -Out $embeddedOut }
-          "Kubescape"   { Det-Kubescape   -Path $extracted -Out $embeddedOut }
-          "KubeScore"   { Det-KubeScore   -Path $extracted -Out $embeddedOut }
-          "Yamllint"    { Det-Yamllint    -Path $extracted -Out $embeddedOut }
-          "KubeAudit"   { Det-KubeAudit   -Path $extracted -Out $embeddedOut }
-          "RBACPolice"  { Det-RBACPolice  -Path $extracted -Out $embeddedOut }
-          "Pluto"       { Det-Pluto       -Path $extracted -Out $embeddedOut }
-          "Conftest"    { Det-Conftest    -Path $extracted -Out $embeddedOut }
+          "Kubescape" { Det-Kubescape   -Path $extracted -Out $embeddedOut }
+          "KubeScore" { Det-KubeScore   -Path $extracted -Out $embeddedOut }
+          "Yamllint" { Det-Yamllint    -Path $extracted -Out $embeddedOut }
+          "KubeAudit" { Det-KubeAudit   -Path $extracted -Out $embeddedOut }
+          "RBACPolice" { Det-RBACPolice  -Path $extracted -Out $embeddedOut }
+          "Pluto" { Det-Pluto       -Path $extracted -Out $embeddedOut }
+          "Conftest" { Det-Conftest    -Path $extracted -Out $embeddedOut }
         }
       }
     }
   }
 
   Write-Host "`n────────── Runtime summary (EXTENDED) ──────────"
-  $global:ToolTimings | Sort-Object Seconds -Descending | Format-Table Tool,Seconds,Status -Auto
+  $global:ToolTimings | Sort-Object Seconds -Descending | Format-Table Tool, Seconds, Status -Auto
+}
+
+# --- Unified Detection Runner -------------------------------------------------
+function Run-AllDetectors {
+  param(
+    [string]$Path = ".",
+    [switch]$Extended
+  )
+  
+  Write-Host "`n========================================" -ForegroundColor Green
+  Write-Host "  SafeFix-K8s Detection Layer" -ForegroundColor Green
+  Write-Host "========================================`n" -ForegroundColor Green
+  
+  if ($Extended) {
+    Write-Host "Mode: EXTENDED (all tools + embedded configs)" -ForegroundColor Cyan
+    Det-RunExtended -Path $Path
+  }
+  else {
+    Write-Host "Mode: LEAN (core tools only)" -ForegroundColor Cyan
+    Det-RunLean -Path $Path
+  }
+  
+  Write-Host "`n========================================" -ForegroundColor Green
+  Write-Host "  Detection Complete!" -ForegroundColor Green
+  Write-Host "  Output location: $OutDir" -ForegroundColor Green
+  Write-Host "========================================`n" -ForegroundColor Green
 }

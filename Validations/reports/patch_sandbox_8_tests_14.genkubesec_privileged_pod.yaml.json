@@ -1,0 +1,19 @@
+{
+    "gates":  [
+                  {
+                      "gate":  "schema",
+                      "evidence":  "Validations/evidence/patch_sandbox_8_tests_14.genkubesec_privileged_pod.yaml/schema/kubeconform.json",
+                      "details":  "kubeconform run",
+                      "status":  "PASS"
+                  },
+                  {
+                      "gate":  "policy",
+                      "evidence":  "Validations/evidence/patch_sandbox_8_tests_14.genkubesec_privileged_pod.yaml/policy/conftest.json",
+                      "details":  "conftest run",
+                      "status":  "PASS"
+                  }
+              ],
+    "overall":  "FAIL",
+    "file_sha256":  "b84f125e758ec619c3fecef4f771ec4b2850b7cbfcc883d95892e03f20f8df93",
+    "file":  "SafeFixK8s/output/patch_sandbox/8/tests/14.genkubesec_privileged_pod.yaml"
+}

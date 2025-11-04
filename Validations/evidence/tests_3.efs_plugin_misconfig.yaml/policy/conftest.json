@@ -1,0 +1,21 @@
+﻿[
+	{
+		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\3.efs_plugin_misconfig.yaml",
+		"namespace": "main",
+		"successes": 24,
+		"failures": [
+			{
+				"msg": "container \"efs-plugin\" must drop ALL Linux capabilities",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "workload must set runAsNonRoot=true at podSecurityContext or container securityContext",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			}
+		]
+	}
+]

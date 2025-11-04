@@ -1,0 +1,18 @@
+﻿{
+  "resources": [
+    {
+      "filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\27.kubeteus_misconfigured_policy.yaml",
+      "kind": "NetworkPolicy",
+      "name": "egress-product",
+      "version": "crd.projectcalico.org/v1",
+      "status": "statusError",
+      "msg": "could not find schema for NetworkPolicy"
+    }
+  ],
+  "summary": {
+    "valid": 0,
+    "invalid": 0,
+    "errors": 1,
+    "skipped": 0
+  }
+}
