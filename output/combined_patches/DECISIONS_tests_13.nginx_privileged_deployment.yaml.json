@@ -1,9 +1,11 @@
 {
   "original_file": "tests\\13.nginx_privileged_deployment.yaml",
   "total_findings": 17,
-  "successful_patches": 1,
+  "successful_patches": 2,
   "models_used": [
-    "groq"
+    "groq",
+    "openrouter",
+    "gemini"
   ],
   "decisions": [
     {
@@ -11,12 +13,20 @@
       "category": "CAP_SYS_ADMIN",
       "severity": "CRITICAL",
       "models_voted": [
-        "groq"
+        "groq",
+        "openrouter",
+        "gemini"
       ],
-      "selected_model": null,
-      "patch_applied": false,
+      "selected_model": "openrouter",
+      "patch_applied": true,
       "votes": {
         "groq": {
+          "classification": "fix"
+        },
+        "openrouter": {
+          "classification": "fix"
+        },
+        "gemini": {
           "classification": "fix"
         }
       }
@@ -26,12 +36,20 @@
       "category": "CAP_SYS_ADMIN",
       "severity": "CRITICAL",
       "models_voted": [
-        "groq"
+        "groq",
+        "openrouter",
+        "gemini"
       ],
       "selected_model": null,
       "patch_applied": false,
       "votes": {
         "groq": {
+          "classification": "fix"
+        },
+        "openrouter": {
+          "classification": "fix"
+        },
+        "gemini": {
           "classification": "fix"
         }
       }
@@ -41,13 +59,21 @@
       "category": "PRIVILEGED",
       "severity": "CRITICAL",
       "models_voted": [
-        "groq"
+        "groq",
+        "openrouter",
+        "gemini"
       ],
       "selected_model": null,
       "patch_applied": false,
       "votes": {
         "groq": {
           "classification": "fix"
+        },
+        "openrouter": {
+          "classification": "fix"
+        },
+        "gemini": {
+          "classification": "needs_review"
         }
       }
     },
@@ -56,13 +82,21 @@
       "category": "PRIVILEGED",
       "severity": "CRITICAL",
       "models_voted": [
-        "groq"
+        "groq",
+        "openrouter",
+        "gemini"
       ],
       "selected_model": null,
       "patch_applied": false,
       "votes": {
         "groq": {
           "classification": "fix"
+        },
+        "openrouter": {
+          "classification": "fix"
+        },
+        "gemini": {
+          "classification": "needs_review"
         }
       }
     },
@@ -71,12 +105,20 @@
       "category": "PRIV_ESCALATION",
       "severity": "CRITICAL",
       "models_voted": [
-        "groq"
+        "groq",
+        "openrouter",
+        "gemini"
       ],
       "selected_model": null,
       "patch_applied": false,
       "votes": {
         "groq": {
+          "classification": "fix"
+        },
+        "openrouter": {
+          "classification": "fix"
+        },
+        "gemini": {
           "classification": "fix"
         }
       }
@@ -86,12 +128,20 @@
       "category": "NO_SECCOMP",
       "severity": "HIGH",
       "models_voted": [
-        "groq"
+        "groq",
+        "openrouter",
+        "gemini"
       ],
-      "selected_model": null,
-      "patch_applied": false,
+      "selected_model": "gemini",
+      "patch_applied": true,
       "votes": {
         "groq": {
+          "classification": "fix"
+        },
+        "openrouter": {
+          "classification": "fix"
+        },
+        "gemini": {
           "classification": "fix"
         }
       }
@@ -101,13 +151,21 @@
       "category": "HARD_CODED_CREDS",
       "severity": "HIGH",
       "models_voted": [
-        "groq"
+        "groq",
+        "openrouter",
+        "gemini"
       ],
       "selected_model": null,
       "patch_applied": false,
       "votes": {
         "groq": {
           "classification": "fix"
+        },
+        "openrouter": {
+          "classification": "fix"
+        },
+        "gemini": {
+          "classification": "needs_review"
         }
       }
     },
@@ -116,13 +174,21 @@
       "category": "READONLY_ROOTFS_FALSE",
       "severity": "HIGH",
       "models_voted": [
-        "groq"
+        "groq",
+        "openrouter",
+        "gemini"
       ],
       "selected_model": null,
       "patch_applied": false,
       "votes": {
         "groq": {
           "classification": "fix"
+        },
+        "openrouter": {
+          "classification": "fix"
+        },
+        "gemini": {
+          "classification": "needs_review"
         }
       }
     },
@@ -131,12 +197,20 @@
       "category": "RUN_AS_NONROOT_FALSE",
       "severity": "HIGH",
       "models_voted": [
-        "groq"
+        "groq",
+        "openrouter",
+        "gemini"
       ],
       "selected_model": null,
       "patch_applied": false,
       "votes": {
         "groq": {
+          "classification": "fix"
+        },
+        "openrouter": {
+          "classification": "fix"
+        },
+        "gemini": {
           "classification": "fix"
         }
       }
@@ -146,13 +220,21 @@
       "category": "NO_APPARMOR",
       "severity": "HIGH",
       "models_voted": [
-        "groq"
+        "groq",
+        "openrouter",
+        "gemini"
       ],
       "selected_model": null,
       "patch_applied": false,
       "votes": {
         "groq": {
           "classification": "fix"
+        },
+        "openrouter": {
+          "classification": "fix"
+        },
+        "gemini": {
+          "classification": "needs_review"
         }
       }
     },
@@ -161,13 +243,21 @@
       "category": "NO_SECCOMP",
       "severity": "HIGH",
       "models_voted": [
-        "groq"
+        "groq",
+        "openrouter",
+        "gemini"
       ],
       "selected_model": null,
       "patch_applied": false,
       "votes": {
         "groq": {
           "classification": "fix"
+        },
+        "openrouter": {
+          "classification": "fix"
+        },
+        "gemini": {
+          "classification": "needs_review"
         }
       }
     },
@@ -176,13 +266,21 @@
       "category": "READONLY_ROOTFS_FALSE",
       "severity": "HIGH",
       "models_voted": [
-        "groq"
+        "groq",
+        "openrouter",
+        "gemini"
       ],
       "selected_model": null,
       "patch_applied": false,
       "votes": {
         "groq": {
-          "classification": "fix"
+          "classification": "needs_review"
+        },
+        "openrouter": {
+          "classification": "needs_review"
+        },
+        "gemini": {
+          "classification": "needs_review"
         }
       }
     },
@@ -191,13 +289,21 @@
       "category": "IMAGE_LATEST",
       "severity": "MEDIUM",
       "models_voted": [
-        "groq"
+        "groq",
+        "openrouter",
+        "gemini"
       ],
       "selected_model": null,
       "patch_applied": false,
       "votes": {
         "groq": {
-          "classification": "fix"
+          "classification": "needs_review"
+        },
+        "openrouter": {
+          "classification": "needs_review"
+        },
+        "gemini": {
+          "classification": "needs_review"
         }
       }
     },
@@ -206,13 +312,21 @@
       "category": "POD_DEFAULT_NAMESPACE",
       "severity": "MEDIUM",
       "models_voted": [
-        "groq"
+        "groq",
+        "openrouter",
+        "gemini"
       ],
       "selected_model": null,
       "patch_applied": false,
       "votes": {
         "groq": {
-          "classification": "fix"
+          "classification": "needs_review"
+        },
+        "openrouter": {
+          "classification": "needs_review"
+        },
+        "gemini": {
+          "classification": "needs_review"
         }
       }
     },
@@ -221,13 +335,21 @@
       "category": "SERVICEACCOUNT_TOKEN_AUTO",
       "severity": "MEDIUM",
       "models_voted": [
-        "groq"
+        "groq",
+        "openrouter",
+        "gemini"
       ],
       "selected_model": null,
       "patch_applied": false,
       "votes": {
         "groq": {
-          "classification": "fix"
+          "classification": "needs_review"
+        },
+        "openrouter": {
+          "classification": "needs_review"
+        },
+        "gemini": {
+          "classification": "needs_review"
         }
       }
     },
@@ -236,13 +358,21 @@
       "category": "IMAGE_LATEST",
       "severity": "MEDIUM",
       "models_voted": [
-        "groq"
+        "groq",
+        "openrouter",
+        "gemini"
       ],
       "selected_model": null,
       "patch_applied": false,
       "votes": {
         "groq": {
-          "classification": "fix"
+          "classification": "needs_review"
+        },
+        "openrouter": {
+          "classification": "needs_review"
+        },
+        "gemini": {
+          "classification": "needs_review"
         }
       }
     },
@@ -251,13 +381,21 @@
       "category": "NETWORK_POLICY_MISSING",
       "severity": "MEDIUM",
       "models_voted": [
-        "groq"
+        "groq",
+        "openrouter",
+        "gemini"
       ],
-      "selected_model": "groq",
-      "patch_applied": true,
+      "selected_model": null,
+      "patch_applied": false,
       "votes": {
         "groq": {
           "classification": "fix"
+        },
+        "openrouter": {
+          "classification": "fix"
+        },
+        "gemini": {
+          "classification": "needs_review"
         }
       }
     }
