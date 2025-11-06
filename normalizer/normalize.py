@@ -6,14 +6,14 @@ SafeFix-K8s LLM Payload Builder (v9.0 - PERFECT EDITION)
 Enterprise-grade normalizer with comprehensive tool parsing, intelligent
 categorization, and robust error handling.
 
-Outputs (default ./output)
+Outputs (default ./output/normalization)
 --------------------------
 - llm_payload.json   (Primary LLM-ready output)
 - normalized_findings.json (Optional debug output)
 
 Usage
 -----
-python Normalizer/normalize.py --raw Detection/output/raw --out output \
+python Normalizer/normalize.py --raw output/detection/raw --out output/normalization \
              [--min-support 1] [--only-security 1] [--emit-normalized 0]
 
 Features
@@ -40,6 +40,10 @@ import argparse, json, re, sys, os
 from pathlib import Path
 from datetime import datetime
 
+OUTPUT_ROOT = Path(os.getenv("SAFEFIX_OUTPUT_ROOT", "output")).resolve()
+DEFAULT_RAW_DIR = os.getenv("SAFEFIX_DETECTION_RAW_DIR") or str(OUTPUT_ROOT / "detection" / "raw")
+DEFAULT_OUT_DIR = os.getenv("SAFEFIX_NORMALIZATION_DIR") or str(OUTPUT_ROOT / "normalization")
+
 # Optional YAML support
 try:
     import yaml  # type: ignore
@@ -49,8 +53,8 @@ except ImportError:  # pragma: no cover
 # ---------------- CLI ----------------
 def parse_args():
     p = argparse.ArgumentParser("SafeFix-K8s LLM payload builder (v8.0)")
-    p.add_argument("--raw", default="Detection/output/raw", help="Folder containing *raw* tool outputs (prefers Detection/output/raw; falls back to detection/output/raw)")
-    p.add_argument("--out", default="output", help="Folder to write outputs (llm_payload.json)")
+    p.add_argument("--raw", default=DEFAULT_RAW_DIR, help="Folder containing *raw* tool outputs (defaults to output/detection/raw)")
+    p.add_argument("--out", default=DEFAULT_OUT_DIR, help="Folder to write outputs (llm_payload.json)")
     p.add_argument("--min-support", type=int, default=1, help="Minimum number of distinct tools to keep a (file,category)")
     p.add_argument("--only-security", type=int, default=1, help="If 1, exclude quality-only categories (probes/limits/schema/yaml)")
     p.add_argument("--emit-normalized", type=int, default=0, help="If 1, also emit normalized_findings.json for debugging")
@@ -632,13 +636,20 @@ def main():
     
     # Back-compat fallback to old layout
     if not raw_dir.exists():
-        legacy = (repo_root / "detection/output/raw").resolve()
-        if legacy.exists():
-            print(f"[INFO] Using legacy path: {legacy}")
-            raw_dir = legacy
+        candidates = [
+            (repo_root / "output/detection/raw").resolve(),
+            (repo_root / "Detection/output/raw").resolve(),
+            (repo_root / "detection/output/raw").resolve()
+        ]
+        for legacy in candidates:
+            if legacy.exists():
+                print(f"[INFO] Using legacy path: {legacy}")
+                raw_dir = legacy
+                break
     
     out_dir = Path(args.out).resolve(); 
     out_dir.mkdir(parents=True, exist_ok=True)
+    os.environ["SAFEFIX_NORMALIZATION_DIR"] = str(out_dir)
     
     if not raw_dir.exists():
         print(f"[ERROR] Raw directory not found: {raw_dir}", file=sys.stderr)
@@ -683,7 +694,7 @@ def main():
     }
     
     (out_dir/"llm_payload.json").write_text(json.dumps(payload, indent=2), encoding="utf-8")
-    print(f"✅ Wrote {out_dir/'llm_payload.json'} | LLM items={len(items)}")
+    print(f"[OK] Wrote {out_dir/'llm_payload.json'} | LLM items={len(items)}")
     
     if int(args.emit_normalized):
         normalized = {
@@ -692,7 +703,7 @@ def main():
             "aggregate": agg
         }
         (out_dir/"normalized_findings.json").write_text(json.dumps(normalized, indent=2), encoding="utf-8")
-        print(f"✅ Wrote {out_dir/'normalized_findings.json'} (debug)")
+        print(f"[OK] Wrote {out_dir/'normalized_findings.json'} (debug)")
 
 if __name__ == "__main__":
     main()

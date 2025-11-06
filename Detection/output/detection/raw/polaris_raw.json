@@ -1,0 +1,33 @@
+﻿{
+  "PolarisOutputVersion": "1.0",
+  "AuditTime": "2025-11-06T11:00:20Z",
+  "SourceType": "Path",
+  "SourceName": "/scan",
+  "DisplayName": "/scan",
+  "ClusterInfo": {
+    "Version": "unknown",
+    "Nodes": 0,
+    "Pods": 0,
+    "Namespaces": 0,
+    "Controllers": 0
+  },
+  "Results": [
+    {
+      "Name": "egress-product",
+      "Namespace": "bookinfo",
+      "Kind": "NetworkPolicy",
+      "Results": {},
+      "PodResult": null,
+      "CreatedTime": "0001-01-01T00:00:00Z"
+    },
+    {
+      "Name": "egress-product",
+      "Namespace": "bookinfo",
+      "Kind": "NetworkPolicy",
+      "Results": {},
+      "PodResult": null,
+      "CreatedTime": "0001-01-01T00:00:00Z"
+    }
+  ],
+  "Score": 100
+}

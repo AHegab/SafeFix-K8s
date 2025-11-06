@@ -1,0 +1,34 @@
+﻿{
+  "resources": [
+    {
+      "filename": "/scan/26.values.yaml",
+      "kind": "",
+      "name": "",
+      "version": "",
+      "status": "statusError",
+      "msg": "error while parsing: missing 'kind' key"
+    },
+    {
+      "filename": "/scan/27.Misconfiguration.yaml",
+      "kind": "NetworkPolicy",
+      "name": "egress-product",
+      "version": "",
+      "status": "statusError",
+      "msg": "error while parsing: missing 'apiVersion' key"
+    },
+    {
+      "filename": "/scan/27.Valid.yaml",
+      "kind": "NetworkPolicy",
+      "name": "egress-product",
+      "version": "",
+      "status": "statusError",
+      "msg": "error while parsing: missing 'apiVersion' key"
+    }
+  ],
+  "summary": {
+    "valid": 0,
+    "invalid": 0,
+    "errors": 3,
+    "skipped": 0
+  }
+}

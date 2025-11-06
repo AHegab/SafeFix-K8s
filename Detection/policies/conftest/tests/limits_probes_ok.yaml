@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: secure-pod-with-limits-probes
+  namespace: production
+spec:
+  containers:
+  - name: app
+    image: nginx@sha256:abcd1234
+    resources:
+      limits:
+        cpu: "1"
+        memory: "512Mi"
+    livenessProbe:
+      httpGet:
+        path: /healthz
+        port: 8080
+      initialDelaySeconds: 10

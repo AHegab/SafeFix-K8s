@@ -2,7 +2,7 @@
 # Requires: pip install httpx jsonschema
 
 from __future__ import annotations
-import os, json, asyncio, hashlib, argparse, time
+import os, json, asyncio, hashlib, argparse, time, itertools
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 import re
@@ -32,6 +32,11 @@ DEFAULT_OPENROUTER_MODELS: List[str] = [
     "deepseek/deepseek-r1-distill-llama-70b:free",  # reasoning-leaning fallback
     "qwen/qwen3-vl-32b-instruct",             # VLM fallback (not required but allowed)
 ]
+
+OUTPUT_ROOT = Path(os.getenv("SAFEFIX_OUTPUT_ROOT", "output")).resolve()
+NORMALIZATION_DIR = Path(os.getenv("SAFEFIX_NORMALIZATION_DIR", OUTPUT_ROOT / "normalization"))
+LLM_DIR = Path(os.getenv("SAFEFIX_LLM_DIR", OUTPUT_ROOT / "llm"))
+PATCH_SANDBOX_DIR = Path(os.getenv("SAFEFIX_LLM_SANDBOX_DIR", LLM_DIR / "patch_sandbox"))
 
 RESPONSE_SCHEMA: Dict[str, Any] = {
     "type": "object",
@@ -437,6 +442,9 @@ def _validate_and_write_patch(file_path: str, patch: str, idx: int, apply_dir: s
 
 def load_payload() -> List[Dict[str, Any]]:
     candidates = [
+        NORMALIZATION_DIR / "llm_payload.json",
+        OUTPUT_ROOT / "normalization/llm_payload.json",
+        Path("output/normalization/llm_payload.json"),
         Path("output/llm_payload.json"),
         Path("Detection/output/llm_payload.json"),
         Path("detection/output/llm_payload.json"),
@@ -448,7 +456,7 @@ def load_payload() -> List[Dict[str, Any]]:
             if isinstance(obj, list): return obj
             if isinstance(obj, dict) and isinstance(obj.get("items"), list): return obj["items"]
             raise ValueError(f"{p} has unexpected structure. Expected a list or {{'items':[...]}}, got {type(obj)}")
-    raise FileNotFoundError("llm_payload.json not found in ., output/, or Detection/detection output/")
+    raise FileNotFoundError("llm_payload.json not found (expected under output/normalization or legacy locations)")
 
 def provider_enabled(name: str) -> bool:
     if name == "groq":        return bool(os.getenv("GROQ_API_KEY", ""))
@@ -672,7 +680,8 @@ def merge_consensus(votes: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
         counts[k] = counts.get(k, 0) + 1
 
     fix_votes = counts.get("fix", 0)
-    final_cls = "fix" if fix_votes >= 2 else (
+    quorum = 2 if len(votes) >= 2 else 1
+    final_cls = "fix" if fix_votes >= quorum else (
         "ignore" if counts.get("ignore", 0) > max(fix_votes, counts.get("needs_review", 0)) else
         "needs_review"
     )
@@ -699,10 +708,12 @@ def parse_args():
     ap.add_argument("--selftest", type=str, default="", help="Run a 1-item provider test: groq|openrouter|gemini|ollama")
     ap.add_argument("--validate", type=str, default="none", choices=["none", "yaml"],
                     help="Post-patch validator: none|yaml (apply diff in-memory and YAML-parse)")
-    ap.add_argument("--apply-dir", type=str, default="output/patch_sandbox",
+    ap.add_argument("--apply-dir", type=str, default=str(PATCH_SANDBOX_DIR),
                     help="Directory to write patched files for inspection (created if missing)")
     ap.add_argument("--autofix", action="store_true", help="Conservatively flip privileged:true and allowPrivilegeEscalation:true to false if still present after patch")
     ap.add_argument("--hygiene", action="store_true", help="After a patch is accepted, apply conservative hygiene (securityContext hardening) before writing")
+    ap.add_argument("--concurrency", type=int, default=1, help="Number of payload items to process in parallel (default=1)")
+    ap.add_argument("--shard-models", action="store_true", help="Assign findings to models in a round-robin fashion instead of asking every enabled model per finding")
     return ap.parse_args()
 
 def _mask(s): 
@@ -732,6 +743,7 @@ async def main():
     models = [m.strip() for m in args.models.split(",") if m.strip()] if args.models else MODELS
     timeout_seconds = args.timeout if args.timeout else LLM_TIMEOUT_SECONDS
     retries = args.retries if args.retries else RETRIES
+    concurrency = max(1, int(args.concurrency))
 
     payload = load_payload()
     total = len(payload)
@@ -740,100 +752,112 @@ async def main():
 
     enabled = [m for m in models if provider_enabled(m)]
     print(f"[SafeFix-LLM] Items: {len(payload)}/{total} | Models: {enabled} "
-        f"| timeout={timeout_seconds}s retries={retries}")
+        f"| timeout={timeout_seconds}s retries={retries} concurrency={concurrency}")
     print(f"[Keys] GROQ={_mask(os.getenv('GROQ_API_KEY',''))} "
           f"| OPENROUTER={_mask(os.getenv('OPENROUTER_API_KEY',''))} "
           f"| GEMINI={_mask(os.getenv('GEMINI_API_KEY',''))}")
 
     t0 = time.time()
-    results: List[Dict[str, Any]] = []
+    results: Dict[int, Dict[str, Any]] = {}
+    sem = asyncio.Semaphore(concurrency)
 
+    async def process_item(idx: int, item: Dict[str, Any], model_list: List[str]) -> None:
+        async with sem:
+            prompt = make_user_prompt(item)
+            votes = await ask_all(model_list, prompt, retries, timeout_seconds)
+            merged = merge_consensus(votes)
+
+            file_path = str(item.get("file", "")).strip()
+            fix_candidates: List[tuple[str, str, float]] = [
+                (m, v.get("patch", ""), float(v.get("confidence", 0.5)))
+                for m, v in votes.items() if v.get("classification") == "fix" and v.get("patch")
+            ]
+
+            validation = {"status": "skipped", "reason": "validation disabled"}
+            chosen_model = None
+            chosen_patch = None
+
+            if fix_candidates:
+                fix_candidates.sort(key=lambda t: (_provider_prio(t[0]), -t[2], -len(t[1])))
+
+                if args.validate == "none":
+                    chosen_model, chosen_patch, _ = fix_candidates[0]
+                    validation = {"status": "skipped", "reason": "validation disabled"}
+                else:
+                    last_reason = None
+                    for model_name, patch_text, _conf in fix_candidates:
+                        vres = _validate_and_write_patch(file_path, patch_text, idx, args.apply_dir, args.validate, str(item.get("category", "")), autofix=args.autofix, hygiene=args.hygiene)
+                        if vres.get("status") == "pass":
+                            chosen_model, chosen_patch = model_name, patch_text
+                            validation = vres
+                            break
+                        else:
+                            last_reason = vres.get("reason")
+                    if chosen_patch is None:
+                        validation = {"status": "fail", "reason": last_reason or "patch_apply_failed_all"}
+
+            if (chosen_patch is None) and args.hygiene and args.validate != "none" and isinstance(file_path, str) and file_path:
+                srcp = Path(file_path)
+                if srcp.exists():
+                    try:
+                        orig_text = srcp.read_text(encoding="utf-8")
+                        new_text, applied_hyg = _apply_hygiene(orig_text, str(item.get("category", "")))
+                        if applied_hyg and (not args.validate == "yaml" or _yaml_is_valid(new_text)):
+                            sandbox = Path(args.apply_dir) / str(idx)
+                            dst = sandbox / file_path
+                            dst.parent.mkdir(parents=True, exist_ok=True)
+                            dst.write_text(new_text, encoding="utf-8")
+                            validation = {"status": "pass", "reason": "hygiene_only", "sandbox_path": str(dst), "hygiene": {"applied": applied_hyg}}
+                    except (OSError, UnicodeDecodeError):
+                        pass
+
+            if chosen_patch is not None and validation.get("status") == "pass":
+                merged["final_classification"] = "fix"
+                merged["final_patch"] = chosen_patch
+                merged["from_model"] = chosen_model or merged.get("from_model") or ""
+                if chosen_model and chosen_model in votes:
+                    try:
+                        merged["confidence"] = float(votes[chosen_model].get("confidence", 0.5))
+                    except (TypeError, ValueError):
+                        merged["confidence"] = 0.5
+            elif merged.get("final_classification") == "fix" and validation.get("status") == "fail":
+                merged["final_classification"] = "needs_review"
+                merged["final_patch"] = ""
+
+            short_id = hashlib.sha1(json.dumps(item, sort_keys=True, ensure_ascii=False).encode()).hexdigest()[:12]
+            results[idx] = {
+                "id": short_id,
+                "file": item.get("file"),
+                "category": item.get("category"),
+                "consensus": merged,
+                "validation": validation,
+            }
+
+            print(f"  • processed {idx}/{len(payload)} (elapsed {time.time()-t0:.1f}s)")
+            await asyncio.sleep(SMALL_DELAY_SECONDS)
+
+    indexed_items: List[tuple[int, Dict[str, Any], List[str]]] = []
+    rr_cycle = itertools.cycle(enabled) if args.shard_models and enabled else None
     for idx, item in enumerate(payload, start=1):
         if not isinstance(item, dict):
             continue
+        chosen_models = enabled
+        if rr_cycle is not None:
+            chosen_models = [next(rr_cycle)]
+        indexed_items.append((idx, item, chosen_models))
 
-        prompt = make_user_prompt(item)
-        votes = await ask_all(models, prompt, retries, timeout_seconds)
-        merged = merge_consensus(votes)
+    if args.shard_models:
+        print(f"[SafeFix-LLM] Model sharding enabled -> {', '.join(enabled) if enabled else 'no providers'}")
 
-        # Build candidate fix patches from votes and try them in provider priority order.
-        file_path = str(item.get("file", "")).strip()
-        fix_candidates: List[tuple[str, str, float]] = [
-            (m, v.get("patch", ""), float(v.get("confidence", 0.5)))
-            for m, v in votes.items() if v.get("classification") == "fix" and v.get("patch")
-        ]
+    tasks = [asyncio.create_task(process_item(idx, item, model_list)) for idx, item, model_list in indexed_items]
+    if tasks:
+        await asyncio.gather(*tasks)
 
-        validation = {"status": "skipped", "reason": "validation disabled"}
-        chosen_model = None
-        chosen_patch = None
-
-        if fix_candidates:
-            # Sort by provider priority, then by confidence desc, then patch length desc
-            fix_candidates.sort(key=lambda t: (_provider_prio(t[0]), -t[2], -len(t[1])))
-
-            if args.validate == "none":
-                # No validation requested; just pick the top-priority patch
-                chosen_model, chosen_patch, _ = fix_candidates[0]
-                validation = {"status": "skipped", "reason": "validation disabled"}
-            else:
-                last_reason = None
-                for model_name, patch_text, _conf in fix_candidates:
-                    vres = _validate_and_write_patch(file_path, patch_text, idx, args.apply_dir, args.validate, str(item.get("category", "")), autofix=args.autofix, hygiene=args.hygiene)
-                    if vres.get("status") == "pass":
-                        chosen_model, chosen_patch = model_name, patch_text
-                        validation = vres
-                        break
-                    else:
-                        last_reason = vres.get("reason")
-                if chosen_patch is None:
-                    validation = {"status": "fail", "reason": last_reason or "patch_apply_failed_all"}
-
-        # If no patch was accepted but hygiene is requested, try hygiene-only write for this file
-        if (chosen_patch is None) and args.hygiene and args.validate != "none" and isinstance(file_path, str) and file_path:
-            srcp = Path(file_path)
-            if srcp.exists():
-                try:
-                    orig_text = srcp.read_text(encoding="utf-8")
-                    new_text, applied_hyg = _apply_hygiene(orig_text, str(item.get("category", "")))
-                    if applied_hyg and (not args.validate == "yaml" or _yaml_is_valid(new_text)):
-                        sandbox = Path(args.apply_dir) / str(idx)
-                        dst = sandbox / file_path
-                        dst.parent.mkdir(parents=True, exist_ok=True)
-                        dst.write_text(new_text, encoding="utf-8")
-                        validation = {"status": "pass", "reason": "hygiene_only", "sandbox_path": str(dst), "hygiene": {"applied": applied_hyg}}
-                except (OSError, UnicodeDecodeError):
-                    # ignore hygiene-only attempt errors; keep original validation
-                    pass
-
-        # Update merged result based on validation outcome
-        if chosen_patch is not None and validation.get("status") == "pass":
-            merged["final_classification"] = "fix"
-            merged["final_patch"] = chosen_patch
-            merged["from_model"] = chosen_model or merged.get("from_model") or ""
-            if chosen_model and chosen_model in votes:
-                try:
-                    merged["confidence"] = float(votes[chosen_model].get("confidence", 0.5))
-                except (TypeError, ValueError):
-                    merged["confidence"] = 0.5
-        elif merged.get("final_classification") == "fix" and validation.get("status") == "fail":
-            merged["final_classification"] = "needs_review"
-            merged["final_patch"] = ""
-
-        short_id = hashlib.sha1(json.dumps(item, sort_keys=True, ensure_ascii=False).encode()).hexdigest()[:12]
-        results.append({
-            "id": short_id,
-            "file": item.get("file"),
-            "category": item.get("category"),
-            "consensus": merged,
-            "validation": validation,
-        })
-
-        print(f"  • processed {idx}/{len(payload)} (elapsed {time.time()-t0:.1f}s)")
-        await asyncio.sleep(SMALL_DELAY_SECONDS)
-
-    Path("output").mkdir(exist_ok=True)
-    out_path = Path("output/llm_decisions.json")
-    out_path.write_text(json.dumps(results, ensure_ascii=False, indent=2), encoding="utf-8")
+    LLM_DIR.mkdir(parents=True, exist_ok=True)
+    os.environ["SAFEFIX_LLM_DIR"] = str(LLM_DIR)
+    out_path = LLM_DIR / "llm_decisions.json"
+    ordered_results = [results[idx] for idx, _, _ in indexed_items if idx in results]
+    out_path.write_text(json.dumps(ordered_results, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"[SafeFix-LLM] Wrote {out_path} | total elapsed {time.time()-t0:.1f}s")
 
 if __name__ == "__main__":

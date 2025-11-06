@@ -1,9 +1,0 @@
-﻿kubectl.exe : error: Unexpected args: [client]
-At C:\Users\Ahmed\OneDrive - GIU AS - German International University of Applied Sciences\Desktop\Bsc Thesis\Implementaions\SafeFixK8s\Validations\validate-gates.ps1:404 
-char:10
-+   $out = & kubectl @kubectlArgs *>&1
-+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    + CategoryInfo          : NotSpecified: (error: Unexpected args: [client]:String) [], RemoteException
-    + FullyQualifiedErrorId : NativeCommandError
- 
-

@@ -6,9 +6,24 @@ $ErrorActionPreference = "Stop"
 # --- paths --------------------------------------------------------------------
 $RepoRoot = Split-Path -Parent $PSScriptRoot
 $DetectionDir = $PSScriptRoot
-$OutDir = Join-Path $DetectionDir "output\raw"
-$LogsDir = Join-Path $DetectionDir "output\logs"
+
+$OutputRoot = $env:SAFEFIX_OUTPUT_ROOT
+if ([string]::IsNullOrWhiteSpace($OutputRoot)) {
+  $OutputRoot = Join-Path $DetectionDir "output"
+} else {
+  try {
+    $OutputRoot = [System.IO.Path]::GetFullPath($OutputRoot)
+  } catch {
+    $OutputRoot = Join-Path $DetectionDir "output"
+  }
+}
+
+$DetectionLayer = Join-Path $OutputRoot "detection"
+$OutDir = Join-Path $DetectionLayer "raw"
+$LogsDir = Join-Path $DetectionLayer "logs"
 New-Item -ItemType Directory -Force -Path $OutDir, $LogsDir | Out-Null
+$env:SAFEFIX_DETECTION_RAW_DIR = $OutDir
+$env:SAFEFIX_DETECTION_LOG_DIR = $LogsDir
 
 # --- helpers ------------------------------------------------------------------
 function Write-NonEmpty($Path) {
@@ -345,11 +360,12 @@ function Det-KubeAudit {
 
 # --- Conftest (OPA) -----------------------------------------------------------
 function Det-Conftest {
-  param([string]$Path = ".", [string]$Out = "$OutDir\conftest_raw.json", [string]$PolicyDir = "$RepoRoot\Validations\policies\opa")
+  param([string]$Path = ".", [string]$Out = "$OutDir\conftest_raw.json", [string]$PolicyFile = "$RepoRoot\Detection\policies\conftest\policy.rego")
   try {
     $abs = Resolve-ScanPath -Path $Path
-    if (-not (Test-Path $PolicyDir)) { _WrapPlaceholder $Out "conftest" "Policy dir not found"; return }
-    docker run --rm -v "${abs}:/scan:ro" -v "${PolicyDir}:/policy:ro" openpolicyagent/conftest:latest `
+    if (-not (Test-Path $PolicyFile)) { _WrapPlaceholder $Out "conftest" "Policy file not found"; return }
+    $policyDir = Split-Path -Parent $PolicyFile
+    docker run --rm -v "${abs}:/scan:ro" -v "${policyDir}:/policy:ro" openpolicyagent/conftest:latest `
       test /scan --policy /policy --all-namespaces --output json | Set-Content -Encoding UTF8 -Path $Out
     Write-NonEmpty $Out; Write-Host "[conftest] -> $Out"
   }
@@ -733,6 +749,7 @@ function Det-RunExtended {
           "RBACPolice" { Det-RBACPolice  -Path $extracted -Out $embeddedOut }
           "Pluto" { Det-Pluto       -Path $extracted -Out $embeddedOut }
           "Conftest" { Det-Conftest    -Path $extracted -Out $embeddedOut }
+          "gitleaks" { Det-Gitleaks    -Path $extracted -Out $embeddedOut }
         }
       }
     }
@@ -753,15 +770,10 @@ function Run-AllDetectors {
   Write-Host "  SafeFix-K8s Detection Layer" -ForegroundColor Green
   Write-Host "========================================`n" -ForegroundColor Green
   
-  if ($Extended) {
-    Write-Host "Mode: EXTENDED (all tools + embedded configs)" -ForegroundColor Cyan
-    Det-RunExtended -Path $Path
-  }
-  else {
-    Write-Host "Mode: LEAN (core tools only)" -ForegroundColor Cyan
-    Det-RunLean -Path $Path
-  }
-  
+
+  Write-Host "Mode: EXTENDED (all tools + embedded configs)" -ForegroundColor Cyan
+  Det-RunExtended -Path $Path
+
   Write-Host "`n========================================" -ForegroundColor Green
   Write-Host "  Detection Complete!" -ForegroundColor Green
   Write-Host "  Output location: $OutDir" -ForegroundColor Green

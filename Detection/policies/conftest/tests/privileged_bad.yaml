@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: insecure-pod-privileged
+  namespace: production
+spec:
+  containers:
+  - name: app
+    image: nginx@sha256:abcd1234
+    securityContext:
+      privileged: true

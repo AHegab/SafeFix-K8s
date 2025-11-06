@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: secure-pod-caps
+  namespace: production
+spec:
+  containers:
+  - name: app
+    image: nginx@sha256:abcd1234
+    securityContext:
+      capabilities:
+        drop:
+        - ALL

@@ -1,8 +1,0 @@
-{
-    "gates":  [
-
-              ],
-    "overall":  "FAIL",
-    "file_sha256":  "5e929516a2e81f9a50f63c8e0a0379871fd0b55260cfd62202418c66494a8dc0",
-    "file":  "SafeFixK8s/Validations/test_input/nginx_deployment.yaml"
-}

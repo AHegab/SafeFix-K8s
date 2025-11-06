@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: insecure-pod-default-sa
+  namespace: production
+spec:
+  # Using default service account with automountServiceAccountToken: true (implicit)
+  containers:
+  - name: app
+    image: nginx@sha256:abcd1234

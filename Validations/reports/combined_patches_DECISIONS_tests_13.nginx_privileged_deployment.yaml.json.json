@@ -1,8 +1,0 @@
-{
-    "gates":  [
-
-              ],
-    "overall":  "FAIL",
-    "file_sha256":  "d046d2b3b889d25ab590ba8f0bb01dbdc64bc6d7cc90c580bfab59e35ce6f5dc",
-    "file":  "SafeFixK8s/output/combined_patches/DECISIONS_tests_13.nginx_privileged_deployment.yaml.json"
-}

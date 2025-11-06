@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: secure-pod-apparmor
+  namespace: production
+  annotations:
+    container.apparmor.security.beta.kubernetes.io/app: runtime/default
+spec:
+  containers:
+  - name: app
+    image: nginx@sha256:abcd1234

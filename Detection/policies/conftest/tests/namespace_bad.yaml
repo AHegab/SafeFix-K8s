@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: insecure-pod-default-ns
+  # Missing namespace or namespace: default
+spec:
+  containers:
+  - name: app
+    image: nginx@sha256:abcd1234

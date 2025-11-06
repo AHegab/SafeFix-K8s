@@ -1,0 +1,17 @@
+﻿[
+	{
+		"filename": "/scan/26.values.yaml",
+		"namespace": "main",
+		"successes": 37
+	},
+	{
+		"filename": "/scan/27.Misconfiguration.yaml",
+		"namespace": "main",
+		"successes": 37
+	},
+	{
+		"filename": "/scan/27.Valid.yaml",
+		"namespace": "main",
+		"successes": 37
+	}
+]

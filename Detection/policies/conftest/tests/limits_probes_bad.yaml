@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: insecure-pod-no-limits-no-probes
+  namespace: production
+spec:
+  containers:
+  - name: app
+    image: nginx@sha256:abcd1234
+    # Missing resources.limits and probes

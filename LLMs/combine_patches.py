@@ -15,28 +15,32 @@ import json
 import sys
 import os
 from pathlib import Path
-from typing import Dict, List, Any
+from typing import Dict, List
 
 # Import from multi_llm_orchestrator
 sys.path.insert(0, str(Path(__file__).parent))
 from multi_llm_orchestrator import (
-    load_dotenv_from_file, system_prompt, make_user_prompt, ask_all,
-    validate_response, _validate_and_write_patch, MODELS, PROVIDER_PRIORITY,
+    load_dotenv_from_file, make_user_prompt, ask_all,
+    _validate_and_write_patch, PROVIDER_PRIORITY,
     LLM_TIMEOUT_SECONDS, RETRIES
 )
 import asyncio
-import hashlib
-import time
+
+OUTPUT_ROOT = Path(os.getenv("SAFEFIX_OUTPUT_ROOT", "output")).resolve()
+NORMALIZATION_DIR = Path(os.getenv("SAFEFIX_NORMALIZATION_DIR", OUTPUT_ROOT / "normalization"))
+LLM_DIR = Path(os.getenv("SAFEFIX_LLM_DIR", OUTPUT_ROOT / "llm"))
+COMBINATION_DIR = Path(os.getenv("SAFEFIX_COMBINATION_DIR", OUTPUT_ROOT / "combination"))
 
 async def combine_patches_for_file(
     target_file: str,
     models: List[str],
-    payload_path: str = "output/llm_payload.json",
-    output_dir: str = "output/combined_patches",
+    payload_path: str = str(NORMALIZATION_DIR / "llm_payload.json"),
+    output_dir: str = str(COMBINATION_DIR),
+    categories: List[str] | None = None,
     retries: int = 3,
     timeout_seconds: int = 60,
     autofix: bool = True,
-    hygiene: bool = True
+    hygiene: bool = False
 ) -> Dict:
     """
     Process all findings for a single file and combine patches into one final output.
@@ -46,8 +50,13 @@ async def combine_patches_for_file(
     """
     # Load payload
     candidates = [
+        NORMALIZATION_DIR / "llm_payload.json",
+        OUTPUT_ROOT / "normalization/llm_payload.json",
+        Path("output/normalization/llm_payload.json"),
+        LLM_DIR / "llm_payload.json",
         Path("output/llm_payload.json"),
         Path("Detection/output/llm_payload.json"),
+        Path("detection/output/llm_payload.json"),
     ]
     payload_path = None
     for p in candidates:
@@ -56,7 +65,7 @@ async def combine_patches_for_file(
             break
     
     if not payload_path:
-        print(f"[ERROR] No llm_payload.json found")
+        print("[ERROR] No llm_payload.json found")
         return None
     
     data = json.loads(payload_path.read_text(encoding="utf-8"))
@@ -64,18 +73,25 @@ async def combine_patches_for_file(
     
     # Filter to only this file
     norm_target = target_file.replace("/", "\\")
-    file_items = [
-        item for item in all_items 
-        if item.get("file", "").replace("/", "\\") == norm_target
-    ]
+    file_items = []
+    for item in all_items:
+        if item.get("file", "").replace("/", "\\") != norm_target:
+            continue
+        if categories and item.get("category") not in categories:
+            continue
+        file_items.append(item)
     
     if not file_items:
-        print(f"[ERROR] No findings for file: {target_file}")
+        if categories:
+            joined = ", ".join(categories)
+            print(f"[ERROR] No findings for file: {target_file} matching categories: {joined}")
+        else:
+            print(f"[ERROR] No findings for file: {target_file}")
         return None
     
     print(f"[CombinePatch] Found {len(file_items)} findings for {target_file}")
     print(f"[CombinePatch] Using models: {models}")
-    print(f"[CombinePatch] Starting iterative patching...")
+    print("[CombinePatch] Starting iterative patching...")
     
     # Start with original file
     original_path = Path(target_file)
@@ -86,6 +102,7 @@ async def combine_patches_for_file(
     # Create output directory
     output_dir_path = Path(output_dir)
     output_dir_path.mkdir(parents=True, exist_ok=True)
+    os.environ["SAFEFIX_COMBINATION_DIR"] = str(output_dir_path)
     
     # Create sandbox directory for patch validation
     sandbox_dir = output_dir_path / "sandbox"
@@ -171,10 +188,10 @@ async def combine_patches_for_file(
         })
         
         if not best_patch:
-            print(f"  [!] No valid patch from any model")
+            print("  [!] No valid patch from any model")
     
     # Final output
-    final_dir = Path("output/combined_patches")
+    final_dir = output_dir_path
     final_dir.mkdir(parents=True, exist_ok=True)
     
     # Create sanitized filename
@@ -197,7 +214,7 @@ async def combine_patches_for_file(
         encoding="utf-8"
     )
     
-    print(f"\n[CombinePatch] Complete!")
+    print("\n[CombinePatch] Complete!")
     print(f"  Original findings: {len(file_items)}")
     print(f"  Patches applied: {successful_patches}")
     print(f"  Output: {final_path}")
@@ -212,22 +229,26 @@ async def main():
     ap.add_argument("--file", required=True, help="Target file path (e.g., tests/13.nginx_privileged_deployment.yaml)")
     ap.add_argument("--models", type=str, default="groq,openrouter,gemini", 
                     help="Comma-separated providers: groq,openrouter,gemini,ollama")
+    ap.add_argument("--categories", type=str, default="",
+                    help="Comma-separated list of finding categories to include (optional)")
     ap.add_argument("--timeout", type=int, default=LLM_TIMEOUT_SECONDS, help="Per-request timeout seconds")
     ap.add_argument("--retries", type=int, default=RETRIES, help="Retries per model")
     ap.add_argument("--validate", type=str, default="yaml", choices=["none", "yaml"],
                     help="Validation mode")
     ap.add_argument("--autofix", action="store_true", default=True,
                     help="Conservatively flip privileged:true and allowPrivilegeEscalation:true to false")
-    ap.add_argument("--hygiene", action="store_true", default=True,
+    ap.add_argument("--hygiene", action="store_true", default=False,
                     help="Apply conservative hygiene hardening")
     
     args = ap.parse_args()
     
     models = [m.strip() for m in args.models.split(",") if m.strip()]
+    categories = [c.strip() for c in args.categories.split(",") if c.strip()]
     
     result = await combine_patches_for_file(
         target_file=args.file,
         models=models,
+        categories=categories or None,
         timeout_seconds=args.timeout,
         retries=args.retries,
         autofix=args.autofix,
@@ -235,9 +256,9 @@ async def main():
     )
     
     if result:
-        print(f"\n✅ Success! Secured file created at: {result}")
+        print(f"\n[SUCCESS] Secured file created at: {result}")
     else:
-        print(f"\n❌ Failed to create combined patch")
+        print("\n[ERROR] Failed to create combined patch")
         sys.exit(1)
 
 if __name__ == "__main__":

@@ -1,8 +1,0 @@
-{
-    "gates":  [
-
-              ],
-    "overall":  "FAIL",
-    "file_sha256":  "b27966447c798c29f985a739f60c54882b39dea328b383d1eb899ce1b34d01ad",
-    "file":  "SafeFixK8s/output/combined_patches/sandbox/temp_1.yaml"
-}

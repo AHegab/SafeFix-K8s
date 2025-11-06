@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: secure-pod-custom-sa
+  namespace: production
+spec:
+  serviceAccountName: my-custom-sa
+  automountServiceAccountToken: false
+  containers:
+  - name: app
+    image: nginx@sha256:abcd1234
