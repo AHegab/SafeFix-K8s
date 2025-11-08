@@ -1,0 +1,18 @@
+﻿{
+  "resources": [
+    {
+      "filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\output\\combination\\VALIDATION_tests_28.role_overly_permissive.yaml.json",
+      "kind": "",
+      "name": "",
+      "version": "",
+      "status": "statusError",
+      "msg": "error while parsing: missing 'kind' key"
+    }
+  ],
+  "summary": {
+    "valid": 0,
+    "invalid": 0,
+    "errors": 1,
+    "skipped": 0
+  }
+}

@@ -1,0 +1,57 @@
+﻿[
+	{
+		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\Validations\\tmp_inputs\\1762601511_c365e8bc\\SECURED_tests_34.echo1_no_securitycontext.yaml",
+		"namespace": "main",
+		"successes": 62,
+		"failures": [
+			{
+				"msg": "container \"echo1\" must define livenessProbe",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "container \"echo1\" must define readinessProbe",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "container \"echo1\" must set imagePullPolicy",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "echo1 must have AppArmor annotation (container.apparmor.security.beta.kubernetes.io/\u003ccontainer\u003e)",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "echo1 securityContext must define seccompProfile",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "echo1: deployment has only 1 replica (not highly available)",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "echo1: no NetworkPolicy defined for workload",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "image \"gio54321/echo\" has no tag (use immutable tag or digest)",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			}
+		]
+	}
+]

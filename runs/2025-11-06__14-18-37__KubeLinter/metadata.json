@@ -1,0 +1,28 @@
+{
+  "tool": "KubeLinter",
+  "tool_normalized": "kubelinter",
+  "scan_path": "c:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\kubernetes-goat\\scenarios",
+  "run_directory": "c:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\runs\\2025-11-06__14-18-37__KubeLinter",
+  "timestamp": "2025-11-06T14:18:37.938235",
+  "gates": "1,2",
+  "models": [
+    "groq"
+  ],
+  "steps_completed": [
+    "detection",
+    "normalization",
+    "llm_repair",
+    "validation"
+  ],
+  "timings": {
+    "detection": 2.376392126083374,
+    "normalization": 0.4231679439544678
+  },
+  "results": {
+    "raw_findings": 0,
+    "normalized_findings": 0
+  },
+  "completed_at": "2025-11-06T14:18:40.783337",
+  "total_duration": 2.799560070037842,
+  "success": true
+}

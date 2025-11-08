@@ -1,0 +1,168 @@
+﻿{
+  "resources": [
+    {
+      "filename": "/scan/27.Misconfiguration.yaml",
+      "kind": "NetworkPolicy",
+      "name": "egress-product",
+      "version": "",
+      "status": "statusError",
+      "msg": "error while parsing: missing 'apiVersion' key"
+    },
+    {
+      "filename": "/scan/27.Valid.yaml",
+      "kind": "NetworkPolicy",
+      "name": "egress-product",
+      "version": "",
+      "status": "statusError",
+      "msg": "error while parsing: missing 'apiVersion' key"
+    },
+    {
+      "filename": "/scan/29.helm_rabbitmq_hardcoded_credentials.yaml",
+      "kind": "",
+      "name": "",
+      "version": "",
+      "status": "statusError",
+      "msg": "error while parsing: missing 'kind' key"
+    },
+    {
+      "filename": "/scan/34.echo1_load_balancer.yaml",
+      "kind": "Service",
+      "name": "echo1-load-balancer",
+      "version": "v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/28.role_overly_permissive.yaml",
+      "kind": "Role",
+      "name": "frontend-role",
+      "version": "rbac.authorization.k8s.io/v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/31.example-nginx.yaml",
+      "kind": "Pod",
+      "name": "nginx",
+      "version": "v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/13.deployment.yaml",
+      "kind": "Deployment",
+      "name": "nginx-deployment",
+      "version": "apps/v1",
+      "status": "statusInvalid",
+      "msg": "problem validating schema. Check JSON formatting: jsonschema validation failed with 'https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/master-standalone-strict/deployment-apps-v1.json#' - at '/spec': missing property 'selector'",
+      "validationErrors": [
+        {
+          "path": "/spec",
+          "msg": "missing property 'selector'"
+        }
+      ]
+    },
+    {
+      "filename": "/scan/34.echo1_no_securitycontext.yaml",
+      "kind": "Deployment",
+      "name": "echo1",
+      "version": "apps/v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/34.echo1_privileged.yaml",
+      "kind": "Deployment",
+      "name": "echo1",
+      "version": "apps/v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/34.unencrypted_secret.yaml",
+      "kind": "Secret",
+      "name": "mysecret",
+      "version": "v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/internal-proxy.deployment.yaml",
+      "kind": "Deployment",
+      "name": "internal-proxy-deployment",
+      "version": "apps/v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/internal-proxy.deployment.yaml",
+      "kind": "Service",
+      "name": "internal-proxy-api-service",
+      "version": "v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/internal-proxy.deployment.yaml",
+      "kind": "Service",
+      "name": "internal-proxy-info-app-service",
+      "version": "v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/insecure-rbac.setup.yaml",
+      "kind": "ServiceAccount",
+      "name": "superadmin",
+      "version": "v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/poor-registry.deployment.yaml",
+      "kind": "Deployment",
+      "name": "poor-registry-deployment",
+      "version": "apps/v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/poor-registry.deployment.yaml",
+      "kind": "Service",
+      "name": "poor-registry-service",
+      "version": "v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/insecure-rbac.setup.yaml",
+      "kind": "ClusterRoleBinding",
+      "name": "superadmin",
+      "version": "rbac.authorization.k8s.io/v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/docker-bench-security.deployment.yaml",
+      "kind": "DaemonSet",
+      "name": "docker-bench-security",
+      "version": "apps/v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/kube-bench-security.node-job.yaml",
+      "kind": "Job",
+      "name": "kube-bench-node",
+      "version": "batch/v1",
+      "status": "statusValid",
+      "msg": ""
+    }
+  ],
+  "summary": {
+    "valid": 15,
+    "invalid": 1,
+    "errors": 3,
+    "skipped": 0
+  }
+}

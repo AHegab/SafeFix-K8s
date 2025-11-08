@@ -1,0 +1,25 @@
+{
+    "gates":  [
+                  {
+                      "gate":  "schema",
+                      "evidence":  "Validations/evidence/1762601039_d7775bee_SECURED_tests_31.example-nginx.yaml/schema/kubeconform.json",
+                      "details":  "kubeconform run",
+                      "status":  "FAIL"
+                  },
+                  {
+                      "gate":  "policy",
+                      "evidence":  "Validations/evidence/1762601039_d7775bee_SECURED_tests_31.example-nginx.yaml/policy/conftest.json",
+                      "details":  "conftest run",
+                      "status":  "FAIL"
+                  },
+                  {
+                      "gate":  "dryrun",
+                      "evidence":  "",
+                      "details":  "no kube-context; dry-run requires a live API server",
+                      "status":  "SKIP"
+                  }
+              ],
+    "overall":  "FAIL",
+    "file_sha256":  "2c5d11f0314cf75cec78831685f74680fd7bb29c4f3cf0aabd27ae807caff711",
+    "file":  "Validations/tmp_inputs/1762601039_d7775bee/SECURED_tests_31.example-nginx.yaml"
+}

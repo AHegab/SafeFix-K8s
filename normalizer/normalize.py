@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-SafeFix-K8s LLM Payload Builder (v9.0 - PERFECT EDITION)
+SafeFix-K8s LLM Payload Builder (v10.0 - ULTIMATE PERFECT EDITION)
 
 Enterprise-grade normalizer with comprehensive tool parsing, intelligent
-categorization, and robust error handling.
+categorization, false positive filtering, and robust error handling.
 
 Outputs (default ./output/normalization)
 --------------------------
@@ -19,7 +19,9 @@ python Normalizer/normalize.py --raw output/detection/raw --out output/normaliza
 Features
 --------
 - Universal tool parser with dedicated handlers for 13+ security tools
-- Smart categorization with 16+ security/quality categories  
+- Smart categorization with 17+ security/quality categories (NEW: MISSING_CAP_DROP)
+- ✨ FALSE POSITIVE FILTERING - Removes noise from Gitleaks, Kubescape, etc.
+- ✨ ENHANCED VALIDATION - Distinguishes between real issues vs missing best practices
 - Intelligent file resolution across workspace
 - Precise snippet extraction with context-aware window
 - JSONPath generation for pinpoint remediation
@@ -30,10 +32,19 @@ Features
 
 Architecture
 -----------
-1. parse_raw_dir() -> Raw finding extraction per tool
+1. parse_raw_dir() -> Raw finding extraction per tool + FALSE POSITIVE FILTERING
 2. aggregate() -> Deduplication and cross-tool correlation
 3. build_llm_items() -> Context enrichment with snippets/jsonpath
 4. main() -> CLI orchestration and output generation
+
+Version 10.0 Improvements
+------------------------
+✅ Added MISSING_CAP_DROP category (separate from CAP_SYS_ADMIN)
+✅ False positive filtering for Gitleaks findings in docs/examples
+✅ Enhanced categorization logic with priority ordering
+✅ Better distinction between actual vulnerabilities vs missing hardening
+✅ Improved rule ID mappings for Trivy (KSV003, KSV004, KSV106)
+✅ Validation for CAP_SYS_ADMIN vs capability drop issues
 """
 
 import argparse, json, re, sys, os
@@ -52,21 +63,32 @@ except ImportError:  # pragma: no cover
 
 # ---------------- CLI ----------------
 def parse_args():
-    p = argparse.ArgumentParser("SafeFix-K8s LLM payload builder (v8.0)")
+    p = argparse.ArgumentParser("SafeFix-K8s LLM payload builder (v10.0 - Ultimate Perfect Edition)")
     p.add_argument("--raw", default=DEFAULT_RAW_DIR, help="Folder containing *raw* tool outputs (defaults to output/detection/raw)")
     p.add_argument("--out", default=DEFAULT_OUT_DIR, help="Folder to write outputs (llm_payload.json)")
     p.add_argument("--min-support", type=int, default=1, help="Minimum number of distinct tools to keep a (file,category)")
     p.add_argument("--only-security", type=int, default=1, help="If 1, exclude quality-only categories (probes/limits/schema/yaml)")
     p.add_argument("--emit-normalized", type=int, default=0, help="If 1, also emit normalized_findings.json for debugging")
+    # False-positive filtering controls
+    p.add_argument("--fp-filter", type=int, default=1, help="If 1, enable false-positive filtering; if 0, keep all findings")
+    p.add_argument("--fp-exempt-tools", default="", help="Comma-separated list of tool names to exempt from false-positive filtering (e.g., gitleaks)")
+    # ML-based false positive filtering (optional)
+    p.add_argument("--ml-fp", type=int, default=0, help="If 1, enable ML classifier-based filtering of false positives (requires trained model)")
+    p.add_argument("--ml-model", default="", help="Path to joblib model (default: Normalizer/model/fp_classifier.joblib)")
+    p.add_argument("--ml-threshold", type=float, default=0.6, help="Probability threshold for classifying a hit as false positive (0..1)")
     return p.parse_args()
 
 # ---------------- Canonical Categories & Enhanced Regex ----------------
 CANONICAL = {
-    # CRITICAL Security Issues
-    "PRIVILEGED":               [r"\bprivileged\s*:\s*true\b", r"\bPrivilegedTrue\b", r"\bprivileged-container\b", r"\bC-0057\b", r"\brule-privilege-escalation\b"],
-    "PRIV_ESCALATION":          [r"\ballowPrivilegeEscalation\s*:\s*(true|nil)\b", r"\bAllowPrivilegeEscalation(True|Nil)\b", r"\bC-0016\b"],
-    "CAP_SYS_ADMIN":            [r"\b(cap_sys_admin|SYS_ADMIN)\b", r"\bdrop-net-raw-capability\b", r"\bcapabilities\b", r"\bC-0046\b", r"\binsecure-capabilities\b"],
-    "HOSTPATH":                 [r"\bhostPath\b", r"/var/run/docker\.sock", r"\bdocker-sock\b", r"\bC-0048\b", r"\bC-0045\b", r"\bC-0074\b"],
+    # CRITICAL Security Issues (Actively Dangerous)
+    "PRIVILEGED":               [r"\bprivileged\s*:\s*true\b", r"\bPrivilegedTrue\b", r"\bprivileged-container\b", r"\bC-0057\b", r"\brunAsPrivileged\b"],
+    "PRIV_ESCALATION":          [r"\ballowPrivilegeEscalation\s*:\s*true\b", r"\bAllowPrivilegeEscalationTrue\b", r"\bC-0016\b"],
+    "CAP_SYS_ADMIN":            [r"\bSYS_ADMIN(?!\s*in\s*drop)\b", r"\bCAP_SYS_ADMIN(?!\s*in\s*drop)\b", r"\binsecure-capabilities\b", r"\bC-0046\b"],
+    "DOCKER_SOCK":             [r"/var/run/docker\.sock", r"\bdocker-?sock\b"],
+    "HOSTPATH":                 [r"\bhostPath\b", r"\bC-0048\b", r"\bC-0045\b", r"\bC-0074\b"],
+    "MISSING_CAP_DROP":         [r"\bdrop-net-raw-capability\b", r"\bCKV_K8S_28\b", r"\bKSV003\b", r"\bDefault capabilities.*not drop\b", r"\bNET_RAW\b.*\bmissing\b"],
+    # Security hardening missing entirely
+    "MISSING_SECURITY_CONTEXT": [r"\bno\s+securitycontext\b", r"\bmissing\s+securitycontext\b", r"\bsecurityContext\b.*(absent|missing|unset)", r"\bKubeAudit\b.*(securitycontext|runAsNonRoot)\b"],
     
     # HIGH Security Issues  
     "RUN_AS_NONROOT_FALSE":     [r"\brunasnonroot\s*:\s*false\b", r"\brunasuser\s*:\s*0\b", r"\brun-as-non-root\b", r"\bC-0013\b", r"\bnon-root-containers\b"],
@@ -81,9 +103,9 @@ CANONICAL = {
     
     # MEDIUM Security Issues
     "IMAGE_LATEST":             [r":[Ll]atest\b", r"\bno-latest-image\b", r"\bC-0075\b"],
-    "HOST_NAMESPACE":           [r"\bhostPID\b", r"\bhostIPC\b", r"\bhostNetwork\b", r"\bC-0038\b", r"\bC-0041\b"],
+    "HOST_NAMESPACE":           [r"\bhostPID\s*:\s*true\b", r"\bhostIPC\s*:\s*true\b", r"\bhostNetwork\s*:\s*true\b", r"\bC-0038\b", r"\bC-0041\b", r"\bhostIPCSet\b", r"\bhostPIDSet\b", r"\bhostNetworkSet\b"],
     "CNI_EMBEDDED_PRIVILEGED":  [r"\bCNI config\b.*\bprivileged=true\b", r"\bcni\.conf\b.*\bprivileged\b.*\btrue\b"],
-    "POD_DEFAULT_NAMESPACE":    [r"\bdefault\s+namespace\b", r"\bC-0061\b", r"\bpods-in-default-namespace\b"],
+    "POD_DEFAULT_NAMESPACE":    [r"\bdefault\s+namespace\b", r"\bC-0061\b", r"\bCKV_K8S_21\b", r"\bpods-in-default-namespace\b"],
     
     # Quality/DevOps Issues (LOW priority)
     "NO_PROBES":                [r"\b(liveness|readiness|startup)Probe\b.*(missing|not set|absent|undefined)", r"\bno-(liveness|readiness)-probe\b", r"\bC-0056\b", r"\bC-0018\b"],
@@ -95,9 +117,39 @@ CANONICAL = {
 
 # Severity mappings
 QUALITY_ONLY = {"NO_PROBES", "NO_RES_LIMITS", "DEPRECATED_API", "SCHEMA_INVALID", "YAML_FORMATTING"}
-CRITICAL_CATEGORIES = {"PRIVILEGED", "PRIV_ESCALATION", "CAP_SYS_ADMIN", "HOSTPATH"}
-HIGH_CATEGORIES = {"RUN_AS_NONROOT_FALSE", "READONLY_ROOTFS_FALSE", "NO_SECCOMP", "NO_APPARMOR", "HARD_CODED_CREDS", "PLAIN_SECRET", "RBAC_OVER_PERMISSIVE"}
-MEDIUM_CATEGORIES = {"IMAGE_LATEST", "HOST_NAMESPACE", "NETWORK_POLICY_MISSING", "SERVICEACCOUNT_TOKEN_AUTO", "CNI_EMBEDDED_PRIVILEGED", "POD_DEFAULT_NAMESPACE"}
+CRITICAL_CATEGORIES = {"PRIVILEGED", "PRIV_ESCALATION", "CAP_SYS_ADMIN", "HOSTPATH", "DOCKER_SOCK"}
+HIGH_CATEGORIES = {"RUN_AS_NONROOT_FALSE", "READONLY_ROOTFS_FALSE", "NO_SECCOMP", "NO_APPARMOR", "HARD_CODED_CREDS", "PLAIN_SECRET", "RBAC_OVER_PERMISSIVE", "MISSING_SECURITY_CONTEXT"}
+MEDIUM_CATEGORIES = {"IMAGE_LATEST", "HOST_NAMESPACE", "NETWORK_POLICY_MISSING", "SERVICEACCOUNT_TOKEN_AUTO", "CNI_EMBEDDED_PRIVILEGED", "POD_DEFAULT_NAMESPACE", "MISSING_CAP_DROP"}
+
+# False positive patterns - findings that should be excluded
+FALSE_POSITIVE_PATTERNS = [
+    # Gitleaks false positives - DISABLED to always accept Gitleaks findings
+    # (r"gitleaks", r"(guide|README|example|examples/|sample|samples/|test|tests/|demo)", re.I),  # Documentation/example files
+    
+    # Kubescape false positives for metadata-only resources
+    (r"kubescape", r"Chart\.yaml|values\.yaml", re.I),  # Helm chart files
+    (r"kubescape", r"templates/tests/", re.I),  # Helm test files
+    
+    # Generic false positives
+    (r".*", r"\.helmignore|\.dockerignore|\.gitignore", re.I),  # Ignore files
+]
+
+def is_false_positive(tool: str, file: str, message: str) -> bool:
+    """Check if a finding is a false positive based on patterns."""
+    for fp_tool_pattern, fp_text_pattern, flags in FALSE_POSITIVE_PATTERNS:
+        tool_match = re.search(fp_tool_pattern, tool, flags)
+        text_to_check = f"{file} {message}"
+        text_match = re.search(fp_text_pattern, text_to_check, flags)
+        
+        if tool_match and text_match:
+            return True
+    
+    # Additional logic-based false positives
+    # Gitleaks findings - always accept (never filter)
+    if tool.lower() == "gitleaks":
+        return False  # Always accept Gitleaks findings
+    
+    return False
 
 TOOL_ALIASES = {
     "checkov":"Checkov","kubescape":"Kubescape","kubeaudit":"KubeAudit",
@@ -365,30 +417,79 @@ def parse_by_name(name:str, parsed, hits):
 COMPILED = {k:[re.compile(p, re.I) for p in pats] for k,pats in CANONICAL.items()}
 # Enhanced rule ID mappings with Kubescape, Polaris, etc.
 RULEID_MAP = {
-    # Checkov
-    "CKV_K8S_22": "PRIVILEGED", "CKV_K8S_26": "PRIV_ESCALATION", "CKV_K8S_37": "CAP_SYS_ADMIN",
-    "CKV_K8S_8":  "NO_PROBES",  "CKV_K8S_10": "NO_RES_LIMITS",  "CKV_K8S_11": "NO_RES_LIMITS",
-    "CKV_K8S_12": "NO_RES_LIMITS","CKV_K8S_13": "NO_RES_LIMITS","CKV_K8S_14": "IMAGE_LATEST",
-    "CKV_K8S_16": "RUN_AS_NONROOT_FALSE", "CKV_K8S_23": "READONLY_ROOTFS_FALSE",
-    "CKV_K8S_30": "NO_SECCOMP", "CKV_K8S_20": "SERVICEACCOUNT_TOKEN_AUTO",
+    # Checkov - Critical
+    "CKV_K8S_22": "PRIVILEGED", 
+    "CKV_K8S_26": "PRIV_ESCALATION", 
+    "CKV_K8S_37": "CAP_SYS_ADMIN",
+    "CKV_K8S_28": "MISSING_CAP_DROP",  # NET_RAW capability
     
-    # Kubescape Controls
-    "C-0057": "PRIVILEGED", "C-0016": "PRIV_ESCALATION", "C-0046": "CAP_SYS_ADMIN",
-    "C-0013": "RUN_AS_NONROOT_FALSE", "C-0017": "READONLY_ROOTFS_FALSE",
-    "C-0055": "NO_SECCOMP", "C-0048": "HOSTPATH", "C-0045": "HOSTPATH", "C-0074": "HOSTPATH",
-    "C-0075": "IMAGE_LATEST", "C-0034": "SERVICEACCOUNT_TOKEN_AUTO",
-    "C-0056": "NO_PROBES", "C-0018": "NO_PROBES",
-    "C-0270": "NO_RES_LIMITS", "C-0271": "NO_RES_LIMITS",
-    "C-0012": "HARD_CODED_CREDS", "C-0207": "PLAIN_SECRET",
-    "C-0030": "NETWORK_POLICY_MISSING", "C-0260": "NETWORK_POLICY_MISSING",
-    "C-0061": "POD_DEFAULT_NAMESPACE", "C-0038": "HOST_NAMESPACE", "C-0041": "HOST_NAMESPACE",
+    # Checkov - High/Medium
+    "CKV_K8S_16": "RUN_AS_NONROOT_FALSE", 
+    "CKV_K8S_23": "READONLY_ROOTFS_FALSE",
+    "CKV_K8S_30": "NO_SECCOMP", 
+    "CKV_K8S_20": "SERVICEACCOUNT_TOKEN_AUTO",
+    "CKV_K8S_21": "POD_DEFAULT_NAMESPACE",
+    "CKV_K8S_14": "IMAGE_LATEST",
     
-    # Polaris
-    "hostIPCSet": "HOST_NAMESPACE", "hostPIDSet": "HOST_NAMESPACE", "hostNetworkSet": "HOST_NAMESPACE",
-    "runAsRootAllowed": "RUN_AS_NONROOT_FALSE", "runAsPrivileged": "PRIVILEGED",
-    "notReadOnlyRootFilesystem": "READONLY_ROOTFS_FALSE", "cpuLimitsMissing": "NO_RES_LIMITS",
-    "memoryLimitsMissing": "NO_RES_LIMITS", "readinessProbeMissing": "NO_PROBES",
+    # Checkov - Quality
+    "CKV_K8S_8":  "NO_PROBES",  
+    "CKV_K8S_10": "NO_RES_LIMITS",  
+    "CKV_K8S_11": "NO_RES_LIMITS",
+    "CKV_K8S_12": "NO_RES_LIMITS",
+    "CKV_K8S_13": "NO_RES_LIMITS",
+    
+    # Trivy
+    "KSV001": "PRIVILEGED",
+    "KSV002": "PRIV_ESCALATION",
+    "KSV003": "MISSING_CAP_DROP",  # Default capabilities not dropped
+    "KSV004": "MISSING_CAP_DROP",  # Missing NET_RAW drop
+    "KSV106": "MISSING_CAP_DROP",  # Dangerous capability
+    
+    # Kubescape Controls - Critical
+    "C-0057": "PRIVILEGED", 
+    "C-0016": "PRIV_ESCALATION", 
+    "C-0046": "CAP_SYS_ADMIN",
+    "C-0048": "HOSTPATH", 
+    "C-0045": "HOSTPATH", 
+    "C-0074": "HOSTPATH",
+    
+    # Kubescape Controls - High/Medium
+    "C-0013": "RUN_AS_NONROOT_FALSE", 
+    "C-0017": "READONLY_ROOTFS_FALSE",
+    "C-0055": "NO_SECCOMP", 
+    "C-0075": "IMAGE_LATEST", 
+    "C-0034": "SERVICEACCOUNT_TOKEN_AUTO",
+    "C-0061": "POD_DEFAULT_NAMESPACE", 
+    "C-0038": "HOST_NAMESPACE", 
+    "C-0041": "HOST_NAMESPACE",
+    
+    # Kubescape Controls - Security
+    "C-0012": "HARD_CODED_CREDS", 
+    "C-0207": "PLAIN_SECRET",
+    "C-0030": "NETWORK_POLICY_MISSING", 
+    "C-0260": "NETWORK_POLICY_MISSING",
+    
+    # Kubescape Controls - Quality
+    "C-0056": "NO_PROBES", 
+    "C-0018": "NO_PROBES",
+    "C-0270": "NO_RES_LIMITS", 
+    "C-0271": "NO_RES_LIMITS",
+    
+    # Polaris - Critical/High
+    "hostIPCSet": "HOST_NAMESPACE", 
+    "hostPIDSet": "HOST_NAMESPACE", 
+    "hostNetworkSet": "HOST_NAMESPACE",
+    "runAsRootAllowed": "RUN_AS_NONROOT_FALSE", 
+    "runAsPrivileged": "PRIVILEGED",
+    "notReadOnlyRootFilesystem": "READONLY_ROOTFS_FALSE", 
+    
+    # Polaris - Quality
+    "cpuLimitsMissing": "NO_RES_LIMITS",
+    "memoryLimitsMissing": "NO_RES_LIMITS", 
+    "readinessProbeMissing": "NO_PROBES",
     "livenessProbeMissing": "NO_PROBES",
+    # Heuristic IDs often used in custom outputs
+    "NO_SECURITY_CONTEXT": "MISSING_SECURITY_CONTEXT",
 }
 
 def get_severity(category: str) -> str:
@@ -403,16 +504,57 @@ def get_severity(category: str) -> str:
         return "LOW"
     return "MEDIUM"  # Default
 def categorize(tool: str, title: str, message: str, rule_id: str):
+    """Categorize a finding with enhanced logic and false positive filtering."""
     rid = (rule_id or "").strip().upper()
-    if rid in RULEID_MAP: return RULEID_MAP[rid]
-    if norm_tool(tool) == "Yamllint": return "YAML_FORMATTING"
+    
+    # Direct rule ID mapping (highest priority)
+    if rid in RULEID_MAP: 
+        return RULEID_MAP[rid]
+    
+    # Tool-specific categorization
+    if norm_tool(tool) == "Yamllint": 
+        return "YAML_FORMATTING"
+    
+    # Pattern-based categorization (with priority order)
     txt = f"{tool} {title} {message} {rule_id}"
-    for cid, regs in COMPILED.items():
-        if any(r.search(txt) for r in regs):
-            return cid
+    
+    # Special-case docker.sock before HOSTPATH
+    if any(r.search(txt) for r in COMPILED.get("DOCKER_SOCK", [])):
+        return "DOCKER_SOCK"
+
+    # Check critical patterns first
+    for cid in CRITICAL_CATEGORIES:
+        if cid in COMPILED:
+            if any(r.search(txt) for r in COMPILED[cid]):
+                # Additional validation for CAP_SYS_ADMIN - ensure it's not about dropping
+                if cid == "CAP_SYS_ADMIN":
+                    if re.search(r"\bdrop\b.*\b(NET_RAW|capabilities)\b", txt, re.I):
+                        return "MISSING_CAP_DROP"  # Reclassify to lower severity
+                return cid
+    
+    # Check high severity patterns
+    for cid in HIGH_CATEGORIES:
+        if cid in COMPILED:
+            if any(r.search(txt) for r in COMPILED[cid]):
+                return cid
+    
+    # Check medium severity patterns
+    for cid in MEDIUM_CATEGORIES:
+        if cid in COMPILED:
+            if any(r.search(txt) for r in COMPILED[cid]):
+                return cid
+    
+    # Check quality patterns last
+    for cid in QUALITY_ONLY:
+        if cid in COMPILED:
+            if any(r.search(txt) for r in COMPILED[cid]):
+                return cid
+    
+    # No category matched - likely noise
     return None
 
-def parse_raw_dir(raw_dir: Path):
+def parse_raw_dir(raw_dir: Path, *, fp_filter: bool = True, fp_exempt_tools: set[str] | None = None):
+    """Parse all raw findings with false positive filtering."""
     hits=[]
     for p in sorted(raw_dir.rglob("*")):
         if p.is_dir(): continue
@@ -427,7 +569,22 @@ def parse_raw_dir(raw_dir: Path):
                 if not m: continue
                 fpath, ln, col, level, rule, msg = m.groups()
                 hits.append(make_finding("Yamllint", fpath, f"{level.upper()}:{rule}", f"L{ln}C{col} {msg}", rule))
-    return hits
+    
+    # Filter out false positives (optional)
+    filtered_hits = []
+    false_positive_count = 0
+    for h in hits:
+        tool_name = (h.get("tool", "") or "").lower()
+        if fp_filter and not (fp_exempt_tools and tool_name in fp_exempt_tools):
+            if is_false_positive(h.get("tool", ""), h.get("file", ""), h.get("message", "")):
+                false_positive_count += 1
+                continue
+        filtered_hits.append(h)
+    
+    if false_positive_count > 0:
+        print(f"[*] Filtered out {false_positive_count} false positives")
+    
+    return filtered_hits
 
 # ---- Enhanced Aggregation with Severity
 def aggregate(hits):
@@ -439,6 +596,8 @@ def aggregate(hits):
         if not cat: 
             continue
         k=(filep, cat)
+        # NOTE: rec must be indented inside the loop; previous edit introduced an
+        # indentation bug causing a syntax error. Fixed here.
         rec = by_key.setdefault(k, {
             "file":filep, 
             "category":cat, 
@@ -452,7 +611,8 @@ def aggregate(hits):
         if h.get("rule_id"): 
             rec["rule_ids"].add(h.get("rule_id",""))
         if len(rec["examples"])<3:
-            ex = h.get("title") or h.get("message") or ""
+            # For RBAC, prefer storing the message (contains verbs/resources) over generic titles
+            ex = (h.get("message") if cat == "RBAC_OVER_PERMISSIVE" else (h.get("title") or h.get("message"))) or ""
             if ex and ex not in rec["examples"]:  # Avoid duplicates
                 rec["examples"].append(ex)
         rec["occ"]+=1
@@ -460,10 +620,17 @@ def aggregate(hits):
     # Freeze and sort by severity then support
     out=[]
     for (f,c),r in by_key.items():
+        # RBAC wildcard escalation: verbs:* combined with resources:* or cluster-admin name inside examples -> escalate severity
+        sev = r["severity"]
+        if c == "RBAC_OVER_PERMISSIVE":
+            # Examine examples for wildcard patterns
+            joined = "\n".join(r["examples"]).lower()
+            if ("verbs" in joined and "*" in joined and "resources" in joined and "*" in joined) or "cluster-admin" in joined:
+                sev = "CRITICAL"  # escalate
         out.append({
             "file": f, 
             "category": c, 
-            "severity": r["severity"],
+            "severity": sev,
             "tools": sorted(r["tools"]),
             "support_count": len(r["tools"]), 
             "rule_ids": sorted([x for x in r["rule_ids"] if x]),
@@ -480,18 +647,22 @@ def aggregate(hits):
 CATEGORY_HINT_REGEX = {
     "PRIVILEGED": re.compile(r"\bprivileged\b", re.I),
     "PRIV_ESCALATION": re.compile(r"allowPrivilegeEscalation", re.I),
-    "CAP_SYS_ADMIN": re.compile(r"capabilities|cap_sys_admin", re.I),
+    "CAP_SYS_ADMIN": re.compile(r"capabilities|cap_sys_admin|SYS_ADMIN", re.I),
+    "MISSING_CAP_DROP": re.compile(r"capabilities.*drop|NET_RAW|securityContext", re.I),
     "RUN_AS_NONROOT_FALSE": re.compile(r"runAsNonRoot|runAsUser", re.I),
     "READONLY_ROOTFS_FALSE": re.compile(r"readOnlyRootFilesystem", re.I),
     "NO_SECCOMP": re.compile(r"seccomp", re.I),
     "NO_APPARMOR": re.compile(r"apparmor", re.I),
-    "HOSTPATH": re.compile(r"hostPath|docker\.sock", re.I),
-    "IMAGE_LATEST": re.compile(r":latest\b", re.I),
+    "HOSTPATH": re.compile(r"hostPath|docker\.sock|volumes", re.I),
+    "IMAGE_LATEST": re.compile(r":latest\b|image:", re.I),
     "NO_PROBES": re.compile(r"(liveness|readiness|startup)Probe", re.I),
     "NO_RES_LIMITS": re.compile(r"resources:|limits:|requests:", re.I),
-    "RBAC_OVER_PERMISSIVE": re.compile(r"verbs:|\*", re.I),
+    "MISSING_SECURITY_CONTEXT": re.compile(r"securityContext|runAsNonRoot|allowPrivilegeEscalation", re.I),
+    "RBAC_OVER_PERMISSIVE": re.compile(r"verbs:|\*|rules:", re.I),
     "DEPRECATED_API": re.compile(r"apiVersion|Ingress|extensions/v1beta1|networking.k8s.io/v1", re.I),
     "SCHEMA_INVALID": re.compile(r"(kind|apiVersion|metadata|spec|selector)", re.I),
+    "POD_DEFAULT_NAMESPACE": re.compile(r"namespace|metadata", re.I),
+    "HOST_NAMESPACE": re.compile(r"hostPID|hostIPC|hostNetwork|spec", re.I),
 }
 
 def locate_file(repo_root: Path, rel_or_name: str) -> Path | None:
@@ -555,12 +726,24 @@ def best_effort_jsonpath(doc: dict | list | None, category: str):
                 return f"{base}[?(@.name=='{name}')].securityContext"
             return f"{base}[0].securityContext"
         return ""
-    if category in {"PRIVILEGED","PRIV_ESCALATION","NO_SECCOMP","RUN_AS_NONROOT_FALSE","READONLY_ROOTFS_FALSE","NO_PROBES","NO_RES_LIMITS","IMAGE_LATEST"}:
+    
+    if category in {"PRIVILEGED","PRIV_ESCALATION","NO_SECCOMP","RUN_AS_NONROOT_FALSE","READONLY_ROOTFS_FALSE","IMAGE_LATEST"}:
+        return first_container_path()
+    if category == "MISSING_CAP_DROP":
+        # Point to capabilities section
+        base_path = first_container_path()
+        return f"{base_path}.capabilities" if base_path else ""
+    if category in {"NO_PROBES", "NO_RES_LIMITS"}:
         return first_container_path()
     if category == "HOSTPATH":
         # volumes or volumeMounts
         base = "$.spec.template.spec" if kind.lower() in {"deployment","daemonset","statefulset","job","cronjob"} else "$.spec"
         return f"{base}.volumes"
+    if category == "HOST_NAMESPACE":
+        base = "$.spec.template.spec" if kind.lower() in {"deployment","daemonset","statefulset","job","cronjob"} else "$.spec"
+        return base
+    if category == "POD_DEFAULT_NAMESPACE":
+        return "$.metadata.namespace"
     if category == "RBAC_OVER_PERMISSIVE":
         return "$.rules"
     return ""
@@ -647,7 +830,7 @@ def main():
                 raw_dir = legacy
                 break
     
-    out_dir = Path(args.out).resolve(); 
+    out_dir = Path(args.out).resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
     os.environ["SAFEFIX_NORMALIZATION_DIR"] = str(out_dir)
     
@@ -656,10 +839,50 @@ def main():
         sys.exit(1)
     
     print(f"[*] Parsing raw outputs from: {raw_dir}")
-    hits = parse_raw_dir(raw_dir)
+    # FP filtering configuration
+    fp_filter = bool(int(getattr(args, "fp_filter", 1)))
+    fp_exempt = set([t.strip().lower() for t in getattr(args, "fp_exempt_tools", "").split(",") if t.strip()]) or None
+    hits = parse_raw_dir(raw_dir, fp_filter=fp_filter, fp_exempt_tools=fp_exempt)
+
+    # Optional ML-based false-positive filtering
+    ml_cfg = {
+        "enabled": False,
+        "filtered": 0,
+        "model": None,
+        "threshold": None
+    }
+    if int(getattr(args, "ml_fp", 0)) == 1:
+        # Load classifier lazily without requiring package install if not used
+        try:
+            sys.path.insert(0, str(Path(__file__).parent))
+            from fp_classifier import FPClassifier  # type: ignore
+            model_path = getattr(args, "ml_model", "") or str(Path(__file__).parent / "model" / "fp_classifier.joblib")
+            clf = FPClassifier(model_path=model_path, threshold=float(getattr(args, "ml_threshold", 0.6)))
+            if getattr(clf, "available", False):
+                kept = []
+                removed = 0
+                for h in hits:
+                    try:
+                        if clf.is_false_positive(h):
+                            removed += 1
+                        else:
+                            kept.append(h)
+                    except (ValueError, RuntimeError, OSError) as _clf_err:
+                        # Non-fatal classifier issue; retain finding
+                        kept.append(h)
+                hits = kept
+                ml_cfg["enabled"] = True
+                ml_cfg["filtered"] = removed
+                ml_cfg["model"] = getattr(clf, "model_path", None)
+                ml_cfg["threshold"] = float(getattr(args, "ml_threshold", 0.6))
+                print(f"[*] ML-FP filtering removed {removed} findings (model={ml_cfg['model']}, thr={ml_cfg['threshold']})")
+            else:
+                print("[!] ML-FP requested but model not available; skipping ML filtering")
+        except (ImportError, OSError, ValueError, RuntimeError) as _e:
+            print(f"[!] ML-FP initialization failed: {_e}")
     print(f"[*] Extracted {len(hits)} raw findings")
     
-    print(f"[*] Aggregating and correlating findings...")
+    print("[*] Aggregating and correlating findings...")
     agg = aggregate(hits)
     print(f"[*] Aggregated to {len(agg)} unique (file, category) pairs")
     
@@ -669,7 +892,7 @@ def main():
         sev = item.get("severity", "UNKNOWN")
         severity_counts[sev] = severity_counts.get(sev, 0) + 1
     
-    print(f"[*] Severity distribution:")
+    print("[*] Severity distribution:")
     for sev in ["CRITICAL", "HIGH", "MEDIUM", "LOW"]:
         if sev in severity_counts:
             print(f"    {sev}: {severity_counts[sev]}")
@@ -679,7 +902,7 @@ def main():
     
     payload = {
         "generated_at": now_iso(), 
-        "version": "sfk-v9.0-perfect", 
+        "version": "sfk-v10.0-ultimate-perfect", 
         "metadata": {
             "raw_findings_count": len(hits),
             "aggregated_count": len(agg),
@@ -687,7 +910,9 @@ def main():
             "severity_distribution": severity_counts,
             "filters": {
                 "min_support": int(args.min_support),
-                "only_security": bool(args.only_security)
+                "only_security": bool(args.only_security),
+                "false_positive_filtering": bool(int(getattr(args, "fp_filter", 1))),
+                "ml_fp": ml_cfg
             }
         },
         "items": items

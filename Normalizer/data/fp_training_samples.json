@@ -1,0 +1,34 @@
+[
+  {
+    "tool": "Kubescape",
+    "file": "charts/example/values.yaml",
+    "title": "Readiness probe missing",
+    "message": "Helm values file does not define readinessProbe",
+    "rule_id": "C-0056",
+    "label": "fp"
+  },
+  {
+    "tool": "KubeConform",
+    "file": "tests/13.nginx_privileged_deployment.yaml",
+    "title": "Schema invalid",
+    "message": "missing property \"metadata\" in io.k8s.api.apps.v1.Deployment",
+    "rule_id": "KUBECONFORM_INVALID",
+    "label": "tp"
+  },
+  {
+    "tool": "Gitleaks",
+    "file": "examples/demo.yaml",
+    "title": "Gitleaks",
+    "message": "password=example not a real secret",
+    "rule_id": "",
+    "label": "fp"
+  },
+  {
+    "tool": "Checkov",
+    "file": "tests/14.genkubesec_privileged_pod.yaml",
+    "title": "Privileged container",
+    "message": "Container runs as privileged",
+    "rule_id": "CKV_K8S_22",
+    "label": "tp"
+  }
+]

@@ -1,0 +1,25 @@
+{
+    "gates":  [
+                  {
+                      "gate":  "schema",
+                      "evidence":  "Validations/evidence/1762601039_d7775bee_SECURED_tests_docker-bench-security.deployment.yaml/schema/kubeconform.json",
+                      "details":  "kubeconform run",
+                      "status":  "PASS"
+                  },
+                  {
+                      "gate":  "policy",
+                      "evidence":  "Validations/evidence/1762601039_d7775bee_SECURED_tests_docker-bench-security.deployment.yaml/policy/conftest.json",
+                      "details":  "conftest run",
+                      "status":  "FAIL"
+                  },
+                  {
+                      "gate":  "dryrun",
+                      "evidence":  "",
+                      "details":  "no kube-context; dry-run requires a live API server",
+                      "status":  "SKIP"
+                  }
+              ],
+    "overall":  "FAIL",
+    "file_sha256":  "1fc077542e609bd844d2916fd1429d816212be342fb4f4aa1c7c6b620eff1754",
+    "file":  "Validations/tmp_inputs/1762601039_d7775bee/SECURED_tests_docker-bench-security.deployment.yaml"
+}

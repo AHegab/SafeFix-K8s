@@ -1,0 +1,108 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: internal-proxy-deployment
+  namespace: internal-proxy-ns
+  labels:
+    app: internal-proxy
+spec:
+  selector:
+    matchLabels:
+      app: internal-proxy
+  template:
+    metadata:
+      labels:
+        app: internal-proxy
+      annotations:
+        container.apparmor.security.beta.kubernetes.io/internal-proxy: runtime/default
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - name: internal-api
+        image: madhuakula/k8s-goat-internal-api
+        resources:
+          limits:
+            cpu: 50m
+            memory: 60Mi
+          requests:
+            cpu: 30m
+            memory: 40Mi
+        ports:
+        - containerPort: 3000
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          capabilities:
+            drop:
+            - ALL
+      - name: info-app
+        image: madhuakula/k8s-goat-info-app
+        resources:
+          limits:
+            cpu: 30m
+            memory: 50Mi
+          requests:
+            cpu: 30m
+            memory: 40Mi
+        ports:
+        - containerPort: 5000
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          capabilities:
+            drop:
+            - ALL
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+        capabilities:
+          drop:
+          - ALL
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: internal-proxy-api-service
+  namespace: default
+spec:
+  ports:
+  - protocol: TCP
+    port: 3000
+    targetPort: 3000
+  selector:
+    app: internal-proxy
+  automountServiceAccountToken: false
+  securityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    capabilities:
+      drop:
+      - ALL
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: internal-proxy-info-app-service
+  namespace: default
+spec:
+  type: NodePort
+  ports:
+  - protocol: TCP
+    port: 5000
+    targetPort: 5000
+    nodePort: 30003
+  selector:
+    app: internal-proxy
+  automountServiceAccountToken: false
+  securityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    capabilities:
+      drop:
+      - ALL

@@ -1,0 +1,15 @@
+﻿[
+	{
+		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\Validations\\tmp_inputs\\1762601025_30d30396\\INEFFECTIVE_tests_29.helm_rabbitmq_hardcoded_credentials.yaml",
+		"namespace": "main",
+		"successes": 69,
+		"failures": [
+			{
+				"msg": "workload must set runAsNonRoot=true at podSecurityContext or container securityContext",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			}
+		]
+	}
+]

@@ -1,0 +1,335 @@
+{
+  "original_file": "tests\\kube-bench-security.node-job.yaml",
+  "total_findings": 17,
+  "successful_patches": 1,
+  "models_used": [
+    "groq",
+    "openrouter",
+    "gemini"
+  ],
+  "decisions": [
+    {
+      "finding": 1,
+      "category": "PRIVILEGED",
+      "severity": null,
+      "models_voted": [
+        "groq",
+        "gemini"
+      ],
+      "selected_model": null,
+      "patch_applied": false,
+      "votes": {
+        "groq": {
+          "classification": "fix"
+        },
+        "gemini": {
+          "classification": "fix"
+        }
+      }
+    },
+    {
+      "finding": 2,
+      "category": "HOSTPATH",
+      "severity": null,
+      "models_voted": [
+        "groq",
+        "gemini"
+      ],
+      "selected_model": null,
+      "patch_applied": false,
+      "votes": {
+        "groq": {
+          "classification": "fix"
+        },
+        "gemini": {
+          "classification": "ignore"
+        }
+      }
+    },
+    {
+      "finding": 3,
+      "category": "CAP_SYS_ADMIN",
+      "severity": null,
+      "models_voted": [
+        "groq",
+        "gemini"
+      ],
+      "selected_model": null,
+      "patch_applied": false,
+      "votes": {
+        "groq": {
+          "classification": "fix"
+        },
+        "gemini": {
+          "classification": "needs_review"
+        }
+      }
+    },
+    {
+      "finding": 4,
+      "category": "HOSTPATH",
+      "severity": null,
+      "models_voted": [
+        "groq",
+        "gemini"
+      ],
+      "selected_model": null,
+      "patch_applied": false,
+      "votes": {
+        "groq": {
+          "classification": "needs_review"
+        },
+        "gemini": {
+          "classification": "needs_review"
+        }
+      }
+    },
+    {
+      "finding": 5,
+      "category": "HOSTPATH",
+      "severity": null,
+      "models_voted": [
+        "groq",
+        "gemini"
+      ],
+      "selected_model": null,
+      "patch_applied": false,
+      "votes": {
+        "groq": {
+          "classification": "needs_review"
+        },
+        "gemini": {
+          "classification": "needs_review"
+        }
+      }
+    },
+    {
+      "finding": 6,
+      "category": "NO_SECCOMP",
+      "severity": null,
+      "models_voted": [
+        "groq",
+        "gemini"
+      ],
+      "selected_model": null,
+      "patch_applied": false,
+      "votes": {
+        "groq": {
+          "classification": "fix"
+        },
+        "gemini": {
+          "classification": "fix"
+        }
+      }
+    },
+    {
+      "finding": 7,
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": null,
+      "models_voted": [
+        "groq",
+        "gemini"
+      ],
+      "selected_model": null,
+      "patch_applied": false,
+      "votes": {
+        "groq": {
+          "classification": "needs_review"
+        },
+        "gemini": {
+          "classification": "needs_review"
+        }
+      }
+    },
+    {
+      "finding": 8,
+      "category": "HARD_CODED_CREDS",
+      "severity": null,
+      "models_voted": [
+        "groq",
+        "gemini"
+      ],
+      "selected_model": "gemini",
+      "patch_applied": true,
+      "votes": {
+        "groq": {
+          "classification": "needs_review"
+        },
+        "gemini": {
+          "classification": "fix"
+        }
+      }
+    },
+    {
+      "finding": 9,
+      "category": "MISSING_SECURITY_CONTEXT",
+      "severity": null,
+      "models_voted": [
+        "groq",
+        "gemini"
+      ],
+      "selected_model": null,
+      "patch_applied": false,
+      "votes": {
+        "groq": {
+          "classification": "needs_review"
+        },
+        "gemini": {
+          "classification": "fix"
+        }
+      }
+    },
+    {
+      "finding": 10,
+      "category": "NO_APPARMOR",
+      "severity": null,
+      "models_voted": [
+        "groq",
+        "gemini"
+      ],
+      "selected_model": null,
+      "patch_applied": false,
+      "votes": {
+        "groq": {
+          "classification": "fix"
+        },
+        "gemini": {
+          "classification": "fix"
+        }
+      }
+    },
+    {
+      "finding": 11,
+      "category": "IMAGE_LATEST",
+      "severity": null,
+      "models_voted": [
+        "groq",
+        "gemini"
+      ],
+      "selected_model": null,
+      "patch_applied": false,
+      "votes": {
+        "groq": {
+          "classification": "needs_review"
+        },
+        "gemini": {
+          "classification": "needs_review"
+        }
+      }
+    },
+    {
+      "finding": 12,
+      "category": "MISSING_CAP_DROP",
+      "severity": null,
+      "models_voted": [
+        "groq",
+        "gemini"
+      ],
+      "selected_model": null,
+      "patch_applied": false,
+      "votes": {
+        "groq": {
+          "classification": "fix"
+        },
+        "gemini": {
+          "classification": "needs_review"
+        }
+      }
+    },
+    {
+      "finding": 13,
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": null,
+      "models_voted": [
+        "groq",
+        "gemini"
+      ],
+      "selected_model": null,
+      "patch_applied": false,
+      "votes": {
+        "groq": {
+          "classification": "needs_review"
+        },
+        "gemini": {
+          "classification": "needs_review"
+        }
+      }
+    },
+    {
+      "finding": 14,
+      "category": "HOST_NAMESPACE",
+      "severity": null,
+      "models_voted": [
+        "groq",
+        "gemini"
+      ],
+      "selected_model": null,
+      "patch_applied": false,
+      "votes": {
+        "groq": {
+          "classification": "needs_review"
+        },
+        "gemini": {
+          "classification": "fix"
+        }
+      }
+    },
+    {
+      "finding": 15,
+      "category": "IMAGE_LATEST",
+      "severity": null,
+      "models_voted": [
+        "groq",
+        "gemini"
+      ],
+      "selected_model": null,
+      "patch_applied": false,
+      "votes": {
+        "groq": {
+          "classification": "fix"
+        },
+        "gemini": {
+          "classification": "needs_review"
+        }
+      }
+    },
+    {
+      "finding": 16,
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": null,
+      "models_voted": [
+        "groq",
+        "gemini"
+      ],
+      "selected_model": null,
+      "patch_applied": false,
+      "votes": {
+        "groq": {
+          "classification": "needs_review"
+        },
+        "gemini": {
+          "classification": "needs_review"
+        }
+      }
+    },
+    {
+      "finding": 17,
+      "category": "SERVICEACCOUNT_TOKEN_AUTO",
+      "severity": null,
+      "models_voted": [
+        "groq",
+        "gemini"
+      ],
+      "selected_model": null,
+      "patch_applied": false,
+      "votes": {
+        "groq": {
+          "classification": "needs_review"
+        },
+        "gemini": {
+          "classification": "needs_review"
+        }
+      }
+    }
+  ]
+}

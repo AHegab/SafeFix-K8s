@@ -1,0 +1,32 @@
+﻿{
+  "resources": [
+    {
+      "filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\Validations\\tmp_inputs\\1762601025_30d30396\\SECURED_tests_poor-registry.deployment.yaml",
+      "kind": "Deployment",
+      "name": "poor-registry-deployment",
+      "version": "apps/v1",
+      "status": "statusError",
+      "msg": "error unmarshalling resource: error converting YAML to JSON: yaml: unmarshal errors:\n  line 26: key \"securityContext\" already set in map\n  line 42: key \"automountServiceAccountToken\" already set in map\n  line 44: key \"securityContext\" already set in map"
+    },
+    {
+      "filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\Validations\\tmp_inputs\\1762601025_30d30396\\SECURED_tests_poor-registry.deployment.yaml",
+      "kind": "Service",
+      "name": "poor-registry-service",
+      "version": "v1",
+      "status": "statusInvalid",
+      "msg": "problem validating schema. Check JSON formatting: jsonschema validation failed with 'https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v1.29.0-standalone-strict/service-v1.json#' - at '/spec': additional properties 'automountServiceAccountToken', 'securityContext' not allowed",
+      "validationErrors": [
+        {
+          "path": "/spec",
+          "msg": "additional properties 'automountServiceAccountToken', 'securityContext' not allowed"
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "valid": 0,
+    "invalid": 1,
+    "errors": 1,
+    "skipped": 0
+  }
+}

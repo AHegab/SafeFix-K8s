@@ -1,0 +1,24 @@
+﻿{
+  "resources": [
+    {
+      "filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\Validations\\tmp_inputs\\1762601050_8d26474f\\SECURED_tests_31.example-nginx.yaml",
+      "kind": "Pod",
+      "name": "nginx",
+      "version": "v1",
+      "status": "statusInvalid",
+      "msg": "problem validating schema. Check JSON formatting: jsonschema validation failed with 'https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v1.29.0-standalone-strict/pod-v1.json#' - at '/spec/securityContext': additional properties 'capabilities', 'readOnlyRootFilesystem', 'allowPrivilegeEscalation' not allowed",
+      "validationErrors": [
+        {
+          "path": "/spec/securityContext",
+          "msg": "additional properties 'capabilities', 'readOnlyRootFilesystem', 'allowPrivilegeEscalation' not allowed"
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "valid": 0,
+    "invalid": 1,
+    "errors": 0,
+    "skipped": 0
+  }
+}

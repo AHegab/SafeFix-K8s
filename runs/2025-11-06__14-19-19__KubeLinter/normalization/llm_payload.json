@@ -1,0 +1,16 @@
+{
+  "generated_at": "2025-11-06T12:19:21Z",
+  "version": "sfk-v10.0-ultimate-perfect",
+  "metadata": {
+    "raw_findings_count": 0,
+    "aggregated_count": 0,
+    "llm_items_count": 0,
+    "severity_distribution": {},
+    "filters": {
+      "min_support": 1,
+      "only_security": true,
+      "false_positive_filtering": true
+    }
+  },
+  "items": []
+}

@@ -1,0 +1,52 @@
+﻿{
+  "resources": [
+    {
+      "filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\output\\combination\\SECURED_tests_internal-proxy.deployment.yaml",
+      "kind": "Service",
+      "name": "internal-proxy-api-service",
+      "version": "v1",
+      "status": "statusInvalid",
+      "msg": "problem validating schema. Check JSON formatting: jsonschema validation failed with 'https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v1.29.0-standalone-strict/service-v1.json#' - at '/spec': additional properties 'securityContext' not allowed",
+      "validationErrors": [
+        {
+          "path": "/spec",
+          "msg": "additional properties 'securityContext' not allowed"
+        }
+      ]
+    },
+    {
+      "filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\output\\combination\\SECURED_tests_internal-proxy.deployment.yaml",
+      "kind": "Service",
+      "name": "internal-proxy-info-app-service",
+      "version": "v1",
+      "status": "statusInvalid",
+      "msg": "problem validating schema. Check JSON formatting: jsonschema validation failed with 'https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v1.29.0-standalone-strict/service-v1.json#' - at '/spec': additional properties 'securityContext' not allowed",
+      "validationErrors": [
+        {
+          "path": "/spec",
+          "msg": "additional properties 'securityContext' not allowed"
+        }
+      ]
+    },
+    {
+      "filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\output\\combination\\SECURED_tests_internal-proxy.deployment.yaml",
+      "kind": "Deployment",
+      "name": "internal-proxy-deployment",
+      "version": "apps/v1",
+      "status": "statusInvalid",
+      "msg": "problem validating schema. Check JSON formatting: jsonschema validation failed with 'https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v1.29.0-standalone-strict/deployment-apps-v1.json#' - at '/spec/template/spec/securityContext': additional properties 'allowPrivilegeEscalation', 'capabilities', 'readOnlyRootFilesystem' not allowed",
+      "validationErrors": [
+        {
+          "path": "/spec/template/spec/securityContext",
+          "msg": "additional properties 'allowPrivilegeEscalation', 'capabilities', 'readOnlyRootFilesystem' not allowed"
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "valid": 0,
+    "invalid": 3,
+    "errors": 0,
+    "skipped": 0
+  }
+}

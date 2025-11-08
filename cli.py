@@ -17,6 +17,8 @@ import json
 import subprocess
 import time
 from pathlib import Path
+import shutil
+import uuid
 from typing import Optional, List
 from datetime import datetime
 
@@ -24,7 +26,8 @@ try:
     import typer
     from rich.console import Console
     from rich.table import Table
-    from rich.progress import Progress, SpinnerColumn, TextColumn
+    from rich import box
+    # from rich.progress import Progress, SpinnerColumn, TextColumn
     from rich.panel import Panel
     from rich.syntax import Syntax
     from rich.prompt import Confirm, Prompt
@@ -40,6 +43,29 @@ app = typer.Typer(
 )
 console = Console()
 
+
+def _env_guard(stage: str):
+    """Prevent cross-stage contamination by clearing unrelated SAFEFIX_* vars.
+    Allowlist minimal vars per stage; remove others to avoid stale paths from previous runs.
+    """
+    allow = {
+        "scan": {"SAFEFIX_OUTPUT_ROOT", "SAFEFIX_DETECTION_RAW_DIR", "SAFEFIX_DETECTION_LOG_DIR"},
+        "normalize": {"SAFEFIX_OUTPUT_ROOT", "SAFEFIX_DETECTION_RAW_DIR", "SAFEFIX_NORMALIZATION_DIR"},
+        "llm": {"SAFEFIX_OUTPUT_ROOT", "SAFEFIX_NORMALIZATION_DIR", "SAFEFIX_LLM_DIR", "SAFEFIX_LLM_SANDBOX_DIR"},
+        "combine": {"SAFEFIX_OUTPUT_ROOT", "SAFEFIX_LLM_DIR", "SAFEFIX_COMBINATION_DIR"},
+        "validate": {"SAFEFIX_OUTPUT_ROOT", "SAFEFIX_VALIDATION_DIR"},
+        "pipeline": {"SAFEFIX_OUTPUT_ROOT"},
+    }.get(stage, set())
+    to_del = [k for k in os.environ.keys() if k.startswith("SAFEFIX_") and k not in allow]
+    for k in to_del:
+        os.environ.pop(k, None)
+
+def _table_box():
+    enc = str(getattr(sys.stdout, "encoding", "") or "").lower()
+    if enc.startswith("cp") or "1252" in enc or "ansi" in enc:
+        return box.SIMPLE
+    return box.HEAVY_HEAD
+
 # Get repo root
 REPO_ROOT = Path(__file__).parent.absolute()
 DETECTION_DIR = REPO_ROOT / "Detection"
@@ -47,6 +73,7 @@ NORMALIZER_DIR = REPO_ROOT / "Normalizer"
 LLMS_DIR = REPO_ROOT / "LLMs"
 VALIDATIONS_DIR = REPO_ROOT / "Validations"
 OUTPUT_DIR = REPO_ROOT / "output"
+EVAL_DIR = REPO_ROOT / "Evaluation"
 
 
 def _ensure_layer(name: str) -> Path:
@@ -63,8 +90,17 @@ VALIDATION_LAYER = _ensure_layer("validation")
 
 
 def print_banner():
-    """Print CLI banner."""
-    banner = """
+    """Print CLI banner with ASCII fallback for Windows codepages."""
+    enc = str(getattr(sys.stdout, "encoding", "") or "").lower()
+    if enc.startswith("cp") or "1252" in enc or "ansi" in enc:
+        banner = (
+            "+-----------------------------------------------------------+\n"
+            "|    SafeFix-K8s Security Remediation Pipeline              |\n"
+            "|                   Automated Security Fixes                |\n"
+            "+-----------------------------------------------------------+\n"
+        )
+    else:
+        banner = """
 ╔═══════════════════════════════════════════════════════════╗
 ║          SafeFix-K8s Security Remediation Pipeline        ║
 ║                    Automated Security Fixes                ║
@@ -74,8 +110,8 @@ def print_banner():
 
 
 def print_summary(title: str, data: dict, suggestions: List[str] = None):
-    """Print a formatted summary table."""
-    table = Table(title=title, show_header=True, header_style="bold magenta")
+    """Print a formatted summary table with encoding-aware box style."""
+    table = Table(title=title, show_header=True, header_style="bold magenta", box=_table_box())
     table.add_column("Metric", style="cyan")
     table.add_column("Value", justify="right", style="green")
     
@@ -100,8 +136,9 @@ def find_existing(paths: List[Path], expected: Path) -> Path:
 @app.command()
 def scan(
     path: str = typer.Option("tests", "--path", "-p", help="Path to scan"),
-    mode: str = typer.Option("extended", "--mode", "-m", help="Scan mode: lean or extended"),
+    mode: str = typer.Option("extended", "--mode", "-m", help="Scan mode: lean, extended, or single"),
     extended: bool = typer.Option(True, "--extended/--lean", "-e/-l", help="Use extended mode (13 tools) - default is extended"),
+    tool: Optional[str] = typer.Option(None, "--tool", "-t", help="Single tool to run (e.g., kubescape, trivy, checkov)"),
     dry_run: bool = typer.Option(False, "--dry-run", help="Show what would be scanned without executing"),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Custom output directory")
 ):
@@ -110,12 +147,19 @@ def scan(
     
     By default, runs EXTENDED mode with all 13 tools (10 LEAN + rbac-police, pluto, gitleaks).
     Use --lean to run only the 10 core tools.
+    Use --tool <name> to run a single specific tool.
+    
+    Available tools:
+        KubeConform, KubeLinter, Polaris, Checkov, TrivyConfig, Kubescape,
+        KubeScore, Yamllint, KubeAudit, Conftest, RBACPolice, Pluto, Gitleaks
     
     Examples:
         cli.py scan --path tests                    # Extended mode (13 tools)
         cli.py scan --path . --lean                 # Lean mode (10 tools)
-        cli.py scan --dry-run
+        cli.py scan --path tests --tool Kubescape   # Single tool only
+        cli.py scan --tool Trivy --dry-run
     """
+    _env_guard("scan")
     print_banner()
     start_time = time.time()
     
@@ -124,16 +168,30 @@ def scan(
         console.print(f"[bold red]Error:[/bold red] Path not found: {path}")
         raise typer.Exit(1)
     
-    mode_str = "EXTENDED" if extended or mode.lower() == "extended" else "LEAN"
-    tool_count = 13 if extended or mode.lower() == "extended" else 10
+    # Determine mode
+    if tool:
+        mode_str = f"SINGLE ({tool})"
+        tool_count = 1
+        function_name = "Det-RunSingle"
+        function_args = f"-Path '{scan_path}' -Tool {tool}"
+    elif extended or mode.lower() == "extended":
+        mode_str = "EXTENDED"
+        tool_count = 13
+        function_name = "Det-RunExtended"
+        function_args = f"-Path '{scan_path}'"
+    else:
+        mode_str = "LEAN"
+        tool_count = 10
+        function_name = "Det-RunLean"
+        function_args = f"-Path '{scan_path}'"
     
     console.print(f"[bold cyan]Scanning:[/bold cyan] {scan_path}")
-    console.print(f"[bold cyan]Mode:[/bold cyan] {mode_str} ({tool_count} tools)")
+    console.print(f"[bold cyan]Mode:[/bold cyan] {mode_str} ({tool_count} tool{'s' if tool_count > 1 else ''})")
     console.print(f"[bold cyan]Started:[/bold cyan] {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
     
     if dry_run:
         console.print("[yellow]DRY RUN - showing what would be executed:[/yellow]\n")
-        console.print(f"Command: powershell -NoProfile -ExecutionPolicy Bypass -Command \". {DETECTION_DIR / 'detectors.ps1'}; {'Det-RunExtended' if extended else 'Det-RunLean'} -Path '{scan_path}'\"")
+        console.print(f"Command: powershell -NoProfile -ExecutionPolicy Bypass -Command \". {DETECTION_DIR / 'detectors.ps1'}; {function_name} {function_args}\"")
         console.print("\n[yellow]No changes made. Remove --dry-run to execute.[/yellow]")
         return
     
@@ -149,15 +207,17 @@ def scan(
 
     # Execute detection
     try:
-        with console.status(f"[bold green]Running {tool_count} security scanners...") as status:
+        with console.status(f"[bold green]Running {tool_count} security scanner{'s' if tool_count > 1 else ''}..."):
             if sys.platform == "win32":
                 # Dot-source the script to load functions, then call the function
                 script_path = str(DETECTION_DIR / 'detectors.ps1').replace("'", "''")  # Escape single quotes
                 scan_path_str = str(scan_path).replace("'", "''")  # Convert Path to str first
-                function_name = 'Det-RunExtended' if extended else 'Det-RunLean'
                 
-                # Use dot-sourcing with proper escaping
-                ps_command = f". '{script_path}'; {function_name} -Path '{scan_path_str}'"
+                # Build PowerShell command
+                if tool:
+                    ps_command = f". '{script_path}'; Det-RunSingle -Path '{scan_path_str}' -Tool {tool}"
+                else:
+                    ps_command = f". '{script_path}'; {function_name} -Path '{scan_path_str}'"
                 
                 cmd = [
                     "powershell", "-NoProfile", "-ExecutionPolicy", "Bypass",
@@ -169,14 +229,14 @@ def scan(
                     f"cd '{DETECTION_DIR}' && ./detectors.sh {'--extended' if extended else ''} '{scan_path}'"
                 ]
             
-            result = subprocess.run(cmd, capture_output=True, text=True, cwd=str(REPO_ROOT), env=env)
+            result = subprocess.run(cmd, capture_output=True, text=True, cwd=str(REPO_ROOT), env=env, check=False)
             
             if result.returncode != 0:
                 console.print(f"[bold red]Scan failed with exit code {result.returncode}[/bold red]")
                 console.print(result.stderr)
                 raise typer.Exit(1)
     
-    except Exception as e:
+    except (OSError, ValueError) as e:
         console.print(f"[bold red]Error during scan:[/bold red] {e}")
         raise typer.Exit(1)
     
@@ -200,7 +260,7 @@ def scan(
                     count = 1
                 tool_results[file.stem.replace('_raw', '')] = count
                 finding_count += count
-            except:
+            except (json.JSONDecodeError, OSError, ValueError):
                 tool_results[file.stem.replace('_raw', '')] = 0
     
     elapsed = time.time() - start_time
@@ -224,13 +284,11 @@ def scan(
     # Tool breakdown
     if tool_results:
         console.print("\n[bold]Tool Breakdown:[/bold]")
-        tool_table = Table(show_header=True, header_style="bold magenta")
+        tool_table = Table(show_header=True, header_style="bold magenta", box=_table_box())
         tool_table.add_column("Tool", style="cyan")
         tool_table.add_column("Findings", justify="right", style="yellow")
-        
         for tool, count in sorted(tool_results.items(), key=lambda x: -x[1]):
             tool_table.add_row(tool, str(count))
-        
         console.print(tool_table)
 
 
@@ -250,6 +308,7 @@ def normalize(
     cli.py normalize --raw output/detection/raw --out output/normalization
         cli.py normalize --min-support 2 --only-security
     """
+    _env_guard("normalize")
     print_banner()
     start_time = time.time()
     
@@ -284,7 +343,7 @@ def normalize(
     
     # Execute normalization
     try:
-        with console.status("[bold green]Normalizing findings...") as status:
+        with console.status("[bold green]Normalizing findings..."):
             cmd = [
                 sys.executable,
                 str(NORMALIZER_DIR / "normalize.py"),
@@ -297,10 +356,10 @@ def normalize(
             env["SAFEFIX_DETECTION_RAW_DIR"] = str(raw_dir)
             env["SAFEFIX_NORMALIZATION_DIR"] = str(out_dir)
             
-            result = subprocess.run(cmd, capture_output=True, text=True, cwd=str(REPO_ROOT), env=env)
+            result = subprocess.run(cmd, capture_output=True, text=True, cwd=str(REPO_ROOT), env=env, check=False)
             
             if result.returncode != 0:
-                console.print(f"[bold red]Normalization failed[/bold red]")
+                console.print("[bold red]Normalization failed[/bold red]")
                 console.print(result.stderr)
                 raise typer.Exit(1)
             
@@ -357,6 +416,7 @@ def llm_run(
     hygiene: bool = typer.Option(True, "--hygiene/--no-hygiene", help="Enable security hygiene"),
     limit: int = typer.Option(0, "--limit", "-l", help="Limit number of items (0=all)"),
     timeout: int = typer.Option(25, "--timeout", "-t", help="Timeout per model in seconds"),
+    concurrency: int = typer.Option(5, "--concurrency", "-c", help="Process N items in parallel"),
     dry_run: bool = typer.Option(False, "--dry-run", help="Show what would be executed")
 ):
     """
@@ -366,7 +426,9 @@ def llm_run(
         cli.py llm run --models groq,openrouter
         cli.py llm run --autofix --hygiene --limit 10
         cli.py llm run --no-autofix --timeout 60
+        cli.py llm run --concurrency 10  # Process 10 items at once (faster!)
     """
+    _env_guard("llm")
     print_banner()
     start_time = time.time()
     
@@ -374,11 +436,12 @@ def llm_run(
     console.print(f"[bold cyan]Autofix:[/bold cyan] {autofix}")
     console.print(f"[bold cyan]Hygiene:[/bold cyan] {hygiene}")
     console.print(f"[bold cyan]Limit:[/bold cyan] {limit if limit > 0 else 'All'}")
-    console.print(f"[bold cyan]Timeout:[/bold cyan] {timeout}s\n")
+    console.print(f"[bold cyan]Timeout:[/bold cyan] {timeout}s")
+    console.print(f"[bold cyan]Concurrency:[/bold cyan] {concurrency}\n")
     
     if dry_run:
         console.print("[yellow]DRY RUN - showing what would be executed:[/yellow]\n")
-        cmd_str = f"python {LLMS_DIR / 'multi_llm_orchestrator.py'} --models {models}"
+        cmd_str = f"python {LLMS_DIR / 'multi_llm_orchestrator.py'} --models {models} --concurrency {concurrency}"
         if autofix:
             cmd_str += " --autofix"
         if hygiene:
@@ -395,7 +458,8 @@ def llm_run(
             sys.executable,
             str(LLMS_DIR / "multi_llm_orchestrator.py"),
             "--models", models,
-            "--timeout", str(timeout)
+            "--timeout", str(timeout),
+            "--concurrency", str(concurrency)
         ]
         
         if autofix:
@@ -406,32 +470,46 @@ def llm_run(
             cmd.extend(["--limit", str(limit)])
         
         env = os.environ.copy()
-        env["SAFEFIX_OUTPUT_ROOT"] = str(OUTPUT_DIR)
-        env["SAFEFIX_NORMALIZATION_DIR"] = str(NORMALIZATION_LAYER)
-        env["SAFEFIX_LLM_DIR"] = str(LLM_LAYER)
-        env["SAFEFIX_LLM_SANDBOX_DIR"] = str(LLM_LAYER / "patch_sandbox")
+        # Use environment variables if already set (for tool-specific paths), otherwise use defaults
+        env["SAFEFIX_OUTPUT_ROOT"] = os.getenv("SAFEFIX_OUTPUT_ROOT", str(OUTPUT_DIR))
+        env["SAFEFIX_NORMALIZATION_DIR"] = os.getenv("SAFEFIX_NORMALIZATION_DIR", str(NORMALIZATION_LAYER))
+        env["SAFEFIX_LLM_DIR"] = os.getenv("SAFEFIX_LLM_DIR", str(LLM_LAYER))
+        
+        llm_sandbox = Path(env["SAFEFIX_LLM_DIR"]) / "patch_sandbox"
+        env["SAFEFIX_LLM_SANDBOX_DIR"] = str(llm_sandbox)
 
-        with console.status("[bold green]Running LLM orchestration...") as status:
-            result = subprocess.run(cmd, capture_output=True, text=True, cwd=str(REPO_ROOT), env=env)
+        with console.status("[bold green]Running LLM orchestration..."):
+            result = subprocess.run(cmd, capture_output=True, text=True, cwd=str(REPO_ROOT), env=env, check=False)
             
             if result.returncode != 0:
-                console.print(f"[bold red]LLM orchestration failed[/bold red]")
+                console.print("[bold red]LLM orchestration failed[/bold red]")
                 console.print(result.stderr)
                 raise typer.Exit(1)
             
             console.print(result.stdout)
     
-    except Exception as e:
+    except (OSError, ValueError) as e:
         console.print(f"[bold red]Error during LLM orchestration:[/bold red] {e}")
         raise typer.Exit(1)
     
     elapsed = time.time() - start_time
     
     # Parse results
-    decisions_path = find_existing([
+    # Prefer tool-scoped SAFE FIX_LLM_DIR (e.g., output/<tool>/llm) if present, then fall back to global
+    llm_dir_env = Path(os.getenv("SAFEFIX_LLM_DIR", str(LLM_LAYER)).strip())
+    # If tool-scoped path doesn't exist, attempt discovery across output/*/llm
+    candidates = [
+        llm_dir_env / "llm_decisions.json",
         LLM_LAYER / "llm_decisions.json",
-        OUTPUT_DIR / "llm_decisions.json"
-    ], LLM_LAYER / "llm_decisions.json")
+        OUTPUT_DIR / "llm_decisions.json",
+    ]
+    if not any(p.exists() for p in candidates):
+        try:
+            for p in OUTPUT_DIR.glob("*/llm/llm_decisions.json"):
+                candidates.append(p)
+        except (OSError, ValueError, json.JSONDecodeError):
+            pass
+    decisions_path = find_existing(candidates, llm_dir_env / "llm_decisions.json")
     processed = 0
     fixed = 0
     
@@ -472,6 +550,7 @@ def combine(
         cli.py combine tests/13.nginx_privileged_deployment.yaml
         cli.py combine tests/13.nginx_privileged_deployment.yaml --no-autofix
     """
+    _env_guard("combine")
     print_banner()
     start_time = time.time()
     
@@ -529,9 +608,10 @@ def combine(
 
         combination_dir.mkdir(parents=True, exist_ok=True)
         env = os.environ.copy()
-        env["SAFEFIX_OUTPUT_ROOT"] = str(OUTPUT_DIR)
-        env["SAFEFIX_NORMALIZATION_DIR"] = str(NORMALIZATION_LAYER)
-        env["SAFEFIX_LLM_DIR"] = str(LLM_LAYER)
+        # Use environment variables if already set (for tool-specific paths), otherwise use defaults
+        env["SAFEFIX_OUTPUT_ROOT"] = os.getenv("SAFEFIX_OUTPUT_ROOT", str(OUTPUT_DIR))
+        env["SAFEFIX_NORMALIZATION_DIR"] = os.getenv("SAFEFIX_NORMALIZATION_DIR", str(NORMALIZATION_LAYER))
+        env["SAFEFIX_LLM_DIR"] = os.getenv("SAFEFIX_LLM_DIR", str(LLM_LAYER))
         env["SAFEFIX_COMBINATION_DIR"] = str(combination_dir)
         
         with console.status("[bold green]Combining patches...") as status:
@@ -550,7 +630,7 @@ def combine(
     
     elapsed = time.time() - start_time
     
-    # Find output file
+    # Find output file (support new prefixes)
     candidates = [
         combination_dir,
         COMBINATION_LAYER,
@@ -559,19 +639,67 @@ def combine(
     ]
     output_dir = find_existing(candidates, combination_dir)
     safe_name = file.replace("\\", "_").replace("/", "_")
-    secured_file = output_dir / f"SECURED_{safe_name}"
+    prefixes = ["SECURED_", "INEFFECTIVE_", "INVALID_", "MANUAL_REQUIRED_"]
+    produced_file = None
+    produced_status = None
+    # Prefer validation result if available to avoid stale files
+    validation_json = output_dir / f"VALIDATION_{safe_name}.json"
+    if validation_json.exists():
+        try:
+            vdata = json.loads(validation_json.read_text(encoding='utf-8'))
+            st = str(vdata.get("status", "")).upper()
+            status_to_prefix = {
+                "EFFECTIVE": "SECURED_",
+                "INEFFECTIVE": "INEFFECTIVE_",
+                "INVALID": "INVALID_",
+                "MANUAL_REQUIRED": "MANUAL_REQUIRED_",
+            }
+            pref = status_to_prefix.get(st)
+            if pref:
+                p = output_dir / f"{pref}{safe_name}"
+                if p.exists():
+                    produced_file = p
+                    produced_status = st
+        except Exception:
+            pass
+    # Fallback: pick newest matching file by mtime
+    if produced_file is None:
+        newest_mtime = -1.0
+        newest_path = None
+        newest_status = None
+        for pref in prefixes:
+            p = output_dir / f"{pref}{safe_name}"
+            if p.exists():
+                try:
+                    mtime = p.stat().st_mtime
+                    if mtime > newest_mtime:
+                        newest_mtime = mtime
+                        newest_path = p
+                        newest_status = pref.rstrip('_')
+                except Exception:
+                    continue
+        if newest_path:
+            produced_file = newest_path
+            produced_status = newest_status
     decisions_file = output_dir / f"DECISIONS_{safe_name}.json"
     
     summary_data = {
         "Patches Combined": "Multiple",
-        "Output File": str(secured_file) if secured_file.exists() else "Not found",
+        "Output File": str(produced_file) if produced_file else "Not found",
+        "Status": produced_status or "N/A",
         "Decisions Log": str(decisions_file) if decisions_file.exists() else "Not found",
         "Elapsed Time": f"{elapsed:.1f}s"
     }
     
+    # Validation should be suggested only when validator status is EFFECTIVE (which maps to SECURED_ file)
+    validate_hint = (
+        f"python cli.py validate --file {produced_file} --gates 1,2"
+        if (produced_file and produced_status == "EFFECTIVE")
+        else "(skip) Only SECURED_* files should be validated"
+    )
     suggestions = [
-        f"python cli.py validate --file {secured_file} --gates 1,2",
-        f"Review secured file: {secured_file}",
+        validate_hint,
+        f"Review output file: {produced_file}" if produced_file else "Review output directory for results",
         f"Review decision log: {decisions_file}",
         "Compare with original using diff tools"
     ]
@@ -579,11 +707,11 @@ def combine(
     print_summary("Patch Combination Complete", summary_data, suggestions)
 
 
-@app.command()
-def validate(
-    file: str = typer.Argument(..., help="File to validate"),
+@app.command(name="validate")
+def validate_cmd(
+    file: str = typer.Argument(..., help="File to validate (we will validate all YAMLs in its directory)"),
     gates: str = typer.Option("1,2", "--gates", "-g", help="Comma-separated gate numbers (1-7)"),
-    sandbox: bool = typer.Option(False, "--sandbox", "-s", help="Enable sandbox deployment (gates 3-7)"),
+    sandbox: bool = typer.Option(False, "--sandbox", "-s", help="Enable sandbox deployment (gates 4-7)"),
     dry_run: bool = typer.Option(False, "--dry-run", help="Show what would be validated")
 ):
     """
@@ -602,6 +730,7 @@ def validate(
         cli.py validate output/combined_patches/SECURED_*.yaml --gates 1,2
         cli.py validate output/combined_patches/SECURED_*.yaml --gates 1,2,3,4,5 --sandbox
     """
+    _env_guard("validate")
     print_banner()
     start_time = time.time()
     
@@ -609,6 +738,13 @@ def validate(
     if not file_path.exists():
         console.print(f"[bold red]Error:[/bold red] File not found: {file}")
         raise typer.Exit(1)
+
+    # If a JSON decision artifact was passed (e.g., DECISIONS_*.yaml.json), switch to its directory
+    # and attempt to auto-locate SECURED_* YAMLs for validation instead of *.yaml.json.
+    if file_path.suffix.lower() == ".json":
+        console.print("[yellow]Input appears to be a JSON artifact; auto-selecting hardened YAMLs in directory.[/yellow]")
+        candidate_dir = file_path.parent
+        file_path = candidate_dir  # treat as directory for staging
     
     gate_list = [int(g.strip()) for g in gates.split(",")]
     
@@ -618,9 +754,13 @@ def validate(
     
     if dry_run:
         console.print("[yellow]DRY RUN - showing what would be executed:[/yellow]\n")
-        cmd_str = f"powershell -NoProfile -ExecutionPolicy Bypass -File {VALIDATIONS_DIR / 'validate-gates.ps1'} -FilePath {file}"
-        if sandbox:
-            cmd_str += " -EnableSandbox"
+        gate_map = {1: "schema", 2: "policy", 3: "dryrun", 4: "sandbox", 5: "health", 6: "network", 7: "e2e"}
+        gate_numbers = [int(g.strip()) for g in gates.split(",") if g.strip().isdigit()]
+        gate_names = [gate_map.get(n) for n in gate_numbers if gate_map.get(n)] or ["schema", "policy"]
+        gates_arg = ",".join(gate_names)
+        cmd_str = (
+            f"powershell -NoProfile -ExecutionPolicy Bypass -Command \"& '{VALIDATIONS_DIR / 'validate-gates.ps1'}' -InputDir '{file_path.parent}' -OutputDir '.' -Gates {gates_arg}{' -EnableSandbox' if sandbox else ''}\""
+        )
         console.print(f"Command: {cmd_str}")
         console.print("\n[yellow]No changes made. Remove --dry-run to execute.[/yellow]")
         return
@@ -628,28 +768,78 @@ def validate(
     # Execute validation
     try:
         validate_script = str(VALIDATIONS_DIR / "validate-gates.ps1")
-        
+
+        # Translate numeric gates to names expected by the script
+        gate_map = {
+            1: "schema", 2: "policy", 3: "dryrun",
+            4: "sandbox", 5: "health", 6: "network", 7: "e2e"
+        }
+        gate_numbers = [int(g.strip()) for g in gates.split(",") if g.strip().isdigit()]
+        gate_names = [gate_map.get(n) for n in gate_numbers if gate_map.get(n)]
+        if not gate_names:
+            gate_names = ["schema", "policy"]
+        gates_arg = ",".join(gate_names)
+
+        # Determine source directory (if a specific secured file given, use its parent; if a directory, use it directly)
+        src_dir = (file_path.parent if file_path.is_file() else file_path).resolve()
+        tmp_root = (VALIDATIONS_DIR / "tmp_inputs").resolve()
+        tmp_root.mkdir(parents=True, exist_ok=True)
+        tmp_dir = tmp_root / (str(int(time.time())) + "_" + uuid.uuid4().hex[:8])
+        tmp_dir.mkdir(parents=True, exist_ok=True)
+
+        # Copy only YAML/YML files, skipping known auxiliary prefixes
+        skipped = []
+        copied = 0
+        for p in src_dir.iterdir():
+            if not p.is_file():
+                continue
+            name_lower = p.name.lower()
+            # Exclude any JSON-manifest hybrids (*.yaml.json) and decision/policy artifacts
+            if name_lower.endswith((".yaml", ".yml")) and not name_lower.endswith(".yaml.json"):
+                # Prefer only hardened SECURED_* files if present in directory
+                if any(q.startswith("secured_") for q in os.listdir(src_dir)):
+                    if not name_lower.startswith("secured_"):
+                        skipped.append(p.name)
+                        continue
+                if name_lower.startswith(("decisions_", "validation_", "scaffold_")):
+                    skipped.append(p.name)
+                    continue
+                try:
+                    shutil.copy2(str(p), str(tmp_dir / p.name))
+                    copied += 1
+                except (OSError, shutil.Error):
+                    skipped.append(p.name)
+            else:
+                # Skip non-YAML
+                continue
+
+        input_dir = str(tmp_dir)
+        # Prefer writing reports under Validations (script expects OutputDir relative to its CWD)
+        output_dir = '.'
+
         # Build PowerShell command with proper path quoting
-        ps_command = f"& '{validate_script}' -FilePath '{file_path}'"
+        ps_command = (
+            f"& '{validate_script}' -InputDir '{input_dir}' -OutputDir '{output_dir}' -Gates {gates_arg}"
+        )
         if sandbox:
             ps_command += " -EnableSandbox"
-        
+
         cmd = [
             "powershell", "-NoProfile", "-ExecutionPolicy", "Bypass",
             "-Command", ps_command
         ]
         
-        with console.status(f"[bold green]Running validation gates {gates}...") as status:
-            result = subprocess.run(cmd, capture_output=True, text=True, cwd=str(VALIDATIONS_DIR))
+        with console.status(f"[bold green]Running validation gates {gates} on {copied} YAMLs (staged) ..."):
+            result = subprocess.run(cmd, capture_output=True, text=True, cwd=str(VALIDATIONS_DIR), check=False)
             
             if result.returncode != 0:
-                console.print(f"[bold red]Validation failed[/bold red]")
+                console.print("[bold red]Validation failed[/bold red]")
                 console.print(result.stderr)
                 raise typer.Exit(1)
             
             console.print(result.stdout)
     
-    except Exception as e:
+    except (OSError, ValueError) as e:
         console.print(f"[bold red]Error during validation:[/bold red] {e}")
         raise typer.Exit(1)
     
@@ -657,6 +847,8 @@ def validate(
     
     summary_data = {
         "Gates Run": len(gate_list),
+        "YAMLs Validated": copied,
+        "Skipped": len(skipped),
         "Elapsed Time": f"{elapsed:.1f}s"
     }
     
@@ -689,11 +881,12 @@ def review(
     
     # Find original file
     secured_name = file_path.name
-    if secured_name.startswith("SECURED_"):
-        original_name = secured_name.replace("SECURED_", "").replace("_", "/")
-        original_path = REPO_ROOT / original_name
-    else:
-        original_path = None
+    original_path = None
+    for pref in ["SECURED_", "INEFFECTIVE_", "INVALID_", "MANUAL_REQUIRED_"]:
+        if secured_name.startswith(pref):
+            original_name = secured_name.replace(pref, "").replace("_", "/")
+            original_path = REPO_ROOT / original_name
+            break
     
     console.print(f"[bold cyan]Reviewing:[/bold cyan] {file_path}\n")
     
@@ -772,37 +965,70 @@ def review(
 def pipeline(
     path: str = typer.Option("tests", "--path", "-p", help="Path to scan"),
     target_file: Optional[str] = typer.Option(None, "--target", "-t", help="Specific file to patch (optional)"),
+    tool: Optional[str] = typer.Option(None, "--tool", help="Single tool to run (e.g., Kubescape, Trivy)"),
     skip_scan: bool = typer.Option(False, "--skip-scan", help="Skip scan if already completed"),
     skip_normalize: bool = typer.Option(False, "--skip-normalize", help="Skip normalization if already completed"),
     skip_llm: bool = typer.Option(False, "--skip-llm", help="Skip LLM analysis if already completed"),
     validate: bool = typer.Option(True, "--validate/--no-validate", help="Run validation after patching"),
+    hygiene: bool = typer.Option(False, "--hygiene/--no-hygiene", help="Enable security hygiene checks"),
     dry_run: bool = typer.Option(False, "--dry-run", help="Show pipeline steps without executing")
 ):
     """
     Run the complete SafeFix-K8s pipeline end-to-end.
     
     Pipeline steps:
-      1. SCAN - Run all 13 security tools on manifests
+      1. SCAN - Run security tools on manifests (13 tools or single tool with --tool)
       2. NORMALIZE - Aggregate and deduplicate findings
       3. LLM - Generate fixes using AI consensus
       4. COMBINE - Apply patches to manifests
       5. VALIDATE - Run 7-gate validation (optional)
     
+    Available tools (for --tool option):
+        KubeConform, KubeLinter, Polaris, Checkov, TrivyConfig, Kubescape,
+        KubeScore, Yamllint, KubeAudit, Conftest, RBACPolice, Pluto, Gitleaks
+    
     Examples:
-        cli.py pipeline --path tests
+        cli.py pipeline --path tests                        # Full pipeline (13 tools)
+        cli.py pipeline --path tests --tool Kubescape       # Single tool pipeline
         cli.py pipeline --path tests --target tests/13.nginx_privileged_deployment.yaml
-        cli.py pipeline --skip-scan --skip-normalize  # Resume from LLM step
-        cli.py pipeline --dry-run  # Preview pipeline
+        cli.py pipeline --skip-scan --skip-normalize        # Resume from LLM step
+        cli.py pipeline --dry-run                           # Preview pipeline
     """
+    _env_guard("pipeline")
     print_banner()
     
     start_time = time.time()
-    console.print("[bold green]Starting Complete Pipeline[/bold green]\n")
+    mode_str = f"using {tool} only" if tool else "with all 13 tools"
+    console.print(f"[bold green]Starting Complete Pipeline ({mode_str})[/bold green]\n")
+    
+    # Create tool-specific output directory if single tool mode
+    if tool:
+        tool_output_root = OUTPUT_DIR / tool.lower()
+        tool_detection_layer = tool_output_root / "detection"
+        tool_normalization_layer = tool_output_root / "normalization"
+        tool_llm_layer = tool_output_root / "llm"
+        tool_combination_layer = tool_output_root / "combination"
+        tool_validation_layer = tool_output_root / "validation"
+        
+        # Create directories
+        for layer_dir in [tool_detection_layer, tool_normalization_layer, tool_llm_layer, 
+                          tool_combination_layer, tool_validation_layer]:
+            layer_dir.mkdir(parents=True, exist_ok=True)
+        
+        console.print(f"[bold cyan]Output Directory:[/bold cyan] {tool_output_root}\n")
+    else:
+        tool_output_root = OUTPUT_DIR
+        tool_detection_layer = DETECTION_LAYER
+        tool_normalization_layer = NORMALIZATION_LAYER
+        tool_llm_layer = LLM_LAYER
+        tool_combination_layer = COMBINATION_LAYER
+        tool_validation_layer = VALIDATION_LAYER
     
     if dry_run:
         console.print("[yellow]DRY RUN - Pipeline steps that would execute:[/yellow]\n")
         if not skip_scan:
-            console.print("  1. [cyan]SCAN[/cyan] - Run 13 security tools")
+            scan_desc = f"Run {tool} tool" if tool else "Run 13 security tools"
+            console.print(f"  1. [cyan]SCAN[/cyan] - {scan_desc}")
         if not skip_normalize:
             console.print("  2. [cyan]NORMALIZE[/cyan] - Aggregate findings")
         if not skip_llm:
@@ -810,18 +1036,58 @@ def pipeline(
         console.print("  4. [cyan]COMBINE[/cyan] - Apply patches")
         if validate:
             console.print("  5. [cyan]VALIDATE[/cyan] - Run 7-gate validation")
+        if tool:
+            console.print(f"\n[cyan]Output will be saved to: {tool_output_root}[/cyan]")
         console.print("\n[yellow]Remove --dry-run to execute pipeline[/yellow]")
         return
     
     # Track pipeline progress
     steps_completed = []
     
+    # Set environment variables for tool-specific output
+    original_env = os.environ.copy()
+    if tool:
+        os.environ["SAFEFIX_OUTPUT_ROOT"] = str(tool_output_root)
+        os.environ["SAFEFIX_DETECTION_RAW_DIR"] = str(tool_detection_layer / "raw")
+        os.environ["SAFEFIX_DETECTION_LOG_DIR"] = str(tool_detection_layer / "logs")
+        os.environ["SAFEFIX_NORMALIZATION_DIR"] = str(tool_normalization_layer)
+        os.environ["SAFEFIX_LLM_DIR"] = str(tool_llm_layer)
+        os.environ["SAFEFIX_COMBINATION_DIR"] = str(tool_combination_layer)
+        os.environ["SAFEFIX_VALIDATION_DIR"] = str(tool_validation_layer)
+    
     try:
         # Step 1: SCAN
         if not skip_scan:
             console.print("[bold cyan]Step 1/5: SCAN[/bold cyan]")
-            console.print("Running all 13 security detection tools...\n")
-            scan(path=path, mode="extended", extended=True, dry_run=False)
+            if tool:
+                console.print(f"Running {tool} security scanner...\n")
+                # Set detection output directories
+                raw_dir = tool_detection_layer / "raw"
+                logs_dir = tool_detection_layer / "logs"
+                raw_dir.mkdir(parents=True, exist_ok=True)
+                logs_dir.mkdir(parents=True, exist_ok=True)
+                
+                # Run scan with tool-specific output
+                scan_path = Path(path).absolute()
+                env = os.environ.copy()
+                env["SAFEFIX_OUTPUT_ROOT"] = str(tool_output_root)
+                env["SAFEFIX_DETECTION_RAW_DIR"] = str(raw_dir)
+                env["SAFEFIX_DETECTION_LOG_DIR"] = str(logs_dir)
+                
+                script_path = str(DETECTION_DIR / 'detectors.ps1').replace("'", "''")
+                scan_path_str = str(scan_path).replace("'", "''")
+                ps_command = f". '{script_path}'; Det-RunSingle -Path '{scan_path_str}' -Tool {tool}"
+                
+                cmd = ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", ps_command]
+                result = subprocess.run(cmd, capture_output=True, text=True, cwd=str(REPO_ROOT), env=env)
+                
+                if result.returncode != 0:
+                    console.print(f"[bold red]Scan failed[/bold red]")
+                    console.print(result.stderr)
+                    raise typer.Exit(1)
+            else:
+                console.print("Running all 13 security detection tools...\n")
+                scan(path=path, mode="extended", extended=True, tool=None, dry_run=False)
             steps_completed.append("SCAN")
             console.print("\n[green]✓ Scan completed[/green]\n")
         else:
@@ -831,9 +1097,14 @@ def pipeline(
         if not skip_normalize:
             console.print("[bold cyan]Step 2/5: NORMALIZE[/bold cyan]")
             console.print("Aggregating and deduplicating findings...\n")
+            
+            # Use tool-specific paths
+            raw_input = str(tool_detection_layer / "raw") if tool else "Detection/output/raw"
+            norm_output = str(tool_normalization_layer) if tool else "output"
+            
             normalize(
-                raw="Detection/output/raw",
-                out="output",
+                raw=raw_input,
+                out=norm_output,
                 min_support=1,
                 only_security=True,
                 dry_run=False
@@ -846,13 +1117,25 @@ def pipeline(
         # Step 3: LLM
         if not skip_llm:
             console.print("[bold cyan]Step 3/5: LLM ANALYSIS[/bold cyan]")
-            console.print("Running multi-LLM consensus voting...\n")
+            hygiene_status = "enabled" if hygiene else "disabled"
+            console.print(f"Running multi-LLM consensus voting (hygiene {hygiene_status}, 5 parallel)...\n")
+            
+            # Update environment for LLM stage
+            if tool:
+                os.environ["SAFEFIX_NORMALIZATION_DIR"] = str(tool_normalization_layer)
+                os.environ["SAFEFIX_LLM_DIR"] = str(tool_llm_layer)
+            else:
+                # Ensure we write to the global output/llm even if a previous run left a tool-scoped env var around
+                os.environ["SAFEFIX_NORMALIZATION_DIR"] = str(NORMALIZATION_LAYER)
+                os.environ["SAFEFIX_LLM_DIR"] = str(LLM_LAYER)
+            
             llm_run(
                 models="groq,openrouter,gemini",
                 autofix=True,
-                hygiene=True,
+                hygiene=hygiene,
                 limit=0,
                 timeout=25,
+                concurrency=5,
                 dry_run=False
             )
             steps_completed.append("LLM")
@@ -869,15 +1152,33 @@ def pipeline(
             console.print(f"Patching specific file: {target_file}\n")
         else:
             # Find all files with patches from LLM output
-            llm_decisions_file = OUTPUT_DIR / "llm_decisions.json"
-            if llm_decisions_file.exists():
-                with open(llm_decisions_file) as f:
-                    llm_data = json.load(f)
-                    files_to_patch = list(set([item.get("file", "") for item in llm_data if item.get("file")]))
-                    console.print(f"Found {len(files_to_patch)} files to patch\n")
-            else:
-                console.print("[red]Error: No LLM decisions found. Run LLM step first.[/red]")
+            # Search global and tool-scoped locations e.g., output/<tool>/llm/llm_decisions.json
+            candidates = []
+            if tool:
+                candidates.append(tool_llm_layer / "llm_decisions.json")
+            candidates.extend([
+                LLM_LAYER / "llm_decisions.json",
+                OUTPUT_DIR / "llm/llm_decisions.json",
+            ])
+            try:
+                for p in OUTPUT_DIR.glob("*/llm/llm_decisions.json"):
+                    candidates.append(p)
+            except Exception:
+                pass
+
+            llm_decisions_file = next((p for p in candidates if p.exists()), None)
+            if llm_decisions_file is None:
+                console.print(f"[red]Error:[/red] No LLM decisions found under {OUTPUT_DIR}. Run 'python cli.py run' first or check API keys in .env.")
                 raise typer.Exit(1)
+
+            with llm_decisions_file.open(encoding="utf-8") as f:
+                llm_data = json.load(f)
+            files_to_patch = list({item.get("file", "") for item in llm_data if item.get("file")})
+            console.print(f"Found {len(files_to_patch)} files to patch (from {llm_decisions_file})\n")
+        
+        # Update environment for combination stage
+        if tool:
+            os.environ["SAFEFIX_COMBINATION_DIR"] = str(tool_combination_layer)
         
         # Apply patches to each file
         patched_files = []
@@ -889,7 +1190,8 @@ def pipeline(
                     models="groq,openrouter,gemini",
                     autofix=True,
                     hygiene=True,
-                    output=None,
+                    output=str(tool_combination_layer) if tool else None,
+                    categories=None,
                     dry_run=False
                 )
                 patched_files.append(file_path)
@@ -902,15 +1204,33 @@ def pipeline(
             console.print("[bold cyan]Step 5/5: VALIDATE[/bold cyan]")
             console.print("Running 7-gate validation framework...\n")
             
+            # Update environment for validation stage
+            if tool:
+                os.environ["SAFEFIX_VALIDATION_DIR"] = str(tool_validation_layer)
+            
             # Validate each patched file
-            output_dir = OUTPUT_DIR / "combined_patches"
+            # Use the combination layer where SECURED_/INEFFECTIVE_/... files are written
+            output_dir = tool_combination_layer if tool else COMBINATION_LAYER
             if output_dir.exists():
                 secured_files = list(output_dir.glob("SECURED_*.yaml"))
                 console.print(f"Validating {len(secured_files)} secured files\n")
                 
                 for secured_file in secured_files:
                     console.print(f"[cyan]Validating: {secured_file.name}[/cyan]")
-                    validate(file=str(secured_file), gates="1,2,3", sandbox=False, dry_run=False)
+                    # Call validate command via subprocess to avoid naming conflict
+                    validate_args = [
+                        sys.executable,
+                        __file__,
+                        "validate",
+                        str(secured_file),
+                        "--gates", "1,2,3"
+                    ]
+                    result = subprocess.run(validate_args, capture_output=True, text=True, cwd=str(REPO_ROOT), check=False)
+                    if result.returncode != 0:
+                        console.print(f"[red]Validation failed for {secured_file.name}[/red]")
+                        console.print(result.stderr)
+                    else:
+                        console.print(result.stdout)
                 
                 steps_completed.append("VALIDATE")
                 console.print(f"\n[green]✓ Validation completed[/green]\n")
@@ -923,6 +1243,11 @@ def pipeline(
         console.print(f"\n[bold red]Pipeline failed at step: {steps_completed[-1] if steps_completed else 'START'}[/bold red]")
         console.print(f"[red]Error: {e}[/red]")
         raise typer.Exit(1)
+    finally:
+        # Restore original environment
+        if tool:
+            os.environ.clear()
+            os.environ.update(original_env)
     
     # Final summary
     elapsed = time.time() - start_time
@@ -931,20 +1256,26 @@ def pipeline(
     console.print("[bold green]PIPELINE COMPLETED SUCCESSFULLY[/bold green]")
     console.print("="*60 + "\n")
     
+    output_location = str(tool_output_root) if tool else str(OUTPUT_DIR / "combined_patches")
+    
     summary_data = {
         "Total Time": f"{elapsed:.1f}s",
         "Steps Completed": " → ".join(steps_completed),
         "Files Scanned": path,
         "Files Patched": len(patched_files) if 'patched_files' in locals() else 0,
-        "Output Directory": str(OUTPUT_DIR / "combined_patches")
+        "Output Directory": output_location
     }
     
     print_summary("Pipeline Summary", summary_data)
     
     console.print("\n[bold cyan]Next Steps:[/bold cyan]")
-    console.print("  1. Review secured files in: output/combined_patches/")
-    console.print("  2. Use: python cli.py review <file> to compare changes")
-    console.print("  3. Deploy validated manifests to your cluster")
+    if tool:
+        console.print(f"  1. Review output in: {tool_output_root}/")
+        console.print(f"  2. Secured files in: {tool_combination_layer}/")
+    else:
+        console.print("  1. Review secured files in: output/combined_patches/")
+    console.print("  3. Use: python cli.py review <file> to compare changes")
+    console.print("  4. Deploy validated manifests to your cluster")
 
 
 @app.command()
@@ -962,6 +1293,153 @@ def completion(
     console.print(f"[yellow]Note: Auto-completion support requires typer[all][/yellow]")
     console.print(f"\nInstall: pip install 'typer[all]'")
     console.print(f"Then run: safefix-k8s --install-completion {shell}")
+
+
+@app.command()
+def report(
+    scope: str = typer.Option(str(OUTPUT_DIR), "--scope", "-s", help="Root directory to scan for VALIDATION_*.json (default: output)"),
+    out: Optional[str] = typer.Option(None, "--out", "-o", help="Write consolidated report JSON here (defaults next to scope)")
+):
+    """
+    Aggregate VALIDATION_*.json files into a summary per tool and overall totals.
+
+    Examples:
+        cli.py report --scope output/conftest/combination
+        cli.py report --scope output
+    """
+    print_banner()
+    scope_path = Path(scope).resolve()
+    if not scope_path.exists():
+        console.print(f"[bold red]Error:[/bold red] Scope path not found: {scope}")
+        raise typer.Exit(1)
+
+    # Collect all validation files
+    validation_files: List[Path] = []
+    if scope_path.is_file() and scope_path.name.startswith("VALIDATION_"):
+        validation_files = [scope_path]
+    else:
+        # Typical shapes: output/<tool>/combination/VALIDATION_*.json or output/combination
+        for p in scope_path.rglob("VALIDATION_*.json"):
+            validation_files.append(p)
+
+    if not validation_files:
+        console.print("[yellow]No validation files found under scope[/yellow]")
+        return
+
+    total = len(validation_files)
+    by_status = {"EFFECTIVE": 0, "INEFFECTIVE": 0, "INVALID": 0, "MANUAL_REQUIRED": 0}
+    examples: List[dict] = []
+    by_tool: dict = {}
+
+    def infer_tool(p: Path) -> str:
+        # Expect path like output/<tool>/combination/VALIDATION_...
+        parts = [x.lower() for x in p.parts]
+        if "output" in parts:
+            try:
+                idx = parts.index("output")
+                if idx + 1 < len(parts):
+                    return p.parts[idx + 1]
+            except Exception:
+                pass
+        return "root"
+
+    for vf in validation_files:
+        try:
+            data = json.loads(vf.read_text(encoding='utf-8'))
+        except Exception:
+            continue
+        status = str(data.get("status", "")).upper() or "INEFFECTIVE"
+        if status not in by_status:
+            status = "INEFFECTIVE"
+        by_status[status] += 1
+        tool = infer_tool(vf)
+        by_tool.setdefault(tool, {"EFFECTIVE": 0, "INEFFECTIVE": 0, "INVALID": 0, "MANUAL_REQUIRED": 0, "files": []})
+        by_tool[tool][status] += 1
+        # Keep up to 3 examples
+        if len(examples) < 3:
+            examples.append({"file": data.get("original_file"), "status": status, "path": str(vf)})
+
+    summary = {
+        "scope": str(scope_path),
+        "totals": {"files": total, **by_status},
+        "by_tool": by_tool,
+        "examples": examples,
+        "generated_at": datetime.now().isoformat(timespec='seconds')
+    }
+
+    # Output path
+    if out:
+        out_path = Path(out)
+        if not out_path.is_absolute():
+            out_path = (scope_path if scope_path.is_dir() else scope_path.parent) / out_path
+    else:
+        base_dir = scope_path if scope_path.is_dir() else scope_path.parent
+        out_path = base_dir / "patch_validation_report.json"
+    try:
+        out_path.write_text(json.dumps(summary, indent=2), encoding='utf-8')
+        console.print(f"[green]Wrote report:[/green] {out_path}")
+    except Exception as e:
+        console.print(f"[red]Failed to write report:[/red] {e}")
+
+    # Pretty table
+    table = Table(title="Validation Summary", show_header=True, header_style="bold magenta", box=_table_box())
+    table.add_column("Status", style="cyan")
+    table.add_column("Count", justify="right")
+    for k in ("EFFECTIVE", "INEFFECTIVE", "INVALID", "MANUAL_REQUIRED"):
+        table.add_row(k, str(by_status[k]))
+    console.print(table)
+
+
+@app.command()
+def evaluate(
+    normalized: Optional[str] = typer.Option(None, "--normalized", "-n", help="Path to llm_payload.json; if omitted, --scope will be used"),
+    scope: Optional[str] = typer.Option(str(OUTPUT_DIR), "--scope", "-s", help="Search recursively under this folder for llm_payload.json when --normalized not provided"),
+    gt: str = typer.Option(str(REPO_ROOT / "Evaluation" / "ground_truth_vulns.json"), "--gt", help="Ground truth JSON path"),
+    out: str = typer.Option(str(OUTPUT_DIR / "detection_effectiveness_report.json"), "--out", "-o", help="Where to write evaluation report")
+):
+    """
+    Evaluate detection coverage against ground truth vulnerabilities.
+
+    Examples:
+        cli.py evaluate --normalized output/normalization/llm_payload.json
+        cli.py evaluate --scope output --gt Evaluation/ground_truth_vulns.json
+    """
+    print_banner()
+    eval_script = EVAL_DIR / "evaluate_detection.py"
+    if not eval_script.exists():
+        console.print(f"[bold red]Error:[/bold red] Evaluation script not found at {eval_script}")
+        raise typer.Exit(1)
+
+    args = [sys.executable, str(eval_script), "--gt", gt, "--out", out]
+    if normalized:
+        args.extend(["--normalized", normalized])
+    else:
+        if scope:
+            args.extend(["--scope", scope])
+
+    with console.status("[bold green]Running evaluation..."):
+        result = subprocess.run(args, capture_output=True, text=True, cwd=str(REPO_ROOT))
+        if result.returncode != 0:
+            console.print("[bold red]Evaluation failed[/bold red]")
+            console.print(result.stderr)
+            raise typer.Exit(1)
+        console.print(result.stdout)
+
+    # Print a short summary if report exists
+    try:
+        data = json.loads(Path(out).read_text(encoding='utf-8'))
+        reports = data.get("reports", [])
+        table = Table(title="Detection Effectiveness", show_header=True, header_style="bold magenta", box=_table_box())
+        table.add_column("Payload", style="cyan")
+        table.add_column("Recall", justify="right")
+        table.add_column("Precision", justify="right")
+        for r in reports:
+            totals = r.get("totals", {})
+            table.add_row(Path(r.get("payload","?")).name, str(totals.get("recall","?")), str(totals.get("precision","?")))
+        console.print(table)
+        console.print(f"[green]Report saved to:[/green] {out}")
+    except Exception:
+        pass
 
 
 @app.command()

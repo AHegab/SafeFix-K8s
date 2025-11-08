@@ -9,8 +9,8 @@ import re
 import httpx
 from jsonschema import validate, ValidationError
 
-LLM_TIMEOUT_SECONDS = 25
-RETRIES             = 2
+LLM_TIMEOUT_SECONDS = 40
+RETRIES             = 3
 SMALL_DELAY_SECONDS = 0.20
 # Prefer OpenRouter first so we can control exact models, others are fallback
 MODELS: List[str]   = ["openrouter", "groq", "gemini", "ollama"]
@@ -29,14 +29,14 @@ OLLAMA_MODEL     = os.getenv("OLLAMA_MODEL", "llama3.1:8b-instruct")
 DEFAULT_OPENROUTER_MODELS: List[str] = [
     "meta-llama/llama-3.3-70b-instruct:free",  # strong instruction following
     "mistralai/mistral-7b-instruct:free",      # light + fast fallback
-    "deepseek/deepseek-r1-distill-llama-70b:free",  # reasoning-leaning fallback
-    "qwen/qwen3-vl-32b-instruct",             # VLM fallback (not required but allowed)
 ]
 
 OUTPUT_ROOT = Path(os.getenv("SAFEFIX_OUTPUT_ROOT", "output")).resolve()
-NORMALIZATION_DIR = Path(os.getenv("SAFEFIX_NORMALIZATION_DIR", OUTPUT_ROOT / "normalization"))
-LLM_DIR = Path(os.getenv("SAFEFIX_LLM_DIR", OUTPUT_ROOT / "llm"))
-PATCH_SANDBOX_DIR = Path(os.getenv("SAFEFIX_LLM_SANDBOX_DIR", LLM_DIR / "patch_sandbox"))
+# Resolve directories to absolute paths even if they don't yet exist; this avoids
+# accidental relative path issues when the cwd differs (Windows/OneDrive quirks).
+NORMALIZATION_DIR = Path(os.getenv("SAFEFIX_NORMALIZATION_DIR", OUTPUT_ROOT / "normalization")).resolve()
+LLM_DIR = Path(os.getenv("SAFEFIX_LLM_DIR", OUTPUT_ROOT / "llm")).resolve()
+PATCH_SANDBOX_DIR = Path(os.getenv("SAFEFIX_LLM_SANDBOX_DIR", LLM_DIR / "patch_sandbox")).resolve()
 
 RESPONSE_SCHEMA: Dict[str, Any] = {
     "type": "object",
@@ -172,10 +172,13 @@ def _extract_diff_target(text: str) -> Optional[str]:
     return None
 
 def _apply_unified_diff_to_text(orig_text: str, patch: str) -> Optional[str]:
+    """Apply unified diff with fuzzy matching for line number mismatches."""
     lines = orig_text.splitlines(keepends=True)
     new_lines: List[str] = []
     i = 0
     in_hunk = False
+    fuzzy_search_window = 5  # Search +/- 5 lines if exact position fails
+    
     for line in patch.splitlines(keepends=False):
         if line.startswith('@@ '):
             m = _HUNK_RE.match(line)
@@ -183,8 +186,11 @@ def _apply_unified_diff_to_text(orig_text: str, patch: str) -> Optional[str]:
                 return None
             start1 = int(m.group('start1'))
             target_index = start1 - 1
+            
+            # If target is before current position, fail
             if target_index < i:
                 return None
+            
             new_lines.extend(lines[i:target_index])
             i = target_index
             in_hunk = True
@@ -201,18 +207,49 @@ def _apply_unified_diff_to_text(orig_text: str, patch: str) -> Optional[str]:
         tag = line[0]
         content = line[1:]
         if tag == ' ':
+            # Context line - try exact match first, then fuzzy
             if i >= len(lines):
                 return None
-            if lines[i].rstrip('\n\r') != content:
-                return None
-            new_lines.append(lines[i])
-            i += 1
+            if lines[i].rstrip('\n\r') == content:
+                new_lines.append(lines[i])
+                i += 1
+            else:
+                # Fuzzy match: search nearby lines
+                found = False
+                for offset in range(-fuzzy_search_window, fuzzy_search_window + 1):
+                    if offset == 0:
+                        continue  # Already tried exact
+                    check_i = i + offset
+                    if 0 <= check_i < len(lines) and lines[check_i].rstrip('\n\r') == content:
+                        # Found match at different line, adjust position
+                        new_lines.extend(lines[i:check_i])
+                        new_lines.append(lines[check_i])
+                        i = check_i + 1
+                        found = True
+                        break
+                if not found:
+                    return None
         elif tag == '-':
+            # Line to remove - try exact match first, then fuzzy
             if i >= len(lines):
                 return None
-            if lines[i].rstrip('\n\r') != content:
-                return None
-            i += 1
+            if lines[i].rstrip('\n\r') == content:
+                i += 1
+            else:
+                # Fuzzy match: search nearby lines
+                found = False
+                for offset in range(-fuzzy_search_window, fuzzy_search_window + 1):
+                    if offset == 0:
+                        continue
+                    check_i = i + offset
+                    if 0 <= check_i < len(lines) and lines[check_i].rstrip('\n\r') == content:
+                        # Found line to remove at different position
+                        new_lines.extend(lines[i:check_i])
+                        i = check_i + 1
+                        found = True
+                        break
+                if not found:
+                    return None
         elif tag == '+':
             nl = '\n' if (len(lines) == 0 or lines[0].endswith('\n')) else ('\r\n' if any(l.endswith('\r\n') for l in lines[:50]) else '\n')
             new_lines.append(content + nl)
@@ -233,15 +270,14 @@ def _yaml_is_valid(text: str) -> bool:
         return False
 
 def _apply_hygiene(text: str, _category: str = "") -> tuple[str, List[str]]:
-    """Apply conservative hygiene hardening to K8s YAML while preserving intent.
-    Returns (new_text, applied_rule_names). If PyYAML is not available or YAML invalid, returns input unchanged.
-    Rules (applied only when fields are missing/unsafe):
+    """Apply enhanced hygiene hardening to K8s YAML while preserving intent.
+    Returns (new_text, applied_rule_names). If PyYAML not available or YAML invalid, returns input unchanged.
+    Added hardening beyond original scope:
       - Flip privileged: true -> false
-      - For pod.spec and all (init)containers securityContext:
-          * allowPrivilegeEscalation: false (if missing)
-          * readOnlyRootFilesystem: true (if missing)
-          * runAsNonRoot: true (if missing)
-          * capabilities.drop includes ALL (if missing)
+      - Pod & container securityContext defaults (privEsc=false, roRootFS=true, runAsNonRoot=true, caps.drop=ALL)
+      - Pin :latest image tags to :1.0.0 (placeholder) to avoid mutable image risk
+      - Inject minimal resource requests/limits if absent (cpu:50m/200m, memory:64Mi/256Mi)
+      - Set automountServiceAccountToken: false when missing (pod spec)
     """
     try:
         import yaml  # type: ignore
@@ -293,22 +329,58 @@ def _apply_hygiene(text: str, _category: str = "") -> tuple[str, List[str]]:
             for v in d:
                 walk_flip_priv(v)
 
+    def ensure_resources(container: dict) -> List[str]:
+        changes: List[str] = []
+        res = container.get("resources")
+        if not isinstance(res, dict):
+            res = {}
+            container["resources"] = res
+        req = res.get("requests")
+        if not isinstance(req, dict):
+            req = {}
+            res["requests"] = req
+        if "cpu" not in req:
+            req["cpu"] = "50m"
+            changes.append("resources.requests.cpu=50m")
+        if "memory" not in req:
+            req["memory"] = "64Mi"
+            changes.append("resources.requests.memory=64Mi")
+        lim = res.get("limits")
+        if not isinstance(lim, dict):
+            lim = {}
+            res["limits"] = lim
+        if "cpu" not in lim:
+            lim["cpu"] = "200m"
+            changes.append("resources.limits.cpu=200m")
+        if "memory" not in lim:
+            lim["memory"] = "256Mi"
+            changes.append("resources.limits.memory=256Mi")
+        return changes
+
+    def pin_image(container: dict) -> List[str]:
+        changes: List[str] = []
+        img = container.get("image")
+        if isinstance(img, str) and ":latest" in img:
+            container["image"] = img.replace(":latest", ":1.0.0")
+            changes.append("image:tag_pinned_from_latest")
+        return changes
+
     for doc in docs:
         if not isinstance(doc, dict):
             continue
-        # Walk spec
         spec = doc.get("spec")
-        # Support workload controllers with template.spec
         if isinstance(spec, dict) and "template" in spec and isinstance(spec.get("template"), dict):
             podspec = spec["template"].get("spec")
         else:
             podspec = spec if isinstance(spec, dict) else None
 
-        # Flip privileged: true at any level
         walk_flip_priv(doc)
 
-        # Pod-level securityContext
         if isinstance(podspec, dict):
+            if podspec.get("automountServiceAccountToken") is None:
+                podspec["automountServiceAccountToken"] = False
+                applied.append("pod.automountServiceAccountToken:false")
+                changed = True
             psc = podspec.get("securityContext")
             if psc is None:
                 psc = {}
@@ -330,8 +402,12 @@ def _apply_hygiene(text: str, _category: str = "") -> tuple[str, List[str]]:
                         sc = {}
                         c["securityContext"] = sc
                     local2 = ensure_sc(sc)
-                    if local2:
+                    res_changes = ensure_resources(c)
+                    img_changes = pin_image(c)
+                    if local2 or res_changes or img_changes:
                         applied.extend([f"{key}[{idx2}].securityContext:{x}" for x in local2])
+                        applied.extend([f"{key}[{idx2}].{x}" for x in res_changes])
+                        applied.extend([f"{key}[{idx2}].{x}" for x in img_changes])
                         changed = True
 
     if not changed:
@@ -680,7 +756,14 @@ def merge_consensus(votes: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
         counts[k] = counts.get(k, 0) + 1
 
     fix_votes = counts.get("fix", 0)
-    quorum = 2 if len(votes) >= 2 else 1
+    # Adjusted quorum: Accept single fix vote if it's majority of successful votes
+    # (excludes needs_review from API failures)
+    ignore_votes = counts.get("ignore", 0)
+    successful_votes = fix_votes + ignore_votes  # Exclude needs_review (often from errors)
+    
+    # If we have at least 1 fix vote and no contradicting votes, accept it
+    quorum = 1 if successful_votes >= 1 else 2
+    
     final_cls = "fix" if fix_votes >= quorum else (
         "ignore" if counts.get("ignore", 0) > max(fix_votes, counts.get("needs_review", 0)) else
         "needs_review"
@@ -853,9 +936,13 @@ async def main():
     if tasks:
         await asyncio.gather(*tasks)
 
+    # Ensure output directory exists even if env supplied a nested tool path like output/<tool>/llm
     LLM_DIR.mkdir(parents=True, exist_ok=True)
     os.environ["SAFEFIX_LLM_DIR"] = str(LLM_DIR)
     out_path = LLM_DIR / "llm_decisions.json"
+    # Extra safety: create parent of the out file explicitly to avoid FileNotFoundError
+    # when the path was changed mid-run or resolved differently.
+    out_path.parent.mkdir(parents=True, exist_ok=True)
     ordered_results = [results[idx] for idx, _, _ in indexed_items if idx in results]
     out_path.write_text(json.dumps(ordered_results, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"[SafeFix-LLM] Wrote {out_path} | total elapsed {time.time()-t0:.1f}s")

@@ -1,0 +1,21 @@
+﻿[
+	{
+		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\output\\combination\\MANUAL_REQUIRED_tests_insecure-rbac.setup.yaml",
+		"namespace": "main",
+		"successes": 138,
+		"failures": [
+			{
+				"msg": "workload must set runAsNonRoot=true at podSecurityContext or container securityContext",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "workload must set runAsNonRoot=true at podSecurityContext or container securityContext",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			}
+		]
+	}
+]

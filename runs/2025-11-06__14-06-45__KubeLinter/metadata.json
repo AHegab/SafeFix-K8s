@@ -1,0 +1,19 @@
+{
+  "tool": "KubeLinter",
+  "tool_normalized": "kubelinter",
+  "scan_path": "c:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests",
+  "run_directory": "c:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\runs\\2025-11-06__14-06-45__KubeLinter",
+  "timestamp": "2025-11-06T14:06:45.938562",
+  "gates": "1,2",
+  "models": [
+    "groq",
+    "openrouter",
+    "gemini"
+  ],
+  "steps_completed": [],
+  "timings": {},
+  "results": {},
+  "completed_at": "2025-11-06T14:06:45.946114",
+  "total_duration": 0,
+  "success": false
+}

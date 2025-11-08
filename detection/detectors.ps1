@@ -10,10 +10,12 @@ $DetectionDir = $PSScriptRoot
 $OutputRoot = $env:SAFEFIX_OUTPUT_ROOT
 if ([string]::IsNullOrWhiteSpace($OutputRoot)) {
   $OutputRoot = Join-Path $DetectionDir "output"
-} else {
+}
+else {
   try {
     $OutputRoot = [System.IO.Path]::GetFullPath($OutputRoot)
-  } catch {
+  }
+  catch {
     $OutputRoot = Join-Path $DetectionDir "output"
   }
 }
@@ -360,13 +362,25 @@ function Det-KubeAudit {
 
 # --- Conftest (OPA) -----------------------------------------------------------
 function Det-Conftest {
-  param([string]$Path = ".", [string]$Out = "$OutDir\conftest_raw.json", [string]$PolicyFile = "$RepoRoot\Detection\policies\conftest\policy.rego")
+  param([string]$Path = ".", [string]$Out = "$OutDir\conftest_raw.json", [string]$PolicyDir = "$RepoRoot\Detection\policies\conftest")
   try {
     $abs = Resolve-ScanPath -Path $Path
-    if (-not (Test-Path $PolicyFile)) { _WrapPlaceholder $Out "conftest" "Policy file not found"; return }
-    $policyDir = Split-Path -Parent $PolicyFile
-    docker run --rm -v "${abs}:/scan:ro" -v "${policyDir}:/policy:ro" openpolicyagent/conftest:latest `
-      test /scan --policy /policy --all-namespaces --output json | Set-Content -Encoding UTF8 -Path $Out
+    if (-not (Test-Path $PolicyDir)) { _WrapPlaceholder $Out "conftest" "Policy directory not found"; return }
+    
+    # Try local conftest first
+    $local = $null
+    try { $local = (Get-Command conftest -ErrorAction Stop).Source } catch { }
+    
+    if ($local) {
+      Write-Host "[conftest] Using local conftest at $local" -ForegroundColor Cyan
+      & conftest test $abs --policy $PolicyDir --all-namespaces --output json | Set-Content -Encoding UTF8 -Path $Out
+    }
+    else {
+      # Fallback to Docker
+      Write-Host "[conftest] Using Docker container" -ForegroundColor Cyan
+      docker run --rm -v "${abs}:/scan:ro" -v "${PolicyDir}:/policy:ro" openpolicyagent/conftest:latest `
+        test /scan --policy /policy --all-namespaces --output json | Set-Content -Encoding UTF8 -Path $Out
+    }
     Write-NonEmpty $Out; Write-Host "[conftest] -> $Out"
   }
   catch { _WrapPlaceholder $Out "conftest" $_.Exception.Message }
@@ -592,24 +606,79 @@ function Det-RBACPolice {
 
 # --- Gitleaks (secrets) -------------------------------------------------------
 function Det-Gitleaks {
-  param([string]$Path = ".")
-  $Out = Join-Path $OutDir "gitleaks_raw.json"
+  param(
+    [string]$Path = ".",
+    [string]$Out = "$OutDir\gitleaks_raw.json"
+  )
   $prevEA = $ErrorActionPreference
   $ErrorActionPreference = "Continue"
   try {
     Write-Host "[gitleaks] Scanning for secrets..." -ForegroundColor Cyan
-    $gitleaksCmd = Get-Command gitleaks -ErrorAction SilentlyContinue
-    if ($gitleaksCmd) {
-      $abs = Resolve-ScanPath -Path $Path
-      $rulesPath = Join-Path $RepoRoot "Detection\policies\gitleaks-rules.toml"
-      & gitleaks detect --source $abs --no-git --report-path $Out --report-format json --config $rulesPath 2>$null
+    $abs = Resolve-ScanPath -Path $Path
+    $rulesPath = Join-Path $RepoRoot "Detection\policies\gitleaks-rules.toml"
 
+    function Test-GitleaksNonEmpty {
+      param([string]$Path)
+      if (!(Test-Path -LiteralPath $Path)) { return $false }
+      try {
+        $content = Get-Content -LiteralPath $Path -Raw
+        if ([string]::IsNullOrWhiteSpace($content)) { return $false }
+        $trim = $content.Trim()
+        if ($trim -eq "[]") { return $false }
+        # Try parse as array; if not array, try object with common properties
+        try {
+          $json = $trim | ConvertFrom-Json
+          if ($json -is [System.Array]) { return ($json.Count -gt 0) }
+          if ($json -is [PSCustomObject]) {
+            if ($json.findings) { return ($json.findings.Count -gt 0) }
+            if ($json.Leaks) { return ($json.Leaks.Count -gt 0) }
+          }
+          return $true
+        }
+        catch { return ((Get-Item $Path).Length -gt 3) }
+      }
+      catch { return $false }
+    }
+
+    $gitleaksCmd = $null
+    try { $gitleaksCmd = (Get-Command gitleaks -ErrorAction Stop).Source } catch { }
+
+    if ($gitleaksCmd) {
+      # First attempt: with repo rules
+      & gitleaks detect --source $abs --no-git --report-path $Out --report-format json --config $rulesPath 2>$null
+      if (-not (Test-GitleaksNonEmpty -Path $Out)) {
+        Write-Host "[gitleaks] No findings with repo rules; retrying with default rules" -ForegroundColor Yellow
+        & gitleaks detect --source $abs --no-git --report-path $Out --report-format json 2>$null
+      }
       if (!(Test-Path $Out)) { '[]' | Set-Content -Encoding UTF8 -Path $Out }
+      Write-Host "[gitleaks] -> $Out" -ForegroundColor Green
     }
     else {
-      '[{"note":"Gitleaks not installed. Install locally for secret scanning."}]' |
-      Set-Content -Encoding UTF8 -Path $Out
-      Write-Host "[gitleaks] -> $Out (placeholder - tool not installed)"
+      # Docker fallback
+      $tmpOut = Join-Path $abs "gitleaks_raw.json"
+      try {
+        if (Test-Path $rulesPath) {
+          docker run --rm -v "${abs}:/scan" -v "${rulesPath}:/rules.toml:ro" zricethezav/gitleaks:latest `
+            detect --source /scan --no-git --report-path /scan/gitleaks_raw.json --report-format json --config /rules.toml 2>$null | Out-Null
+        }
+        else {
+          docker run --rm -v "${abs}:/scan" zricethezav/gitleaks:latest `
+            detect --source /scan --no-git --report-path /scan/gitleaks_raw.json --report-format json 2>$null | Out-Null
+        }
+        if ((Test-Path $tmpOut) -and ($tmpOut -ne $Out)) { Move-Item -Force $tmpOut $Out }
+        if (-not (Test-GitleaksNonEmpty -Path $Out)) {
+          Write-Host "[gitleaks] Docker run yielded no findings; retrying without custom rules" -ForegroundColor Yellow
+          docker run --rm -v "${abs}:/scan" zricethezav/gitleaks:latest `
+            detect --source /scan --no-git --report-path /scan/gitleaks_raw.json --report-format json 2>$null | Out-Null
+          if ((Test-Path $tmpOut) -and ($tmpOut -ne $Out)) { Move-Item -Force $tmpOut $Out }
+        }
+        if (!(Test-Path $Out)) { '[]' | Set-Content -Encoding UTF8 -Path $Out }
+        Write-Host "[gitleaks] -> $Out (docker)" -ForegroundColor Green
+      }
+      catch {
+        '[{"note":"Gitleaks not installed and docker fallback failed: ' + ($_.Exception.Message -replace '"', '\"') + '"}]' | Set-Content -Encoding UTF8 -Path $Out
+        Write-Host "[gitleaks] -> $Out (placeholder - not installed)"
+      }
     }
   }
   catch {
@@ -619,6 +688,51 @@ function Det-Gitleaks {
 }
 
 # --- orchestration ------------------------------------------------------------
+function Det-RunSingle {
+  param(
+    [string]$Path = ".",
+    [string]$Tool = ""
+  )
+  
+  $validTools = @(
+    "KubeConform", "KubeLinter", "Polaris", "Checkov", "TrivyConfig",
+    "Kubescape", "KubeScore", "Yamllint", "KubeAudit", "Conftest",
+    "RBACPolice", "Pluto", "Gitleaks"
+  )
+  
+  if (-not ($Tool -in $validTools)) {
+    Write-Host "[ERROR] Invalid tool name: $Tool" -ForegroundColor Red
+    Write-Host "Valid tools: $($validTools -join ', ')" -ForegroundColor Yellow
+    return
+  }
+  
+  $abs = Resolve-ScanPath -Path $Path
+  Write-Host "Scanning with: $Tool" -ForegroundColor Cyan
+  Write-Host "Path: $abs" -ForegroundColor Cyan
+  
+  Invoke-WithTiming -Name $Tool {
+    switch ($Tool) {
+      "KubeConform" { Det-KubeConform -Path $abs }
+      "KubeLinter" { Det-KubeLinter  -Path $abs }
+      "Polaris" { Det-Polaris     -Path $abs }
+      "Checkov" { Det-Checkov     -Path $abs }
+      "TrivyConfig" { Det-TrivyConfig -Path $abs }
+      "Kubescape" { Det-Kubescape   -Path $abs }
+      "KubeScore" { Det-KubeScore   -Path $abs }
+      "Yamllint" { Det-Yamllint    -Path $abs }
+      "KubeAudit" { Det-KubeAudit   -Path $abs }
+      "Conftest" { Det-Conftest    -Path $abs }
+      "RBACPolice" { Det-RBACPolice  -Path $abs }
+      "Pluto" { Det-Pluto       -Path $abs }
+      "Gitleaks" { Det-Gitleaks    -Path $abs }
+    }
+  }
+  
+  Write-Host "`n────────── Runtime summary ──────────"
+  $global:ToolTimings | Sort-Object Seconds -Descending |
+  Format-Table Tool, Seconds, Status -Auto
+}
+
 function Det-RunLean {
   param([string]$Path = ".")
   Ensure-DetectorImages

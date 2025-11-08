@@ -1,0 +1,26 @@
+﻿[
+    {
+        "rule":  "DangerousVerb_delete",
+        "severity":  "MEDIUM",
+        "message":  "Dangerous verb \u0027delete\u0027 detected - ensure this is necessary",
+        "file":  "/scan/28.role_overly_permissive.yaml",
+        "kind":  "Role",
+        "category":  "dangerous_permissions"
+    },
+    {
+        "rule":  "ClusterAdminReference",
+        "severity":  "CRITICAL",
+        "message":  "References cluster-admin role - grants full cluster access",
+        "file":  "/scan/insecure-rbac.setup.yaml",
+        "kind":  "ClusterRole",
+        "category":  "excessive_permissions"
+    },
+    {
+        "rule":  "ClusterAdminBinding",
+        "severity":  "CRITICAL",
+        "message":  "Binds to cluster-admin role - grants full cluster access",
+        "file":  "/scan/insecure-rbac.setup.yaml",
+        "kind":  "ClusterRoleBinding",
+        "category":  "excessive_permissions"
+    }
+]

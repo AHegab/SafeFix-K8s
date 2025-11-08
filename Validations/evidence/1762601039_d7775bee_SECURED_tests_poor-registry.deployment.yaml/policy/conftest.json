@@ -1,0 +1,65 @@
+﻿[
+	{
+		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\Validations\\tmp_inputs\\1762601039_d7775bee\\SECURED_tests_poor-registry.deployment.yaml",
+		"namespace": "main",
+		"successes": 131,
+		"warnings": [
+			{
+				"msg": "poor-registry-deployment: replicas not specified (defaults to 1, not highly available)",
+				"metadata": {
+					"query": "data.main.warn"
+				}
+			}
+		],
+		"failures": [
+			{
+				"msg": "container \"poor-registry\" must define livenessProbe",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "container \"poor-registry\" must define readinessProbe",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "container \"poor-registry\" must set imagePullPolicy",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "image \"madhuakula/k8s-goat-poor-registry\" has no tag (use immutable tag or digest)",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "poor-registry-deployment must have AppArmor annotation (container.apparmor.security.beta.kubernetes.io/\u003ccontainer\u003e)",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "poor-registry-deployment securityContext must define seccompProfile",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "poor-registry-deployment: no NetworkPolicy defined for workload",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "workload must set runAsNonRoot=true at podSecurityContext or container securityContext",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			}
+		]
+	}
+]

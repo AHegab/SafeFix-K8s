@@ -1,0 +1,24 @@
+﻿{
+  "resources": [
+    {
+      "filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\output\\combination\\sandbox\\tests\\34.echo1_privileged.yaml",
+      "kind": "Deployment",
+      "name": "echo1",
+      "version": "apps/v1",
+      "status": "statusInvalid",
+      "msg": "problem validating schema. Check JSON formatting: jsonschema validation failed with 'https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v1.29.0-standalone-strict/deployment-apps-v1.json#' - at '/spec/template/spec/securityContext': additional properties 'allowPrivilegeEscalation', 'capabilities', 'readOnlyRootFilesystem' not allowed",
+      "validationErrors": [
+        {
+          "path": "/spec/template/spec/securityContext",
+          "msg": "additional properties 'allowPrivilegeEscalation', 'capabilities', 'readOnlyRootFilesystem' not allowed"
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "valid": 0,
+    "invalid": 1,
+    "errors": 0,
+    "skipped": 0
+  }
+}

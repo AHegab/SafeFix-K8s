@@ -1,0 +1,69 @@
+{
+  "original_file": "tests\\insecure-rbac.setup.yaml",
+  "total_findings": 3,
+  "successful_patches": 0,
+  "models_used": [
+    "groq",
+    "openrouter",
+    "gemini"
+  ],
+  "decisions": [
+    {
+      "finding": 1,
+      "category": "RBAC_OVER_PERMISSIVE",
+      "severity": null,
+      "models_voted": [
+        "groq",
+        "gemini"
+      ],
+      "selected_model": null,
+      "patch_applied": false,
+      "votes": {
+        "groq": {
+          "classification": "fix"
+        },
+        "gemini": {
+          "classification": "needs_review"
+        }
+      }
+    },
+    {
+      "finding": 2,
+      "category": "RBAC_OVER_PERMISSIVE",
+      "severity": null,
+      "models_voted": [
+        "groq",
+        "gemini"
+      ],
+      "selected_model": null,
+      "patch_applied": false,
+      "votes": {
+        "groq": {
+          "classification": "needs_review"
+        },
+        "gemini": {
+          "classification": "needs_review"
+        }
+      }
+    },
+    {
+      "finding": 3,
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": null,
+      "models_voted": [
+        "groq",
+        "gemini"
+      ],
+      "selected_model": null,
+      "patch_applied": false,
+      "votes": {
+        "groq": {
+          "classification": "needs_review"
+        },
+        "gemini": {
+          "classification": "fix"
+        }
+      }
+    }
+  ]
+}

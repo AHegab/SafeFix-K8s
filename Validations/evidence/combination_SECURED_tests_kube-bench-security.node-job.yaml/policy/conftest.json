@@ -1,0 +1,141 @@
+﻿[
+	{
+		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\output\\combination\\SECURED_tests_kube-bench-security.node-job.yaml",
+		"namespace": "main",
+		"successes": 48,
+		"failures": [
+			{
+				"msg": "container \"kube-bench\" must define livenessProbe",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "container \"kube-bench\" must define readinessProbe",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "container \"kube-bench\" must set CPU limit",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "container \"kube-bench\" must set CPU request",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "container \"kube-bench\" must set imagePullPolicy",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "container \"kube-bench\" must set memory limit",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "container \"kube-bench\" must set memory request",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "hostPID must be false",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "hostPath volume disallowed: \"/etc/cni/net.d/\"",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "hostPath volume disallowed: \"/etc/kubernetes\"",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "hostPath volume disallowed: \"/etc/systemd\"",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "hostPath volume disallowed: \"/lib/systemd\"",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "hostPath volume disallowed: \"/opt/cni/bin/\"",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "hostPath volume disallowed: \"/srv/kubernetes\"",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "hostPath volume disallowed: \"/usr/bin\"",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "hostPath volume disallowed: \"/var/lib/etcd\"",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "hostPath volume disallowed: \"/var/lib/kube-controller-manager\"",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "hostPath volume disallowed: \"/var/lib/kube-scheduler\"",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "hostPath volume disallowed: \"/var/lib/kubelet\"",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "image \"docker.io/aquasec/kube-bench:latest\" uses the 'latest' tag",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "kube-bench-node must have AppArmor annotation (container.apparmor.security.beta.kubernetes.io/\u003ccontainer\u003e)",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "kube-bench-node securityContext must define seccompProfile",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			}
+		]
+	}
+]

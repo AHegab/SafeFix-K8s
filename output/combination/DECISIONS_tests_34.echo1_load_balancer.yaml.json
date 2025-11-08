@@ -1,0 +1,50 @@
+{
+  "original_file": "tests\\34.echo1_load_balancer.yaml",
+  "total_findings": 2,
+  "successful_patches": 0,
+  "models_used": [
+    "groq",
+    "openrouter",
+    "gemini"
+  ],
+  "decisions": [
+    {
+      "finding": 1,
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": null,
+      "models_voted": [
+        "groq",
+        "gemini"
+      ],
+      "selected_model": null,
+      "patch_applied": false,
+      "votes": {
+        "groq": {
+          "classification": "needs_review"
+        },
+        "gemini": {
+          "classification": "needs_review"
+        }
+      }
+    },
+    {
+      "finding": 2,
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": null,
+      "models_voted": [
+        "groq",
+        "gemini"
+      ],
+      "selected_model": null,
+      "patch_applied": false,
+      "votes": {
+        "groq": {
+          "classification": "fix"
+        },
+        "gemini": {
+          "classification": "fix"
+        }
+      }
+    }
+  ]
+}

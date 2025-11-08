@@ -1,1 +1,42 @@
-[]
+[
+ {
+  "RuleID": "plaintext-password-key",
+  "Description": "Hardcoded password in config (plaintext secret)",
+  "StartLine": 8,
+  "EndLine": 8,
+  "StartColumn": 4,
+  "EndColumn": 23,
+  "Match": "password: pFXfkH5cKA",
+  "Secret": "pFXfkH5cKA",
+  "File": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/29.helm_rabbitmq_hardcoded_credentials.yaml",
+  "SymlinkFile": "",
+  "Commit": "",
+  "Entropy": 3.321928,
+  "Author": "",
+  "Email": "",
+  "Date": "",
+  "Message": "",
+  "Tags": [],
+  "Fingerprint": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/29.helm_rabbitmq_hardcoded_credentials.yaml:plaintext-password-key:8"
+ },
+ {
+  "RuleID": "plaintext-password-key",
+  "Description": "Hardcoded password in config (plaintext secret)",
+  "StartLine": 9,
+  "EndLine": 9,
+  "StartColumn": 4,
+  "EndColumn": 25,
+  "Match": "password: cGFzc3dvcmQ=",
+  "Secret": "cGFzc3dvcmQ=",
+  "File": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/34.unencrypted_secret.yaml",
+  "SymlinkFile": "",
+  "Commit": "",
+  "Entropy": 3.188722,
+  "Author": "",
+  "Email": "",
+  "Date": "",
+  "Message": "",
+  "Tags": [],
+  "Fingerprint": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/34.unencrypted_secret.yaml:plaintext-password-key:9"
+ }
+]

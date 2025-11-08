@@ -1,0 +1,6 @@
+{
+  "original_file": "tests\\docker-bench-security.deployment.yaml",
+  "status": "EFFECTIVE",
+  "issues": [],
+  "successful_patches": 1
+}

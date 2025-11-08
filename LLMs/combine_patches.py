@@ -15,14 +15,16 @@ import json
 import sys
 import os
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Tuple
+import re
 
 # Import from multi_llm_orchestrator
 sys.path.insert(0, str(Path(__file__).parent))
 from multi_llm_orchestrator import (
-    load_dotenv_from_file, make_user_prompt, ask_all,
-    _validate_and_write_patch, PROVIDER_PRIORITY,
-    LLM_TIMEOUT_SECONDS, RETRIES
+    load_dotenv_from_file,
+    _validate_and_write_patch,
+    LLM_TIMEOUT_SECONDS, RETRIES,
+    _apply_hygiene as orchestrator_hygiene
 )
 import asyncio
 
@@ -30,6 +32,194 @@ OUTPUT_ROOT = Path(os.getenv("SAFEFIX_OUTPUT_ROOT", "output")).resolve()
 NORMALIZATION_DIR = Path(os.getenv("SAFEFIX_NORMALIZATION_DIR", OUTPUT_ROOT / "normalization"))
 LLM_DIR = Path(os.getenv("SAFEFIX_LLM_DIR", OUTPUT_ROOT / "llm"))
 COMBINATION_DIR = Path(os.getenv("SAFEFIX_COMBINATION_DIR", OUTPUT_ROOT / "combination"))
+
+# ---------------------------
+# Lightweight hygiene (fallback if orchestrator hygiene not imported)
+# ---------------------------
+try:
+    import yaml  # type: ignore
+except ImportError:  # pragma: no cover
+    yaml = None
+
+def _combine_hygiene(text: str) -> tuple[str, list[str]]:
+    """Apply baseline hardening to final combined YAML even if original patches skipped hygiene.
+    Reuses orchestrator hygiene if available; otherwise performs a minimal regex-based pass.
+    Returns (new_text, applied_rules)."""
+    # Prefer orchestrator rich hygiene (already adds resources, image pin, etc.)
+    try:
+        new_text, applied = orchestrator_hygiene(text, "")
+        if applied:
+            return new_text, [f"orchestrator:{a}" for a in applied]
+    except Exception:
+        pass
+    applied: list[str] = []
+    original = text
+    # Simple regex flips
+    def sub(pat, repl, tag):
+        nonlocal text
+        new_t = re.sub(pat, repl, text, flags=re.I|re.M)
+        if new_t != text:
+            applied.append(tag)
+            text = new_t
+    sub(r"(?m)^(\s*)privileged:\s*true\b", r"\1privileged: false", "privileged:false")
+    sub(r"(?m)^(\s*)allowPrivilegeEscalation:\s*true\b", r"\1allowPrivilegeEscalation: false", "allowPrivilegeEscalation:false")
+    # Inject automountServiceAccountToken: false if pod spec and missing
+    if "kind: Pod" in text and "automountServiceAccountToken" not in text:
+        m = re.search(r"(?m)^spec:\s*$", text)
+        if m:
+            insert_at = m.end()
+            text = text[:insert_at] + "\n  automountServiceAccountToken: false" + text[insert_at:]
+            applied.append("pod.automountServiceAccountToken:false")
+    return text, applied
+
+
+# ---------------------------
+# Post-patch validation utils
+# ---------------------------
+def _strip_diff_artifacts(text: str) -> Tuple[str, bool]:
+    """Remove stray unified-diff leading '+' that accidentally got into final content.
+    Returns (clean_text, changed).
+    Conservative rule: only strip single leading '+' when the remainder looks like a YAML key line (contains ':').
+    """
+    changed = False
+    out_lines: List[str] = []
+    for line in text.splitlines(keepends=True):
+        lstr = line.lstrip()
+        # Only strip a single '+' that is followed by a YAML-ish key (e.g., 'password: ...')
+        if lstr.startswith('+') and not lstr.startswith('++'):
+            candidate = lstr[1:].lstrip()
+            if ':' in candidate and not candidate.startswith('---') and not candidate.startswith('+++'):
+                indent = len(line) - len(line.lstrip())
+                newline_char = '\n' if line.endswith('\n') else ''
+                out_lines.append(' ' * indent + candidate + newline_char)
+                changed = True
+                continue
+        out_lines.append(line)
+    return ("".join(out_lines), changed)
+
+
+def _contains_rbac_cluster_admin(content: str) -> bool:
+    c = content.lower()
+    return ('kind: clusterrolebinding' in c) and ('name: cluster-admin' in c)
+
+
+def _contains_plus_artifacts(content: str) -> bool:
+    # Lines that begin with '+' (diff artifacts) suggest invalid YAML
+    for line in content.splitlines():
+        if line.lstrip().startswith('+') and not line.lstrip().startswith('++'):
+            return True
+    return False
+
+
+def _bool_in(content: str, needle: str) -> bool:
+    return needle.lower() in content.lower()
+
+
+def _security_improvements(original: str, current: str) -> Dict[str, bool]:
+    """Heuristic improvements detector for pod/container security."""
+    return {
+        "privileged_removed": _bool_in(original, 'privileged: true') and (not _bool_in(current, 'privileged: true')),
+        "no_priv_esc_added": (not _bool_in(original, 'allowPrivilegeEscalation: false')) and _bool_in(current, 'allowPrivilegeEscalation: false'),
+        "run_as_non_root_added": (not _bool_in(original, 'runAsNonRoot: true')) and _bool_in(current, 'runAsNonRoot: true'),
+        "ro_fs_added": (not _bool_in(original, 'readOnlyRootFilesystem: true')) and _bool_in(current, 'readOnlyRootFilesystem: true'),
+        "caps_drop_all": _bool_in(current, 'capabilities') and _bool_in(current, 'drop') and (_bool_in(current, ' drop: - all') or _bool_in(current, ' drop: - ALL') or _bool_in(current, 'drop:\n            - ALL') or _bool_in(current, 'drop:\n                - all')),
+    }
+
+
+def _is_secret_externalized(original: str, current: str) -> bool:
+    """Treat as improved if password value changed from literal to env/placeholder or secret reference."""
+    orig_has_literal = False
+    curr_has_external = False
+    for line in original.splitlines():
+        if 'password:' in line and ('${' not in line) and ('secretKeyRef' not in original):
+            orig_has_literal = True
+            break
+    if ('secretKeyRef' in current) or ('envFrom' in current) or ('${' in current):
+        curr_has_external = True
+    return orig_has_literal and curr_has_external
+
+
+def _validate_effectiveness(original: str, current: str) -> Tuple[str, List[str]]:
+    """Return (status, issues).
+    status in {EFFECTIVE, INEFFECTIVE, INVALID, MANUAL_REQUIRED}
+    """
+    issues: List[str] = []
+
+    # Invalid YAML heuristics (diff artifacts)
+    if _contains_plus_artifacts(current):
+        issues.append("Diff artifacts detected ('+' prefixes)")
+        return ("INVALID", issues)
+
+    # RBAC cluster-admin
+    if _contains_rbac_cluster_admin(current):
+        issues.append("ClusterRoleBinding to cluster-admin present")
+        return ("MANUAL_REQUIRED", issues)
+
+    # Secrets externalization
+    if _is_secret_externalized(original, current):
+        return ("EFFECTIVE", issues)
+
+    # Security hardening
+    imp = _security_improvements(original, current)
+    if any(imp.values()):
+        # If privileged is still true while other improvements present, mark as INEFFECTIVE
+        if _bool_in(current, 'privileged: true'):
+            issues.append("Container still privileged: true")
+            return ("INEFFECTIVE", issues)
+        return ("EFFECTIVE", issues)
+
+    # If nothing changed materially, ineffective
+    issues.append("No material security improvement detected")
+    return ("INEFFECTIVE", issues)
+
+
+def _ensure_doc_start_and_lf(content: str) -> str:
+    """Ensure YAML document start and LF newlines."""
+    text = content.replace('\r\n', '\n').replace('\r', '\n')
+    if text.lstrip().startswith('apiVersion:') and not text.lstrip().startswith('---'):
+        # Prepend doc start preserving leading whitespace/newline
+        leading = ''
+        idx = 0
+        while idx < len(text) and text[idx] in ['\n', ' ', '\t']:
+            leading += text[idx]
+            idx += 1
+        text = f"---\n{text}" if leading == '' else text.replace(leading + 'apiVersion:', f"---\n{leading}apiVersion:", 1)
+    return text
+
+
+def _attempt_privileged_autofix(current: str) -> Tuple[str, bool]:
+    """Conservatively flip privileged:true to false and add allowPrivilegeEscalation: false if missing under same block."""
+    if 'privileged: true' not in current:
+        return current, False
+    lines = current.splitlines(keepends=True)
+    changed = False
+    for i, line in enumerate(lines):
+        if 'privileged: true' in line:
+            # Flip to false
+            lines[i] = line.replace('privileged: true', 'privileged: false')
+            changed = True
+            # Try to add allowPrivilegeEscalation: false if not present nearby (next few lines until indent decreases)
+            indent = len(line) - len(line.lstrip())
+            insert_at = i + 1
+            has_no_priv_esc = False
+            j = i + 1
+            while j < len(lines):
+                next_line = lines[j]
+                nindent = len(next_line) - len(next_line.lstrip())
+                if next_line.strip() == '' or next_line.lstrip().startswith('#'):
+                    j += 1
+                    continue
+                if nindent <= indent:
+                    break
+                if 'allowPrivilegeEscalation' in next_line:
+                    has_no_priv_esc = True
+                    break
+                j += 1
+            if not has_no_priv_esc:
+                newline_char = '\n'
+                lines.insert(insert_at + 0, ' ' * (indent) + 'allowPrivilegeEscalation: false' + newline_char)
+            break
+    return ''.join(lines), changed
 
 async def combine_patches_for_file(
     target_file: str,
@@ -44,38 +234,67 @@ async def combine_patches_for_file(
 ) -> Dict:
     """
     Process all findings for a single file and combine patches into one final output.
+    Uses pre-generated LLM decisions from llm_decisions.json instead of re-querying models.
     
     Returns:
         Path to the final combined patch file
     """
-    # Load payload
-    candidates = [
-        NORMALIZATION_DIR / "llm_payload.json",
-        OUTPUT_ROOT / "normalization/llm_payload.json",
-        Path("output/normalization/llm_payload.json"),
-        LLM_DIR / "llm_payload.json",
-        Path("output/llm_payload.json"),
-        Path("Detection/output/llm_payload.json"),
-        Path("detection/output/llm_payload.json"),
+    # Load LLM decisions (already has consensus)
+    # Discover llm_decisions.json robustly across standard and tool-scoped locations.
+    # Prefer an llm_decisions.json that actually contains entries for target_file.
+    llm_decisions_candidates = [
+        LLM_DIR / "llm_decisions.json",
+        OUTPUT_ROOT / "llm/llm_decisions.json",
+        Path("output/llm/llm_decisions.json"),
+        Path("output/llm_decisions.json"),
     ]
-    payload_path = None
-    for p in candidates:
-        if p.exists():
-            payload_path = p
-            break
-    
-    if not payload_path:
-        print("[ERROR] No llm_payload.json found")
+    # Also search tool-specific paths like output/<tool>/llm/llm_decisions.json
+    try:
+        for sub in OUTPUT_ROOT.glob("*/llm/llm_decisions.json"):
+            llm_decisions_candidates.append(sub)
+    except Exception:
+        pass
+
+    llm_decisions_path = None
+    norm_target_all = {target_file.replace("\\", "/").lower(), target_file.replace("/", "\\").lower()}
+    for p in llm_decisions_candidates:
+        if not p.exists():
+            continue
+        try:
+            data = json.loads(p.read_text(encoding="utf-8"))
+            # If this decisions file references our target file, prefer it.
+            for it in data:
+                f = str(it.get("file", "")).strip()
+                fl = f.lower()
+                if fl in norm_target_all or any(fl.endswith(nt) for nt in norm_target_all):
+                    llm_decisions_path = p
+                    decisions_data = data
+                    break
+            if llm_decisions_path:
+                break
+        except Exception:
+            continue
+    # Fallback to first existing candidate if none matched the file
+    if not llm_decisions_path:
+        for p in llm_decisions_candidates:
+            if p.exists():
+                try:
+                    decisions_data = json.loads(p.read_text(encoding="utf-8"))
+                    llm_decisions_path = p
+                    break
+                except Exception:
+                    continue
+
+    if not llm_decisions_path:
+        print("[ERROR] No llm_decisions.json found. Run LLM stage first.")
         return None
-    
-    data = json.loads(payload_path.read_text(encoding="utf-8"))
-    all_items = data.get("items", data if isinstance(data, list) else [])
     
     # Filter to only this file
     norm_target = target_file.replace("/", "\\")
     file_items = []
-    for item in all_items:
-        if item.get("file", "").replace("/", "\\") != norm_target:
+    for item in decisions_data:
+        cand = item.get("file", "")
+        if cand.replace("/", "\\") != norm_target and cand.replace("\\", "/") != target_file.replace("\\", "/"):
             continue
         if categories and item.get("category") not in categories:
             continue
@@ -117,64 +336,102 @@ async def combine_patches_for_file(
     for idx, item in enumerate(file_items, 1):
         print(f"\n[{idx}/{len(file_items)}] Processing: {item.get('category', 'UNKNOWN')}")
         
-        # Update item with current content
-        item_copy = dict(item)
-        item_copy["original_manifest"] = current_content
+        # Get consensus from LLM decisions
+        consensus = item.get("consensus", {})
+        final_classification = consensus.get("final_classification", "needs_review")
+        final_patch = consensus.get("final_patch", "")
+        from_model = consensus.get("from_model", "")
         
-        # Get patches from all models
-        prompt = make_user_prompt(item_copy)
-        votes = await ask_all(models, prompt, retries, timeout_seconds)
-        
-        # Debug: print votes
+        # Debug: print consensus
         if idx <= 2:  # Only print for first 2 findings
-            print(f"  DEBUG: Votes = {json.dumps(votes, indent=2)}")
+            print(f"  DEBUG: Consensus classification={final_classification}, has_patch={bool(final_patch)}, from_model={from_model}")
         
-        # Find best patch
+        # Apply patch if consensus says fix
         best_patch = None
         best_model = None
         
-        for model_name in PROVIDER_PRIORITY:
-            if model_name not in votes:
-                continue
-            resp = votes[model_name]
+        if final_classification == "fix" and final_patch:
+            # Apply the patch to current_content
+            # Create the original file path structure in sandbox to match the diff target
+            temp_file_path = sandbox_dir / original_path
+            temp_file_path.parent.mkdir(parents=True, exist_ok=True)
+            temp_file_path.write_text(current_content, encoding="utf-8")
             
-            # Debug
+            # Try to apply the consensus patch
+            result = _validate_and_write_patch(
+                str(temp_file_path),
+                final_patch,
+                idx,
+                str(sandbox_dir),
+                "yaml",  # validate_mode
+                item.get("category", ""),
+                autofix,
+                hygiene
+            )
+            
             if idx <= 2:
-                print(f"  DEBUG [{model_name}]: classification={resp.get('classification')}, has_patch={bool(resp.get('patch'))}")
+                print(f"  DEBUG: Validation result = {result.get('status')}, reason = {result.get('reason', 'N/A')}")
             
-            if resp.get("classification") == "fix" and resp.get("patch"):
-                # Apply the patch to current_content manually
-                # Create the original file path structure in sandbox to match the diff target
-                temp_file_path = sandbox_dir / original_path
-                temp_file_path.parent.mkdir(parents=True, exist_ok=True)
-                temp_file_path.write_text(current_content, encoding="utf-8")
+            if result.get("status") == "pass":
+                best_patch = final_patch
+                best_model = from_model
                 
-                # Try to apply this patch
-                result = _validate_and_write_patch(
-                    str(temp_file_path),
-                    resp["patch"],
-                    idx,
-                    str(sandbox_dir),
-                    "yaml",  # validate_mode
-                    item.get("category", ""),
-                    autofix,
-                    hygiene
-                )
-                
-                if idx <= 2:
-                    print(f"  DEBUG: Validation result = {result.get('status')}, reason = {result.get('reason', 'N/A')}")
-                
-                if result.get("status") == "pass":
-                    best_patch = resp["patch"]
-                    best_model = model_name
+                # Update current_content with patched version
+                sandbox_path = Path(result["sandbox_path"])
+                if sandbox_path.exists():
+                    current_content = sandbox_path.read_text(encoding="utf-8")
+                    successful_patches += 1
+                    print(f"  [OK] Applied patch from {from_model}")
+            elif item.get("category") == "HARD_CODED_CREDS":
+                # Fallback: Simple text replacement for hardcoded credentials
+                print(f"  [INFO] Patch failed, trying simple replacement for HARD_CODED_CREDS...")
+                try:
+                    # Extract what the patch is trying to set (even if malformed)
+                    # Look for lines with password: ${...} or similar patterns
+                    replacement_line = None
+                    for line in final_patch.splitlines():
+                        if "password:" in line.lower() and ("${" in line or "<" in line or "ENV" in line.upper()):
+                            replacement_line = line.strip()
+                            break
                     
-                    # Update current_content with patched version
-                    sandbox_path = Path(result["sandbox_path"])
-                    if sandbox_path.exists():
-                        current_content = sandbox_path.read_text(encoding="utf-8")
+                    if replacement_line:
+                        print(f"  DEBUG: Replacement line: {replacement_line}")
+                        # Find and replace the password line in current content
+                        lines = current_content.splitlines(keepends=True)
+                        for i, line in enumerate(lines):
+                            line_stripped = line.strip()
+                            if "password:" in line_stripped.lower() and "${" not in line_stripped and "<" not in line_stripped:
+                                # Replace the password line, preserving indentation
+                                indent = len(line) - len(line.lstrip())
+                                newline_char = "\n" if line.endswith("\n") else ""
+                                lines[i] = " " * indent + replacement_line + newline_char
+                                current_content = "".join(lines)
+                                successful_patches += 1
+                                best_patch = f"text_replacement: {replacement_line}"
+                                best_model = from_model + " (fallback)"
+                                print(f"  [OK] Applied simple replacement for hardcoded credential")
+                                break
+                    else:
+                        print(f"  [WARN] Could not extract replacement line from patch")
+                except Exception as e:
+                    print(f"  [WARN] Fallback replacement failed: {e}")
+            else:
+                # Conservative fallback: if patch failed for PRIVILEGED, try direct toggle
+                cat = str(item.get("category", "")).upper()
+                if "PRIVILEG" in cat:
+                    auto_fixed, changed = _attempt_privileged_autofix(current_content)
+                    if changed:
+                        # Ensure YAML doc start and normalize newlines
+                        current_content = _ensure_doc_start_and_lf(auto_fixed)
                         successful_patches += 1
-                        print(f"  [OK] Applied patch from {model_name}")
-                    break
+                        best_patch = "fallback:privileged_toggle"
+                        best_model = (from_model or "consensus") + " (fallback)"
+                        print("  [OK] Applied fallback: set privileged:false and added allowPrivilegeEscalation:false")
+                    else:
+                        print("  [INFO] Fallback skipped: no privileged:true found in current content")
+        
+        # Get votes from consensus for decision logging
+        votes = consensus.get("votes", {})
         
         # Record decision
         decisions.append({
@@ -190,13 +447,58 @@ async def combine_patches_for_file(
         if not best_patch:
             print("  [!] No valid patch from any model")
     
-    # Final output
+    # Final output (cleanup, validate efficacy)
     final_dir = output_dir_path
     final_dir.mkdir(parents=True, exist_ok=True)
     
     # Create sanitized filename
     safe_name = target_file.replace("\\", "_").replace("/", "_").replace("..", "")
-    final_path = final_dir / f"SECURED_{safe_name}"
+    
+    # Attempt to strip accidental diff artifacts before validation, then normalize YAML formatting
+    cleaned, cleaned_changed = _strip_diff_artifacts(current_content)
+    if cleaned_changed:
+        print("  [INFO] Cleaned diff artifacts from final content")
+        current_content = cleaned
+    current_content = _ensure_doc_start_and_lf(current_content)
+    
+    status, issues = _validate_effectiveness(
+        original_path.read_text(encoding="utf-8"),
+        current_content,
+    )
+
+    # Final hygiene pass if requested via environment (SAFEFIX_COMBINE_HYGIENE=1) or if ineffective due to missing basics
+    want_hygiene = os.getenv("SAFEFIX_COMBINE_HYGIENE", "1") == "1"
+    if want_hygiene:
+        if status != "EFFECTIVE" or any(k in current_content for k in [": latest", "privileged: true"]):
+            hardened_text, applied_h = _combine_hygiene(current_content)
+            if applied_h:
+                current_content = hardened_text
+                # Re-evaluate effectiveness after hygiene
+                status, issues = _validate_effectiveness(
+                    original_path.read_text(encoding="utf-8"),
+                    current_content,
+                )
+
+    # Optional privileged auto-fix attempt if ineffective solely due to privilege remaining
+    if status == "INEFFECTIVE" and any('privileged' in s.lower() for s in issues):
+        auto_fixed, changed = _attempt_privileged_autofix(current_content)
+        if changed:
+            print("  [INFO] Applied privileged auto-fix (privileged: true -> false) and added allowPrivilegeEscalation: false")
+            current_content = auto_fixed
+            # Re-normalize and re-evaluate
+            current_content = _ensure_doc_start_and_lf(current_content)
+            status, issues = _validate_effectiveness(
+                original_path.read_text(encoding="utf-8"),
+                current_content,
+            )
+    
+    prefix = {
+        "EFFECTIVE": "SECURED_",
+        "INEFFECTIVE": "INEFFECTIVE_",
+        "INVALID": "INVALID_",
+        "MANUAL_REQUIRED": "MANUAL_REQUIRED_",
+    }.get(status, "INEFFECTIVE_")
+    final_path = final_dir / f"{prefix}{safe_name}"
     
     # Write final combined file using current_content
     final_path.write_text(current_content, encoding="utf-8")
@@ -214,11 +516,68 @@ async def combine_patches_for_file(
         encoding="utf-8"
     )
     
+    # Write validation report
+    validation_path = final_dir / f"VALIDATION_{safe_name}.json"
+    validation_path.write_text(
+        json.dumps({
+            "original_file": target_file,
+            "status": status,
+            "issues": issues,
+            "successful_patches": successful_patches
+        }, indent=2),
+        encoding="utf-8"
+    )
+
+    # If RBAC manual required, scaffold a least-privilege template for guidance
+    if status == "MANUAL_REQUIRED" and _contains_rbac_cluster_admin(current_content):
+        scaffold_path = final_dir / f"SCAFFOLD_{safe_name}"
+        scaffold = (
+            "# Least-Privilege RBAC scaffold. Replace resources/verbs with exact needs.\n"
+            "apiVersion: v1\n"
+            "kind: Namespace\n"
+            "metadata:\n"
+            "  name: app-namespace\n"
+            "---\n"
+            "apiVersion: v1\n"
+            "kind: ServiceAccount\n"
+            "metadata:\n"
+            "  name: app-sa\n"
+            "  namespace: app-namespace\n"
+            "automountServiceAccountToken: false\n"
+            "---\n"
+            "apiVersion: rbac.authorization.k8s.io/v1\n"
+            "kind: Role\n"
+            "metadata:\n"
+            "  name: app-role\n"
+            "  namespace: app-namespace\n"
+            "rules:\n"
+            "  - apiGroups: ['']\n"
+            "    resources: ['pods']\n"
+            "    verbs: ['get', 'list', 'watch']\n"
+            "---\n"
+            "apiVersion: rbac.authorization.k8s.io/v1\n"
+            "kind: RoleBinding\n"
+            "metadata:\n"
+            "  name: app-binding\n"
+            "  namespace: app-namespace\n"
+            "subjects:\n"
+            "  - kind: ServiceAccount\n"
+            "    name: app-sa\n"
+            "    namespace: app-namespace\n"
+            "roleRef:\n"
+            "  apiGroup: rbac.authorization.k8s.io\n"
+            "  kind: Role\n"
+            "  name: app-role\n"
+        )
+        scaffold_path.write_text(scaffold, encoding="utf-8")
+        print(f"  [INFO] Wrote RBAC scaffold: {scaffold_path}")
+    
     print("\n[CombinePatch] Complete!")
     print(f"  Original findings: {len(file_items)}")
     print(f"  Patches applied: {successful_patches}")
-    print(f"  Output: {final_path}")
+    print(f"  Output: {final_path} [{status}]")
     print(f"  Decisions: {decisions_path}")
+    print(f"  Validation: {validation_path}")
     
     return final_path
 

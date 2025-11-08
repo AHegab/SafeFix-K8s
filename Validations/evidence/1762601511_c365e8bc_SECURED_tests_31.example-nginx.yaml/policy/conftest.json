@@ -1,0 +1,69 @@
+﻿[
+	{
+		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\Validations\\tmp_inputs\\1762601511_c365e8bc\\SECURED_tests_31.example-nginx.yaml",
+		"namespace": "main",
+		"successes": 60,
+		"failures": [
+			{
+				"msg": "Pod must have AppArmor annotation (container.apparmor.security.beta.kubernetes.io/\u003ccontainer\u003e)",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "Pod securityContext must define seccompProfile",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "container \"nginx\" adds Linux capabilities",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "container \"nginx\" must define livenessProbe",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "container \"nginx\" must define readinessProbe",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "container \"nginx\" must set imagePullPolicy",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "hostIPC must be false",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "hostNetwork must be false",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "hostPID must be false",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "nginx: no NetworkPolicy defined for pod",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			}
+		]
+	}
+]
