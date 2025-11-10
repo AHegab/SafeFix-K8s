@@ -16,26 +16,44 @@ spec:
     spec:
       serviceAccountName: default
       containers:
-        - name: echo1
-          image: gio54321/echo
-          env:
-            - name: ECHO_NAME
-              value: echo1
-            - name: AUTH_ENDPOINT
-              value: http://authserver
-          resources:
-            limits:
-              cpu: 300m
-              memory: 500Mi
-            requests:
-              cpu: 100m
-              memory: 200Mi
-          ports:
-            - containerPort: 8080
-          securityContext:
-            capabilities:
-              drop:
-                - all
-              add:
-                - NET_BIND_SERVICE
-            readOnlyRootFilesystem: true
+      - name: echo1
+        image: gio54321/echo
+        env:
+        - name: ECHO_NAME
+          value: echo1
+        - name: AUTH_ENDPOINT
+          value: http://authserver
+        resources:
+          limits:
+            cpu: 300m
+            memory: 500Mi
+          requests:
+            cpu: 100m
+            memory: 200Mi
+        ports:
+        - containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 3
+        securityContext:
+          capabilities:
+            drop:
+            - all
+            add:
+            - NET_BIND_SERVICE
+          readOnlyRootFilesystem: true
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+      automountServiceAccountToken: false
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+        capabilities:
+          drop:
+          - ALL

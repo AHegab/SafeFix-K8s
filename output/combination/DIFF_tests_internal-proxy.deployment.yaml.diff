@@ -1,0 +1,61 @@
+--- tests\internal-proxy.deployment.yaml+++ output\combination\SECURED_tests_internal-proxy.deployment.yaml@@ -26,6 +26,13 @@             memory: 40Mi
+         ports:
+         - containerPort: 3000
++        securityContext:
++          allowPrivilegeEscalation: false
++          readOnlyRootFilesystem: true
++          runAsNonRoot: true
++          capabilities:
++            drop:
++            - ALL
+       - name: info-app
+         image: madhuakula/k8s-goat-info-app
+         resources:
+@@ -36,7 +43,22 @@             cpu: 30m
+             memory: 40Mi
+         ports:
+-        - containerPort: 5000  
++        - containerPort: 5000
++        securityContext:
++          allowPrivilegeEscalation: false
++          readOnlyRootFilesystem: true
++          runAsNonRoot: true
++          capabilities:
++            drop:
++            - ALL
++      securityContext:
++        runAsNonRoot: true
++        allowPrivilegeEscalation: false
++        readOnlyRootFilesystem: true
++        capabilities:
++          drop:
++          - ALL
++      automountServiceAccountToken: false
+ ---
+ apiVersion: v1
+ kind: Service
+@@ -50,6 +72,14 @@     targetPort: 3000
+   selector:
+     app: internal-proxy
++  automountServiceAccountToken: false
++  securityContext:
++    allowPrivilegeEscalation: false
++    readOnlyRootFilesystem: true
++    runAsNonRoot: true
++    capabilities:
++      drop:
++      - ALL
+ ---
+ apiVersion: v1
+ kind: Service
+@@ -65,3 +95,11 @@     nodePort: 30003
+   selector:
+     app: internal-proxy
++  automountServiceAccountToken: false
++  securityContext:
++    allowPrivilegeEscalation: false
++    readOnlyRootFilesystem: true
++    runAsNonRoot: true
++    capabilities:
++      drop:
++      - ALL

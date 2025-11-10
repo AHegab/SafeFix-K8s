@@ -196,9 +196,20 @@ detection/output/logs/*.log
 detection/output/logs/*.txt
 !detection/output/logs/.gitkeep
 
-# Normalized output
+# Normalized + pipeline outputs (reports/artifacts)
 output/normalized_findings.json
-output/*.json
+output/llm_payload.json
+output/detection_effectiveness_report.json
+output/stage_deltas.json
+output/patch_validation_report.json
+output/llm/patch_sandbox/**
+output/llm/llm_decisions.json
+output/combination/SECURED_*
+output/combination/INEFFECTIVE_*
+output/combination/INVALID_*
+output/combination/MANUAL_REQUIRED_*
+output/combination/DECISIONS_*.json
+output/combination/VALIDATION_*.json
 !output/.gitkeep
 
 # Temporary files
@@ -246,6 +257,14 @@ $RECYCLE.BIN/
 kubeaudit.exe
 kubescape.exe
 !detection/tools/**/*.exe
+
+# Validation evidence and temp inputs
+Validations/evidence/**
+Validations/tmp_inputs/**
+Validations/reports/**
+
+# Runs/logs directory
+runs/**
 
 # Sensitive data and credentials
 *.key

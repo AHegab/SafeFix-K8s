@@ -1,0 +1,1761 @@
+{
+  "generated_at": "2025-11-10T11:31:32.386442Z",
+  "version": "raw-kubescore",
+  "metadata": {
+    "raw_findings_count": 92,
+    "aggregated_count": 92,
+    "llm_items_count": 92,
+    "source_tool": "kubescore",
+    "normalized": false
+  },
+  "items": [
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "NODEPORT_SERVICE",
+      "severity": "MEDIUM",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "service-type"
+      ],
+      "examples": [
+        "The service is of type NodePort"
+      ],
+      "occurrences": 1,
+      "message": "The service is of type NodePort",
+      "description": "NodePort services should be avoided as they are insecure, and can not be used together with NetworkPolicies. LoadBalancers or use of an Ingress is recommended over NodePorts.",
+      "line": 54
+    },
+    {
+      "file": "kube-bench-security.node-job.yaml",
+      "category": "POD_NETWORKPOLICY",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "pod-networkpolicy"
+      ],
+      "examples": [
+        "The pod does not have a matching NetworkPolicy"
+      ],
+      "occurrences": 1,
+      "message": "The pod does not have a matching NetworkPolicy",
+      "description": "Create a NetworkPolicy that targets this pod to control who/what can communicate with this pod. Note, this feature needs to be supported by the CNI implementation used in the Kubernetes cluster to have an effect.",
+      "line": 2
+    },
+    {
+      "file": "kube-bench-security.node-job.yaml",
+      "category": "CONTAINER_SECURITY_CONTEXT_USER_GROUP_ID",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-security-context-user-group-id"
+      ],
+      "examples": [
+        "Container has no configured security context"
+      ],
+      "occurrences": 1,
+      "message": "Container has no configured security context",
+      "description": "Set securityContext to run the container in a more secure context.",
+      "line": 2
+    },
+    {
+      "file": "kube-bench-security.node-job.yaml",
+      "category": "CONTAINER_IMAGE_TAG",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-image-tag"
+      ],
+      "examples": [
+        "Image with latest tag"
+      ],
+      "occurrences": 1,
+      "message": "Image with latest tag",
+      "description": "Using a fixed tag is recommended to avoid accidental upgrades",
+      "line": 2
+    },
+    {
+      "file": "kube-bench-security.node-job.yaml",
+      "category": "CONTAINER_SECURITY_CONTEXT_READONLYROOTFILESYSTEM",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-security-context-readonlyrootfilesystem"
+      ],
+      "examples": [
+        "Container has no configured security context"
+      ],
+      "occurrences": 1,
+      "message": "Container has no configured security context",
+      "description": "Set securityContext to run the container in a more secure context.",
+      "line": 2
+    },
+    {
+      "file": "kube-bench-security.node-job.yaml",
+      "category": "CONTAINER_SECCOMP_PROFILE",
+      "severity": "MEDIUM",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-seccomp-profile"
+      ],
+      "examples": [
+        "Skipped because container-seccomp-profile is ignored"
+      ],
+      "occurrences": 1,
+      "message": "Skipped because container-seccomp-profile is ignored",
+      "description": "Skipped because container-seccomp-profile is ignored",
+      "line": 2
+    },
+    {
+      "file": "kube-bench-security.node-job.yaml",
+      "category": "CONTAINER_EPHEMERAL_STORAGE_REQUEST_AND_LIMIT",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-ephemeral-storage-request-and-limit"
+      ],
+      "examples": [
+        "Ephemeral Storage limit is not set"
+      ],
+      "occurrences": 1,
+      "message": "Ephemeral Storage limit is not set",
+      "description": "Resource limits are recommended to avoid resource DDOS. Set resources.limits.ephemeral-storage",
+      "line": 2
+    },
+    {
+      "file": "kube-bench-security.node-job.yaml",
+      "category": "CONTAINER_RESOURCES",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-resources"
+      ],
+      "examples": [
+        "CPU limit is not set"
+      ],
+      "occurrences": 1,
+      "message": "CPU limit is not set",
+      "description": "Resource limits are recommended to avoid resource DDOS. Set resources.limits.cpu",
+      "line": 2
+    },
+    {
+      "file": "13.deployment.yaml",
+      "category": "CONTAINER_IMAGE_TAG",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-image-tag"
+      ],
+      "examples": [
+        "Image with latest tag"
+      ],
+      "occurrences": 1,
+      "message": "Image with latest tag",
+      "description": "Using a fixed tag is recommended to avoid accidental upgrades",
+      "line": 1
+    },
+    {
+      "file": "13.deployment.yaml",
+      "category": "CONTAINER_SECURITY_CONTEXT_USER_GROUP_ID",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-security-context-user-group-id"
+      ],
+      "examples": [
+        "The container is running with a low user ID"
+      ],
+      "occurrences": 1,
+      "message": "The container is running with a low user ID",
+      "description": "A userid above 10 000 is recommended to avoid conflicts with the host. Set securityContext.runAsUser to a value > 10000",
+      "line": 1
+    },
+    {
+      "file": "13.deployment.yaml",
+      "category": "CONTAINER_EPHEMERAL_STORAGE_REQUEST_AND_LIMIT",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-ephemeral-storage-request-and-limit"
+      ],
+      "examples": [
+        "Ephemeral Storage limit is not set"
+      ],
+      "occurrences": 1,
+      "message": "Ephemeral Storage limit is not set",
+      "description": "Resource limits are recommended to avoid resource DDOS. Set resources.limits.ephemeral-storage",
+      "line": 1
+    },
+    {
+      "file": "13.deployment.yaml",
+      "category": "CONTAINER_SECURITY_CONTEXT_READONLYROOTFILESYSTEM",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-security-context-readonlyrootfilesystem"
+      ],
+      "examples": [
+        "The pod has a container with a writable root filesystem"
+      ],
+      "occurrences": 1,
+      "message": "The pod has a container with a writable root filesystem",
+      "description": "Set securityContext.readOnlyRootFilesystem to true",
+      "line": 1
+    },
+    {
+      "file": "13.deployment.yaml",
+      "category": "CONTAINER_SECCOMP_PROFILE",
+      "severity": "MEDIUM",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-seccomp-profile"
+      ],
+      "examples": [
+        "Skipped because container-seccomp-profile is ignored"
+      ],
+      "occurrences": 1,
+      "message": "Skipped because container-seccomp-profile is ignored",
+      "description": "Skipped because container-seccomp-profile is ignored",
+      "line": 1
+    },
+    {
+      "file": "13.deployment.yaml",
+      "category": "CONTAINER_RESOURCES",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-resources"
+      ],
+      "examples": [
+        "CPU limit is not set"
+      ],
+      "occurrences": 1,
+      "message": "CPU limit is not set",
+      "description": "Resource limits are recommended to avoid resource DDOS. Set resources.limits.cpu",
+      "line": 1
+    },
+    {
+      "file": "13.deployment.yaml",
+      "category": "CONTAINER_SECURITY_CONTEXT_PRIVILEGED",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-security-context-privileged"
+      ],
+      "examples": [
+        "The container is privileged"
+      ],
+      "occurrences": 1,
+      "message": "The container is privileged",
+      "description": "Set securityContext.privileged to false. Privileged containers can access all devices on the host, and grants almost the same access as non-containerized processes on the host.",
+      "line": 1
+    },
+    {
+      "file": "13.deployment.yaml",
+      "category": "POD_NETWORKPOLICY",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "pod-networkpolicy"
+      ],
+      "examples": [
+        "The pod does not have a matching NetworkPolicy"
+      ],
+      "occurrences": 1,
+      "message": "The pod does not have a matching NetworkPolicy",
+      "description": "Create a NetworkPolicy that targets this pod to control who/what can communicate with this pod. Note, this feature needs to be supported by the CNI implementation used in the Kubernetes cluster to have an effect.",
+      "line": 1
+    },
+    {
+      "file": "13.deployment.yaml",
+      "category": "DEPLOYMENT_HAS_HOST_PODANTIAFFINITY",
+      "severity": "MEDIUM",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "deployment-has-host-podantiaffinity"
+      ],
+      "examples": [
+        "Deployment does not have a host podAntiAffinity set"
+      ],
+      "occurrences": 1,
+      "message": "Deployment does not have a host podAntiAffinity set",
+      "description": "It's recommended to set a podAntiAffinity that stops multiple pods from a deployment from being scheduled on the same node. This increases availability in case the node becomes unavailable.",
+      "line": 1
+    },
+    {
+      "file": "13.deployment.yaml",
+      "category": "DEPLOYMENT_POD_SELECTOR_LABELS_MATCH_TEMPLATE_METADATA_LABELS",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "deployment-pod-selector-labels-match-template-metadata-labels"
+      ],
+      "examples": [
+        "Deployment selector labels not matching template metadata labels"
+      ],
+      "occurrences": 1,
+      "message": "Deployment selector labels not matching template metadata labels",
+      "description": "Deployment require `.spec.selector` to match `.spec.template.metadata.labels`. https://kubernetes.io/docs/concepts/workloads/controllers/deployment/",
+      "line": 1
+    },
+    {
+      "file": "13.deployment.yaml",
+      "category": "DEPLOYMENT_STRATEGY",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "deployment-strategy"
+      ],
+      "examples": [
+        "Skipped as the Deployment is not targeted by a service"
+      ],
+      "occurrences": 1,
+      "message": "Skipped as the Deployment is not targeted by a service",
+      "description": "Skipped as the Deployment is not targeted by a service",
+      "line": 1
+    },
+    {
+      "file": "13.deployment.yaml",
+      "category": "DEPLOYMENT_REPLICAS",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "deployment-replicas"
+      ],
+      "examples": [
+        "Skipped as the Deployment is not targeted by service"
+      ],
+      "occurrences": 1,
+      "message": "Skipped as the Deployment is not targeted by service",
+      "description": "Skipped as the Deployment is not targeted by service",
+      "line": 1
+    },
+    {
+      "file": "13.deployment.yaml",
+      "category": "DEPLOYMENT_HAS_PODDISRUPTIONBUDGET",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "deployment-has-poddisruptionbudget"
+      ],
+      "examples": [
+        "No matching PodDisruptionBudget was found"
+      ],
+      "occurrences": 1,
+      "message": "No matching PodDisruptionBudget was found",
+      "description": "It's recommended to define a PodDisruptionBudget to avoid unexpected downtime during Kubernetes maintenance operations, such as when draining a node. ",
+      "line": 1
+    },
+    {
+      "file": "34.echo1_privileged.yaml",
+      "category": "CONTAINER_SECURITY_CONTEXT_READONLYROOTFILESYSTEM",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-security-context-readonlyrootfilesystem"
+      ],
+      "examples": [
+        "Container has no configured security context"
+      ],
+      "occurrences": 1,
+      "message": "Container has no configured security context",
+      "description": "Set securityContext to run the container in a more secure context.",
+      "line": 1
+    },
+    {
+      "file": "34.echo1_privileged.yaml",
+      "category": "CONTAINER_SECCOMP_PROFILE",
+      "severity": "MEDIUM",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-seccomp-profile"
+      ],
+      "examples": [
+        "Skipped because container-seccomp-profile is ignored"
+      ],
+      "occurrences": 1,
+      "message": "Skipped because container-seccomp-profile is ignored",
+      "description": "Skipped because container-seccomp-profile is ignored",
+      "line": 1
+    },
+    {
+      "file": "34.echo1_privileged.yaml",
+      "category": "CONTAINER_MEMORY_REQUESTS_EQUAL_LIMITS",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-memory-requests-equal-limits"
+      ],
+      "examples": [
+        "Skipped because container-memory-requests-equal-limits is ignored"
+      ],
+      "occurrences": 1,
+      "message": "Skipped because container-memory-requests-equal-limits is ignored",
+      "description": "Skipped because container-memory-requests-equal-limits is ignored",
+      "line": 1
+    },
+    {
+      "file": "34.echo1_privileged.yaml",
+      "category": "CONTAINER_EPHEMERAL_STORAGE_REQUEST_AND_LIMIT",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-ephemeral-storage-request-and-limit"
+      ],
+      "examples": [
+        "Ephemeral Storage limit is not set"
+      ],
+      "occurrences": 1,
+      "message": "Ephemeral Storage limit is not set",
+      "description": "Resource limits are recommended to avoid resource DDOS. Set resources.limits.ephemeral-storage",
+      "line": 1
+    },
+    {
+      "file": "34.echo1_privileged.yaml",
+      "category": "POD_NETWORKPOLICY",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "pod-networkpolicy"
+      ],
+      "examples": [
+        "The pod does not have a matching NetworkPolicy"
+      ],
+      "occurrences": 1,
+      "message": "The pod does not have a matching NetworkPolicy",
+      "description": "Create a NetworkPolicy that targets this pod to control who/what can communicate with this pod. Note, this feature needs to be supported by the CNI implementation used in the Kubernetes cluster to have an effect.",
+      "line": 1
+    },
+    {
+      "file": "34.echo1_privileged.yaml",
+      "category": "CONTAINER_RESOURCE_REQUESTS_EQUAL_LIMITS",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-resource-requests-equal-limits"
+      ],
+      "examples": [
+        "Skipped because container-resource-requests-equal-limits is ignored"
+      ],
+      "occurrences": 1,
+      "message": "Skipped because container-resource-requests-equal-limits is ignored",
+      "description": "Skipped because container-resource-requests-equal-limits is ignored",
+      "line": 1
+    },
+    {
+      "file": "34.echo1_privileged.yaml",
+      "category": "CONTAINER_SECURITY_CONTEXT_USER_GROUP_ID",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-security-context-user-group-id"
+      ],
+      "examples": [
+        "Container has no configured security context"
+      ],
+      "occurrences": 1,
+      "message": "Container has no configured security context",
+      "description": "Set securityContext to run the container in a more secure context.",
+      "line": 1
+    },
+    {
+      "file": "34.echo1_privileged.yaml",
+      "category": "CONTAINER_CPU_REQUESTS_EQUAL_LIMITS",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-cpu-requests-equal-limits"
+      ],
+      "examples": [
+        "Skipped because container-cpu-requests-equal-limits is ignored"
+      ],
+      "occurrences": 1,
+      "message": "Skipped because container-cpu-requests-equal-limits is ignored",
+      "description": "Skipped because container-cpu-requests-equal-limits is ignored",
+      "line": 1
+    },
+    {
+      "file": "34.echo1_privileged.yaml",
+      "category": "CONTAINER_IMAGE_TAG",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-image-tag"
+      ],
+      "examples": [
+        "Image with latest tag"
+      ],
+      "occurrences": 1,
+      "message": "Image with latest tag",
+      "description": "Using a fixed tag is recommended to avoid accidental upgrades",
+      "line": 1
+    },
+    {
+      "file": "34.echo1_privileged.yaml",
+      "category": "CONTAINER_SECCOMP_PROFILE",
+      "severity": "MEDIUM",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-seccomp-profile"
+      ],
+      "examples": [
+        "Skipped because container-seccomp-profile is ignored"
+      ],
+      "occurrences": 1,
+      "message": "Skipped because container-seccomp-profile is ignored",
+      "description": "Skipped because container-seccomp-profile is ignored",
+      "line": 1
+    },
+    {
+      "file": "34.echo1_privileged.yaml",
+      "category": "CONTAINER_MEMORY_REQUESTS_EQUAL_LIMITS",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-memory-requests-equal-limits"
+      ],
+      "examples": [
+        "Skipped because container-memory-requests-equal-limits is ignored"
+      ],
+      "occurrences": 1,
+      "message": "Skipped because container-memory-requests-equal-limits is ignored",
+      "description": "Skipped because container-memory-requests-equal-limits is ignored",
+      "line": 1
+    },
+    {
+      "file": "34.echo1_privileged.yaml",
+      "category": "CONTAINER_EPHEMERAL_STORAGE_REQUEST_AND_LIMIT",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-ephemeral-storage-request-and-limit"
+      ],
+      "examples": [
+        "Ephemeral Storage limit is not set"
+      ],
+      "occurrences": 1,
+      "message": "Ephemeral Storage limit is not set",
+      "description": "Resource limits are recommended to avoid resource DDOS. Set resources.limits.ephemeral-storage",
+      "line": 1
+    },
+    {
+      "file": "34.echo1_privileged.yaml",
+      "category": "CONTAINER_RESOURCE_REQUESTS_EQUAL_LIMITS",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-resource-requests-equal-limits"
+      ],
+      "examples": [
+        "Skipped because container-resource-requests-equal-limits is ignored"
+      ],
+      "occurrences": 1,
+      "message": "Skipped because container-resource-requests-equal-limits is ignored",
+      "description": "Skipped because container-resource-requests-equal-limits is ignored",
+      "line": 1
+    },
+    {
+      "file": "34.echo1_privileged.yaml",
+      "category": "POD_NETWORKPOLICY",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "pod-networkpolicy"
+      ],
+      "examples": [
+        "The pod does not have a matching NetworkPolicy"
+      ],
+      "occurrences": 1,
+      "message": "The pod does not have a matching NetworkPolicy",
+      "description": "Create a NetworkPolicy that targets this pod to control who/what can communicate with this pod. Note, this feature needs to be supported by the CNI implementation used in the Kubernetes cluster to have an effect.",
+      "line": 1
+    },
+    {
+      "file": "34.echo1_privileged.yaml",
+      "category": "CONTAINER_CPU_REQUESTS_EQUAL_LIMITS",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-cpu-requests-equal-limits"
+      ],
+      "examples": [
+        "Skipped because container-cpu-requests-equal-limits is ignored"
+      ],
+      "occurrences": 1,
+      "message": "Skipped because container-cpu-requests-equal-limits is ignored",
+      "description": "Skipped because container-cpu-requests-equal-limits is ignored",
+      "line": 1
+    },
+    {
+      "file": "34.echo1_privileged.yaml",
+      "category": "CONTAINER_IMAGE_TAG",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-image-tag"
+      ],
+      "examples": [
+        "Image with latest tag"
+      ],
+      "occurrences": 1,
+      "message": "Image with latest tag",
+      "description": "Using a fixed tag is recommended to avoid accidental upgrades",
+      "line": 1
+    },
+    {
+      "file": "34.echo1_privileged.yaml",
+      "category": "CONTAINER_SECURITY_CONTEXT_USER_GROUP_ID",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-security-context-user-group-id"
+      ],
+      "examples": [
+        "The container is running with a low user ID"
+      ],
+      "occurrences": 1,
+      "message": "The container is running with a low user ID",
+      "description": "A userid above 10 000 is recommended to avoid conflicts with the host. Set securityContext.runAsUser to a value > 10000",
+      "line": 1
+    },
+    {
+      "file": "34.echo1_privileged.yaml",
+      "category": "DEPLOYMENT_STRATEGY",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "deployment-strategy"
+      ],
+      "examples": [
+        "Skipped as the Deployment is not targeted by a service"
+      ],
+      "occurrences": 1,
+      "message": "Skipped as the Deployment is not targeted by a service",
+      "description": "Skipped as the Deployment is not targeted by a service",
+      "line": 1
+    },
+    {
+      "file": "34.echo1_privileged.yaml",
+      "category": "DEPLOYMENT_REPLICAS",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "deployment-replicas"
+      ],
+      "examples": [
+        "Skipped as the Deployment is not targeted by service"
+      ],
+      "occurrences": 1,
+      "message": "Skipped as the Deployment is not targeted by service",
+      "description": "Skipped as the Deployment is not targeted by service",
+      "line": 1
+    },
+    {
+      "file": "34.echo1_privileged.yaml",
+      "category": "DEPLOYMENT_HAS_PODDISRUPTIONBUDGET",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "deployment-has-poddisruptionbudget"
+      ],
+      "examples": [
+        "Skipped because the deployment has less than 2 replicas"
+      ],
+      "occurrences": 1,
+      "message": "Skipped because the deployment has less than 2 replicas",
+      "description": "Skipped because the deployment has less than 2 replicas",
+      "line": 1
+    },
+    {
+      "file": "34.echo1_privileged.yaml",
+      "category": "DEPLOYMENT_HAS_HOST_PODANTIAFFINITY",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "deployment-has-host-podantiaffinity"
+      ],
+      "examples": [
+        "Skipped because the deployment has less than 2 replicas"
+      ],
+      "occurrences": 1,
+      "message": "Skipped because the deployment has less than 2 replicas",
+      "description": "Skipped because the deployment has less than 2 replicas",
+      "line": 1
+    },
+    {
+      "file": "34.echo1_privileged.yaml",
+      "category": "DEPLOYMENT_STRATEGY",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "deployment-strategy"
+      ],
+      "examples": [
+        "Skipped as the Deployment is not targeted by a service"
+      ],
+      "occurrences": 1,
+      "message": "Skipped as the Deployment is not targeted by a service",
+      "description": "Skipped as the Deployment is not targeted by a service",
+      "line": 1
+    },
+    {
+      "file": "34.echo1_privileged.yaml",
+      "category": "DEPLOYMENT_REPLICAS",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "deployment-replicas"
+      ],
+      "examples": [
+        "Skipped as the Deployment is not targeted by service"
+      ],
+      "occurrences": 1,
+      "message": "Skipped as the Deployment is not targeted by service",
+      "description": "Skipped as the Deployment is not targeted by service",
+      "line": 1
+    },
+    {
+      "file": "34.echo1_privileged.yaml",
+      "category": "DEPLOYMENT_HAS_PODDISRUPTIONBUDGET",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "deployment-has-poddisruptionbudget"
+      ],
+      "examples": [
+        "Skipped because the deployment has less than 2 replicas"
+      ],
+      "occurrences": 1,
+      "message": "Skipped because the deployment has less than 2 replicas",
+      "description": "Skipped because the deployment has less than 2 replicas",
+      "line": 1
+    },
+    {
+      "file": "34.echo1_privileged.yaml",
+      "category": "DEPLOYMENT_HAS_HOST_PODANTIAFFINITY",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "deployment-has-host-podantiaffinity"
+      ],
+      "examples": [
+        "Skipped because the deployment has less than 2 replicas"
+      ],
+      "occurrences": 1,
+      "message": "Skipped because the deployment has less than 2 replicas",
+      "description": "Skipped because the deployment has less than 2 replicas",
+      "line": 1
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "CONTAINER_SECURITY_CONTEXT_USER_GROUP_ID",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-security-context-user-group-id"
+      ],
+      "examples": [
+        "Container has no configured security context"
+      ],
+      "occurrences": 1,
+      "message": "Container has no configured security context",
+      "description": "Set securityContext to run the container in a more secure context.",
+      "line": 1
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "CONTAINER_CPU_REQUESTS_EQUAL_LIMITS",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-cpu-requests-equal-limits"
+      ],
+      "examples": [
+        "Skipped because container-cpu-requests-equal-limits is ignored"
+      ],
+      "occurrences": 1,
+      "message": "Skipped because container-cpu-requests-equal-limits is ignored",
+      "description": "Skipped because container-cpu-requests-equal-limits is ignored",
+      "line": 1
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "CONTAINER_IMAGE_TAG",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-image-tag"
+      ],
+      "examples": [
+        "Image with latest tag"
+      ],
+      "occurrences": 1,
+      "message": "Image with latest tag",
+      "description": "Using a fixed tag is recommended to avoid accidental upgrades",
+      "line": 1
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "CONTAINER_SECURITY_CONTEXT_READONLYROOTFILESYSTEM",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-security-context-readonlyrootfilesystem"
+      ],
+      "examples": [
+        "Container has no configured security context"
+      ],
+      "occurrences": 1,
+      "message": "Container has no configured security context",
+      "description": "Set securityContext to run the container in a more secure context.",
+      "line": 1
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "CONTAINER_SECCOMP_PROFILE",
+      "severity": "MEDIUM",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-seccomp-profile"
+      ],
+      "examples": [
+        "Skipped because container-seccomp-profile is ignored"
+      ],
+      "occurrences": 1,
+      "message": "Skipped because container-seccomp-profile is ignored",
+      "description": "Skipped because container-seccomp-profile is ignored",
+      "line": 1
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "CONTAINER_MEMORY_REQUESTS_EQUAL_LIMITS",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-memory-requests-equal-limits"
+      ],
+      "examples": [
+        "Skipped because container-memory-requests-equal-limits is ignored"
+      ],
+      "occurrences": 1,
+      "message": "Skipped because container-memory-requests-equal-limits is ignored",
+      "description": "Skipped because container-memory-requests-equal-limits is ignored",
+      "line": 1
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "CONTAINER_EPHEMERAL_STORAGE_REQUEST_AND_LIMIT",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-ephemeral-storage-request-and-limit"
+      ],
+      "examples": [
+        "Ephemeral Storage limit is not set"
+      ],
+      "occurrences": 1,
+      "message": "Ephemeral Storage limit is not set",
+      "description": "Resource limits are recommended to avoid resource DDOS. Set resources.limits.ephemeral-storage",
+      "line": 1
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "POD_PROBES",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "pod-probes"
+      ],
+      "examples": [
+        "Container is missing a readinessProbe"
+      ],
+      "occurrences": 1,
+      "message": "Container is missing a readinessProbe",
+      "description": "A readinessProbe should be used to indicate when the service is ready to receive traffic. Without it, the Pod is risking to receive traffic before it has booted. It's also used during rollouts, and can prevent downtime if a new version of the application is failing.",
+      "line": 1
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "POD_NETWORKPOLICY",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "pod-networkpolicy"
+      ],
+      "examples": [
+        "The pod does not have a matching NetworkPolicy"
+      ],
+      "occurrences": 1,
+      "message": "The pod does not have a matching NetworkPolicy",
+      "description": "Create a NetworkPolicy that targets this pod to control who/what can communicate with this pod. Note, this feature needs to be supported by the CNI implementation used in the Kubernetes cluster to have an effect.",
+      "line": 1
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "CONTAINER_RESOURCE_REQUESTS_EQUAL_LIMITS",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-resource-requests-equal-limits"
+      ],
+      "examples": [
+        "Skipped because container-resource-requests-equal-limits is ignored"
+      ],
+      "occurrences": 1,
+      "message": "Skipped because container-resource-requests-equal-limits is ignored",
+      "description": "Skipped because container-resource-requests-equal-limits is ignored",
+      "line": 1
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "DEPLOYMENT_REPLICAS",
+      "severity": "MEDIUM",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "deployment-replicas"
+      ],
+      "examples": [
+        "Deployment few replicas"
+      ],
+      "occurrences": 1,
+      "message": "Deployment few replicas",
+      "description": "Deployments targeted by Services are recommended to have at least 2 replicas to prevent unwanted downtime.",
+      "line": 1
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "DEPLOYMENT_HAS_PODDISRUPTIONBUDGET",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "deployment-has-poddisruptionbudget"
+      ],
+      "examples": [
+        "No matching PodDisruptionBudget was found"
+      ],
+      "occurrences": 1,
+      "message": "No matching PodDisruptionBudget was found",
+      "description": "It's recommended to define a PodDisruptionBudget to avoid unexpected downtime during Kubernetes maintenance operations, such as when draining a node. ",
+      "line": 1
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "DEPLOYMENT_HAS_HOST_PODANTIAFFINITY",
+      "severity": "MEDIUM",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "deployment-has-host-podantiaffinity"
+      ],
+      "examples": [
+        "Deployment does not have a host podAntiAffinity set"
+      ],
+      "occurrences": 1,
+      "message": "Deployment does not have a host podAntiAffinity set",
+      "description": "It's recommended to set a podAntiAffinity that stops multiple pods from a deployment from being scheduled on the same node. This increases availability in case the node becomes unavailable.",
+      "line": 1
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "POD_NETWORKPOLICY",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "pod-networkpolicy"
+      ],
+      "examples": [
+        "The pod does not have a matching NetworkPolicy"
+      ],
+      "occurrences": 1,
+      "message": "The pod does not have a matching NetworkPolicy",
+      "description": "Create a NetworkPolicy that targets this pod to control who/what can communicate with this pod. Note, this feature needs to be supported by the CNI implementation used in the Kubernetes cluster to have an effect.",
+      "line": 1
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "CONTAINER_IMAGE_TAG",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-image-tag"
+      ],
+      "examples": [
+        "Image with latest tag"
+      ],
+      "occurrences": 1,
+      "message": "Image with latest tag",
+      "description": "Using a fixed tag is recommended to avoid accidental upgrades",
+      "line": 1
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "CONTAINER_SECURITY_CONTEXT_USER_GROUP_ID",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-security-context-user-group-id"
+      ],
+      "examples": [
+        "The container is running with a low user ID"
+      ],
+      "occurrences": 1,
+      "message": "The container is running with a low user ID",
+      "description": "A userid above 10 000 is recommended to avoid conflicts with the host. Set securityContext.runAsUser to a value > 10000",
+      "line": 1
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "CONTAINER_SECCOMP_PROFILE",
+      "severity": "MEDIUM",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-seccomp-profile"
+      ],
+      "examples": [
+        "Skipped because container-seccomp-profile is ignored"
+      ],
+      "occurrences": 1,
+      "message": "Skipped because container-seccomp-profile is ignored",
+      "description": "Skipped because container-seccomp-profile is ignored",
+      "line": 1
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "CONTAINER_EPHEMERAL_STORAGE_REQUEST_AND_LIMIT",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-ephemeral-storage-request-and-limit"
+      ],
+      "examples": [
+        "Ephemeral Storage limit is not set"
+      ],
+      "occurrences": 1,
+      "message": "Ephemeral Storage limit is not set",
+      "description": "Resource limits are recommended to avoid resource DDOS. Set resources.limits.ephemeral-storage",
+      "line": 1
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "CONTAINER_SECURITY_CONTEXT_READONLYROOTFILESYSTEM",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-security-context-readonlyrootfilesystem"
+      ],
+      "examples": [
+        "The pod has a container with a writable root filesystem"
+      ],
+      "occurrences": 1,
+      "message": "The pod has a container with a writable root filesystem",
+      "description": "Set securityContext.readOnlyRootFilesystem to true",
+      "line": 1
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "CONTAINER_RESOURCES",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-resources"
+      ],
+      "examples": [
+        "CPU limit is not set"
+      ],
+      "occurrences": 1,
+      "message": "CPU limit is not set",
+      "description": "Resource limits are recommended to avoid resource DDOS. Set resources.limits.cpu",
+      "line": 1
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "CONTAINER_SECURITY_CONTEXT_PRIVILEGED",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-security-context-privileged"
+      ],
+      "examples": [
+        "The container is privileged"
+      ],
+      "occurrences": 1,
+      "message": "The container is privileged",
+      "description": "Set securityContext.privileged to false. Privileged containers can access all devices on the host, and grants almost the same access as non-containerized processes on the host.",
+      "line": 1
+    },
+    {
+      "file": "34.echo1_load_balancer.yaml",
+      "category": "DANGLING_SERVICE",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "service-targets-pod"
+      ],
+      "examples": [
+        "The services selector does not match any pods"
+      ],
+      "occurrences": 1,
+      "message": "The services selector does not match any pods",
+      "description": "The services selector does not match any pods",
+      "line": 1
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "CONTAINER_SECURITY_CONTEXT_USER_GROUP_ID",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-security-context-user-group-id"
+      ],
+      "examples": [
+        "The container is running with a low user ID"
+      ],
+      "occurrences": 1,
+      "message": "The container is running with a low user ID",
+      "description": "A userid above 10 000 is recommended to avoid conflicts with the host. Set securityContext.runAsUser to a value > 10000",
+      "line": 1
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "CONTAINER_CPU_REQUESTS_EQUAL_LIMITS",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-cpu-requests-equal-limits"
+      ],
+      "examples": [
+        "Skipped because container-cpu-requests-equal-limits is ignored"
+      ],
+      "occurrences": 1,
+      "message": "Skipped because container-cpu-requests-equal-limits is ignored",
+      "description": "Skipped because container-cpu-requests-equal-limits is ignored",
+      "line": 1
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "CONTAINER_IMAGE_TAG",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-image-tag"
+      ],
+      "examples": [
+        "Image with latest tag"
+      ],
+      "occurrences": 1,
+      "message": "Image with latest tag",
+      "description": "Using a fixed tag is recommended to avoid accidental upgrades",
+      "line": 1
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "CONTAINER_SECURITY_CONTEXT_READONLYROOTFILESYSTEM",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-security-context-readonlyrootfilesystem"
+      ],
+      "examples": [
+        "The pod has a container with a writable root filesystem"
+      ],
+      "occurrences": 1,
+      "message": "The pod has a container with a writable root filesystem",
+      "description": "Set securityContext.readOnlyRootFilesystem to true",
+      "line": 1
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "CONTAINER_SECCOMP_PROFILE",
+      "severity": "MEDIUM",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-seccomp-profile"
+      ],
+      "examples": [
+        "Skipped because container-seccomp-profile is ignored"
+      ],
+      "occurrences": 1,
+      "message": "Skipped because container-seccomp-profile is ignored",
+      "description": "Skipped because container-seccomp-profile is ignored",
+      "line": 1
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "CONTAINER_MEMORY_REQUESTS_EQUAL_LIMITS",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-memory-requests-equal-limits"
+      ],
+      "examples": [
+        "Skipped because container-memory-requests-equal-limits is ignored"
+      ],
+      "occurrences": 1,
+      "message": "Skipped because container-memory-requests-equal-limits is ignored",
+      "description": "Skipped because container-memory-requests-equal-limits is ignored",
+      "line": 1
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "CONTAINER_EPHEMERAL_STORAGE_REQUEST_AND_LIMIT",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-ephemeral-storage-request-and-limit"
+      ],
+      "examples": [
+        "Ephemeral Storage limit is not set"
+      ],
+      "occurrences": 1,
+      "message": "Ephemeral Storage limit is not set",
+      "description": "Resource limits are recommended to avoid resource DDOS. Set resources.limits.ephemeral-storage",
+      "line": 1
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "CONTAINER_SECURITY_CONTEXT_PRIVILEGED",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-security-context-privileged"
+      ],
+      "examples": [
+        "The container is privileged"
+      ],
+      "occurrences": 1,
+      "message": "The container is privileged",
+      "description": "Set securityContext.privileged to false. Privileged containers can access all devices on the host, and grants almost the same access as non-containerized processes on the host.",
+      "line": 1
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "POD_NETWORKPOLICY",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "pod-networkpolicy"
+      ],
+      "examples": [
+        "The pod does not have a matching NetworkPolicy"
+      ],
+      "occurrences": 1,
+      "message": "The pod does not have a matching NetworkPolicy",
+      "description": "Create a NetworkPolicy that targets this pod to control who/what can communicate with this pod. Note, this feature needs to be supported by the CNI implementation used in the Kubernetes cluster to have an effect.",
+      "line": 1
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "CONTAINER_RESOURCE_REQUESTS_EQUAL_LIMITS",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-resource-requests-equal-limits"
+      ],
+      "examples": [
+        "Skipped because container-resource-requests-equal-limits is ignored"
+      ],
+      "occurrences": 1,
+      "message": "Skipped because container-resource-requests-equal-limits is ignored",
+      "description": "Skipped because container-resource-requests-equal-limits is ignored",
+      "line": 1
+    },
+    {
+      "file": "poor-registry.deployment.yaml",
+      "category": "POD_NETWORKPOLICY",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "pod-networkpolicy"
+      ],
+      "examples": [
+        "The pod does not have a matching NetworkPolicy"
+      ],
+      "occurrences": 1,
+      "message": "The pod does not have a matching NetworkPolicy",
+      "description": "Create a NetworkPolicy that targets this pod to control who/what can communicate with this pod. Note, this feature needs to be supported by the CNI implementation used in the Kubernetes cluster to have an effect.",
+      "line": 1
+    },
+    {
+      "file": "poor-registry.deployment.yaml",
+      "category": "CONTAINER_RESOURCE_REQUESTS_EQUAL_LIMITS",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-resource-requests-equal-limits"
+      ],
+      "examples": [
+        "Skipped because container-resource-requests-equal-limits is ignored"
+      ],
+      "occurrences": 1,
+      "message": "Skipped because container-resource-requests-equal-limits is ignored",
+      "description": "Skipped because container-resource-requests-equal-limits is ignored",
+      "line": 1
+    },
+    {
+      "file": "poor-registry.deployment.yaml",
+      "category": "CONTAINER_SECURITY_CONTEXT_USER_GROUP_ID",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-security-context-user-group-id"
+      ],
+      "examples": [
+        "Container has no configured security context"
+      ],
+      "occurrences": 1,
+      "message": "Container has no configured security context",
+      "description": "Set securityContext to run the container in a more secure context.",
+      "line": 1
+    },
+    {
+      "file": "poor-registry.deployment.yaml",
+      "category": "CONTAINER_CPU_REQUESTS_EQUAL_LIMITS",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-cpu-requests-equal-limits"
+      ],
+      "examples": [
+        "Skipped because container-cpu-requests-equal-limits is ignored"
+      ],
+      "occurrences": 1,
+      "message": "Skipped because container-cpu-requests-equal-limits is ignored",
+      "description": "Skipped because container-cpu-requests-equal-limits is ignored",
+      "line": 1
+    },
+    {
+      "file": "poor-registry.deployment.yaml",
+      "category": "CONTAINER_IMAGE_TAG",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-image-tag"
+      ],
+      "examples": [
+        "Image with latest tag"
+      ],
+      "occurrences": 1,
+      "message": "Image with latest tag",
+      "description": "Using a fixed tag is recommended to avoid accidental upgrades",
+      "line": 1
+    },
+    {
+      "file": "poor-registry.deployment.yaml",
+      "category": "CONTAINER_SECURITY_CONTEXT_READONLYROOTFILESYSTEM",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-security-context-readonlyrootfilesystem"
+      ],
+      "examples": [
+        "Container has no configured security context"
+      ],
+      "occurrences": 1,
+      "message": "Container has no configured security context",
+      "description": "Set securityContext to run the container in a more secure context.",
+      "line": 1
+    },
+    {
+      "file": "poor-registry.deployment.yaml",
+      "category": "CONTAINER_SECCOMP_PROFILE",
+      "severity": "MEDIUM",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-seccomp-profile"
+      ],
+      "examples": [
+        "Skipped because container-seccomp-profile is ignored"
+      ],
+      "occurrences": 1,
+      "message": "Skipped because container-seccomp-profile is ignored",
+      "description": "Skipped because container-seccomp-profile is ignored",
+      "line": 1
+    },
+    {
+      "file": "poor-registry.deployment.yaml",
+      "category": "CONTAINER_MEMORY_REQUESTS_EQUAL_LIMITS",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-memory-requests-equal-limits"
+      ],
+      "examples": [
+        "Skipped because container-memory-requests-equal-limits is ignored"
+      ],
+      "occurrences": 1,
+      "message": "Skipped because container-memory-requests-equal-limits is ignored",
+      "description": "Skipped because container-memory-requests-equal-limits is ignored",
+      "line": 1
+    },
+    {
+      "file": "poor-registry.deployment.yaml",
+      "category": "CONTAINER_EPHEMERAL_STORAGE_REQUEST_AND_LIMIT",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-ephemeral-storage-request-and-limit"
+      ],
+      "examples": [
+        "Ephemeral Storage limit is not set"
+      ],
+      "occurrences": 1,
+      "message": "Ephemeral Storage limit is not set",
+      "description": "Resource limits are recommended to avoid resource DDOS. Set resources.limits.ephemeral-storage",
+      "line": 1
+    },
+    {
+      "file": "poor-registry.deployment.yaml",
+      "category": "CONTAINER_RESOURCES",
+      "severity": "MEDIUM",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "container-resources"
+      ],
+      "examples": [
+        "CPU request is not set"
+      ],
+      "occurrences": 1,
+      "message": "CPU request is not set",
+      "description": "Resource requests are recommended to make sure that the application can start and run without crashing. Set resources.requests.cpu",
+      "line": 1
+    },
+    {
+      "file": "poor-registry.deployment.yaml",
+      "category": "POD_PROBES",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "pod-probes"
+      ],
+      "examples": [
+        "Container is missing a readinessProbe"
+      ],
+      "occurrences": 1,
+      "message": "Container is missing a readinessProbe",
+      "description": "A readinessProbe should be used to indicate when the service is ready to receive traffic. Without it, the Pod is risking to receive traffic before it has booted. It's also used during rollouts, and can prevent downtime if a new version of the application is failing.",
+      "line": 1
+    },
+    {
+      "file": "poor-registry.deployment.yaml",
+      "category": "DEPLOYMENT_REPLICAS",
+      "severity": "MEDIUM",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "deployment-replicas"
+      ],
+      "examples": [
+        "Deployment few replicas"
+      ],
+      "occurrences": 1,
+      "message": "Deployment few replicas",
+      "description": "Deployments targeted by Services are recommended to have at least 2 replicas to prevent unwanted downtime.",
+      "line": 1
+    },
+    {
+      "file": "poor-registry.deployment.yaml",
+      "category": "DEPLOYMENT_HAS_PODDISRUPTIONBUDGET",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "deployment-has-poddisruptionbudget"
+      ],
+      "examples": [
+        "No matching PodDisruptionBudget was found"
+      ],
+      "occurrences": 1,
+      "message": "No matching PodDisruptionBudget was found",
+      "description": "It's recommended to define a PodDisruptionBudget to avoid unexpected downtime during Kubernetes maintenance operations, such as when draining a node. ",
+      "line": 1
+    },
+    {
+      "file": "poor-registry.deployment.yaml",
+      "category": "DEPLOYMENT_HAS_HOST_PODANTIAFFINITY",
+      "severity": "MEDIUM",
+      "tools": [
+        "Kube-Score"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "deployment-has-host-podantiaffinity"
+      ],
+      "examples": [
+        "Deployment does not have a host podAntiAffinity set"
+      ],
+      "occurrences": 1,
+      "message": "Deployment does not have a host podAntiAffinity set",
+      "description": "It's recommended to set a podAntiAffinity that stops multiple pods from a deployment from being scheduled on the same node. This increases availability in case the node becomes unavailable.",
+      "line": 1
+    }
+  ]
+}

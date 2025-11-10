@@ -1,0 +1,89 @@
+{
+  "generated_at": "2025-11-10T11:05:14.039856Z",
+  "version": "raw-kubeconform",
+  "metadata": {
+    "raw_findings_count": 4,
+    "aggregated_count": 4,
+    "llm_items_count": 4,
+    "source_tool": "kubeconform",
+    "normalized": false
+  },
+  "items": [
+    {
+      "file": "27.Misconfiguration.yaml",
+      "category": "SCHEMA_VALIDATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "Kubeconform"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "statusError"
+      ],
+      "examples": [
+        "error while parsing: missing 'apiVersion' key"
+      ],
+      "occurrences": 1,
+      "message": "error while parsing: missing 'apiVersion' key",
+      "description": "NetworkPolicy: error while parsing: missing 'apiVersion' key",
+      "line": 0
+    },
+    {
+      "file": "27.Valid.yaml",
+      "category": "SCHEMA_VALIDATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "Kubeconform"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "statusError"
+      ],
+      "examples": [
+        "error while parsing: missing 'apiVersion' key"
+      ],
+      "occurrences": 1,
+      "message": "error while parsing: missing 'apiVersion' key",
+      "description": "NetworkPolicy: error while parsing: missing 'apiVersion' key",
+      "line": 0
+    },
+    {
+      "file": "29.helm_rabbitmq_hardcoded_credentials.yaml",
+      "category": "MISSING_KIND",
+      "severity": "HIGH",
+      "tools": [
+        "Kubeconform"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "statusError"
+      ],
+      "examples": [
+        "error while parsing: missing 'kind' key"
+      ],
+      "occurrences": 1,
+      "message": "error while parsing: missing 'kind' key",
+      "description": ": error while parsing: missing 'kind' key",
+      "line": 0
+    },
+    {
+      "file": "13.deployment.yaml",
+      "category": "MISSING_SELECTOR",
+      "severity": "HIGH",
+      "tools": [
+        "Kubeconform"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "statusInvalid"
+      ],
+      "examples": [
+        "problem validating schema. Check JSON formatting: jsonschema validation failed with 'https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/master-standalone-strict/deployment-apps-v1.json#' - at '/spec': missing property 'selector'"
+      ],
+      "occurrences": 1,
+      "message": "problem validating schema. Check JSON formatting: jsonschema validation failed with 'https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/master-standalone-strict/deployment-apps-v1.json#' - at '/spec': missing property 'selector'",
+      "description": "Deployment: problem validating schema. Check JSON formatting: jsonschema validation failed with 'https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/master-standalone-strict/deployment-apps-v1.json#' - at '/spec': missing property 'selector'",
+      "line": 0
+    }
+  ]
+}

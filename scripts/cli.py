@@ -80,23 +80,49 @@ def status():
     table.add_column("Size", justify="right", style="green")
     table.add_column("Status", style="yellow")
 
-    expected_files = [
+
+    # List of all 13 tools and their output files
+    all_tools = [
+        ("Kubescape", "kubescape_raw.json"),
+        ("KubeAudit", "kubeaudit_raw.json"),
         ("KubeConform", "kubeconform_raw.json"),
         ("KubeLinter", "kubelinter_raw.json"),
+        ("KubeScore", "kubescore_raw.json"),
         ("Polaris", "polaris_raw.json"),
         ("Trivy", "trivy_config_raw.json"),
-        ("Kubescape", "kubescape_raw.json"),
-        ("KubeScore", "kubescore_raw.json"),
         ("Yamllint", "yamllint_raw.txt"),
-        ("KubeAudit", "kubeaudit_raw.json"),
+        ("Checkov", "checkov_raw.json"),
+        ("Conftest", "conftest_raw.json"),
+        ("Pluto", "pluto_raw.json"),
+        ("RBACPolice", "rbacpolice_raw.json"),
+        ("Gitleaks", "gitleaks_raw.json"),
     ]
 
-    for tool_name, filename in expected_files:
+    for tool_name, filename in all_tools:
         filepath = raw_dir / filename
         if filepath.exists():
+            # Count findings for JSON or TXT
+            try:
+                if filename.endswith(".json"):
+                    import json
+                    data = json.loads(filepath.read_text(encoding="utf-8"))
+                    if isinstance(data, list):
+                        finding_count = len(data)
+                    elif isinstance(data, dict) and "results" in data:
+                        finding_count = len(data["results"])
+                    else:
+                        finding_count = sum(
+                            len(v) if isinstance(v, list) else 1 for v in data.values()
+                        )
+                elif filename.endswith(".txt"):
+                    finding_count = sum(1 for line in filepath.read_text(encoding="utf-8").splitlines() if line.strip())
+                else:
+                    finding_count = "?"
+            except Exception:
+                finding_count = "?"
             size = filepath.stat().st_size
             size_str = f"{size:,} B" if size < 1024 else f"{size/1024:.1f} KB"
-            status = "✓ OK" if size > 10 else "⚠ Empty"
+            status = f"✓ {finding_count} findings" if finding_count != "?" else "✓ OK"
             table.add_row(tool_name, filename, size_str, status)
         else:
             table.add_row(tool_name, filename, "-", "✗ Missing")

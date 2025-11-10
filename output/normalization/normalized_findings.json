@@ -1,0 +1,1267 @@
+[
+  {
+    "file": "(unknown)",
+    "category": "HOSTPATH",
+    "severity": "CRITICAL",
+    "tools": [
+      "Conftest",
+      "KubeAudit",
+      "Polaris",
+      "Trivy"
+    ],
+    "support_count": 4,
+    "rule_ids": [],
+    "examples": [
+      "Conftest",
+      "KubeAudit",
+      "Polaris"
+    ],
+    "occurrences": 44
+  },
+  {
+    "file": "(unknown)",
+    "category": "CAP_SYS_ADMIN",
+    "severity": "CRITICAL",
+    "tools": [
+      "Checkov",
+      "KubeLinter"
+    ],
+    "support_count": 2,
+    "rule_ids": [],
+    "examples": [
+      "Checkov",
+      "KubeLinter"
+    ],
+    "occurrences": 2
+  },
+  {
+    "file": "(unknown)",
+    "category": "DOCKER_SOCK",
+    "severity": "CRITICAL",
+    "tools": [
+      "KubeAudit"
+    ],
+    "support_count": 1,
+    "rule_ids": [],
+    "examples": [
+      "KubeAudit"
+    ],
+    "occurrences": 2
+  },
+  {
+    "file": "(unknown)",
+    "category": "PRIVILEGED",
+    "severity": "CRITICAL",
+    "tools": [
+      "Trivy"
+    ],
+    "support_count": 1,
+    "rule_ids": [],
+    "examples": [
+      "Trivy"
+    ],
+    "occurrences": 37
+  },
+  {
+    "file": "path=1470188748/api=apps/v1//Deployment/echo1",
+    "category": "PRIV_ESCALATION",
+    "severity": "CRITICAL",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0016"
+    ],
+    "examples": [
+      "Allow privilege escalation"
+    ],
+    "occurrences": 1
+  },
+  {
+    "file": "path=816180702/api=apps/v1//Deployment/nginx-deployment",
+    "category": "PRIVILEGED",
+    "severity": "CRITICAL",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0057"
+    ],
+    "examples": [
+      "Privileged container"
+    ],
+    "occurrences": 1
+  },
+  {
+    "file": "path=816180702/api=apps/v1//Deployment/nginx-deployment",
+    "category": "PRIV_ESCALATION",
+    "severity": "CRITICAL",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0016"
+    ],
+    "examples": [
+      "Allow privilege escalation"
+    ],
+    "occurrences": 1
+  },
+  {
+    "file": "tests\\13.deployment.yaml",
+    "category": "HOSTPATH",
+    "severity": "CRITICAL",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0048"
+    ],
+    "examples": [
+      "HostPath mount"
+    ],
+    "occurrences": 1
+  },
+  {
+    "file": "tests\\13.deployment.yaml",
+    "category": "PRIV_ESCALATION",
+    "severity": "CRITICAL",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0016"
+    ],
+    "examples": [
+      "Allow privilege escalation"
+    ],
+    "occurrences": 1
+  },
+  {
+    "file": "tests\\31.example-nginx.yaml",
+    "category": "CAP_SYS_ADMIN",
+    "severity": "CRITICAL",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0046"
+    ],
+    "examples": [
+      "Insecure capabilities"
+    ],
+    "occurrences": 1
+  },
+  {
+    "file": "tests\\31.example-nginx.yaml",
+    "category": "PRIVILEGED",
+    "severity": "CRITICAL",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0057"
+    ],
+    "examples": [
+      "Privileged container"
+    ],
+    "occurrences": 1
+  },
+  {
+    "file": "tests\\31.example-nginx.yaml",
+    "category": "PRIV_ESCALATION",
+    "severity": "CRITICAL",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0016"
+    ],
+    "examples": [
+      "Allow privilege escalation"
+    ],
+    "occurrences": 2
+  },
+  {
+    "file": "tests\\docker-bench-security.deployment.yaml",
+    "category": "HOSTPATH",
+    "severity": "CRITICAL",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0048",
+      "C-0074"
+    ],
+    "examples": [
+      "Container runtime socket mounted",
+      "HostPath mount"
+    ],
+    "occurrences": 2
+  },
+  {
+    "file": "tests\\docker-bench-security.deployment.yaml",
+    "category": "PRIVILEGED",
+    "severity": "CRITICAL",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0057"
+    ],
+    "examples": [
+      "Privileged container"
+    ],
+    "occurrences": 1
+  },
+  {
+    "file": "tests\\docker-bench-security.deployment.yaml",
+    "category": "PRIV_ESCALATION",
+    "severity": "CRITICAL",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0016"
+    ],
+    "examples": [
+      "Allow privilege escalation"
+    ],
+    "occurrences": 1
+  },
+  {
+    "file": "tests\\internal-proxy.deployment.yaml",
+    "category": "PRIV_ESCALATION",
+    "severity": "CRITICAL",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0016"
+    ],
+    "examples": [
+      "Allow privilege escalation"
+    ],
+    "occurrences": 1
+  },
+  {
+    "file": "tests\\poor-registry.deployment.yaml",
+    "category": "PRIV_ESCALATION",
+    "severity": "CRITICAL",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0016"
+    ],
+    "examples": [
+      "Allow privilege escalation"
+    ],
+    "occurrences": 1
+  },
+  {
+    "file": "(unknown)",
+    "category": "HARD_CODED_CREDS",
+    "severity": "HIGH",
+    "tools": [
+      "Checkov",
+      "Conftest",
+      "KubeConform",
+      "KubeScore",
+      "Polaris",
+      "Trivy"
+    ],
+    "support_count": 6,
+    "rule_ids": [],
+    "examples": [
+      "Checkov",
+      "Conftest",
+      "KubeConform"
+    ],
+    "occurrences": 21
+  },
+  {
+    "file": "(unknown)",
+    "category": "NO_APPARMOR",
+    "severity": "HIGH",
+    "tools": [
+      "KubeAudit"
+    ],
+    "support_count": 1,
+    "rule_ids": [],
+    "examples": [
+      "KubeAudit"
+    ],
+    "occurrences": 18
+  },
+  {
+    "file": "(unknown)",
+    "category": "NO_SECCOMP",
+    "severity": "HIGH",
+    "tools": [
+      "KubeAudit"
+    ],
+    "support_count": 1,
+    "rule_ids": [],
+    "examples": [
+      "KubeAudit"
+    ],
+    "occurrences": 16
+  },
+  {
+    "file": "(unknown)",
+    "category": "RUN_AS_NONROOT_FALSE",
+    "severity": "HIGH",
+    "tools": [
+      "Trivy"
+    ],
+    "support_count": 1,
+    "rule_ids": [],
+    "examples": [
+      "Trivy"
+    ],
+    "occurrences": 1
+  },
+  {
+    "file": "path=1470188748/api=apps/v1//Deployment/echo1",
+    "category": "RUN_AS_NONROOT_FALSE",
+    "severity": "HIGH",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0013"
+    ],
+    "examples": [
+      "Non-root containers"
+    ],
+    "occurrences": 1
+  },
+  {
+    "file": "path=816180702/api=apps/v1//Deployment/nginx-deployment",
+    "category": "NO_SECCOMP",
+    "severity": "HIGH",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0055"
+    ],
+    "examples": [
+      "Linux hardening"
+    ],
+    "occurrences": 1
+  },
+  {
+    "file": "path=816180702/api=apps/v1//Deployment/nginx-deployment",
+    "category": "READONLY_ROOTFS_FALSE",
+    "severity": "HIGH",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0017"
+    ],
+    "examples": [
+      "Immutable container filesystem"
+    ],
+    "occurrences": 1
+  },
+  {
+    "file": "path=816180702/api=apps/v1//Deployment/nginx-deployment",
+    "category": "RUN_AS_NONROOT_FALSE",
+    "severity": "HIGH",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0013"
+    ],
+    "examples": [
+      "Non-root containers"
+    ],
+    "occurrences": 1
+  },
+  {
+    "file": "tests\\13.deployment.yaml",
+    "category": "NO_SECCOMP",
+    "severity": "HIGH",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0055"
+    ],
+    "examples": [
+      "Linux hardening"
+    ],
+    "occurrences": 1
+  },
+  {
+    "file": "tests\\13.deployment.yaml",
+    "category": "READONLY_ROOTFS_FALSE",
+    "severity": "HIGH",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0017"
+    ],
+    "examples": [
+      "Immutable container filesystem"
+    ],
+    "occurrences": 1
+  },
+  {
+    "file": "tests\\13.deployment.yaml",
+    "category": "RUN_AS_NONROOT_FALSE",
+    "severity": "HIGH",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0013"
+    ],
+    "examples": [
+      "Non-root containers"
+    ],
+    "occurrences": 1
+  },
+  {
+    "file": "tests\\29.helm_rabbitmq_hardcoded_credentials.yaml",
+    "category": "HARD_CODED_CREDS",
+    "severity": "HIGH",
+    "tools": [
+      "Gitleaks"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "plaintext-password-key"
+    ],
+    "examples": [
+      "plaintext-password-key"
+    ],
+    "occurrences": 1
+  },
+  {
+    "file": "tests\\31.example-nginx.yaml",
+    "category": "NO_SECCOMP",
+    "severity": "HIGH",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0055"
+    ],
+    "examples": [
+      "Linux hardening"
+    ],
+    "occurrences": 2
+  },
+  {
+    "file": "tests\\31.example-nginx.yaml",
+    "category": "READONLY_ROOTFS_FALSE",
+    "severity": "HIGH",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0017"
+    ],
+    "examples": [
+      "Immutable container filesystem"
+    ],
+    "occurrences": 2
+  },
+  {
+    "file": "tests\\31.example-nginx.yaml",
+    "category": "RUN_AS_NONROOT_FALSE",
+    "severity": "HIGH",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0013"
+    ],
+    "examples": [
+      "Non-root containers"
+    ],
+    "occurrences": 2
+  },
+  {
+    "file": "tests\\34.unencrypted_secret.yaml",
+    "category": "HARD_CODED_CREDS",
+    "severity": "HIGH",
+    "tools": [
+      "Gitleaks"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "plaintext-password-key"
+    ],
+    "examples": [
+      "plaintext-password-key"
+    ],
+    "occurrences": 1
+  },
+  {
+    "file": "tests\\docker-bench-security.deployment.yaml",
+    "category": "NO_SECCOMP",
+    "severity": "HIGH",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0055"
+    ],
+    "examples": [
+      "Linux hardening"
+    ],
+    "occurrences": 1
+  },
+  {
+    "file": "tests\\docker-bench-security.deployment.yaml",
+    "category": "READONLY_ROOTFS_FALSE",
+    "severity": "HIGH",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0017"
+    ],
+    "examples": [
+      "Immutable container filesystem"
+    ],
+    "occurrences": 1
+  },
+  {
+    "file": "tests\\docker-bench-security.deployment.yaml",
+    "category": "RUN_AS_NONROOT_FALSE",
+    "severity": "HIGH",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0013"
+    ],
+    "examples": [
+      "Non-root containers"
+    ],
+    "occurrences": 1
+  },
+  {
+    "file": "tests\\internal-proxy.deployment.yaml",
+    "category": "NO_SECCOMP",
+    "severity": "HIGH",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0055"
+    ],
+    "examples": [
+      "Linux hardening"
+    ],
+    "occurrences": 1
+  },
+  {
+    "file": "tests\\internal-proxy.deployment.yaml",
+    "category": "READONLY_ROOTFS_FALSE",
+    "severity": "HIGH",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0017"
+    ],
+    "examples": [
+      "Immutable container filesystem"
+    ],
+    "occurrences": 1
+  },
+  {
+    "file": "tests\\internal-proxy.deployment.yaml",
+    "category": "RUN_AS_NONROOT_FALSE",
+    "severity": "HIGH",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0013"
+    ],
+    "examples": [
+      "Non-root containers"
+    ],
+    "occurrences": 1
+  },
+  {
+    "file": "tests\\poor-registry.deployment.yaml",
+    "category": "NO_SECCOMP",
+    "severity": "HIGH",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0055"
+    ],
+    "examples": [
+      "Linux hardening"
+    ],
+    "occurrences": 1
+  },
+  {
+    "file": "tests\\poor-registry.deployment.yaml",
+    "category": "READONLY_ROOTFS_FALSE",
+    "severity": "HIGH",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0017"
+    ],
+    "examples": [
+      "Immutable container filesystem"
+    ],
+    "occurrences": 1
+  },
+  {
+    "file": "tests\\poor-registry.deployment.yaml",
+    "category": "RUN_AS_NONROOT_FALSE",
+    "severity": "HIGH",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0013"
+    ],
+    "examples": [
+      "Non-root containers"
+    ],
+    "occurrences": 1
+  },
+  {
+    "file": "(unknown)",
+    "category": "MISSING_CAP_DROP",
+    "severity": "MEDIUM",
+    "tools": [
+      "Checkov",
+      "Conftest",
+      "KubeAudit",
+      "Trivy"
+    ],
+    "support_count": 4,
+    "rule_ids": [],
+    "examples": [
+      "Checkov",
+      "Conftest",
+      "KubeAudit"
+    ],
+    "occurrences": 115
+  },
+  {
+    "file": "(unknown)",
+    "category": "HOST_NAMESPACE",
+    "severity": "MEDIUM",
+    "tools": [
+      "Conftest",
+      "Trivy"
+    ],
+    "support_count": 2,
+    "rule_ids": [],
+    "examples": [
+      "Conftest",
+      "Trivy"
+    ],
+    "occurrences": 28
+  },
+  {
+    "file": "(unknown)",
+    "category": "IMAGE_LATEST",
+    "severity": "MEDIUM",
+    "tools": [
+      "Conftest",
+      "Trivy"
+    ],
+    "support_count": 2,
+    "rule_ids": [],
+    "examples": [
+      "Conftest",
+      "Trivy"
+    ],
+    "occurrences": 142
+  },
+  {
+    "file": "(unknown)",
+    "category": "POD_DEFAULT_NAMESPACE",
+    "severity": "MEDIUM",
+    "tools": [
+      "Trivy"
+    ],
+    "support_count": 1,
+    "rule_ids": [],
+    "examples": [
+      "Trivy"
+    ],
+    "occurrences": 9
+  },
+  {
+    "file": "path=1470188748/api=apps/v1//Deployment/echo1",
+    "category": "NETWORK_POLICY_MISSING",
+    "severity": "MEDIUM",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0030",
+      "C-0260"
+    ],
+    "examples": [
+      "Missing network policy",
+      "Ingress and Egress blocked"
+    ],
+    "occurrences": 2
+  },
+  {
+    "file": "path=1470188748/api=apps/v1//Deployment/echo1",
+    "category": "POD_DEFAULT_NAMESPACE",
+    "severity": "MEDIUM",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0061"
+    ],
+    "examples": [
+      "Pods in default namespace"
+    ],
+    "occurrences": 1
+  },
+  {
+    "file": "path=816180702/api=apps/v1//Deployment/nginx-deployment",
+    "category": "NETWORK_POLICY_MISSING",
+    "severity": "MEDIUM",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0030",
+      "C-0260"
+    ],
+    "examples": [
+      "Missing network policy",
+      "Ingress and Egress blocked"
+    ],
+    "occurrences": 2
+  },
+  {
+    "file": "path=816180702/api=apps/v1//Deployment/nginx-deployment",
+    "category": "POD_DEFAULT_NAMESPACE",
+    "severity": "MEDIUM",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0061"
+    ],
+    "examples": [
+      "Pods in default namespace"
+    ],
+    "occurrences": 1
+  },
+  {
+    "file": "tests\\13.deployment.yaml",
+    "category": "HOST_NAMESPACE",
+    "severity": "MEDIUM",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0038"
+    ],
+    "examples": [
+      "Host PID/IPC privileges"
+    ],
+    "occurrences": 1
+  },
+  {
+    "file": "tests\\13.deployment.yaml",
+    "category": "NETWORK_POLICY_MISSING",
+    "severity": "MEDIUM",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0030",
+      "C-0260"
+    ],
+    "examples": [
+      "Missing network policy",
+      "Ingress and Egress blocked"
+    ],
+    "occurrences": 2
+  },
+  {
+    "file": "tests\\13.deployment.yaml",
+    "category": "POD_DEFAULT_NAMESPACE",
+    "severity": "MEDIUM",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0061"
+    ],
+    "examples": [
+      "Pods in default namespace"
+    ],
+    "occurrences": 1
+  },
+  {
+    "file": "tests\\31.example-nginx.yaml",
+    "category": "HOST_NAMESPACE",
+    "severity": "MEDIUM",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0038",
+      "C-0041"
+    ],
+    "examples": [
+      "HostNetwork access",
+      "Host PID/IPC privileges"
+    ],
+    "occurrences": 2
+  },
+  {
+    "file": "tests\\31.example-nginx.yaml",
+    "category": "NETWORK_POLICY_MISSING",
+    "severity": "MEDIUM",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0030",
+      "C-0260"
+    ],
+    "examples": [
+      "Missing network policy",
+      "Ingress and Egress blocked"
+    ],
+    "occurrences": 4
+  },
+  {
+    "file": "tests\\31.example-nginx.yaml",
+    "category": "POD_DEFAULT_NAMESPACE",
+    "severity": "MEDIUM",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0061"
+    ],
+    "examples": [
+      "Pods in default namespace"
+    ],
+    "occurrences": 2
+  },
+  {
+    "file": "tests\\docker-bench-security.deployment.yaml",
+    "category": "HOST_NAMESPACE",
+    "severity": "MEDIUM",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0038",
+      "C-0041"
+    ],
+    "examples": [
+      "HostNetwork access",
+      "Host PID/IPC privileges"
+    ],
+    "occurrences": 2
+  },
+  {
+    "file": "tests\\docker-bench-security.deployment.yaml",
+    "category": "NETWORK_POLICY_MISSING",
+    "severity": "MEDIUM",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0030",
+      "C-0260"
+    ],
+    "examples": [
+      "Missing network policy",
+      "Ingress and Egress blocked"
+    ],
+    "occurrences": 2
+  },
+  {
+    "file": "tests\\docker-bench-security.deployment.yaml",
+    "category": "POD_DEFAULT_NAMESPACE",
+    "severity": "MEDIUM",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0061"
+    ],
+    "examples": [
+      "Pods in default namespace"
+    ],
+    "occurrences": 1
+  },
+  {
+    "file": "tests\\internal-proxy.deployment.yaml",
+    "category": "NETWORK_POLICY_MISSING",
+    "severity": "MEDIUM",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0030",
+      "C-0260"
+    ],
+    "examples": [
+      "Missing network policy",
+      "Ingress and Egress blocked"
+    ],
+    "occurrences": 2
+  },
+  {
+    "file": "tests\\internal-proxy.deployment.yaml",
+    "category": "POD_DEFAULT_NAMESPACE",
+    "severity": "MEDIUM",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0061"
+    ],
+    "examples": [
+      "Pods in default namespace"
+    ],
+    "occurrences": 1
+  },
+  {
+    "file": "tests\\poor-registry.deployment.yaml",
+    "category": "NETWORK_POLICY_MISSING",
+    "severity": "MEDIUM",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0030",
+      "C-0260"
+    ],
+    "examples": [
+      "Missing network policy",
+      "Ingress and Egress blocked"
+    ],
+    "occurrences": 2
+  },
+  {
+    "file": "tests\\poor-registry.deployment.yaml",
+    "category": "POD_DEFAULT_NAMESPACE",
+    "severity": "MEDIUM",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0061"
+    ],
+    "examples": [
+      "Pods in default namespace"
+    ],
+    "occurrences": 1
+  },
+  {
+    "file": "(unknown)",
+    "category": "NO_RES_LIMITS",
+    "severity": "LOW",
+    "tools": [
+      "Conftest",
+      "Polaris"
+    ],
+    "support_count": 2,
+    "rule_ids": [],
+    "examples": [
+      "Conftest",
+      "Polaris"
+    ],
+    "occurrences": 75
+  },
+  {
+    "file": "(unknown)",
+    "category": "DEPRECATED_API",
+    "severity": "LOW",
+    "tools": [
+      "KubeScore"
+    ],
+    "support_count": 1,
+    "rule_ids": [],
+    "examples": [
+      "KubeScore"
+    ],
+    "occurrences": 12
+  },
+  {
+    "file": "(unknown)",
+    "category": "NO_PROBES",
+    "severity": "LOW",
+    "tools": [
+      "Polaris"
+    ],
+    "support_count": 1,
+    "rule_ids": [],
+    "examples": [
+      "Polaris"
+    ],
+    "occurrences": 32
+  },
+  {
+    "file": "(unknown)",
+    "category": "SCHEMA_INVALID",
+    "severity": "LOW",
+    "tools": [
+      "KubeConform"
+    ],
+    "support_count": 1,
+    "rule_ids": [],
+    "examples": [
+      "KubeConform"
+    ],
+    "occurrences": 120
+  },
+  {
+    "file": "path=1470188748/api=apps/v1//Deployment/echo1",
+    "category": "NO_PROBES",
+    "severity": "LOW",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0018",
+      "C-0056"
+    ],
+    "examples": [
+      "Configured liveness probe",
+      "Configured readiness probe"
+    ],
+    "occurrences": 2
+  },
+  {
+    "file": "path=816180702/api=apps/v1//Deployment/nginx-deployment",
+    "category": "NO_PROBES",
+    "severity": "LOW",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0018",
+      "C-0056"
+    ],
+    "examples": [
+      "Configured liveness probe",
+      "Configured readiness probe"
+    ],
+    "occurrences": 2
+  },
+  {
+    "file": "path=816180702/api=apps/v1//Deployment/nginx-deployment",
+    "category": "NO_RES_LIMITS",
+    "severity": "LOW",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0270",
+      "C-0271"
+    ],
+    "examples": [
+      "Ensure memory limits are set",
+      "Ensure CPU limits are set"
+    ],
+    "occurrences": 2
+  },
+  {
+    "file": "tests\\13.deployment.yaml",
+    "category": "NO_PROBES",
+    "severity": "LOW",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0018",
+      "C-0056"
+    ],
+    "examples": [
+      "Configured liveness probe",
+      "Configured readiness probe"
+    ],
+    "occurrences": 2
+  },
+  {
+    "file": "tests\\13.deployment.yaml",
+    "category": "NO_RES_LIMITS",
+    "severity": "LOW",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0270",
+      "C-0271"
+    ],
+    "examples": [
+      "Ensure memory limits are set",
+      "Ensure CPU limits are set"
+    ],
+    "occurrences": 2
+  },
+  {
+    "file": "tests\\31.example-nginx.yaml",
+    "category": "NO_PROBES",
+    "severity": "LOW",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0018",
+      "C-0056"
+    ],
+    "examples": [
+      "Configured liveness probe",
+      "Configured readiness probe"
+    ],
+    "occurrences": 4
+  },
+  {
+    "file": "tests\\31.example-nginx.yaml",
+    "category": "NO_RES_LIMITS",
+    "severity": "LOW",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0270",
+      "C-0271"
+    ],
+    "examples": [
+      "Ensure memory limits are set",
+      "Ensure CPU limits are set"
+    ],
+    "occurrences": 2
+  },
+  {
+    "file": "tests\\docker-bench-security.deployment.yaml",
+    "category": "NO_PROBES",
+    "severity": "LOW",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0018",
+      "C-0056"
+    ],
+    "examples": [
+      "Configured liveness probe",
+      "Configured readiness probe"
+    ],
+    "occurrences": 2
+  },
+  {
+    "file": "tests\\internal-proxy.deployment.yaml",
+    "category": "NO_PROBES",
+    "severity": "LOW",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0018",
+      "C-0056"
+    ],
+    "examples": [
+      "Configured liveness probe",
+      "Configured readiness probe"
+    ],
+    "occurrences": 2
+  },
+  {
+    "file": "tests\\poor-registry.deployment.yaml",
+    "category": "NO_PROBES",
+    "severity": "LOW",
+    "tools": [
+      "Kubescape"
+    ],
+    "support_count": 1,
+    "rule_ids": [
+      "C-0018",
+      "C-0056"
+    ],
+    "examples": [
+      "Configured liveness probe",
+      "Configured readiness probe"
+    ],
+    "occurrences": 2
+  }
+]

@@ -1,0 +1,70 @@
+{
+  "generated_at": "2025-11-10T11:06:07.909787Z",
+  "version": "raw-rbacpolice",
+  "metadata": {
+    "raw_findings_count": 3,
+    "aggregated_count": 3,
+    "llm_items_count": 3,
+    "source_tool": "rbacpolice",
+    "normalized": false
+  },
+  "items": [
+    {
+      "file": "28.role_overly_permissive.yaml",
+      "category": "DANGEROUS_VERB",
+      "severity": "MEDIUM",
+      "tools": [
+        "RBAC-Police"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "DangerousVerb_delete"
+      ],
+      "examples": [
+        "Dangerous verb 'delete' detected - ensure this is necessary"
+      ],
+      "occurrences": 1,
+      "message": "Dangerous verb 'delete' detected - ensure this is necessary",
+      "description": "Dangerous verb 'delete' detected - ensure this is necessary",
+      "line": 0
+    },
+    {
+      "file": "insecure-rbac.setup.yaml",
+      "category": "EXCESSIVE_PERMISSIONS",
+      "severity": "CRITICAL",
+      "tools": [
+        "RBAC-Police"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "ClusterAdminReference"
+      ],
+      "examples": [
+        "References cluster-admin role - grants full cluster access"
+      ],
+      "occurrences": 1,
+      "message": "References cluster-admin role - grants full cluster access",
+      "description": "References cluster-admin role - grants full cluster access",
+      "line": 0
+    },
+    {
+      "file": "insecure-rbac.setup.yaml",
+      "category": "EXCESSIVE_PERMISSIONS",
+      "severity": "CRITICAL",
+      "tools": [
+        "RBAC-Police"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "ClusterAdminBinding"
+      ],
+      "examples": [
+        "Binds to cluster-admin role - grants full cluster access"
+      ],
+      "occurrences": 1,
+      "message": "Binds to cluster-admin role - grants full cluster access",
+      "description": "Binds to cluster-admin role - grants full cluster access",
+      "line": 0
+    }
+  ]
+}

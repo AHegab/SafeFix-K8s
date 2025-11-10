@@ -1,9 +1,8 @@
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: internal-proxy-deployment
-  namespace: internal-proxy-ns
+  namespace: default
   labels:
     app: internal-proxy
 spec:
@@ -14,10 +13,7 @@ spec:
     metadata:
       labels:
         app: internal-proxy
-      annotations:
-        container.apparmor.security.beta.kubernetes.io/internal-proxy: runtime/default
     spec:
-      automountServiceAccountToken: false
       containers:
       - name: internal-api
         image: madhuakula/k8s-goat-internal-api
@@ -56,12 +52,13 @@ spec:
             drop:
             - ALL
       securityContext:
+        runAsNonRoot: true
         allowPrivilegeEscalation: false
         readOnlyRootFilesystem: true
-        runAsNonRoot: true
         capabilities:
           drop:
           - ALL
+      automountServiceAccountToken: false
 ---
 apiVersion: v1
 kind: Service

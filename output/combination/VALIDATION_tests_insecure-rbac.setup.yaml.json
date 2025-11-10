@@ -1,8 +1,0 @@
-{
-  "original_file": "tests\\insecure-rbac.setup.yaml",
-  "status": "MANUAL_REQUIRED",
-  "issues": [
-    "ClusterRoleBinding to cluster-admin present"
-  ],
-  "successful_patches": 0
-}

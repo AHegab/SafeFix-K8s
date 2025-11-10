@@ -298,6 +298,8 @@ def normalize(
     out: str = typer.Option(str(NORMALIZATION_LAYER), "--out", "-o", help="Output directory"),
     min_support: int = typer.Option(1, "--min-support", help="Minimum tool agreement"),
     only_security: bool = typer.Option(True, "--only-security", help="Filter only security findings"),
+    ml_fp: bool = typer.Option(True, "--ml-fp/--no-ml-fp", help="Apply ML-based false-positive filtering when model available"),
+    ml_threshold: float = typer.Option(0.6, "--ml-threshold", help="Probability threshold for ML false-positive filtering"),
     dry_run: bool = typer.Option(False, "--dry-run", help="Show what would be normalized")
 ):
     """
@@ -333,11 +335,21 @@ def normalize(
     console.print(f"[bold cyan]Normalizing:[/bold cyan] {raw_dir}")
     console.print(f"[bold cyan]Output:[/bold cyan] {out_dir}")
     console.print(f"[bold cyan]Min Support:[/bold cyan] {min_support}")
-    console.print(f"[bold cyan]Security Only:[/bold cyan] {only_security}\n")
+    console.print(f"[bold cyan]Security Only:[/bold cyan] {only_security}")
+    console.print(f"[bold cyan]ML FP Filter:[/bold cyan] {'enabled' if ml_fp else 'disabled'} (threshold={ml_threshold})\n")
     
     if dry_run:
         console.print("[yellow]DRY RUN - showing what would be executed:[/yellow]\n")
-        console.print(f"Command: python {NORMALIZER_DIR / 'normalize.py'} --raw {raw_dir} --out {out_dir}")
+        cmd_parts = [
+            f"python {NORMALIZER_DIR / 'normalize.py'}",
+            f"--raw {raw_dir}",
+            f"--out {out_dir}",
+            f"--min-support {min_support}",
+            f"--only-security {1 if only_security else 0}",
+            f"--ml-fp {1 if ml_fp else 0}",
+            f"--ml-threshold {ml_threshold}"
+        ]
+        console.print(f"Command: {' '.join(cmd_parts)}")
         console.print("\n[yellow]No changes made. Remove --dry-run to execute.[/yellow]")
         return
     
@@ -348,7 +360,11 @@ def normalize(
                 sys.executable,
                 str(NORMALIZER_DIR / "normalize.py"),
                 "--raw", str(raw_dir),
-                "--out", str(out_dir)
+                "--out", str(out_dir),
+                "--min-support", str(min_support),
+                "--only-security", ("1" if only_security else "0"),
+                "--ml-fp", ("1" if ml_fp else "0"),
+                "--ml-threshold", str(ml_threshold)
             ]
 
             env = os.environ.copy()
@@ -417,6 +433,8 @@ def llm_run(
     limit: int = typer.Option(0, "--limit", "-l", help="Limit number of items (0=all)"),
     timeout: int = typer.Option(25, "--timeout", "-t", help="Timeout per model in seconds"),
     concurrency: int = typer.Option(5, "--concurrency", "-c", help="Process N items in parallel"),
+    validate: str = typer.Option("yaml", "--validate", "-v", help="Post-patch validation mode: none or yaml"),
+    apply_dir: Optional[str] = typer.Option(None, "--apply-dir", help="Directory to stage per-finding fixed manifests"),
     dry_run: bool = typer.Option(False, "--dry-run", help="Show what would be executed")
 ):
     """
@@ -437,7 +455,11 @@ def llm_run(
     console.print(f"[bold cyan]Hygiene:[/bold cyan] {hygiene}")
     console.print(f"[bold cyan]Limit:[/bold cyan] {limit if limit > 0 else 'All'}")
     console.print(f"[bold cyan]Timeout:[/bold cyan] {timeout}s")
-    console.print(f"[bold cyan]Concurrency:[/bold cyan] {concurrency}\n")
+    console.print(f"[bold cyan]Concurrency:[/bold cyan] {concurrency}")
+    console.print(f"[bold cyan]Validation:[/bold cyan] {validate}")
+    if apply_dir:
+        console.print(f"[bold cyan]Apply Dir:[/bold cyan] {apply_dir}")
+    console.print("")
     
     if dry_run:
         console.print("[yellow]DRY RUN - showing what would be executed:[/yellow]\n")
@@ -448,6 +470,9 @@ def llm_run(
             cmd_str += " --hygiene"
         if limit > 0:
             cmd_str += f" --limit {limit}"
+        cmd_str += f" --validate {validate}"
+        if apply_dir:
+            cmd_str += f" --apply-dir {apply_dir}"
         console.print(f"Command: {cmd_str}")
         console.print("\n[yellow]No changes made. Remove --dry-run to execute.[/yellow]")
         return
@@ -459,7 +484,8 @@ def llm_run(
             str(LLMS_DIR / "multi_llm_orchestrator.py"),
             "--models", models,
             "--timeout", str(timeout),
-            "--concurrency", str(concurrency)
+            "--concurrency", str(concurrency),
+            "--validate", validate
         ]
         
         if autofix:
@@ -468,6 +494,8 @@ def llm_run(
             cmd.append("--hygiene")
         if limit > 0:
             cmd.extend(["--limit", str(limit)])
+        if apply_dir:
+            cmd.extend(["--apply-dir", apply_dir])
         
         env = os.environ.copy()
         # Use environment variables if already set (for tool-specific paths), otherwise use defaults
@@ -475,7 +503,10 @@ def llm_run(
         env["SAFEFIX_NORMALIZATION_DIR"] = os.getenv("SAFEFIX_NORMALIZATION_DIR", str(NORMALIZATION_LAYER))
         env["SAFEFIX_LLM_DIR"] = os.getenv("SAFEFIX_LLM_DIR", str(LLM_LAYER))
         
-        llm_sandbox = Path(env["SAFEFIX_LLM_DIR"]) / "patch_sandbox"
+        if apply_dir:
+            llm_sandbox = Path(apply_dir)
+        else:
+            llm_sandbox = Path(env["SAFEFIX_LLM_DIR"]) / "patch_sandbox"
         env["SAFEFIX_LLM_SANDBOX_DIR"] = str(llm_sandbox)
 
         with console.status("[bold green]Running LLM orchestration..."):
@@ -578,33 +609,25 @@ def combine(
     
     if dry_run:
         console.print("[yellow]DRY RUN - showing what would be executed:[/yellow]\n")
-        cmd_str = f"python {LLMS_DIR / 'combine_patches.py'} --file {file} --models {models}"
-        if autofix:
-            cmd_str += " --autofix"
+        cmd_str = f"python {LLMS_DIR / 'combine_yaml_files.py'} --file {file}"
         if hygiene:
             cmd_str += " --hygiene"
-        if categories:
-            cmd_str += f" --categories {categories}"
         console.print(f"Command: {cmd_str}")
         console.print(f"Env: SAFEFIX_COMBINATION_DIR={combination_dir}")
         console.print("\n[yellow]No changes made. Remove --dry-run to execute.[/yellow]")
         return
     
-    # Execute patch combination
+    # Execute YAML file combination
     try:
         cmd = [
             sys.executable,
-            str(LLMS_DIR / "combine_patches.py"),
+            str(LLMS_DIR / "combine_yaml_files.py"),
             "--file", file,
-            "--models", models
+            "--output", str(combination_dir)
         ]
         
-        if autofix:
-            cmd.append("--autofix")
         if hygiene:
             cmd.append("--hygiene")
-        if categories:
-            cmd.extend(["--categories", categories])
 
         combination_dir.mkdir(parents=True, exist_ok=True)
         env = os.environ.copy()
@@ -614,11 +637,11 @@ def combine(
         env["SAFEFIX_LLM_DIR"] = os.getenv("SAFEFIX_LLM_DIR", str(LLM_LAYER))
         env["SAFEFIX_COMBINATION_DIR"] = str(combination_dir)
         
-        with console.status("[bold green]Combining patches...") as status:
+        with console.status("[bold green]Combining fixed YAML files...") as status:
             result = subprocess.run(cmd, capture_output=True, text=True, cwd=str(REPO_ROOT), env=env)
             
             if result.returncode != 0:
-                console.print(f"[bold red]Patch combination failed[/bold red]")
+                console.print(f"[bold red]YAML combination failed[/bold red]")
                 console.print(result.stderr)
                 raise typer.Exit(1)
             
@@ -683,11 +706,15 @@ def combine(
             produced_status = newest_status
     decisions_file = output_dir / f"DECISIONS_{safe_name}.json"
     
+    # Look for diff file
+    diff_file = output_dir / f"DIFF_{safe_name}.diff"
+    summary_file = output_dir / f"SUMMARY_{safe_name}.json"
+    
     summary_data = {
-        "Patches Combined": "Multiple",
+        "Files Combined": "Multiple fixed YAML files",
         "Output File": str(produced_file) if produced_file else "Not found",
-        "Status": produced_status or "N/A",
-        "Decisions Log": str(decisions_file) if decisions_file.exists() else "Not found",
+        "Diff File": str(diff_file) if diff_file.exists() else "Not found",
+        "Summary File": str(summary_file) if summary_file.exists() else "Not found",
         "Elapsed Time": f"{elapsed:.1f}s"
     }
     
@@ -699,12 +726,12 @@ def combine(
     )
     suggestions = [
         validate_hint,
-        f"Review output file: {produced_file}" if produced_file else "Review output directory for results",
-        f"Review decision log: {decisions_file}",
-        "Compare with original using diff tools"
+        f"Review secured file: {produced_file}" if produced_file else "Review output directory for results",
+        f"View changes: {diff_file}" if diff_file.exists() else "Check diff file in output directory",
+        f"Review summary: {summary_file}" if summary_file.exists() else "Check summary file in output directory"
     ]
     
-    print_summary("Patch Combination Complete", summary_data, suggestions)
+    print_summary("YAML Combination Complete", summary_data, suggestions)
 
 
 @app.command(name="validate")
@@ -1099,14 +1126,16 @@ def pipeline(
             console.print("Aggregating and deduplicating findings...\n")
             
             # Use tool-specific paths
-            raw_input = str(tool_detection_layer / "raw") if tool else "Detection/output/raw"
-            norm_output = str(tool_normalization_layer) if tool else "output"
+            raw_input = str(tool_detection_layer / "raw") if tool else str(DETECTION_LAYER / "raw")
+            norm_output = str(tool_normalization_layer) if tool else str(NORMALIZATION_LAYER)
             
             normalize(
                 raw=raw_input,
                 out=norm_output,
                 min_support=1,
                 only_security=True,
+                ml_fp=True,
+                ml_threshold=0.6,
                 dry_run=False
             )
             steps_completed.append("NORMALIZE")
@@ -1136,6 +1165,8 @@ def pipeline(
                 limit=0,
                 timeout=25,
                 concurrency=5,
+                validate="yaml",
+                apply_dir=None,
                 dry_run=False
             )
             steps_completed.append("LLM")
@@ -1440,6 +1471,125 @@ def evaluate(
         console.print(f"[green]Report saved to:[/green] {out}")
     except Exception:
         pass
+
+
+@app.command()
+def raw_to_llm(
+    tool: str = typer.Argument(..., help="Tool name: checkov, trivy, kubescape, kubeaudit, conftest, polaris, gitleaks, kubeconform, kubelinter, kubescore, pluto, rbacpolice, yamllint"),
+    raw_file: str = typer.Option(None, "--raw", "-r", help="Path to raw tool output file"),
+    models: str = typer.Option("groq,openrouter,gemini", "--models", "-m", help="Comma-separated LLM providers"),
+    concurrency: int = typer.Option(15, "--concurrency", "-c", help="Number of items to process in parallel"),
+    fast: bool = typer.Option(True, "--fast/--quality", help="Fast mode (model sharding) or quality mode (full consensus)"),
+    output: Optional[str] = typer.Option(None, "--output", "-o", help="Output directory for LLM decisions")
+):
+    """
+    Send raw tool findings directly to LLM (bypasses normalization).
+    
+    This command takes raw detection output from a specific tool and sends it
+    directly to the LLM orchestrator without going through the normalizer.
+    
+    Examples:
+        cli.py raw-to-llm checkov --raw Detection/output/detection/raw/checkov_raw.json
+        cli.py raw-to-llm trivy --raw Detection/output/detection/raw/trivy_config_raw.json --fast
+        cli.py raw-to-llm kubescape --raw Detection/output/detection/raw/kubescape_raw.json --quality
+    """
+    _env_guard("llm")
+    print_banner()
+    start_time = time.time()
+    
+    # Find raw file if not provided
+    if not raw_file:
+        raw_candidates = [
+            DETECTION_DIR / "output" / "detection" / "raw" / f"{tool.lower()}_raw.json",
+            DETECTION_DIR / "output" / "raw" / f"{tool.lower()}_raw.json",
+            DETECTION_LAYER / "raw" / f"{tool.lower()}_raw.json",
+            OUTPUT_DIR / "detection" / "raw" / f"{tool.lower()}_raw.json",
+        ]
+        
+        for candidate in raw_candidates:
+            if candidate.exists():
+                raw_file = str(candidate)
+                break
+        
+        if not raw_file:
+            console.print(f"[bold red]Error:[/bold red] Raw file not found for {tool}")
+            console.print(f"Checked locations:")
+            for c in raw_candidates:
+                console.print(f"  - {c}")
+            console.print(f"\nPlease specify with --raw option")
+            raise typer.Exit(1)
+    
+    raw_path = Path(raw_file)
+    if not raw_path.exists():
+        console.print(f"[bold red]Error:[/bold red] Raw file not found: {raw_file}")
+        raise typer.Exit(1)
+    
+    console.print(f"[bold cyan]Tool:[/bold cyan] {tool.upper()}")
+    console.print(f"[bold cyan]Raw File:[/bold cyan] {raw_path}")
+    console.print(f"[bold cyan]Models:[/bold cyan] {models}")
+    console.print(f"[bold cyan]Mode:[/bold cyan] {'FAST (sharding)' if fast else 'QUALITY (consensus)'}")
+    console.print(f"[bold cyan]Concurrency:[/bold cyan] {concurrency}\n")
+    
+    # Run raw-to-llm script
+    raw_to_llm_script = LLMS_DIR / "raw_to_llm.py"
+    if not raw_to_llm_script.exists():
+        console.print(f"[bold red]Error:[/bold red] {raw_to_llm_script} not found")
+        raise typer.Exit(1)
+    
+    cmd = [
+        sys.executable, str(raw_to_llm_script),
+        "--tool", tool.lower(),
+        "--raw", str(raw_path),
+        "--models", models,
+        "--concurrency", str(concurrency)
+    ]
+    
+    if fast:
+        cmd.append("--shard-models")
+    
+    if output:
+        cmd.extend(["--output", output])
+    
+    env = os.environ.copy()
+    env["SAFEFIX_OUTPUT_ROOT"] = str(OUTPUT_DIR)
+    env["SAFEFIX_NORMALIZATION_DIR"] = str(NORMALIZATION_LAYER)
+    env["SAFEFIX_LLM_DIR"] = str(LLM_LAYER)
+    
+    try:
+        with console.status(f"[bold green]Processing raw {tool} findings..."):
+            result = subprocess.run(cmd, capture_output=True, text=True, cwd=str(REPO_ROOT), env=env)
+            
+            if result.returncode != 0:
+                console.print(f"[bold red]Raw-to-LLM processing failed[/bold red]")
+                console.print(result.stderr)
+                raise typer.Exit(1)
+            
+            console.print(result.stdout)
+    
+    except Exception as e:
+        console.print(f"[bold red]Error during raw-to-LLM processing:[/bold red] {e}")
+        raise typer.Exit(1)
+    
+    elapsed = time.time() - start_time
+    
+    # Find output
+    output_dir = Path(output) if output else LLM_LAYER
+    decisions_file = output_dir / "llm_decisions.json"
+    
+    summary_data = {
+        "Tool": tool.upper(),
+        "Raw File": str(raw_path),
+        "Decisions File": str(decisions_file) if decisions_file.exists() else "Not found",
+        "Elapsed Time": f"{elapsed:.1f}s"
+    }
+    
+    suggestions = [
+        f"Review decisions: {decisions_file}",
+        "Run combine to apply fixes: python cli.py combine <target_file>",
+        "Or use: python LLMs/combine_yaml_files.py --file <target_file>"
+    ]
+    
+    print_summary("Raw-to-LLM Complete", summary_data, suggestions)
 
 
 @app.command()

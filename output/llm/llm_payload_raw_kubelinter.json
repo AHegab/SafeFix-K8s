@@ -1,0 +1,1058 @@
+{
+  "generated_at": "2025-11-10T11:05:22.827950Z",
+  "version": "raw-kubelinter",
+  "metadata": {
+    "raw_findings_count": 55,
+    "aggregated_count": 55,
+    "llm_items_count": 55,
+    "source_tool": "kubelinter",
+    "normalized": false
+  },
+  "items": [
+    {
+      "file": "13.deployment.yaml",
+      "category": "LATEST_TAG",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "latest-tag"
+      ],
+      "examples": [
+        "The container \"nginx\" is using an invalid container image, \"nginx:latest\". Please use images that are not blocked by the `BlockList` criteria : [\".*:(latest)$\" \"^[^:]*$\" \"(.*/[^:]+)$\"]"
+      ],
+      "occurrences": 1,
+      "message": "The container \"nginx\" is using an invalid container image, \"nginx:latest\". Please use images that are not blocked by the `BlockList` criteria : [\".*:(latest)$\" \"^[^:]*$\" \"(.*/[^:]+)$\"]",
+      "description": "The container \"nginx\" is using an invalid container image, \"nginx:latest\". Please use images that are not blocked by the `BlockList` criteria : [\".*:(latest)$\" \"^[^:]*$\" \"(.*/[^:]+)$\"]. Use a container image with a specific tag other than latest.",
+      "line": 0
+    },
+    {
+      "file": "13.deployment.yaml",
+      "category": "MISMATCHING_SELECTOR",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "mismatching-selector"
+      ],
+      "examples": [
+        "object has no selector specified"
+      ],
+      "occurrences": 1,
+      "message": "object has no selector specified",
+      "description": "object has no selector specified. Confirm that your deployment selector correctly matches the labels in its pod template.",
+      "line": 0
+    },
+    {
+      "file": "13.deployment.yaml",
+      "category": "NO_ANTI_AFFINITY",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "no-anti-affinity"
+      ],
+      "examples": [
+        "object has 2 replicas but does not specify inter pod anti-affinity"
+      ],
+      "occurrences": 1,
+      "message": "object has 2 replicas but does not specify inter pod anti-affinity",
+      "description": "object has 2 replicas but does not specify inter pod anti-affinity. Specify anti-affinity in your pod specification to ensure that the orchestrator attempts to schedule replicas on different nodes. Using podAntiAffinity, specify a labelSelector that matches pods for the deployment, and set the topologyKey to kubernetes.io/hostname. Refer to https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity for details.",
+      "line": 0
+    },
+    {
+      "file": "13.deployment.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "no-read-only-root-fs"
+      ],
+      "examples": [
+        "container \"nginx\" does not have a read-only root file system"
+      ],
+      "occurrences": 1,
+      "message": "container \"nginx\" does not have a read-only root file system",
+      "description": "container \"nginx\" does not have a read-only root file system. Set readOnlyRootFilesystem to true in the container securityContext.",
+      "line": 0
+    },
+    {
+      "file": "13.deployment.yaml",
+      "category": "PRIV_ESCALATION",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "privilege-escalation-container"
+      ],
+      "examples": [
+        "container \"nginx\" is Privileged hence allows privilege escalation."
+      ],
+      "occurrences": 1,
+      "message": "container \"nginx\" is Privileged hence allows privilege escalation.",
+      "description": "container \"nginx\" is Privileged hence allows privilege escalation.. Ensure containers do not allow privilege escalation by setting allowPrivilegeEscalation=false, privileged=false and removing CAP_SYS_ADMIN capability. See https://kubernetes.io/docs/tasks/configure-pod-container/security-context/ for more details.",
+      "line": 0
+    },
+    {
+      "file": "13.deployment.yaml",
+      "category": "PRIVILEGED",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "privileged-container"
+      ],
+      "examples": [
+        "container \"nginx\" is privileged"
+      ],
+      "occurrences": 1,
+      "message": "container \"nginx\" is privileged",
+      "description": "container \"nginx\" is privileged. Do not run your container as privileged unless it is required.",
+      "line": 0
+    },
+    {
+      "file": "13.deployment.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "run-as-non-root"
+      ],
+      "examples": [
+        "container \"nginx\" is not set to runAsNonRoot"
+      ],
+      "occurrences": 1,
+      "message": "container \"nginx\" is not set to runAsNonRoot",
+      "description": "container \"nginx\" is not set to runAsNonRoot. Set runAsUser to a non-zero number and runAsNonRoot to true in your pod or container securityContext. Refer to https://kubernetes.io/docs/tasks/configure-pod-container/security-context/ for details.",
+      "line": 0
+    },
+    {
+      "file": "13.deployment.yaml",
+      "category": "NO_RES_LIMITS",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "unset-cpu-requirements"
+      ],
+      "examples": [
+        "container \"nginx\" has cpu request 0"
+      ],
+      "occurrences": 1,
+      "message": "container \"nginx\" has cpu request 0",
+      "description": "container \"nginx\" has cpu request 0. Set CPU requests for your container based on its requirements. Refer to https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#requests-and-limits for details.",
+      "line": 0
+    },
+    {
+      "file": "13.deployment.yaml",
+      "category": "NO_RES_LIMITS",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "unset-memory-requirements"
+      ],
+      "examples": [
+        "container \"nginx\" has memory limit 0"
+      ],
+      "occurrences": 1,
+      "message": "container \"nginx\" has memory limit 0",
+      "description": "container \"nginx\" has memory limit 0. Set memory limits for your container based on its requirements. Refer to https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#requests-and-limits for details.",
+      "line": 0
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "DROP_NET_RAW_CAPABILITY",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "drop-net-raw-capability"
+      ],
+      "examples": [
+        "container \"nginx\" has ADD capability: \"NET_RAW\", which matched with the forbidden capability for containers"
+      ],
+      "occurrences": 1,
+      "message": "container \"nginx\" has ADD capability: \"NET_RAW\", which matched with the forbidden capability for containers",
+      "description": "container \"nginx\" has ADD capability: \"NET_RAW\", which matched with the forbidden capability for containers. NET_RAW makes it so that an application within the container is able to craft raw packets, use raw sockets, and bind to any address. Remove this capability in the containers under containers security contexts.",
+      "line": 0
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "DROP_NET_RAW_CAPABILITY",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "drop-net-raw-capability"
+      ],
+      "examples": [
+        "container \"nginx\" has DROP capabilities: [], but does not drop capability \"NET_RAW\" which is required"
+      ],
+      "occurrences": 1,
+      "message": "container \"nginx\" has DROP capabilities: [], but does not drop capability \"NET_RAW\" which is required",
+      "description": "container \"nginx\" has DROP capabilities: [], but does not drop capability \"NET_RAW\" which is required. NET_RAW makes it so that an application within the container is able to craft raw packets, use raw sockets, and bind to any address. Remove this capability in the containers under containers security contexts.",
+      "line": 0
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "HOST_NAMESPACE",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "host-ipc"
+      ],
+      "examples": [
+        "resource shares host's IPC namespace (via hostIPC=true)."
+      ],
+      "occurrences": 1,
+      "message": "resource shares host's IPC namespace (via hostIPC=true).",
+      "description": "resource shares host's IPC namespace (via hostIPC=true).. Ensure the host's IPC namespace is not shared.",
+      "line": 0
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "HOST_NAMESPACE",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "host-network"
+      ],
+      "examples": [
+        "resource shares host's network namespace (via hostNetwork=true)."
+      ],
+      "occurrences": 1,
+      "message": "resource shares host's network namespace (via hostNetwork=true).",
+      "description": "resource shares host's network namespace (via hostNetwork=true).. Ensure the host's network namespace is not shared.",
+      "line": 0
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "HOST_NAMESPACE",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "host-pid"
+      ],
+      "examples": [
+        "object shares the host's process namespace (via hostPID=true)."
+      ],
+      "occurrences": 1,
+      "message": "object shares the host's process namespace (via hostPID=true).",
+      "description": "object shares the host's process namespace (via hostPID=true).. Ensure the host's process namespace is not shared.",
+      "line": 0
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "LATEST_TAG",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "latest-tag"
+      ],
+      "examples": [
+        "The container \"nginx\" is using an invalid container image, \"nginx:latest\". Please use images that are not blocked by the `BlockList` criteria : [\".*:(latest)$\" \"^[^:]*$\" \"(.*/[^:]+)$\"]"
+      ],
+      "occurrences": 1,
+      "message": "The container \"nginx\" is using an invalid container image, \"nginx:latest\". Please use images that are not blocked by the `BlockList` criteria : [\".*:(latest)$\" \"^[^:]*$\" \"(.*/[^:]+)$\"]",
+      "description": "The container \"nginx\" is using an invalid container image, \"nginx:latest\". Please use images that are not blocked by the `BlockList` criteria : [\".*:(latest)$\" \"^[^:]*$\" \"(.*/[^:]+)$\"]. Use a container image with a specific tag other than latest.",
+      "line": 0
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "no-read-only-root-fs"
+      ],
+      "examples": [
+        "container \"nginx\" does not have a read-only root file system"
+      ],
+      "occurrences": 1,
+      "message": "container \"nginx\" does not have a read-only root file system",
+      "description": "container \"nginx\" does not have a read-only root file system. Set readOnlyRootFilesystem to true in the container securityContext.",
+      "line": 0
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "PRIV_ESCALATION",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "privilege-escalation-container"
+      ],
+      "examples": [
+        "container \"nginx\" is Privileged hence allows privilege escalation."
+      ],
+      "occurrences": 1,
+      "message": "container \"nginx\" is Privileged hence allows privilege escalation.",
+      "description": "container \"nginx\" is Privileged hence allows privilege escalation.. Ensure containers do not allow privilege escalation by setting allowPrivilegeEscalation=false, privileged=false and removing CAP_SYS_ADMIN capability. See https://kubernetes.io/docs/tasks/configure-pod-container/security-context/ for more details.",
+      "line": 0
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "PRIVILEGED",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "privileged-container"
+      ],
+      "examples": [
+        "container \"nginx\" is privileged"
+      ],
+      "occurrences": 1,
+      "message": "container \"nginx\" is privileged",
+      "description": "container \"nginx\" is privileged. Do not run your container as privileged unless it is required.",
+      "line": 0
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "run-as-non-root"
+      ],
+      "examples": [
+        "container \"nginx\" is not set to runAsNonRoot"
+      ],
+      "occurrences": 1,
+      "message": "container \"nginx\" is not set to runAsNonRoot",
+      "description": "container \"nginx\" is not set to runAsNonRoot. Set runAsUser to a non-zero number and runAsNonRoot to true in your pod or container securityContext. Refer to https://kubernetes.io/docs/tasks/configure-pod-container/security-context/ for details.",
+      "line": 0
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "NO_RES_LIMITS",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "unset-cpu-requirements"
+      ],
+      "examples": [
+        "container \"nginx\" has cpu request 0"
+      ],
+      "occurrences": 1,
+      "message": "container \"nginx\" has cpu request 0",
+      "description": "container \"nginx\" has cpu request 0. Set CPU requests for your container based on its requirements. Refer to https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#requests-and-limits for details.",
+      "line": 0
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "NO_RES_LIMITS",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "unset-memory-requirements"
+      ],
+      "examples": [
+        "container \"nginx\" has memory limit 0"
+      ],
+      "occurrences": 1,
+      "message": "container \"nginx\" has memory limit 0",
+      "description": "container \"nginx\" has memory limit 0. Set memory limits for your container based on its requirements. Refer to https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#requests-and-limits for details.",
+      "line": 0
+    },
+    {
+      "file": "34.echo1_load_balancer.yaml",
+      "category": "DANGLING_SERVICE",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "dangling-service"
+      ],
+      "examples": [
+        "no pods found matching service labels (map[name:echo1-load-balancer])"
+      ],
+      "occurrences": 1,
+      "message": "no pods found matching service labels (map[name:echo1-load-balancer])",
+      "description": "no pods found matching service labels (map[name:echo1-load-balancer]). Confirm that your service's selector correctly matches the labels on one of your deployments.",
+      "line": 0
+    },
+    {
+      "file": "34.echo1_no_securitycontext.yaml",
+      "category": "LATEST_TAG",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "latest-tag"
+      ],
+      "examples": [
+        "The container \"echo1\" is using an invalid container image, \"gio54321/echo\". Please use images that are not blocked by the `BlockList` criteria : [\".*:(latest)$\" \"^[^:]*$\" \"(.*/[^:]+)$\"]"
+      ],
+      "occurrences": 1,
+      "message": "The container \"echo1\" is using an invalid container image, \"gio54321/echo\". Please use images that are not blocked by the `BlockList` criteria : [\".*:(latest)$\" \"^[^:]*$\" \"(.*/[^:]+)$\"]",
+      "description": "The container \"echo1\" is using an invalid container image, \"gio54321/echo\". Please use images that are not blocked by the `BlockList` criteria : [\".*:(latest)$\" \"^[^:]*$\" \"(.*/[^:]+)$\"]. Use a container image with a specific tag other than latest.",
+      "line": 0
+    },
+    {
+      "file": "34.echo1_no_securitycontext.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "no-read-only-root-fs"
+      ],
+      "examples": [
+        "container \"echo1\" does not have a read-only root file system"
+      ],
+      "occurrences": 1,
+      "message": "container \"echo1\" does not have a read-only root file system",
+      "description": "container \"echo1\" does not have a read-only root file system. Set readOnlyRootFilesystem to true in the container securityContext.",
+      "line": 0
+    },
+    {
+      "file": "34.echo1_no_securitycontext.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "run-as-non-root"
+      ],
+      "examples": [
+        "container \"echo1\" is not set to runAsNonRoot"
+      ],
+      "occurrences": 1,
+      "message": "container \"echo1\" is not set to runAsNonRoot",
+      "description": "container \"echo1\" is not set to runAsNonRoot. Set runAsUser to a non-zero number and runAsNonRoot to true in your pod or container securityContext. Refer to https://kubernetes.io/docs/tasks/configure-pod-container/security-context/ for details.",
+      "line": 0
+    },
+    {
+      "file": "34.echo1_privileged.yaml",
+      "category": "LATEST_TAG",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "latest-tag"
+      ],
+      "examples": [
+        "The container \"echo1\" is using an invalid container image, \"gio54321/echo\". Please use images that are not blocked by the `BlockList` criteria : [\".*:(latest)$\" \"^[^:]*$\" \"(.*/[^:]+)$\"]"
+      ],
+      "occurrences": 1,
+      "message": "The container \"echo1\" is using an invalid container image, \"gio54321/echo\". Please use images that are not blocked by the `BlockList` criteria : [\".*:(latest)$\" \"^[^:]*$\" \"(.*/[^:]+)$\"]",
+      "description": "The container \"echo1\" is using an invalid container image, \"gio54321/echo\". Please use images that are not blocked by the `BlockList` criteria : [\".*:(latest)$\" \"^[^:]*$\" \"(.*/[^:]+)$\"]. Use a container image with a specific tag other than latest.",
+      "line": 0
+    },
+    {
+      "file": "34.echo1_privileged.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "run-as-non-root"
+      ],
+      "examples": [
+        "container \"echo1\" is not set to runAsNonRoot"
+      ],
+      "occurrences": 1,
+      "message": "container \"echo1\" is not set to runAsNonRoot",
+      "description": "container \"echo1\" is not set to runAsNonRoot. Set runAsUser to a non-zero number and runAsNonRoot to true in your pod or container securityContext. Refer to https://kubernetes.io/docs/tasks/configure-pod-container/security-context/ for details.",
+      "line": 0
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "DOCKER_SOCK",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "docker-sock"
+      ],
+      "examples": [
+        "host system directory \"/var/run/docker.sock\" is mounted on container \"docker-bench\""
+      ],
+      "occurrences": 1,
+      "message": "host system directory \"/var/run/docker.sock\" is mounted on container \"docker-bench\"",
+      "description": "host system directory \"/var/run/docker.sock\" is mounted on container \"docker-bench\". Ensure the Docker socket is not mounted inside any containers by removing the associated  Volume and VolumeMount in deployment yaml specification. If the Docker socket is mounted inside a container it could allow processes running within  the container to execute Docker commands which would effectively allow for full control of the host.",
+      "line": 0
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "DROP_NET_RAW_CAPABILITY",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "drop-net-raw-capability"
+      ],
+      "examples": [
+        "container \"docker-bench\" has DROP capabilities: [], but does not drop capability \"NET_RAW\" which is required"
+      ],
+      "occurrences": 1,
+      "message": "container \"docker-bench\" has DROP capabilities: [], but does not drop capability \"NET_RAW\" which is required",
+      "description": "container \"docker-bench\" has DROP capabilities: [], but does not drop capability \"NET_RAW\" which is required. NET_RAW makes it so that an application within the container is able to craft raw packets, use raw sockets, and bind to any address. Remove this capability in the containers under containers security contexts.",
+      "line": 0
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "HOST_NAMESPACE",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "host-ipc"
+      ],
+      "examples": [
+        "resource shares host's IPC namespace (via hostIPC=true)."
+      ],
+      "occurrences": 1,
+      "message": "resource shares host's IPC namespace (via hostIPC=true).",
+      "description": "resource shares host's IPC namespace (via hostIPC=true).. Ensure the host's IPC namespace is not shared.",
+      "line": 0
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "HOST_NAMESPACE",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "host-network"
+      ],
+      "examples": [
+        "resource shares host's network namespace (via hostNetwork=true)."
+      ],
+      "occurrences": 1,
+      "message": "resource shares host's network namespace (via hostNetwork=true).",
+      "description": "resource shares host's network namespace (via hostNetwork=true).. Ensure the host's network namespace is not shared.",
+      "line": 0
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "HOST_NAMESPACE",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "host-pid"
+      ],
+      "examples": [
+        "object shares the host's process namespace (via hostPID=true)."
+      ],
+      "occurrences": 1,
+      "message": "object shares the host's process namespace (via hostPID=true).",
+      "description": "object shares the host's process namespace (via hostPID=true).. Ensure the host's process namespace is not shared.",
+      "line": 0
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "LATEST_TAG",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "latest-tag"
+      ],
+      "examples": [
+        "The container \"docker-bench\" is using an invalid container image, \"madhuakula/hacker-container\". Please use images that are not blocked by the `BlockList` criteria : [\".*:(latest)$\" \"^[^:]*$\" \"(.*/[^:]+)$\"]"
+      ],
+      "occurrences": 1,
+      "message": "The container \"docker-bench\" is using an invalid container image, \"madhuakula/hacker-container\". Please use images that are not blocked by the `BlockList` criteria : [\".*:(latest)$\" \"^[^:]*$\" \"(.*/[^:]+)$\"]",
+      "description": "The container \"docker-bench\" is using an invalid container image, \"madhuakula/hacker-container\". Please use images that are not blocked by the `BlockList` criteria : [\".*:(latest)$\" \"^[^:]*$\" \"(.*/[^:]+)$\"]. Use a container image with a specific tag other than latest.",
+      "line": 0
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "no-read-only-root-fs"
+      ],
+      "examples": [
+        "container \"docker-bench\" does not have a read-only root file system"
+      ],
+      "occurrences": 1,
+      "message": "container \"docker-bench\" does not have a read-only root file system",
+      "description": "container \"docker-bench\" does not have a read-only root file system. Set readOnlyRootFilesystem to true in the container securityContext.",
+      "line": 0
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "PRIV_ESCALATION",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "privilege-escalation-container"
+      ],
+      "examples": [
+        "container \"docker-bench\" is Privileged hence allows privilege escalation."
+      ],
+      "occurrences": 1,
+      "message": "container \"docker-bench\" is Privileged hence allows privilege escalation.",
+      "description": "container \"docker-bench\" is Privileged hence allows privilege escalation.. Ensure containers do not allow privilege escalation by setting allowPrivilegeEscalation=false, privileged=false and removing CAP_SYS_ADMIN capability. See https://kubernetes.io/docs/tasks/configure-pod-container/security-context/ for more details.",
+      "line": 0
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "PRIVILEGED",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "privileged-container"
+      ],
+      "examples": [
+        "container \"docker-bench\" is privileged"
+      ],
+      "occurrences": 1,
+      "message": "container \"docker-bench\" is privileged",
+      "description": "container \"docker-bench\" is privileged. Do not run your container as privileged unless it is required.",
+      "line": 0
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "run-as-non-root"
+      ],
+      "examples": [
+        "container \"docker-bench\" is not set to runAsNonRoot"
+      ],
+      "occurrences": 1,
+      "message": "container \"docker-bench\" is not set to runAsNonRoot",
+      "description": "container \"docker-bench\" is not set to runAsNonRoot. Set runAsUser to a non-zero number and runAsNonRoot to true in your pod or container securityContext. Refer to https://kubernetes.io/docs/tasks/configure-pod-container/security-context/ for details.",
+      "line": 0
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "SENSITIVE_HOST_MOUNTS",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "sensitive-host-mounts"
+      ],
+      "examples": [
+        "host system directory \"/etc\" is mounted on container \"docker-bench\""
+      ],
+      "occurrences": 1,
+      "message": "host system directory \"/etc\" is mounted on container \"docker-bench\"",
+      "description": "host system directory \"/etc\" is mounted on container \"docker-bench\". Ensure sensitive host system directories are not mounted in containers by removing those Volumes and VolumeMounts.",
+      "line": 0
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "LATEST_TAG",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "latest-tag"
+      ],
+      "examples": [
+        "The container \"internal-api\" is using an invalid container image, \"madhuakula/k8s-goat-internal-api\". Please use images that are not blocked by the `BlockList` criteria : [\".*:(latest)$\" \"^[^:]*$\" \"(.*/[^:]+)$\"]"
+      ],
+      "occurrences": 1,
+      "message": "The container \"internal-api\" is using an invalid container image, \"madhuakula/k8s-goat-internal-api\". Please use images that are not blocked by the `BlockList` criteria : [\".*:(latest)$\" \"^[^:]*$\" \"(.*/[^:]+)$\"]",
+      "description": "The container \"internal-api\" is using an invalid container image, \"madhuakula/k8s-goat-internal-api\". Please use images that are not blocked by the `BlockList` criteria : [\".*:(latest)$\" \"^[^:]*$\" \"(.*/[^:]+)$\"]. Use a container image with a specific tag other than latest.",
+      "line": 0
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "LATEST_TAG",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "latest-tag"
+      ],
+      "examples": [
+        "The container \"info-app\" is using an invalid container image, \"madhuakula/k8s-goat-info-app\". Please use images that are not blocked by the `BlockList` criteria : [\".*:(latest)$\" \"^[^:]*$\" \"(.*/[^:]+)$\"]"
+      ],
+      "occurrences": 1,
+      "message": "The container \"info-app\" is using an invalid container image, \"madhuakula/k8s-goat-info-app\". Please use images that are not blocked by the `BlockList` criteria : [\".*:(latest)$\" \"^[^:]*$\" \"(.*/[^:]+)$\"]",
+      "description": "The container \"info-app\" is using an invalid container image, \"madhuakula/k8s-goat-info-app\". Please use images that are not blocked by the `BlockList` criteria : [\".*:(latest)$\" \"^[^:]*$\" \"(.*/[^:]+)$\"]. Use a container image with a specific tag other than latest.",
+      "line": 0
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "no-read-only-root-fs"
+      ],
+      "examples": [
+        "container \"internal-api\" does not have a read-only root file system"
+      ],
+      "occurrences": 1,
+      "message": "container \"internal-api\" does not have a read-only root file system",
+      "description": "container \"internal-api\" does not have a read-only root file system. Set readOnlyRootFilesystem to true in the container securityContext.",
+      "line": 0
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "no-read-only-root-fs"
+      ],
+      "examples": [
+        "container \"info-app\" does not have a read-only root file system"
+      ],
+      "occurrences": 1,
+      "message": "container \"info-app\" does not have a read-only root file system",
+      "description": "container \"info-app\" does not have a read-only root file system. Set readOnlyRootFilesystem to true in the container securityContext.",
+      "line": 0
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "run-as-non-root"
+      ],
+      "examples": [
+        "container \"internal-api\" is not set to runAsNonRoot"
+      ],
+      "occurrences": 1,
+      "message": "container \"internal-api\" is not set to runAsNonRoot",
+      "description": "container \"internal-api\" is not set to runAsNonRoot. Set runAsUser to a non-zero number and runAsNonRoot to true in your pod or container securityContext. Refer to https://kubernetes.io/docs/tasks/configure-pod-container/security-context/ for details.",
+      "line": 0
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "run-as-non-root"
+      ],
+      "examples": [
+        "container \"info-app\" is not set to runAsNonRoot"
+      ],
+      "occurrences": 1,
+      "message": "container \"info-app\" is not set to runAsNonRoot",
+      "description": "container \"info-app\" is not set to runAsNonRoot. Set runAsUser to a non-zero number and runAsNonRoot to true in your pod or container securityContext. Refer to https://kubernetes.io/docs/tasks/configure-pod-container/security-context/ for details.",
+      "line": 0
+    },
+    {
+      "file": "kube-bench-security.node-job.yaml",
+      "category": "HOST_NAMESPACE",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "host-pid"
+      ],
+      "examples": [
+        "object shares the host's process namespace (via hostPID=true)."
+      ],
+      "occurrences": 1,
+      "message": "object shares the host's process namespace (via hostPID=true).",
+      "description": "object shares the host's process namespace (via hostPID=true).. Ensure the host's process namespace is not shared.",
+      "line": 0
+    },
+    {
+      "file": "kube-bench-security.node-job.yaml",
+      "category": "JOB_TTL_SECONDS_AFTER_FINISHED",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "job-ttl-seconds-after-finished"
+      ],
+      "examples": [
+        "Standalone Job does not specify ttlSecondsAfterFinished"
+      ],
+      "occurrences": 1,
+      "message": "Standalone Job does not specify ttlSecondsAfterFinished",
+      "description": "Standalone Job does not specify ttlSecondsAfterFinished. Set Job.spec.ttlSecondsAfterFinished. Unset CronJob.Spec.JobTemplate.Spec.ttlSecondsAfterFinished.",
+      "line": 0
+    },
+    {
+      "file": "kube-bench-security.node-job.yaml",
+      "category": "LATEST_TAG",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "latest-tag"
+      ],
+      "examples": [
+        "The container \"kube-bench\" is using an invalid container image, \"docker.io/aquasec/kube-bench:latest\". Please use images that are not blocked by the `BlockList` criteria : [\".*:(latest)$\" \"^[^:]*$\" \"(.*/[^:]+)$\"]"
+      ],
+      "occurrences": 1,
+      "message": "The container \"kube-bench\" is using an invalid container image, \"docker.io/aquasec/kube-bench:latest\". Please use images that are not blocked by the `BlockList` criteria : [\".*:(latest)$\" \"^[^:]*$\" \"(.*/[^:]+)$\"]",
+      "description": "The container \"kube-bench\" is using an invalid container image, \"docker.io/aquasec/kube-bench:latest\". Please use images that are not blocked by the `BlockList` criteria : [\".*:(latest)$\" \"^[^:]*$\" \"(.*/[^:]+)$\"]. Use a container image with a specific tag other than latest.",
+      "line": 0
+    },
+    {
+      "file": "kube-bench-security.node-job.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "no-read-only-root-fs"
+      ],
+      "examples": [
+        "container \"kube-bench\" does not have a read-only root file system"
+      ],
+      "occurrences": 1,
+      "message": "container \"kube-bench\" does not have a read-only root file system",
+      "description": "container \"kube-bench\" does not have a read-only root file system. Set readOnlyRootFilesystem to true in the container securityContext.",
+      "line": 0
+    },
+    {
+      "file": "kube-bench-security.node-job.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "run-as-non-root"
+      ],
+      "examples": [
+        "container \"kube-bench\" is not set to runAsNonRoot"
+      ],
+      "occurrences": 1,
+      "message": "container \"kube-bench\" is not set to runAsNonRoot",
+      "description": "container \"kube-bench\" is not set to runAsNonRoot. Set runAsUser to a non-zero number and runAsNonRoot to true in your pod or container securityContext. Refer to https://kubernetes.io/docs/tasks/configure-pod-container/security-context/ for details.",
+      "line": 0
+    },
+    {
+      "file": "kube-bench-security.node-job.yaml",
+      "category": "NO_RES_LIMITS",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "unset-cpu-requirements"
+      ],
+      "examples": [
+        "container \"kube-bench\" has cpu request 0"
+      ],
+      "occurrences": 1,
+      "message": "container \"kube-bench\" has cpu request 0",
+      "description": "container \"kube-bench\" has cpu request 0. Set CPU requests for your container based on its requirements. Refer to https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#requests-and-limits for details.",
+      "line": 0
+    },
+    {
+      "file": "kube-bench-security.node-job.yaml",
+      "category": "NO_RES_LIMITS",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "unset-memory-requirements"
+      ],
+      "examples": [
+        "container \"kube-bench\" has memory limit 0"
+      ],
+      "occurrences": 1,
+      "message": "container \"kube-bench\" has memory limit 0",
+      "description": "container \"kube-bench\" has memory limit 0. Set memory limits for your container based on its requirements. Refer to https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#requests-and-limits for details.",
+      "line": 0
+    },
+    {
+      "file": "poor-registry.deployment.yaml",
+      "category": "LATEST_TAG",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "latest-tag"
+      ],
+      "examples": [
+        "The container \"poor-registry\" is using an invalid container image, \"madhuakula/k8s-goat-poor-registry\". Please use images that are not blocked by the `BlockList` criteria : [\".*:(latest)$\" \"^[^:]*$\" \"(.*/[^:]+)$\"]"
+      ],
+      "occurrences": 1,
+      "message": "The container \"poor-registry\" is using an invalid container image, \"madhuakula/k8s-goat-poor-registry\". Please use images that are not blocked by the `BlockList` criteria : [\".*:(latest)$\" \"^[^:]*$\" \"(.*/[^:]+)$\"]",
+      "description": "The container \"poor-registry\" is using an invalid container image, \"madhuakula/k8s-goat-poor-registry\". Please use images that are not blocked by the `BlockList` criteria : [\".*:(latest)$\" \"^[^:]*$\" \"(.*/[^:]+)$\"]. Use a container image with a specific tag other than latest.",
+      "line": 0
+    },
+    {
+      "file": "poor-registry.deployment.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "no-read-only-root-fs"
+      ],
+      "examples": [
+        "container \"poor-registry\" does not have a read-only root file system"
+      ],
+      "occurrences": 1,
+      "message": "container \"poor-registry\" does not have a read-only root file system",
+      "description": "container \"poor-registry\" does not have a read-only root file system. Set readOnlyRootFilesystem to true in the container securityContext.",
+      "line": 0
+    },
+    {
+      "file": "poor-registry.deployment.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "run-as-non-root"
+      ],
+      "examples": [
+        "container \"poor-registry\" is not set to runAsNonRoot"
+      ],
+      "occurrences": 1,
+      "message": "container \"poor-registry\" is not set to runAsNonRoot",
+      "description": "container \"poor-registry\" is not set to runAsNonRoot. Set runAsUser to a non-zero number and runAsNonRoot to true in your pod or container securityContext. Refer to https://kubernetes.io/docs/tasks/configure-pod-container/security-context/ for details.",
+      "line": 0
+    },
+    {
+      "file": "poor-registry.deployment.yaml",
+      "category": "NO_RES_LIMITS",
+      "severity": "HIGH",
+      "tools": [
+        "Kube-Linter"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "unset-cpu-requirements"
+      ],
+      "examples": [
+        "container \"poor-registry\" has cpu request 0"
+      ],
+      "occurrences": 1,
+      "message": "container \"poor-registry\" has cpu request 0",
+      "description": "container \"poor-registry\" has cpu request 0. Set CPU requests for your container based on its requirements. Refer to https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#requests-and-limits for details.",
+      "line": 0
+    }
+  ]
+}

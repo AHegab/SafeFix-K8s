@@ -1,0 +1,3053 @@
+{
+  "generated_at": "2025-11-10T11:18:52.144154Z",
+  "version": "raw-trivy",
+  "metadata": {
+    "raw_findings_count": 160,
+    "aggregated_count": 160,
+    "llm_items_count": 160,
+    "source_tool": "trivy",
+    "normalized": false
+  },
+  "items": [
+    {
+      "file": "13.deployment.yaml",
+      "category": "PRIV_ESCALATION",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV001"
+      ],
+      "examples": [
+        "Can elevate its own privileges"
+      ],
+      "occurrences": 1,
+      "message": "Container 'nginx' of Deployment 'nginx-deployment' should set 'securityContext.allowPrivilegeEscalation' to false",
+      "description": "A program inside the container can elevate its own privileges and run as root, which might give the program control over the container and node.",
+      "line": 10
+    },
+    {
+      "file": "13.deployment.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV003"
+      ],
+      "examples": [
+        "Default capabilities: some containers do not drop all"
+      ],
+      "occurrences": 1,
+      "message": "Container 'nginx' of Deployment 'nginx-deployment' should add 'ALL' to 'securityContext.capabilities.drop'",
+      "description": "The container should drop all default capabilities and add only those that are needed for its execution.",
+      "line": 10
+    },
+    {
+      "file": "13.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV004"
+      ],
+      "examples": [
+        "Default capabilities: some containers do not drop any"
+      ],
+      "occurrences": 1,
+      "message": "Container 'nginx' of 'deployment' 'nginx-deployment' in 'default' namespace should set securityContext.capabilities.drop",
+      "description": "Security best practices require containers to run with minimal required capabilities.",
+      "line": 10
+    },
+    {
+      "file": "13.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV011"
+      ],
+      "examples": [
+        "CPU not limited"
+      ],
+      "occurrences": 1,
+      "message": "Container 'nginx' of Deployment 'nginx-deployment' should set 'resources.limits.cpu'",
+      "description": "Enforcing CPU limits prevents DoS via resource exhaustion.",
+      "line": 10
+    },
+    {
+      "file": "13.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV012"
+      ],
+      "examples": [
+        "Runs as root user"
+      ],
+      "occurrences": 1,
+      "message": "Container 'nginx' of Deployment 'nginx-deployment' should set 'securityContext.runAsNonRoot' to true",
+      "description": "Force the running image to run as a non-root user to ensure least privileges.",
+      "line": 10
+    },
+    {
+      "file": "13.deployment.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV013"
+      ],
+      "examples": [
+        "Image tag \":latest\" used"
+      ],
+      "occurrences": 1,
+      "message": "Container 'nginx' of Deployment 'nginx-deployment' should specify an image tag",
+      "description": "It is best to avoid using the ':latest' image tag when deploying containers in production. Doing so makes it hard to track which version of the image is running, and hard to roll back the version.",
+      "line": 10
+    },
+    {
+      "file": "13.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "HIGH",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV014"
+      ],
+      "examples": [
+        "Root file system is not read-only"
+      ],
+      "occurrences": 1,
+      "message": "Container 'nginx' of Deployment 'nginx-deployment' should set 'securityContext.readOnlyRootFilesystem' to true",
+      "description": "An immutable root file system prevents applications from writing to their local disk. This can limit intrusions, as attackers will not be able to tamper with the file system or write foreign executables to disk.",
+      "line": 10
+    },
+    {
+      "file": "13.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV015"
+      ],
+      "examples": [
+        "CPU requests not specified"
+      ],
+      "occurrences": 1,
+      "message": "Container 'nginx' of Deployment 'nginx-deployment' should set 'resources.requests.cpu'",
+      "description": "When containers have resource requests specified, the scheduler can make better decisions about which nodes to place pods on, and how to deal with resource contention.",
+      "line": 10
+    },
+    {
+      "file": "13.deployment.yaml",
+      "category": "PRIV_ESCALATION",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV016"
+      ],
+      "examples": [
+        "Memory requests not specified"
+      ],
+      "occurrences": 1,
+      "message": "Container 'nginx' of Deployment 'nginx-deployment' should set 'resources.requests.memory'",
+      "description": "When containers have memory requests specified, the scheduler can make better decisions about which nodes to place pods on, and how to deal with resource contention.",
+      "line": 10
+    },
+    {
+      "file": "13.deployment.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV017"
+      ],
+      "examples": [
+        "Privileged"
+      ],
+      "occurrences": 1,
+      "message": "Container 'nginx' of Deployment 'nginx-deployment' should set 'securityContext.privileged' to false",
+      "description": "Privileged containers share namespaces with the host system and do not offer any security. They should be used exclusively for system containers that require high privileges.",
+      "line": 10
+    },
+    {
+      "file": "13.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV018"
+      ],
+      "examples": [
+        "Memory not limited"
+      ],
+      "occurrences": 1,
+      "message": "Container 'nginx' of Deployment 'nginx-deployment' should set 'resources.limits.memory'",
+      "description": "Enforcing memory limits prevents DoS via resource exhaustion.",
+      "line": 10
+    },
+    {
+      "file": "13.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV020"
+      ],
+      "examples": [
+        "Runs with UID <= 10000"
+      ],
+      "occurrences": 1,
+      "message": "Container 'nginx' of Deployment 'nginx-deployment' should set 'securityContext.runAsUser' > 10000",
+      "description": "Force the container to run with user ID > 10000 to avoid conflicts with the hostΓÇÖs user table.",
+      "line": 10
+    },
+    {
+      "file": "13.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV021"
+      ],
+      "examples": [
+        "Runs with GID <= 10000"
+      ],
+      "occurrences": 1,
+      "message": "Container 'nginx' of Deployment 'nginx-deployment' should set 'securityContext.runAsGroup' > 10000",
+      "description": "Force the container to run with group ID > 10000 to avoid conflicts with the hostΓÇÖs user table.",
+      "line": 10
+    },
+    {
+      "file": "13.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV030"
+      ],
+      "examples": [
+        "Runtime/Default Seccomp profile not set"
+      ],
+      "occurrences": 1,
+      "message": "Either Pod or Container should set 'securityContext.seccompProfile.type' to 'RuntimeDefault'",
+      "description": "According to pod security standard 'Seccomp', the RuntimeDefault seccomp profile must be required, or allow specific additional profiles.",
+      "line": 10
+    },
+    {
+      "file": "13.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV104"
+      ],
+      "examples": [
+        "Seccomp policies disabled"
+      ],
+      "occurrences": 1,
+      "message": "container \"nginx\" of deployment \"nginx-deployment\" in \"default\" namespace should specify a seccomp profile",
+      "description": "A program inside the container can bypass Seccomp protection policies.",
+      "line": 10
+    },
+    {
+      "file": "13.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV106"
+      ],
+      "examples": [
+        "Container capabilities must only include NET_BIND_SERVICE"
+      ],
+      "occurrences": 1,
+      "message": "container should drop all",
+      "description": "Containers must drop ALL capabilities, and are only permitted to add back the NET_BIND_SERVICE capability.",
+      "line": 10
+    },
+    {
+      "file": "13.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV110"
+      ],
+      "examples": [
+        "Workloads in the default namespace"
+      ],
+      "occurrences": 1,
+      "message": "deployment nginx-deployment in default namespace should set metadata.namespace to a non-default namespace",
+      "description": "Checks whether a workload is running in the default namespace.",
+      "line": 4
+    },
+    {
+      "file": "13.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "HIGH",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV118"
+      ],
+      "examples": [
+        "Default security context configured"
+      ],
+      "occurrences": 1,
+      "message": "deployment nginx-deployment in default namespace is using the default security context, which allows root privileges",
+      "description": "Security context controls the allocation of security parameters for the pod/container/volume, ensuring the appropriate level of protection. Relying on default security context may expose vulnerabilities to potential attacks that rely on privileged access.",
+      "line": 9
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "PRIV_ESCALATION",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV001"
+      ],
+      "examples": [
+        "Can elevate its own privileges"
+      ],
+      "occurrences": 1,
+      "message": "Container 'nginx' of Pod 'nginx' should set 'securityContext.allowPrivilegeEscalation' to false",
+      "description": "A program inside the container can elevate its own privileges and run as root, which might give the program control over the container and node.",
+      "line": 12
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV003"
+      ],
+      "examples": [
+        "Default capabilities: some containers do not drop all"
+      ],
+      "occurrences": 1,
+      "message": "Container 'nginx' of Pod 'nginx' should add 'ALL' to 'securityContext.capabilities.drop'",
+      "description": "The container should drop all default capabilities and add only those that are needed for its execution.",
+      "line": 12
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV004"
+      ],
+      "examples": [
+        "Default capabilities: some containers do not drop any"
+      ],
+      "occurrences": 1,
+      "message": "Container 'nginx' of 'pod' 'nginx' in 'default' namespace should set securityContext.capabilities.drop",
+      "description": "Security best practices require containers to run with minimal required capabilities.",
+      "line": 12
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "UNKNOWN",
+      "severity": "HIGH",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV005"
+      ],
+      "examples": [
+        "SYS_ADMIN capability added"
+      ],
+      "occurrences": 1,
+      "message": "Container 'nginx' of Pod 'nginx' should not include 'SYS_ADMIN' in 'securityContext.capabilities.add'",
+      "description": "SYS_ADMIN gives the processes running inside the container privileges that are equivalent to root.",
+      "line": 12
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "UNKNOWN",
+      "severity": "HIGH",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV008"
+      ],
+      "examples": [
+        "Access to host IPC namespace"
+      ],
+      "occurrences": 1,
+      "message": "Pod 'nginx' should not set 'spec.template.spec.hostIPC' to true",
+      "description": "Sharing the hostΓÇÖs IPC namespace allows container processes to communicate with processes on the host.",
+      "line": 8
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "UNKNOWN",
+      "severity": "HIGH",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV009"
+      ],
+      "examples": [
+        "Access to host network"
+      ],
+      "occurrences": 1,
+      "message": "Pod 'nginx' should not set 'spec.template.spec.hostNetwork' to true",
+      "description": "Sharing the hostΓÇÖs network namespace permits processes in the pod to communicate with processes bound to the hostΓÇÖs loopback adapter.",
+      "line": 8
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "UNKNOWN",
+      "severity": "HIGH",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV010"
+      ],
+      "examples": [
+        "Access to host PID"
+      ],
+      "occurrences": 1,
+      "message": "Pod 'nginx' should not set 'spec.template.spec.hostPID' to true",
+      "description": "Sharing the hostΓÇÖs PID namespace allows visibility on host processes, potentially leaking information such as environment variables and configuration.",
+      "line": 8
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV011"
+      ],
+      "examples": [
+        "CPU not limited"
+      ],
+      "occurrences": 1,
+      "message": "Container 'nginx' of Pod 'nginx' should set 'resources.limits.cpu'",
+      "description": "Enforcing CPU limits prevents DoS via resource exhaustion.",
+      "line": 12
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "UNKNOWN",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV012"
+      ],
+      "examples": [
+        "Runs as root user"
+      ],
+      "occurrences": 1,
+      "message": "Container 'nginx' of Pod 'nginx' should set 'securityContext.runAsNonRoot' to true",
+      "description": "Force the running image to run as a non-root user to ensure least privileges.",
+      "line": 12
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV013"
+      ],
+      "examples": [
+        "Image tag \":latest\" used"
+      ],
+      "occurrences": 1,
+      "message": "Container 'nginx' of Pod 'nginx' should specify an image tag",
+      "description": "It is best to avoid using the ':latest' image tag when deploying containers in production. Doing so makes it hard to track which version of the image is running, and hard to roll back the version.",
+      "line": 12
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "UNKNOWN",
+      "severity": "HIGH",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV014"
+      ],
+      "examples": [
+        "Root file system is not read-only"
+      ],
+      "occurrences": 1,
+      "message": "Container 'nginx' of Pod 'nginx' should set 'securityContext.readOnlyRootFilesystem' to true",
+      "description": "An immutable root file system prevents applications from writing to their local disk. This can limit intrusions, as attackers will not be able to tamper with the file system or write foreign executables to disk.",
+      "line": 12
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV015"
+      ],
+      "examples": [
+        "CPU requests not specified"
+      ],
+      "occurrences": 1,
+      "message": "Container 'nginx' of Pod 'nginx' should set 'resources.requests.cpu'",
+      "description": "When containers have resource requests specified, the scheduler can make better decisions about which nodes to place pods on, and how to deal with resource contention.",
+      "line": 12
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "PRIV_ESCALATION",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV016"
+      ],
+      "examples": [
+        "Memory requests not specified"
+      ],
+      "occurrences": 1,
+      "message": "Container 'nginx' of Pod 'nginx' should set 'resources.requests.memory'",
+      "description": "When containers have memory requests specified, the scheduler can make better decisions about which nodes to place pods on, and how to deal with resource contention.",
+      "line": 12
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV017"
+      ],
+      "examples": [
+        "Privileged"
+      ],
+      "occurrences": 1,
+      "message": "Container 'nginx' of Pod 'nginx' should set 'securityContext.privileged' to false",
+      "description": "Privileged containers share namespaces with the host system and do not offer any security. They should be used exclusively for system containers that require high privileges.",
+      "line": 12
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV018"
+      ],
+      "examples": [
+        "Memory not limited"
+      ],
+      "occurrences": 1,
+      "message": "Container 'nginx' of Pod 'nginx' should set 'resources.limits.memory'",
+      "description": "Enforcing memory limits prevents DoS via resource exhaustion.",
+      "line": 12
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV020"
+      ],
+      "examples": [
+        "Runs with UID <= 10000"
+      ],
+      "occurrences": 1,
+      "message": "Container 'nginx' of Pod 'nginx' should set 'securityContext.runAsUser' > 10000",
+      "description": "Force the container to run with user ID > 10000 to avoid conflicts with the hostΓÇÖs user table.",
+      "line": 12
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV021"
+      ],
+      "examples": [
+        "Runs with GID <= 10000"
+      ],
+      "occurrences": 1,
+      "message": "Container 'nginx' of Pod 'nginx' should set 'securityContext.runAsGroup' > 10000",
+      "description": "Force the container to run with group ID > 10000 to avoid conflicts with the hostΓÇÖs user table.",
+      "line": 12
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "UNKNOWN",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV022"
+      ],
+      "examples": [
+        "Specific capabilities added"
+      ],
+      "occurrences": 1,
+      "message": "Container 'nginx' of Pod 'nginx' should not set 'securityContext.capabilities.add'",
+      "description": "According to pod security standard 'Capabilities', capabilities beyond the default set must not be added.",
+      "line": 12
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV030"
+      ],
+      "examples": [
+        "Runtime/Default Seccomp profile not set"
+      ],
+      "occurrences": 1,
+      "message": "Either Pod or Container should set 'securityContext.seccompProfile.type' to 'RuntimeDefault'",
+      "description": "According to pod security standard 'Seccomp', the RuntimeDefault seccomp profile must be required, or allow specific additional profiles.",
+      "line": 12
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "UNKNOWN",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV104"
+      ],
+      "examples": [
+        "Seccomp policies disabled"
+      ],
+      "occurrences": 1,
+      "message": "container \"nginx\" of pod \"nginx\" in \"default\" namespace should specify a seccomp profile",
+      "description": "A program inside the container can bypass Seccomp protection policies.",
+      "line": 12
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV106"
+      ],
+      "examples": [
+        "Container capabilities must only include NET_BIND_SERVICE"
+      ],
+      "occurrences": 1,
+      "message": "container should drop all",
+      "description": "Containers must drop ALL capabilities, and are only permitted to add back the NET_BIND_SERVICE capability.",
+      "line": 12
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV110"
+      ],
+      "examples": [
+        "Workloads in the default namespace"
+      ],
+      "occurrences": 1,
+      "message": "pod nginx in default namespace should set metadata.namespace to a non-default namespace",
+      "description": "Checks whether a workload is running in the default namespace.",
+      "line": 5
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "UNKNOWN",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV117"
+      ],
+      "examples": [
+        "Prevent binding to privileged ports"
+      ],
+      "occurrences": 1,
+      "message": "pod nginx in default namespace should not set spec.template.spec.containers.ports.containerPort to less than 1024",
+      "description": "The ports which are lower than 1024 receive and transmit various sensitive and privileged data. Allowing containers to use them can bring serious implications.",
+      "line": 0
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "UNKNOWN",
+      "severity": "HIGH",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV118"
+      ],
+      "examples": [
+        "Default security context configured"
+      ],
+      "occurrences": 1,
+      "message": "pod nginx in default namespace is using the default security context, which allows root privileges",
+      "description": "Security context controls the allocation of security parameters for the pod/container/volume, ensuring the appropriate level of protection. Relying on default security context may expose vulnerabilities to potential attacks that rely on privileged access.",
+      "line": 8
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "UNKNOWN",
+      "severity": "HIGH",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV119"
+      ],
+      "examples": [
+        "NET_RAW capability added"
+      ],
+      "occurrences": 1,
+      "message": "container nginx of pod nginx in default namespace should not include 'NET_RAW' in securityContext.capabilities.add",
+      "description": "The NET_RAW capability grants attackers the ability to eavesdrop on network traffic or generate IP traffic with falsified source addresses, posing serious security risks.",
+      "line": 0
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "UNKNOWN",
+      "severity": "HIGH",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV120"
+      ],
+      "examples": [
+        "SYS_MODULE capability added"
+      ],
+      "occurrences": 1,
+      "message": "container {\"__defsec_metadata\": {\"endline\": 26, \"filepath\": \"31.example-nginx.yaml\", \"offset\": 0, \"startline\": 12}, \"image\": \"nginx:latest\", \"name\": \"nginx\", \"ports\": [{\"__defsec_metadata\": {\"endline\": 15, \"filepath\": \"31.example-nginx.yaml\", \"offset\": 0, \"startline\": 15}, \"containerPort\": 80}], \"securityContext\": {\"__defsec_metadata\": {\"endline\": 26, \"filepath\": \"31.example-nginx.yaml\", \"offset\": 0, \"startline\": 18}, \"capabilities\": {\"__defsec_metadata\": {\"endline\": 26, \"filepath\": \"31.example-nginx.yaml\", \"offset\": 0, \"startline\": 20}, \"add\": [\"NET_ADMIN\", \"SYS_ADMIN\", \"SYS_MODULE\", \"SYSLOG\", \"NET_RAW\", \"CHOWN\"]}, \"privileged\": true}} of pod nginx in default namespace should not include 'SYS_MODULE' in securityContext.capabilities.add",
+      "description": "The SYS_MODULE capability grants attackers the ability to install and remove kernel modules, posing serious security risks.",
+      "line": 12
+    },
+    {
+      "file": "34.echo1_no_securitycontext.yaml",
+      "category": "PRIV_ESCALATION",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV001"
+      ],
+      "examples": [
+        "Can elevate its own privileges"
+      ],
+      "occurrences": 1,
+      "message": "Container 'echo1' of Deployment 'echo1' should set 'securityContext.allowPrivilegeEscalation' to false",
+      "description": "A program inside the container can elevate its own privileges and run as root, which might give the program control over the container and node.",
+      "line": 19
+    },
+    {
+      "file": "34.echo1_no_securitycontext.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV003"
+      ],
+      "examples": [
+        "Default capabilities: some containers do not drop all"
+      ],
+      "occurrences": 1,
+      "message": "Container 'echo1' of Deployment 'echo1' should add 'ALL' to 'securityContext.capabilities.drop'",
+      "description": "The container should drop all default capabilities and add only those that are needed for its execution.",
+      "line": 19
+    },
+    {
+      "file": "34.echo1_no_securitycontext.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV004"
+      ],
+      "examples": [
+        "Default capabilities: some containers do not drop any"
+      ],
+      "occurrences": 1,
+      "message": "Container 'echo1' of 'deployment' 'echo1' in 'default' namespace should set securityContext.capabilities.drop",
+      "description": "Security best practices require containers to run with minimal required capabilities.",
+      "line": 19
+    },
+    {
+      "file": "34.echo1_no_securitycontext.yaml",
+      "category": "UNKNOWN",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV012"
+      ],
+      "examples": [
+        "Runs as root user"
+      ],
+      "occurrences": 1,
+      "message": "Container 'echo1' of Deployment 'echo1' should set 'securityContext.runAsNonRoot' to true",
+      "description": "Force the running image to run as a non-root user to ensure least privileges.",
+      "line": 19
+    },
+    {
+      "file": "34.echo1_no_securitycontext.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV013"
+      ],
+      "examples": [
+        "Image tag \":latest\" used"
+      ],
+      "occurrences": 1,
+      "message": "Container 'echo1' of Deployment 'echo1' should specify an image tag",
+      "description": "It is best to avoid using the ':latest' image tag when deploying containers in production. Doing so makes it hard to track which version of the image is running, and hard to roll back the version.",
+      "line": 19
+    },
+    {
+      "file": "34.echo1_no_securitycontext.yaml",
+      "category": "UNKNOWN",
+      "severity": "HIGH",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV014"
+      ],
+      "examples": [
+        "Root file system is not read-only"
+      ],
+      "occurrences": 1,
+      "message": "Container 'echo1' of Deployment 'echo1' should set 'securityContext.readOnlyRootFilesystem' to true",
+      "description": "An immutable root file system prevents applications from writing to their local disk. This can limit intrusions, as attackers will not be able to tamper with the file system or write foreign executables to disk.",
+      "line": 19
+    },
+    {
+      "file": "34.echo1_no_securitycontext.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV020"
+      ],
+      "examples": [
+        "Runs with UID <= 10000"
+      ],
+      "occurrences": 1,
+      "message": "Container 'echo1' of Deployment 'echo1' should set 'securityContext.runAsUser' > 10000",
+      "description": "Force the container to run with user ID > 10000 to avoid conflicts with the hostΓÇÖs user table.",
+      "line": 19
+    },
+    {
+      "file": "34.echo1_no_securitycontext.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV021"
+      ],
+      "examples": [
+        "Runs with GID <= 10000"
+      ],
+      "occurrences": 1,
+      "message": "Container 'echo1' of Deployment 'echo1' should set 'securityContext.runAsGroup' > 10000",
+      "description": "Force the container to run with group ID > 10000 to avoid conflicts with the hostΓÇÖs user table.",
+      "line": 19
+    },
+    {
+      "file": "34.echo1_no_securitycontext.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV030"
+      ],
+      "examples": [
+        "Runtime/Default Seccomp profile not set"
+      ],
+      "occurrences": 1,
+      "message": "Either Pod or Container should set 'securityContext.seccompProfile.type' to 'RuntimeDefault'",
+      "description": "According to pod security standard 'Seccomp', the RuntimeDefault seccomp profile must be required, or allow specific additional profiles.",
+      "line": 19
+    },
+    {
+      "file": "34.echo1_no_securitycontext.yaml",
+      "category": "UNKNOWN",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV104"
+      ],
+      "examples": [
+        "Seccomp policies disabled"
+      ],
+      "occurrences": 1,
+      "message": "container \"echo1\" of deployment \"echo1\" in \"default\" namespace should specify a seccomp profile",
+      "description": "A program inside the container can bypass Seccomp protection policies.",
+      "line": 19
+    },
+    {
+      "file": "34.echo1_no_securitycontext.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV106"
+      ],
+      "examples": [
+        "Container capabilities must only include NET_BIND_SERVICE"
+      ],
+      "occurrences": 1,
+      "message": "container should drop all",
+      "description": "Containers must drop ALL capabilities, and are only permitted to add back the NET_BIND_SERVICE capability.",
+      "line": 19
+    },
+    {
+      "file": "34.echo1_no_securitycontext.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV110"
+      ],
+      "examples": [
+        "Workloads in the default namespace"
+      ],
+      "occurrences": 1,
+      "message": "deployment echo1 in default namespace should set metadata.namespace to a non-default namespace",
+      "description": "Checks whether a workload is running in the default namespace.",
+      "line": 4
+    },
+    {
+      "file": "34.echo1_no_securitycontext.yaml",
+      "category": "UNKNOWN",
+      "severity": "HIGH",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV118"
+      ],
+      "examples": [
+        "Default security context configured"
+      ],
+      "occurrences": 1,
+      "message": "container echo1 in default namespace is using the default security context",
+      "description": "Security context controls the allocation of security parameters for the pod/container/volume, ensuring the appropriate level of protection. Relying on default security context may expose vulnerabilities to potential attacks that rely on privileged access.",
+      "line": 19
+    },
+    {
+      "file": "34.echo1_no_securitycontext.yaml",
+      "category": "UNKNOWN",
+      "severity": "HIGH",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV118"
+      ],
+      "examples": [
+        "Default security context configured"
+      ],
+      "occurrences": 1,
+      "message": "deployment echo1 in default namespace is using the default security context, which allows root privileges",
+      "description": "Security context controls the allocation of security parameters for the pod/container/volume, ensuring the appropriate level of protection. Relying on default security context may expose vulnerabilities to potential attacks that rely on privileged access.",
+      "line": 17
+    },
+    {
+      "file": "34.echo1_no_securitycontext.yaml",
+      "category": "UNKNOWN",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV0125"
+      ],
+      "examples": [
+        "Restrict container images to trusted registries"
+      ],
+      "occurrences": 1,
+      "message": "Container echo1 in deployment echo1 (namespace: default) uses an image from an untrusted registry.",
+      "description": "Ensure that all containers use images only from trusted registry domains.",
+      "line": 19
+    },
+    {
+      "file": "34.echo1_privileged.yaml",
+      "category": "PRIV_ESCALATION",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV001"
+      ],
+      "examples": [
+        "Can elevate its own privileges"
+      ],
+      "occurrences": 1,
+      "message": "Container 'echo1' of Deployment 'echo1' should set 'securityContext.allowPrivilegeEscalation' to false",
+      "description": "A program inside the container can elevate its own privileges and run as root, which might give the program control over the container and node.",
+      "line": 19
+    },
+    {
+      "file": "34.echo1_privileged.yaml",
+      "category": "UNKNOWN",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV012"
+      ],
+      "examples": [
+        "Runs as root user"
+      ],
+      "occurrences": 1,
+      "message": "Container 'echo1' of Deployment 'echo1' should set 'securityContext.runAsNonRoot' to true",
+      "description": "Force the running image to run as a non-root user to ensure least privileges.",
+      "line": 19
+    },
+    {
+      "file": "34.echo1_privileged.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV013"
+      ],
+      "examples": [
+        "Image tag \":latest\" used"
+      ],
+      "occurrences": 1,
+      "message": "Container 'echo1' of Deployment 'echo1' should specify an image tag",
+      "description": "It is best to avoid using the ':latest' image tag when deploying containers in production. Doing so makes it hard to track which version of the image is running, and hard to roll back the version.",
+      "line": 19
+    },
+    {
+      "file": "34.echo1_privileged.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV020"
+      ],
+      "examples": [
+        "Runs with UID <= 10000"
+      ],
+      "occurrences": 1,
+      "message": "Container 'echo1' of Deployment 'echo1' should set 'securityContext.runAsUser' > 10000",
+      "description": "Force the container to run with user ID > 10000 to avoid conflicts with the hostΓÇÖs user table.",
+      "line": 19
+    },
+    {
+      "file": "34.echo1_privileged.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV021"
+      ],
+      "examples": [
+        "Runs with GID <= 10000"
+      ],
+      "occurrences": 1,
+      "message": "Container 'echo1' of Deployment 'echo1' should set 'securityContext.runAsGroup' > 10000",
+      "description": "Force the container to run with group ID > 10000 to avoid conflicts with the hostΓÇÖs user table.",
+      "line": 19
+    },
+    {
+      "file": "34.echo1_privileged.yaml",
+      "category": "UNKNOWN",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV022"
+      ],
+      "examples": [
+        "Specific capabilities added"
+      ],
+      "occurrences": 1,
+      "message": "Container 'echo1' of Deployment 'echo1' should not set 'securityContext.capabilities.add'",
+      "description": "According to pod security standard 'Capabilities', capabilities beyond the default set must not be added.",
+      "line": 19
+    },
+    {
+      "file": "34.echo1_privileged.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV030"
+      ],
+      "examples": [
+        "Runtime/Default Seccomp profile not set"
+      ],
+      "occurrences": 1,
+      "message": "Either Pod or Container should set 'securityContext.seccompProfile.type' to 'RuntimeDefault'",
+      "description": "According to pod security standard 'Seccomp', the RuntimeDefault seccomp profile must be required, or allow specific additional profiles.",
+      "line": 19
+    },
+    {
+      "file": "34.echo1_privileged.yaml",
+      "category": "UNKNOWN",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV104"
+      ],
+      "examples": [
+        "Seccomp policies disabled"
+      ],
+      "occurrences": 1,
+      "message": "container \"echo1\" of deployment \"echo1\" in \"default\" namespace should specify a seccomp profile",
+      "description": "A program inside the container can bypass Seccomp protection policies.",
+      "line": 19
+    },
+    {
+      "file": "34.echo1_privileged.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV110"
+      ],
+      "examples": [
+        "Workloads in the default namespace"
+      ],
+      "occurrences": 1,
+      "message": "deployment echo1 in default namespace should set metadata.namespace to a non-default namespace",
+      "description": "Checks whether a workload is running in the default namespace.",
+      "line": 4
+    },
+    {
+      "file": "34.echo1_privileged.yaml",
+      "category": "UNKNOWN",
+      "severity": "HIGH",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV118"
+      ],
+      "examples": [
+        "Default security context configured"
+      ],
+      "occurrences": 1,
+      "message": "deployment echo1 in default namespace is using the default security context, which allows root privileges",
+      "description": "Security context controls the allocation of security parameters for the pod/container/volume, ensuring the appropriate level of protection. Relying on default security context may expose vulnerabilities to potential attacks that rely on privileged access.",
+      "line": 17
+    },
+    {
+      "file": "34.echo1_privileged.yaml",
+      "category": "UNKNOWN",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV0125"
+      ],
+      "examples": [
+        "Restrict container images to trusted registries"
+      ],
+      "occurrences": 1,
+      "message": "Container echo1 in deployment echo1 (namespace: default) uses an image from an untrusted registry.",
+      "description": "Ensure that all containers use images only from trusted registry domains.",
+      "line": 19
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "PRIV_ESCALATION",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV001"
+      ],
+      "examples": [
+        "Can elevate its own privileges"
+      ],
+      "occurrences": 1,
+      "message": "Container 'docker-bench' of DaemonSet 'docker-bench-security' should set 'securityContext.allowPrivilegeEscalation' to false",
+      "description": "A program inside the container can elevate its own privileges and run as root, which might give the program control over the container and node.",
+      "line": 33
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV003"
+      ],
+      "examples": [
+        "Default capabilities: some containers do not drop all"
+      ],
+      "occurrences": 1,
+      "message": "Container 'docker-bench' of DaemonSet 'docker-bench-security' should add 'ALL' to 'securityContext.capabilities.drop'",
+      "description": "The container should drop all default capabilities and add only those that are needed for its execution.",
+      "line": 33
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV004"
+      ],
+      "examples": [
+        "Default capabilities: some containers do not drop any"
+      ],
+      "occurrences": 1,
+      "message": "Container 'docker-bench' of 'daemonset' 'docker-bench-security' in 'default' namespace should set securityContext.capabilities.drop",
+      "description": "Security best practices require containers to run with minimal required capabilities.",
+      "line": 33
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "HIGH",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV006"
+      ],
+      "examples": [
+        "hostPath volume mounted with docker.sock"
+      ],
+      "occurrences": 1,
+      "message": "DaemonSet 'docker-bench-security' should not specify '/var/run/docker.socker' in 'spec.template.volumes.hostPath.path'",
+      "description": "Mounting docker.sock from the host can give the container full root access to the host.",
+      "line": 19
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "HIGH",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV008"
+      ],
+      "examples": [
+        "Access to host IPC namespace"
+      ],
+      "occurrences": 1,
+      "message": "DaemonSet 'docker-bench-security' should not set 'spec.template.spec.hostIPC' to true",
+      "description": "Sharing the hostΓÇÖs IPC namespace allows container processes to communicate with processes on the host.",
+      "line": 19
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "HIGH",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV009"
+      ],
+      "examples": [
+        "Access to host network"
+      ],
+      "occurrences": 1,
+      "message": "DaemonSet 'docker-bench-security' should not set 'spec.template.spec.hostNetwork' to true",
+      "description": "Sharing the hostΓÇÖs network namespace permits processes in the pod to communicate with processes bound to the hostΓÇÖs loopback adapter.",
+      "line": 19
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "HIGH",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV010"
+      ],
+      "examples": [
+        "Access to host PID"
+      ],
+      "occurrences": 1,
+      "message": "DaemonSet 'docker-bench-security' should not set 'spec.template.spec.hostPID' to true",
+      "description": "Sharing the hostΓÇÖs PID namespace allows visibility on host processes, potentially leaking information such as environment variables and configuration.",
+      "line": 19
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV012"
+      ],
+      "examples": [
+        "Runs as root user"
+      ],
+      "occurrences": 1,
+      "message": "Container 'docker-bench' of DaemonSet 'docker-bench-security' should set 'securityContext.runAsNonRoot' to true",
+      "description": "Force the running image to run as a non-root user to ensure least privileges.",
+      "line": 33
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV013"
+      ],
+      "examples": [
+        "Image tag \":latest\" used"
+      ],
+      "occurrences": 1,
+      "message": "Container 'docker-bench' of DaemonSet 'docker-bench-security' should specify an image tag",
+      "description": "It is best to avoid using the ':latest' image tag when deploying containers in production. Doing so makes it hard to track which version of the image is running, and hard to roll back the version.",
+      "line": 33
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "HIGH",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV014"
+      ],
+      "examples": [
+        "Root file system is not read-only"
+      ],
+      "occurrences": 1,
+      "message": "Container 'docker-bench' of DaemonSet 'docker-bench-security' should set 'securityContext.readOnlyRootFilesystem' to true",
+      "description": "An immutable root file system prevents applications from writing to their local disk. This can limit intrusions, as attackers will not be able to tamper with the file system or write foreign executables to disk.",
+      "line": 33
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV017"
+      ],
+      "examples": [
+        "Privileged"
+      ],
+      "occurrences": 1,
+      "message": "Container 'docker-bench' of DaemonSet 'docker-bench-security' should set 'securityContext.privileged' to false",
+      "description": "Privileged containers share namespaces with the host system and do not offer any security. They should be used exclusively for system containers that require high privileges.",
+      "line": 33
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV020"
+      ],
+      "examples": [
+        "Runs with UID <= 10000"
+      ],
+      "occurrences": 1,
+      "message": "Container 'docker-bench' of DaemonSet 'docker-bench-security' should set 'securityContext.runAsUser' > 10000",
+      "description": "Force the container to run with user ID > 10000 to avoid conflicts with the hostΓÇÖs user table.",
+      "line": 33
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV021"
+      ],
+      "examples": [
+        "Runs with GID <= 10000"
+      ],
+      "occurrences": 1,
+      "message": "Container 'docker-bench' of DaemonSet 'docker-bench-security' should set 'securityContext.runAsGroup' > 10000",
+      "description": "Force the container to run with group ID > 10000 to avoid conflicts with the hostΓÇÖs user table.",
+      "line": 33
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV022"
+      ],
+      "examples": [
+        "Specific capabilities added"
+      ],
+      "occurrences": 1,
+      "message": "Container 'docker-bench' of DaemonSet 'docker-bench-security' should not set 'securityContext.capabilities.add'",
+      "description": "According to pod security standard 'Capabilities', capabilities beyond the default set must not be added.",
+      "line": 33
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV023"
+      ],
+      "examples": [
+        "hostPath volumes mounted"
+      ],
+      "occurrences": 1,
+      "message": "DaemonSet 'docker-bench-security' should not set 'spec.template.volumes.hostPath'",
+      "description": "According to pod security standard 'HostPath Volumes', HostPath volumes must be forbidden.",
+      "line": 19
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV030"
+      ],
+      "examples": [
+        "Runtime/Default Seccomp profile not set"
+      ],
+      "occurrences": 1,
+      "message": "Either Pod or Container should set 'securityContext.seccompProfile.type' to 'RuntimeDefault'",
+      "description": "According to pod security standard 'Seccomp', the RuntimeDefault seccomp profile must be required, or allow specific additional profiles.",
+      "line": 33
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV104"
+      ],
+      "examples": [
+        "Seccomp policies disabled"
+      ],
+      "occurrences": 1,
+      "message": "container \"docker-bench\" of daemonset \"docker-bench-security\" in \"default\" namespace should specify a seccomp profile",
+      "description": "A program inside the container can bypass Seccomp protection policies.",
+      "line": 33
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV105"
+      ],
+      "examples": [
+        "Containers must not set runAsUser to 0"
+      ],
+      "occurrences": 1,
+      "message": "securityContext.runAsUser should be set to a value greater than 0",
+      "description": "Containers should be forbidden from running with a root UID.",
+      "line": 31
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV105"
+      ],
+      "examples": [
+        "Containers must not set runAsUser to 0"
+      ],
+      "occurrences": 1,
+      "message": "securityContext.runAsUser should be set to a value greater than 0",
+      "description": "Containers should be forbidden from running with a root UID.",
+      "line": 45
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV106"
+      ],
+      "examples": [
+        "Container capabilities must only include NET_BIND_SERVICE"
+      ],
+      "occurrences": 1,
+      "message": "container should drop all",
+      "description": "Containers must drop ALL capabilities, and are only permitted to add back the NET_BIND_SERVICE capability.",
+      "line": 33
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV110"
+      ],
+      "examples": [
+        "Workloads in the default namespace"
+      ],
+      "occurrences": 1,
+      "message": "daemonset docker-bench-security in default namespace should set metadata.namespace to a non-default namespace",
+      "description": "Checks whether a workload is running in the default namespace.",
+      "line": 15
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "HIGH",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV121"
+      ],
+      "examples": [
+        "Kubernetes resource with disallowed volumes mounted"
+      ],
+      "occurrences": 1,
+      "message": "daemonset docker-bench-security in default namespace shouldn't have volumes set to {\"/etc\"}",
+      "description": "HostPath present many security risks and as a security practice it is better to avoid critical host paths mounts.",
+      "line": 19
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV0125"
+      ],
+      "examples": [
+        "Restrict container images to trusted registries"
+      ],
+      "occurrences": 1,
+      "message": "Container docker-bench in daemonset docker-bench-security (namespace: default) uses an image from an untrusted registry.",
+      "description": "Ensure that all containers use images only from trusted registry domains.",
+      "line": 33
+    },
+    {
+      "file": "insecure-rbac.setup.yaml",
+      "category": "UNKNOWN",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV111"
+      ],
+      "examples": [
+        "User with admin access"
+      ],
+      "occurrences": 1,
+      "message": "ClusterRoleBinding 'superadmin' should not bind to roles [\"cluster-admin\", \"admin\", \"edit\"]",
+      "description": "Either cluster-admin or those granted powerful permissions.",
+      "line": 10
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "PRIV_ESCALATION",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV001"
+      ],
+      "examples": [
+        "Can elevate its own privileges"
+      ],
+      "occurrences": 1,
+      "message": "Container 'info-app' of Deployment 'internal-proxy-deployment' should set 'securityContext.allowPrivilegeEscalation' to false",
+      "description": "A program inside the container can elevate its own privileges and run as root, which might give the program control over the container and node.",
+      "line": 29
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "PRIV_ESCALATION",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV001"
+      ],
+      "examples": [
+        "Can elevate its own privileges"
+      ],
+      "occurrences": 1,
+      "message": "Container 'internal-api' of Deployment 'internal-proxy-deployment' should set 'securityContext.allowPrivilegeEscalation' to false",
+      "description": "A program inside the container can elevate its own privileges and run as root, which might give the program control over the container and node.",
+      "line": 18
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV003"
+      ],
+      "examples": [
+        "Default capabilities: some containers do not drop all"
+      ],
+      "occurrences": 1,
+      "message": "Container 'info-app' of Deployment 'internal-proxy-deployment' should add 'ALL' to 'securityContext.capabilities.drop'",
+      "description": "The container should drop all default capabilities and add only those that are needed for its execution.",
+      "line": 29
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV003"
+      ],
+      "examples": [
+        "Default capabilities: some containers do not drop all"
+      ],
+      "occurrences": 1,
+      "message": "Container 'internal-api' of Deployment 'internal-proxy-deployment' should add 'ALL' to 'securityContext.capabilities.drop'",
+      "description": "The container should drop all default capabilities and add only those that are needed for its execution.",
+      "line": 18
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV004"
+      ],
+      "examples": [
+        "Default capabilities: some containers do not drop any"
+      ],
+      "occurrences": 1,
+      "message": "Container 'info-app' of 'deployment' 'internal-proxy-deployment' in 'default' namespace should set securityContext.capabilities.drop",
+      "description": "Security best practices require containers to run with minimal required capabilities.",
+      "line": 29
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV004"
+      ],
+      "examples": [
+        "Default capabilities: some containers do not drop any"
+      ],
+      "occurrences": 1,
+      "message": "Container 'internal-api' of 'deployment' 'internal-proxy-deployment' in 'default' namespace should set securityContext.capabilities.drop",
+      "description": "Security best practices require containers to run with minimal required capabilities.",
+      "line": 18
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV012"
+      ],
+      "examples": [
+        "Runs as root user"
+      ],
+      "occurrences": 1,
+      "message": "Container 'info-app' of Deployment 'internal-proxy-deployment' should set 'securityContext.runAsNonRoot' to true",
+      "description": "Force the running image to run as a non-root user to ensure least privileges.",
+      "line": 29
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV012"
+      ],
+      "examples": [
+        "Runs as root user"
+      ],
+      "occurrences": 1,
+      "message": "Container 'internal-api' of Deployment 'internal-proxy-deployment' should set 'securityContext.runAsNonRoot' to true",
+      "description": "Force the running image to run as a non-root user to ensure least privileges.",
+      "line": 18
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV013"
+      ],
+      "examples": [
+        "Image tag \":latest\" used"
+      ],
+      "occurrences": 1,
+      "message": "Container 'info-app' of Deployment 'internal-proxy-deployment' should specify an image tag",
+      "description": "It is best to avoid using the ':latest' image tag when deploying containers in production. Doing so makes it hard to track which version of the image is running, and hard to roll back the version.",
+      "line": 29
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV013"
+      ],
+      "examples": [
+        "Image tag \":latest\" used"
+      ],
+      "occurrences": 1,
+      "message": "Container 'internal-api' of Deployment 'internal-proxy-deployment' should specify an image tag",
+      "description": "It is best to avoid using the ':latest' image tag when deploying containers in production. Doing so makes it hard to track which version of the image is running, and hard to roll back the version.",
+      "line": 18
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "HIGH",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV014"
+      ],
+      "examples": [
+        "Root file system is not read-only"
+      ],
+      "occurrences": 1,
+      "message": "Container 'info-app' of Deployment 'internal-proxy-deployment' should set 'securityContext.readOnlyRootFilesystem' to true",
+      "description": "An immutable root file system prevents applications from writing to their local disk. This can limit intrusions, as attackers will not be able to tamper with the file system or write foreign executables to disk.",
+      "line": 29
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "HIGH",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV014"
+      ],
+      "examples": [
+        "Root file system is not read-only"
+      ],
+      "occurrences": 1,
+      "message": "Container 'internal-api' of Deployment 'internal-proxy-deployment' should set 'securityContext.readOnlyRootFilesystem' to true",
+      "description": "An immutable root file system prevents applications from writing to their local disk. This can limit intrusions, as attackers will not be able to tamper with the file system or write foreign executables to disk.",
+      "line": 18
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV020"
+      ],
+      "examples": [
+        "Runs with UID <= 10000"
+      ],
+      "occurrences": 1,
+      "message": "Container 'info-app' of Deployment 'internal-proxy-deployment' should set 'securityContext.runAsUser' > 10000",
+      "description": "Force the container to run with user ID > 10000 to avoid conflicts with the hostΓÇÖs user table.",
+      "line": 29
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV020"
+      ],
+      "examples": [
+        "Runs with UID <= 10000"
+      ],
+      "occurrences": 1,
+      "message": "Container 'internal-api' of Deployment 'internal-proxy-deployment' should set 'securityContext.runAsUser' > 10000",
+      "description": "Force the container to run with user ID > 10000 to avoid conflicts with the hostΓÇÖs user table.",
+      "line": 18
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV021"
+      ],
+      "examples": [
+        "Runs with GID <= 10000"
+      ],
+      "occurrences": 1,
+      "message": "Container 'info-app' of Deployment 'internal-proxy-deployment' should set 'securityContext.runAsGroup' > 10000",
+      "description": "Force the container to run with group ID > 10000 to avoid conflicts with the hostΓÇÖs user table.",
+      "line": 29
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV021"
+      ],
+      "examples": [
+        "Runs with GID <= 10000"
+      ],
+      "occurrences": 1,
+      "message": "Container 'internal-api' of Deployment 'internal-proxy-deployment' should set 'securityContext.runAsGroup' > 10000",
+      "description": "Force the container to run with group ID > 10000 to avoid conflicts with the hostΓÇÖs user table.",
+      "line": 18
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV030"
+      ],
+      "examples": [
+        "Runtime/Default Seccomp profile not set"
+      ],
+      "occurrences": 1,
+      "message": "Either Pod or Container should set 'securityContext.seccompProfile.type' to 'RuntimeDefault'",
+      "description": "According to pod security standard 'Seccomp', the RuntimeDefault seccomp profile must be required, or allow specific additional profiles.",
+      "line": 29
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV030"
+      ],
+      "examples": [
+        "Runtime/Default Seccomp profile not set"
+      ],
+      "occurrences": 1,
+      "message": "Either Pod or Container should set 'securityContext.seccompProfile.type' to 'RuntimeDefault'",
+      "description": "According to pod security standard 'Seccomp', the RuntimeDefault seccomp profile must be required, or allow specific additional profiles.",
+      "line": 18
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV104"
+      ],
+      "examples": [
+        "Seccomp policies disabled"
+      ],
+      "occurrences": 1,
+      "message": "container \"info-app\" of deployment \"internal-proxy-deployment\" in \"default\" namespace should specify a seccomp profile",
+      "description": "A program inside the container can bypass Seccomp protection policies.",
+      "line": 29
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV104"
+      ],
+      "examples": [
+        "Seccomp policies disabled"
+      ],
+      "occurrences": 1,
+      "message": "container \"internal-api\" of deployment \"internal-proxy-deployment\" in \"default\" namespace should specify a seccomp profile",
+      "description": "A program inside the container can bypass Seccomp protection policies.",
+      "line": 18
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV106"
+      ],
+      "examples": [
+        "Container capabilities must only include NET_BIND_SERVICE"
+      ],
+      "occurrences": 1,
+      "message": "container should drop all",
+      "description": "Containers must drop ALL capabilities, and are only permitted to add back the NET_BIND_SERVICE capability.",
+      "line": 29
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV106"
+      ],
+      "examples": [
+        "Container capabilities must only include NET_BIND_SERVICE"
+      ],
+      "occurrences": 1,
+      "message": "container should drop all",
+      "description": "Containers must drop ALL capabilities, and are only permitted to add back the NET_BIND_SERVICE capability.",
+      "line": 18
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV110"
+      ],
+      "examples": [
+        "Workloads in the default namespace"
+      ],
+      "occurrences": 1,
+      "message": "deployment internal-proxy-deployment in default namespace should set metadata.namespace to a non-default namespace",
+      "description": "Checks whether a workload is running in the default namespace.",
+      "line": 4
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "HIGH",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV118"
+      ],
+      "examples": [
+        "Default security context configured"
+      ],
+      "occurrences": 1,
+      "message": "container internal-proxy-deployment in default namespace is using the default security context",
+      "description": "Security context controls the allocation of security parameters for the pod/container/volume, ensuring the appropriate level of protection. Relying on default security context may expose vulnerabilities to potential attacks that rely on privileged access.",
+      "line": 18
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "HIGH",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV118"
+      ],
+      "examples": [
+        "Default security context configured"
+      ],
+      "occurrences": 1,
+      "message": "container internal-proxy-deployment in default namespace is using the default security context",
+      "description": "Security context controls the allocation of security parameters for the pod/container/volume, ensuring the appropriate level of protection. Relying on default security context may expose vulnerabilities to potential attacks that rely on privileged access.",
+      "line": 29
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "HIGH",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV118"
+      ],
+      "examples": [
+        "Default security context configured"
+      ],
+      "occurrences": 1,
+      "message": "deployment internal-proxy-deployment in default namespace is using the default security context, which allows root privileges",
+      "description": "Security context controls the allocation of security parameters for the pod/container/volume, ensuring the appropriate level of protection. Relying on default security context may expose vulnerabilities to potential attacks that rely on privileged access.",
+      "line": 17
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV0125"
+      ],
+      "examples": [
+        "Restrict container images to trusted registries"
+      ],
+      "occurrences": 1,
+      "message": "Container info-app in deployment internal-proxy-deployment (namespace: default) uses an image from an untrusted registry.",
+      "description": "Ensure that all containers use images only from trusted registry domains.",
+      "line": 29
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV0125"
+      ],
+      "examples": [
+        "Restrict container images to trusted registries"
+      ],
+      "occurrences": 1,
+      "message": "Container internal-api in deployment internal-proxy-deployment (namespace: default) uses an image from an untrusted registry.",
+      "description": "Ensure that all containers use images only from trusted registry domains.",
+      "line": 18
+    },
+    {
+      "file": "kube-bench-security.node-job.yaml",
+      "category": "PRIV_ESCALATION",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV001"
+      ],
+      "examples": [
+        "Can elevate its own privileges"
+      ],
+      "occurrences": 1,
+      "message": "Container 'kube-bench' of Job 'kube-bench-node' should set 'securityContext.allowPrivilegeEscalation' to false",
+      "description": "A program inside the container can elevate its own privileges and run as root, which might give the program control over the container and node.",
+      "line": 11
+    },
+    {
+      "file": "kube-bench-security.node-job.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV003"
+      ],
+      "examples": [
+        "Default capabilities: some containers do not drop all"
+      ],
+      "occurrences": 1,
+      "message": "Container 'kube-bench' of Job 'kube-bench-node' should add 'ALL' to 'securityContext.capabilities.drop'",
+      "description": "The container should drop all default capabilities and add only those that are needed for its execution.",
+      "line": 11
+    },
+    {
+      "file": "kube-bench-security.node-job.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV004"
+      ],
+      "examples": [
+        "Default capabilities: some containers do not drop any"
+      ],
+      "occurrences": 1,
+      "message": "Container 'kube-bench' of 'job' 'kube-bench-node' in 'default' namespace should set securityContext.capabilities.drop",
+      "description": "Security best practices require containers to run with minimal required capabilities.",
+      "line": 11
+    },
+    {
+      "file": "kube-bench-security.node-job.yaml",
+      "category": "UNKNOWN",
+      "severity": "HIGH",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV010"
+      ],
+      "examples": [
+        "Access to host PID"
+      ],
+      "occurrences": 1,
+      "message": "Job 'kube-bench-node' should not set 'spec.template.spec.hostPID' to true",
+      "description": "Sharing the hostΓÇÖs PID namespace allows visibility on host processes, potentially leaking information such as environment variables and configuration.",
+      "line": 7
+    },
+    {
+      "file": "kube-bench-security.node-job.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV011"
+      ],
+      "examples": [
+        "CPU not limited"
+      ],
+      "occurrences": 1,
+      "message": "Container 'kube-bench' of Job 'kube-bench-node' should set 'resources.limits.cpu'",
+      "description": "Enforcing CPU limits prevents DoS via resource exhaustion.",
+      "line": 11
+    },
+    {
+      "file": "kube-bench-security.node-job.yaml",
+      "category": "UNKNOWN",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV012"
+      ],
+      "examples": [
+        "Runs as root user"
+      ],
+      "occurrences": 1,
+      "message": "Container 'kube-bench' of Job 'kube-bench-node' should set 'securityContext.runAsNonRoot' to true",
+      "description": "Force the running image to run as a non-root user to ensure least privileges.",
+      "line": 11
+    },
+    {
+      "file": "kube-bench-security.node-job.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV013"
+      ],
+      "examples": [
+        "Image tag \":latest\" used"
+      ],
+      "occurrences": 1,
+      "message": "Container 'kube-bench' of Job 'kube-bench-node' should specify an image tag",
+      "description": "It is best to avoid using the ':latest' image tag when deploying containers in production. Doing so makes it hard to track which version of the image is running, and hard to roll back the version.",
+      "line": 11
+    },
+    {
+      "file": "kube-bench-security.node-job.yaml",
+      "category": "UNKNOWN",
+      "severity": "HIGH",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV014"
+      ],
+      "examples": [
+        "Root file system is not read-only"
+      ],
+      "occurrences": 1,
+      "message": "Container 'kube-bench' of Job 'kube-bench-node' should set 'securityContext.readOnlyRootFilesystem' to true",
+      "description": "An immutable root file system prevents applications from writing to their local disk. This can limit intrusions, as attackers will not be able to tamper with the file system or write foreign executables to disk.",
+      "line": 11
+    },
+    {
+      "file": "kube-bench-security.node-job.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV015"
+      ],
+      "examples": [
+        "CPU requests not specified"
+      ],
+      "occurrences": 1,
+      "message": "Container 'kube-bench' of Job 'kube-bench-node' should set 'resources.requests.cpu'",
+      "description": "When containers have resource requests specified, the scheduler can make better decisions about which nodes to place pods on, and how to deal with resource contention.",
+      "line": 11
+    },
+    {
+      "file": "kube-bench-security.node-job.yaml",
+      "category": "PRIV_ESCALATION",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV016"
+      ],
+      "examples": [
+        "Memory requests not specified"
+      ],
+      "occurrences": 1,
+      "message": "Container 'kube-bench' of Job 'kube-bench-node' should set 'resources.requests.memory'",
+      "description": "When containers have memory requests specified, the scheduler can make better decisions about which nodes to place pods on, and how to deal with resource contention.",
+      "line": 11
+    },
+    {
+      "file": "kube-bench-security.node-job.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV018"
+      ],
+      "examples": [
+        "Memory not limited"
+      ],
+      "occurrences": 1,
+      "message": "Container 'kube-bench' of Job 'kube-bench-node' should set 'resources.limits.memory'",
+      "description": "Enforcing memory limits prevents DoS via resource exhaustion.",
+      "line": 11
+    },
+    {
+      "file": "kube-bench-security.node-job.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV020"
+      ],
+      "examples": [
+        "Runs with UID <= 10000"
+      ],
+      "occurrences": 1,
+      "message": "Container 'kube-bench' of Job 'kube-bench-node' should set 'securityContext.runAsUser' > 10000",
+      "description": "Force the container to run with user ID > 10000 to avoid conflicts with the hostΓÇÖs user table.",
+      "line": 11
+    },
+    {
+      "file": "kube-bench-security.node-job.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV021"
+      ],
+      "examples": [
+        "Runs with GID <= 10000"
+      ],
+      "occurrences": 1,
+      "message": "Container 'kube-bench' of Job 'kube-bench-node' should set 'securityContext.runAsGroup' > 10000",
+      "description": "Force the container to run with group ID > 10000 to avoid conflicts with the hostΓÇÖs user table.",
+      "line": 11
+    },
+    {
+      "file": "kube-bench-security.node-job.yaml",
+      "category": "UNKNOWN",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV023"
+      ],
+      "examples": [
+        "hostPath volumes mounted"
+      ],
+      "occurrences": 1,
+      "message": "Job 'kube-bench-node' should not set 'spec.template.volumes.hostPath'",
+      "description": "According to pod security standard 'HostPath Volumes', HostPath volumes must be forbidden.",
+      "line": 7
+    },
+    {
+      "file": "kube-bench-security.node-job.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV030"
+      ],
+      "examples": [
+        "Runtime/Default Seccomp profile not set"
+      ],
+      "occurrences": 1,
+      "message": "Either Pod or Container should set 'securityContext.seccompProfile.type' to 'RuntimeDefault'",
+      "description": "According to pod security standard 'Seccomp', the RuntimeDefault seccomp profile must be required, or allow specific additional profiles.",
+      "line": 11
+    },
+    {
+      "file": "kube-bench-security.node-job.yaml",
+      "category": "UNKNOWN",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV104"
+      ],
+      "examples": [
+        "Seccomp policies disabled"
+      ],
+      "occurrences": 1,
+      "message": "container \"kube-bench\" of job \"kube-bench-node\" in \"default\" namespace should specify a seccomp profile",
+      "description": "A program inside the container can bypass Seccomp protection policies.",
+      "line": 11
+    },
+    {
+      "file": "kube-bench-security.node-job.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV106"
+      ],
+      "examples": [
+        "Container capabilities must only include NET_BIND_SERVICE"
+      ],
+      "occurrences": 1,
+      "message": "container should drop all",
+      "description": "Containers must drop ALL capabilities, and are only permitted to add back the NET_BIND_SERVICE capability.",
+      "line": 11
+    },
+    {
+      "file": "kube-bench-security.node-job.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV110"
+      ],
+      "examples": [
+        "Workloads in the default namespace"
+      ],
+      "occurrences": 1,
+      "message": "job kube-bench-node in default namespace should set metadata.namespace to a non-default namespace",
+      "description": "Checks whether a workload is running in the default namespace.",
+      "line": 5
+    },
+    {
+      "file": "kube-bench-security.node-job.yaml",
+      "category": "UNKNOWN",
+      "severity": "HIGH",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV118"
+      ],
+      "examples": [
+        "Default security context configured"
+      ],
+      "occurrences": 1,
+      "message": "container kube-bench-node in default namespace is using the default security context",
+      "description": "Security context controls the allocation of security parameters for the pod/container/volume, ensuring the appropriate level of protection. Relying on default security context may expose vulnerabilities to potential attacks that rely on privileged access.",
+      "line": 11
+    },
+    {
+      "file": "kube-bench-security.node-job.yaml",
+      "category": "UNKNOWN",
+      "severity": "HIGH",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV118"
+      ],
+      "examples": [
+        "Default security context configured"
+      ],
+      "occurrences": 1,
+      "message": "job kube-bench-node in default namespace is using the default security context, which allows root privileges",
+      "description": "Security context controls the allocation of security parameters for the pod/container/volume, ensuring the appropriate level of protection. Relying on default security context may expose vulnerabilities to potential attacks that rely on privileged access.",
+      "line": 9
+    },
+    {
+      "file": "kube-bench-security.node-job.yaml",
+      "category": "UNKNOWN",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV0125"
+      ],
+      "examples": [
+        "Restrict container images to trusted registries"
+      ],
+      "occurrences": 1,
+      "message": "Container kube-bench in job kube-bench-node (namespace: default) uses an image from an untrusted registry.",
+      "description": "Ensure that all containers use images only from trusted registry domains.",
+      "line": 11
+    },
+    {
+      "file": "poor-registry.deployment.yaml",
+      "category": "PRIV_ESCALATION",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV001"
+      ],
+      "examples": [
+        "Can elevate its own privileges"
+      ],
+      "occurrences": 1,
+      "message": "Container 'poor-registry' of Deployment 'poor-registry-deployment' should set 'securityContext.allowPrivilegeEscalation' to false",
+      "description": "A program inside the container can elevate its own privileges and run as root, which might give the program control over the container and node.",
+      "line": 16
+    },
+    {
+      "file": "poor-registry.deployment.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV003"
+      ],
+      "examples": [
+        "Default capabilities: some containers do not drop all"
+      ],
+      "occurrences": 1,
+      "message": "Container 'poor-registry' of Deployment 'poor-registry-deployment' should add 'ALL' to 'securityContext.capabilities.drop'",
+      "description": "The container should drop all default capabilities and add only those that are needed for its execution.",
+      "line": 16
+    },
+    {
+      "file": "poor-registry.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV004"
+      ],
+      "examples": [
+        "Default capabilities: some containers do not drop any"
+      ],
+      "occurrences": 1,
+      "message": "Container 'poor-registry' of 'deployment' 'poor-registry-deployment' in 'default' namespace should set securityContext.capabilities.drop",
+      "description": "Security best practices require containers to run with minimal required capabilities.",
+      "line": 16
+    },
+    {
+      "file": "poor-registry.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV012"
+      ],
+      "examples": [
+        "Runs as root user"
+      ],
+      "occurrences": 1,
+      "message": "Container 'poor-registry' of Deployment 'poor-registry-deployment' should set 'securityContext.runAsNonRoot' to true",
+      "description": "Force the running image to run as a non-root user to ensure least privileges.",
+      "line": 16
+    },
+    {
+      "file": "poor-registry.deployment.yaml",
+      "category": "RUN_AS_NONROOT_FALSE",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV013"
+      ],
+      "examples": [
+        "Image tag \":latest\" used"
+      ],
+      "occurrences": 1,
+      "message": "Container 'poor-registry' of Deployment 'poor-registry-deployment' should specify an image tag",
+      "description": "It is best to avoid using the ':latest' image tag when deploying containers in production. Doing so makes it hard to track which version of the image is running, and hard to roll back the version.",
+      "line": 16
+    },
+    {
+      "file": "poor-registry.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "HIGH",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV014"
+      ],
+      "examples": [
+        "Root file system is not read-only"
+      ],
+      "occurrences": 1,
+      "message": "Container 'poor-registry' of Deployment 'poor-registry-deployment' should set 'securityContext.readOnlyRootFilesystem' to true",
+      "description": "An immutable root file system prevents applications from writing to their local disk. This can limit intrusions, as attackers will not be able to tamper with the file system or write foreign executables to disk.",
+      "line": 16
+    },
+    {
+      "file": "poor-registry.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV015"
+      ],
+      "examples": [
+        "CPU requests not specified"
+      ],
+      "occurrences": 1,
+      "message": "Container 'poor-registry' of Deployment 'poor-registry-deployment' should set 'resources.requests.cpu'",
+      "description": "When containers have resource requests specified, the scheduler can make better decisions about which nodes to place pods on, and how to deal with resource contention.",
+      "line": 16
+    },
+    {
+      "file": "poor-registry.deployment.yaml",
+      "category": "PRIV_ESCALATION",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV016"
+      ],
+      "examples": [
+        "Memory requests not specified"
+      ],
+      "occurrences": 1,
+      "message": "Container 'poor-registry' of Deployment 'poor-registry-deployment' should set 'resources.requests.memory'",
+      "description": "When containers have memory requests specified, the scheduler can make better decisions about which nodes to place pods on, and how to deal with resource contention.",
+      "line": 16
+    },
+    {
+      "file": "poor-registry.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV020"
+      ],
+      "examples": [
+        "Runs with UID <= 10000"
+      ],
+      "occurrences": 1,
+      "message": "Container 'poor-registry' of Deployment 'poor-registry-deployment' should set 'securityContext.runAsUser' > 10000",
+      "description": "Force the container to run with user ID > 10000 to avoid conflicts with the hostΓÇÖs user table.",
+      "line": 16
+    },
+    {
+      "file": "poor-registry.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV021"
+      ],
+      "examples": [
+        "Runs with GID <= 10000"
+      ],
+      "occurrences": 1,
+      "message": "Container 'poor-registry' of Deployment 'poor-registry-deployment' should set 'securityContext.runAsGroup' > 10000",
+      "description": "Force the container to run with group ID > 10000 to avoid conflicts with the hostΓÇÖs user table.",
+      "line": 16
+    },
+    {
+      "file": "poor-registry.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV030"
+      ],
+      "examples": [
+        "Runtime/Default Seccomp profile not set"
+      ],
+      "occurrences": 1,
+      "message": "Either Pod or Container should set 'securityContext.seccompProfile.type' to 'RuntimeDefault'",
+      "description": "According to pod security standard 'Seccomp', the RuntimeDefault seccomp profile must be required, or allow specific additional profiles.",
+      "line": 16
+    },
+    {
+      "file": "poor-registry.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV104"
+      ],
+      "examples": [
+        "Seccomp policies disabled"
+      ],
+      "occurrences": 1,
+      "message": "container \"poor-registry\" of deployment \"poor-registry-deployment\" in \"default\" namespace should specify a seccomp profile",
+      "description": "A program inside the container can bypass Seccomp protection policies.",
+      "line": 16
+    },
+    {
+      "file": "poor-registry.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV106"
+      ],
+      "examples": [
+        "Container capabilities must only include NET_BIND_SERVICE"
+      ],
+      "occurrences": 1,
+      "message": "container should drop all",
+      "description": "Containers must drop ALL capabilities, and are only permitted to add back the NET_BIND_SERVICE capability.",
+      "line": 16
+    },
+    {
+      "file": "poor-registry.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "LOW",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV110"
+      ],
+      "examples": [
+        "Workloads in the default namespace"
+      ],
+      "occurrences": 1,
+      "message": "deployment poor-registry-deployment in default namespace should set metadata.namespace to a non-default namespace",
+      "description": "Checks whether a workload is running in the default namespace.",
+      "line": 4
+    },
+    {
+      "file": "poor-registry.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "HIGH",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV118"
+      ],
+      "examples": [
+        "Default security context configured"
+      ],
+      "occurrences": 1,
+      "message": "container poor-registry-deployment in default namespace is using the default security context",
+      "description": "Security context controls the allocation of security parameters for the pod/container/volume, ensuring the appropriate level of protection. Relying on default security context may expose vulnerabilities to potential attacks that rely on privileged access.",
+      "line": 16
+    },
+    {
+      "file": "poor-registry.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "HIGH",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV118"
+      ],
+      "examples": [
+        "Default security context configured"
+      ],
+      "occurrences": 1,
+      "message": "deployment poor-registry-deployment in default namespace is using the default security context, which allows root privileges",
+      "description": "Security context controls the allocation of security parameters for the pod/container/volume, ensuring the appropriate level of protection. Relying on default security context may expose vulnerabilities to potential attacks that rely on privileged access.",
+      "line": 15
+    },
+    {
+      "file": "poor-registry.deployment.yaml",
+      "category": "UNKNOWN",
+      "severity": "MEDIUM",
+      "tools": [
+        "Trivy"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV0125"
+      ],
+      "examples": [
+        "Restrict container images to trusted registries"
+      ],
+      "occurrences": 1,
+      "message": "Container poor-registry in deployment poor-registry-deployment (namespace: default) uses an image from an untrusted registry.",
+      "description": "Ensure that all containers use images only from trusted registry domains.",
+      "line": 16
+    }
+  ]
+}

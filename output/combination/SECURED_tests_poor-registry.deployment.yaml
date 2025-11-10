@@ -1,4 +1,3 @@
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -13,22 +12,8 @@ spec:
       labels:
         app: poor-registry
     spec:
-      securityContext:
-        runAsNonRoot: true
-        seccompProfile:
-          type: RuntimeDefault
-      automountServiceAccountToken: false
       containers:
       - name: poor-registry
-        securityContext:
-          readOnlyRootFilesystem: true
-        securityContext:
-          allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: true
-          runAsNonRoot: true
-          capabilities:
-            drop:
-            - ALL
         image: madhuakula/k8s-goat-poor-registry
         resources:
           limits:
@@ -39,14 +24,22 @@ spec:
             memory: 64Mi
         ports:
         - containerPort: 5000
-      automountServiceAccountToken: false
+        securityContext:
+          privileged: false
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          capabilities:
+            drop:
+            - ALL
       securityContext:
+        runAsNonRoot: true
         allowPrivilegeEscalation: false
         readOnlyRootFilesystem: true
-        runAsNonRoot: true
         capabilities:
           drop:
           - ALL
+      automountServiceAccountToken: false
 ---
 apiVersion: v1
 kind: Service

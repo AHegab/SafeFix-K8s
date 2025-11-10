@@ -1,0 +1,29 @@
+{
+  "original_file": "tests\\docker-bench-security.deployment.yaml",
+  "secured_file": "output\\combination\\SECURED_tests_docker-bench-security.deployment.yaml",
+  "diff_file": "output\\combination\\DIFF_tests_docker-bench-security.deployment.yaml.diff",
+  "fixes_applied": 2,
+  "applied_fixes": [
+    "pod.securityContext.runAsUser",
+    "template.spec.containers[0].securityContext.privileged",
+    "template.spec.containers[0].securityContext.allowPrivilegeEscalation",
+    "pod.automountServiceAccountToken",
+    "template.spec.containers[0].securityContext.runAsNonRoot",
+    "template.spec.containers[0].securityContext.readOnlyRootFilesystem",
+    "template.spec.containers[0].capabilities.drop=ALL",
+    "pod.securityContext.runAsNonRoot",
+    "hygiene:pod.securityContext:allowPrivilegeEscalation:false",
+    "hygiene:pod.securityContext:readOnlyRootFilesystem:true",
+    "hygiene:pod.securityContext:capabilities.drop+=ALL"
+  ],
+  "fix_details": [
+    {
+      "category": "HOSTPATH",
+      "model": "groq"
+    },
+    {
+      "category": "NO_SECCOMP",
+      "model": "groq"
+    }
+  ]
+}

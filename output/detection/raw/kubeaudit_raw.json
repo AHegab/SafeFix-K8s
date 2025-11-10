@@ -8,7 +8,7 @@
         "ResourceName":  "nginx-deployment",
         "level":  "error",
         "msg":  "AppArmor annotation missing. The annotation \u0027container.apparmor.security.beta.kubernetes.io/nginx\u0027 should be added.",
-        "time":  "2025-11-08T13:21:15+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/13.deployment.yaml"
     },
     {
@@ -18,7 +18,7 @@
         "ResourceName":  "nginx-deployment",
         "level":  "error",
         "msg":  "Default service account with token mounted. automountServiceAccountToken should be set to \u0027false\u0027 on either the ServiceAccount or on the PodSpec or a non-default service account should be used.",
-        "time":  "2025-11-08T13:21:15+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/13.deployment.yaml"
     },
     {
@@ -29,7 +29,7 @@
         "ResourceName":  "nginx-deployment",
         "level":  "error",
         "msg":  "Security Context not set. The Security Context should be specified and all Capabilities should be dropped by setting the Drop list to ALL.",
-        "time":  "2025-11-08T13:21:15+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/13.deployment.yaml"
     },
     {
@@ -40,7 +40,7 @@
         "ResourceName":  "nginx-deployment",
         "level":  "error",
         "msg":  "runAsNonRoot should be set to true or runAsUser should be set to a value \u003e 0 either in the container SecurityContext or PodSecurityContext.",
-        "time":  "2025-11-08T13:21:15+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/13.deployment.yaml"
     },
     {
@@ -51,7 +51,7 @@
         "ResourceName":  "nginx-deployment",
         "level":  "error",
         "msg":  "allowPrivilegeEscalation not set which allows privilege escalation. It should be set to \u0027false\u0027.",
-        "time":  "2025-11-08T13:21:15+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/13.deployment.yaml"
     },
     {
@@ -62,7 +62,7 @@
         "ResourceName":  "nginx-deployment",
         "level":  "error",
         "msg":  "privileged is set to \u0027true\u0027 in container SecurityContext. It should be set to \u0027false\u0027.",
-        "time":  "2025-11-08T13:21:15+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/13.deployment.yaml"
     },
     {
@@ -73,7 +73,7 @@
         "ResourceName":  "nginx-deployment",
         "level":  "error",
         "msg":  "readOnlyRootFilesystem is not set in container SecurityContext. It should be set to \u0027true\u0027.",
-        "time":  "2025-11-08T13:21:15+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/13.deployment.yaml"
     },
     {
@@ -83,7 +83,7 @@
         "ResourceName":  "nginx-deployment",
         "level":  "error",
         "msg":  "Pod Seccomp profile is missing. Seccomp profile should be added to the pod SecurityContext.",
-        "time":  "2025-11-08T13:21:15+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/13.deployment.yaml"
     },
     {
@@ -95,7 +95,7 @@
         "ResourceName":  "nginx",
         "level":  "error",
         "msg":  "AppArmor annotation missing. The annotation \u0027container.apparmor.security.beta.kubernetes.io/nginx\u0027 should be added.",
-        "time":  "2025-11-08T13:21:15+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/31.example-nginx.yaml"
     },
     {
@@ -105,7 +105,7 @@
         "ResourceName":  "nginx",
         "level":  "error",
         "msg":  "Default service account with token mounted. automountServiceAccountToken should be set to \u0027false\u0027 on either the ServiceAccount or on the PodSpec or a non-default service account should be used.",
-        "time":  "2025-11-08T13:21:15+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/31.example-nginx.yaml"
     },
     {
@@ -116,7 +116,7 @@
         "ResourceName":  "nginx",
         "level":  "error",
         "msg":  "Capability Drop list should be set to ALL. Add the specific ones you need to the Add list and set an override label.",
-        "time":  "2025-11-08T13:21:15+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/31.example-nginx.yaml"
     },
     {
@@ -128,7 +128,7 @@
         "ResourceName":  "nginx",
         "level":  "error",
         "msg":  "Capability \"CHOWN\" added. It should be removed from the capability add list. If you need this capability, add an override label such as \u0027container.kubeaudit.io/nginx.allow-capability-chown: SomeReason\u0027.",
-        "time":  "2025-11-08T13:21:15+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/31.example-nginx.yaml"
     },
     {
@@ -140,7 +140,7 @@
         "ResourceName":  "nginx",
         "level":  "error",
         "msg":  "Capability \"NET_ADMIN\" added. It should be removed from the capability add list. If you need this capability, add an override label such as \u0027container.kubeaudit.io/nginx.allow-capability-net-admin: SomeReason\u0027.",
-        "time":  "2025-11-08T13:21:15+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/31.example-nginx.yaml"
     },
     {
@@ -152,7 +152,7 @@
         "ResourceName":  "nginx",
         "level":  "error",
         "msg":  "Capability \"NET_RAW\" added. It should be removed from the capability add list. If you need this capability, add an override label such as \u0027container.kubeaudit.io/nginx.allow-capability-net-raw: SomeReason\u0027.",
-        "time":  "2025-11-08T13:21:15+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/31.example-nginx.yaml"
     },
     {
@@ -164,7 +164,7 @@
         "ResourceName":  "nginx",
         "level":  "error",
         "msg":  "Capability \"SYSLOG\" added. It should be removed from the capability add list. If you need this capability, add an override label such as \u0027container.kubeaudit.io/nginx.allow-capability-syslog: SomeReason\u0027.",
-        "time":  "2025-11-08T13:21:15+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/31.example-nginx.yaml"
     },
     {
@@ -176,7 +176,7 @@
         "ResourceName":  "nginx",
         "level":  "error",
         "msg":  "Capability \"SYS_ADMIN\" added. It should be removed from the capability add list. If you need this capability, add an override label such as \u0027container.kubeaudit.io/nginx.allow-capability-sys-admin: SomeReason\u0027.",
-        "time":  "2025-11-08T13:21:15+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/31.example-nginx.yaml"
     },
     {
@@ -188,7 +188,7 @@
         "ResourceName":  "nginx",
         "level":  "error",
         "msg":  "Capability \"SYS_MODULE\" added. It should be removed from the capability add list. If you need this capability, add an override label such as \u0027container.kubeaudit.io/nginx.allow-capability-sys-module: SomeReason\u0027.",
-        "time":  "2025-11-08T13:21:15+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/31.example-nginx.yaml"
     },
     {
@@ -198,7 +198,7 @@
         "ResourceName":  "nginx",
         "level":  "error",
         "msg":  "hostNetwork is set to \u0027true\u0027 in PodSpec. It should be set to \u0027false\u0027.",
-        "time":  "2025-11-08T13:21:15+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/31.example-nginx.yaml"
     },
     {
@@ -208,7 +208,7 @@
         "ResourceName":  "nginx",
         "level":  "error",
         "msg":  "hostIPC is set to \u0027true\u0027 in PodSpec. It should be set to \u0027false\u0027.",
-        "time":  "2025-11-08T13:21:15+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/31.example-nginx.yaml"
     },
     {
@@ -218,7 +218,7 @@
         "ResourceName":  "nginx",
         "level":  "error",
         "msg":  "hostPID is set to \u0027true\u0027 in PodSpec. It should be set to \u0027false\u0027.",
-        "time":  "2025-11-08T13:21:15+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/31.example-nginx.yaml"
     },
     {
@@ -229,7 +229,7 @@
         "ResourceName":  "nginx",
         "level":  "error",
         "msg":  "runAsNonRoot should be set to true or runAsUser should be set to a value \u003e 0 either in the container SecurityContext or PodSecurityContext.",
-        "time":  "2025-11-08T13:21:15+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/31.example-nginx.yaml"
     },
     {
@@ -240,7 +240,7 @@
         "ResourceName":  "nginx",
         "level":  "error",
         "msg":  "allowPrivilegeEscalation not set which allows privilege escalation. It should be set to \u0027false\u0027.",
-        "time":  "2025-11-08T13:21:15+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/31.example-nginx.yaml"
     },
     {
@@ -251,7 +251,7 @@
         "ResourceName":  "nginx",
         "level":  "error",
         "msg":  "privileged is set to \u0027true\u0027 in container SecurityContext. It should be set to \u0027false\u0027.",
-        "time":  "2025-11-08T13:21:15+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/31.example-nginx.yaml"
     },
     {
@@ -262,7 +262,7 @@
         "ResourceName":  "nginx",
         "level":  "error",
         "msg":  "readOnlyRootFilesystem is not set in container SecurityContext. It should be set to \u0027true\u0027.",
-        "time":  "2025-11-08T13:21:15+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/31.example-nginx.yaml"
     },
     {
@@ -272,7 +272,7 @@
         "ResourceName":  "nginx",
         "level":  "error",
         "msg":  "Pod Seccomp profile is missing. Seccomp profile should be added to the pod SecurityContext.",
-        "time":  "2025-11-08T13:21:15+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/31.example-nginx.yaml"
     },
     {
@@ -284,7 +284,7 @@
         "ResourceName":  "echo1",
         "level":  "error",
         "msg":  "AppArmor annotation missing. The annotation \u0027container.apparmor.security.beta.kubernetes.io/echo1\u0027 should be added.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/34.echo1_no_securitycontext.yaml"
     },
     {
@@ -294,7 +294,7 @@
         "ResourceName":  "echo1",
         "level":  "error",
         "msg":  "Default service account with token mounted. automountServiceAccountToken should be set to \u0027false\u0027 on either the ServiceAccount or on the PodSpec or a non-default service account should be used.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/34.echo1_no_securitycontext.yaml"
     },
     {
@@ -305,7 +305,7 @@
         "ResourceName":  "echo1",
         "level":  "error",
         "msg":  "Security Context not set. The Security Context should be specified and all Capabilities should be dropped by setting the Drop list to ALL.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/34.echo1_no_securitycontext.yaml"
     },
     {
@@ -316,7 +316,7 @@
         "ResourceName":  "echo1",
         "level":  "error",
         "msg":  "runAsNonRoot should be set to true or runAsUser should be set to a value \u003e 0 either in the container SecurityContext or PodSecurityContext.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/34.echo1_no_securitycontext.yaml"
     },
     {
@@ -327,7 +327,7 @@
         "ResourceName":  "echo1",
         "level":  "error",
         "msg":  "allowPrivilegeEscalation not set which allows privilege escalation. It should be set to \u0027false\u0027.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/34.echo1_no_securitycontext.yaml"
     },
     {
@@ -338,7 +338,7 @@
         "ResourceName":  "echo1",
         "level":  "error",
         "msg":  "readOnlyRootFilesystem is not set in container SecurityContext. It should be set to \u0027true\u0027.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/34.echo1_no_securitycontext.yaml"
     },
     {
@@ -348,7 +348,7 @@
         "ResourceName":  "echo1",
         "level":  "error",
         "msg":  "Pod Seccomp profile is missing. Seccomp profile should be added to the pod SecurityContext.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/34.echo1_no_securitycontext.yaml"
     },
     {
@@ -360,7 +360,7 @@
         "ResourceName":  "echo1",
         "level":  "error",
         "msg":  "AppArmor annotation missing. The annotation \u0027container.apparmor.security.beta.kubernetes.io/echo1\u0027 should be added.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/34.echo1_privileged.yaml"
     },
     {
@@ -370,7 +370,7 @@
         "ResourceName":  "echo1",
         "level":  "error",
         "msg":  "Default service account with token mounted. automountServiceAccountToken should be set to \u0027false\u0027 on either the ServiceAccount or on the PodSpec or a non-default service account should be used.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/34.echo1_privileged.yaml"
     },
     {
@@ -382,7 +382,7 @@
         "ResourceName":  "echo1",
         "level":  "error",
         "msg":  "Capability \"NET_BIND_SERVICE\" added. It should be removed from the capability add list. If you need this capability, add an override label such as \u0027container.kubeaudit.io/echo1.allow-capability-net-bind-service: SomeReason\u0027.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/34.echo1_privileged.yaml"
     },
     {
@@ -393,7 +393,7 @@
         "ResourceName":  "echo1",
         "level":  "error",
         "msg":  "runAsNonRoot should be set to true or runAsUser should be set to a value \u003e 0 either in the container SecurityContext or PodSecurityContext.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/34.echo1_privileged.yaml"
     },
     {
@@ -404,7 +404,7 @@
         "ResourceName":  "echo1",
         "level":  "error",
         "msg":  "allowPrivilegeEscalation not set which allows privilege escalation. It should be set to \u0027false\u0027.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/34.echo1_privileged.yaml"
     },
     {
@@ -414,7 +414,7 @@
         "ResourceName":  "echo1",
         "level":  "error",
         "msg":  "Pod Seccomp profile is missing. Seccomp profile should be added to the pod SecurityContext.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/34.echo1_privileged.yaml"
     },
     {
@@ -426,7 +426,7 @@
         "ResourceName":  "docker-bench-security",
         "level":  "error",
         "msg":  "AppArmor annotation missing. The annotation \u0027container.apparmor.security.beta.kubernetes.io/docker-bench\u0027 should be added.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/docker-bench-security.deployment.yaml"
     },
     {
@@ -436,7 +436,7 @@
         "ResourceName":  "docker-bench-security",
         "level":  "error",
         "msg":  "Default service account with token mounted. automountServiceAccountToken should be set to \u0027false\u0027 on either the ServiceAccount or on the PodSpec or a non-default service account should be used.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/docker-bench-security.deployment.yaml"
     },
     {
@@ -447,7 +447,7 @@
         "ResourceName":  "docker-bench-security",
         "level":  "error",
         "msg":  "Capability Drop list should be set to ALL. Add the specific ones you need to the Add list and set an override label.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/docker-bench-security.deployment.yaml"
     },
     {
@@ -459,7 +459,7 @@
         "ResourceName":  "docker-bench-security",
         "level":  "error",
         "msg":  "Capability \"AUDIT_CONTROL\" added. It should be removed from the capability add list. If you need this capability, add an override label such as \u0027container.kubeaudit.io/docker-bench.allow-capability-audit-control: SomeReason\u0027.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/docker-bench-security.deployment.yaml"
     },
     {
@@ -469,7 +469,7 @@
         "ResourceName":  "docker-bench-security",
         "level":  "error",
         "msg":  "hostNetwork is set to \u0027true\u0027 in PodSpec. It should be set to \u0027false\u0027.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/docker-bench-security.deployment.yaml"
     },
     {
@@ -479,7 +479,7 @@
         "ResourceName":  "docker-bench-security",
         "level":  "error",
         "msg":  "hostIPC is set to \u0027true\u0027 in PodSpec. It should be set to \u0027false\u0027.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/docker-bench-security.deployment.yaml"
     },
     {
@@ -489,7 +489,7 @@
         "ResourceName":  "docker-bench-security",
         "level":  "error",
         "msg":  "hostPID is set to \u0027true\u0027 in PodSpec. It should be set to \u0027false\u0027.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/docker-bench-security.deployment.yaml"
     },
     {
@@ -505,7 +505,7 @@
         "ResourceName":  "docker-bench-security",
         "level":  "error",
         "msg":  "Sensitive path mounted as volume: etc-vol (hostPath: /etc). It should be removed from the container\u0027s mounts list.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/docker-bench-security.deployment.yaml"
     },
     {
@@ -521,7 +521,7 @@
         "ResourceName":  "docker-bench-security",
         "level":  "error",
         "msg":  "Sensitive path mounted as volume: docker-sock-volume (hostPath: /var/run/docker.sock). It should be removed from the container\u0027s mounts list.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/docker-bench-security.deployment.yaml"
     },
     {
@@ -532,7 +532,7 @@
         "ResourceName":  "docker-bench-security",
         "level":  "error",
         "msg":  "runAsUser is set to UID 0 (root user) in the PodSecurityContext. Either set it to a value \u003e 0 or remove it and set runAsNonRoot to true.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/docker-bench-security.deployment.yaml"
     },
     {
@@ -543,7 +543,7 @@
         "ResourceName":  "docker-bench-security",
         "level":  "error",
         "msg":  "allowPrivilegeEscalation not set which allows privilege escalation. It should be set to \u0027false\u0027.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/docker-bench-security.deployment.yaml"
     },
     {
@@ -554,7 +554,7 @@
         "ResourceName":  "docker-bench-security",
         "level":  "error",
         "msg":  "privileged is set to \u0027true\u0027 in container SecurityContext. It should be set to \u0027false\u0027.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/docker-bench-security.deployment.yaml"
     },
     {
@@ -565,7 +565,7 @@
         "ResourceName":  "docker-bench-security",
         "level":  "error",
         "msg":  "readOnlyRootFilesystem is not set in container SecurityContext. It should be set to \u0027true\u0027.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/docker-bench-security.deployment.yaml"
     },
     {
@@ -575,7 +575,7 @@
         "ResourceName":  "docker-bench-security",
         "level":  "error",
         "msg":  "Pod Seccomp profile is missing. Seccomp profile should be added to the pod SecurityContext.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:05+02:00",
         "file":  "/scan/docker-bench-security.deployment.yaml"
     },
     {
@@ -588,7 +588,7 @@
         "ResourceNamespace":  "default",
         "level":  "error",
         "msg":  "AppArmor annotation missing. The annotation \u0027container.apparmor.security.beta.kubernetes.io/internal-api\u0027 should be added.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:06+02:00",
         "file":  "/scan/internal-proxy.deployment.yaml"
     },
     {
@@ -601,7 +601,7 @@
         "ResourceNamespace":  "default",
         "level":  "error",
         "msg":  "AppArmor annotation missing. The annotation \u0027container.apparmor.security.beta.kubernetes.io/info-app\u0027 should be added.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:06+02:00",
         "file":  "/scan/internal-proxy.deployment.yaml"
     },
     {
@@ -612,7 +612,7 @@
         "ResourceNamespace":  "default",
         "level":  "error",
         "msg":  "Default service account with token mounted. automountServiceAccountToken should be set to \u0027false\u0027 on either the ServiceAccount or on the PodSpec or a non-default service account should be used.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:06+02:00",
         "file":  "/scan/internal-proxy.deployment.yaml"
     },
     {
@@ -624,7 +624,7 @@
         "ResourceNamespace":  "default",
         "level":  "error",
         "msg":  "Security Context not set. The Security Context should be specified and all Capabilities should be dropped by setting the Drop list to ALL.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:06+02:00",
         "file":  "/scan/internal-proxy.deployment.yaml"
     },
     {
@@ -636,7 +636,7 @@
         "ResourceNamespace":  "default",
         "level":  "error",
         "msg":  "Security Context not set. The Security Context should be specified and all Capabilities should be dropped by setting the Drop list to ALL.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:06+02:00",
         "file":  "/scan/internal-proxy.deployment.yaml"
     },
     {
@@ -648,7 +648,7 @@
         "ResourceNamespace":  "default",
         "level":  "error",
         "msg":  "runAsNonRoot should be set to true or runAsUser should be set to a value \u003e 0 either in the container SecurityContext or PodSecurityContext.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:06+02:00",
         "file":  "/scan/internal-proxy.deployment.yaml"
     },
     {
@@ -660,7 +660,7 @@
         "ResourceNamespace":  "default",
         "level":  "error",
         "msg":  "runAsNonRoot should be set to true or runAsUser should be set to a value \u003e 0 either in the container SecurityContext or PodSecurityContext.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:06+02:00",
         "file":  "/scan/internal-proxy.deployment.yaml"
     },
     {
@@ -672,7 +672,7 @@
         "ResourceNamespace":  "default",
         "level":  "error",
         "msg":  "allowPrivilegeEscalation not set which allows privilege escalation. It should be set to \u0027false\u0027.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:06+02:00",
         "file":  "/scan/internal-proxy.deployment.yaml"
     },
     {
@@ -684,7 +684,7 @@
         "ResourceNamespace":  "default",
         "level":  "error",
         "msg":  "allowPrivilegeEscalation not set which allows privilege escalation. It should be set to \u0027false\u0027.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:06+02:00",
         "file":  "/scan/internal-proxy.deployment.yaml"
     },
     {
@@ -696,7 +696,7 @@
         "ResourceNamespace":  "default",
         "level":  "error",
         "msg":  "readOnlyRootFilesystem is not set in container SecurityContext. It should be set to \u0027true\u0027.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:06+02:00",
         "file":  "/scan/internal-proxy.deployment.yaml"
     },
     {
@@ -708,7 +708,7 @@
         "ResourceNamespace":  "default",
         "level":  "error",
         "msg":  "readOnlyRootFilesystem is not set in container SecurityContext. It should be set to \u0027true\u0027.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:06+02:00",
         "file":  "/scan/internal-proxy.deployment.yaml"
     },
     {
@@ -719,7 +719,7 @@
         "ResourceNamespace":  "default",
         "level":  "error",
         "msg":  "Pod Seccomp profile is missing. Seccomp profile should be added to the pod SecurityContext.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:06+02:00",
         "file":  "/scan/internal-proxy.deployment.yaml"
     },
     {
@@ -731,7 +731,7 @@
         "ResourceName":  "kube-bench-node",
         "level":  "error",
         "msg":  "AppArmor annotation missing. The annotation \u0027container.apparmor.security.beta.kubernetes.io/kube-bench\u0027 should be added.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:06+02:00",
         "file":  "/scan/kube-bench-security.node-job.yaml"
     },
     {
@@ -741,7 +741,7 @@
         "ResourceName":  "kube-bench-node",
         "level":  "error",
         "msg":  "Default service account with token mounted. automountServiceAccountToken should be set to \u0027false\u0027 on either the ServiceAccount or on the PodSpec or a non-default service account should be used.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:06+02:00",
         "file":  "/scan/kube-bench-security.node-job.yaml"
     },
     {
@@ -752,7 +752,7 @@
         "ResourceName":  "kube-bench-node",
         "level":  "error",
         "msg":  "Security Context not set. The Security Context should be specified and all Capabilities should be dropped by setting the Drop list to ALL.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:06+02:00",
         "file":  "/scan/kube-bench-security.node-job.yaml"
     },
     {
@@ -762,7 +762,7 @@
         "ResourceName":  "kube-bench-node",
         "level":  "error",
         "msg":  "hostPID is set to \u0027true\u0027 in PodSpec. It should be set to \u0027false\u0027.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:06+02:00",
         "file":  "/scan/kube-bench-security.node-job.yaml"
     },
     {
@@ -778,7 +778,7 @@
         "ResourceName":  "kube-bench-node",
         "level":  "error",
         "msg":  "Sensitive path mounted as volume: var-lib-kubelet (hostPath: /var/lib/kubelet). It should be removed from the container\u0027s mounts list.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:06+02:00",
         "file":  "/scan/kube-bench-security.node-job.yaml"
     },
     {
@@ -794,7 +794,7 @@
         "ResourceName":  "kube-bench-node",
         "level":  "error",
         "msg":  "Sensitive path mounted as volume: etc-kubernetes (hostPath: /etc/kubernetes). It should be removed from the container\u0027s mounts list.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:06+02:00",
         "file":  "/scan/kube-bench-security.node-job.yaml"
     },
     {
@@ -805,7 +805,7 @@
         "ResourceName":  "kube-bench-node",
         "level":  "error",
         "msg":  "runAsNonRoot should be set to true or runAsUser should be set to a value \u003e 0 either in the container SecurityContext or PodSecurityContext.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:06+02:00",
         "file":  "/scan/kube-bench-security.node-job.yaml"
     },
     {
@@ -816,7 +816,7 @@
         "ResourceName":  "kube-bench-node",
         "level":  "error",
         "msg":  "allowPrivilegeEscalation not set which allows privilege escalation. It should be set to \u0027false\u0027.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:06+02:00",
         "file":  "/scan/kube-bench-security.node-job.yaml"
     },
     {
@@ -827,7 +827,7 @@
         "ResourceName":  "kube-bench-node",
         "level":  "error",
         "msg":  "readOnlyRootFilesystem is not set in container SecurityContext. It should be set to \u0027true\u0027.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:06+02:00",
         "file":  "/scan/kube-bench-security.node-job.yaml"
     },
     {
@@ -837,7 +837,7 @@
         "ResourceName":  "kube-bench-node",
         "level":  "error",
         "msg":  "Pod Seccomp profile is missing. Seccomp profile should be added to the pod SecurityContext.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:06+02:00",
         "file":  "/scan/kube-bench-security.node-job.yaml"
     },
     {
@@ -850,7 +850,7 @@
         "ResourceNamespace":  "default",
         "level":  "error",
         "msg":  "AppArmor annotation missing. The annotation \u0027container.apparmor.security.beta.kubernetes.io/poor-registry\u0027 should be added.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:06+02:00",
         "file":  "/scan/poor-registry.deployment.yaml"
     },
     {
@@ -861,7 +861,7 @@
         "ResourceNamespace":  "default",
         "level":  "error",
         "msg":  "Default service account with token mounted. automountServiceAccountToken should be set to \u0027false\u0027 on either the ServiceAccount or on the PodSpec or a non-default service account should be used.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:06+02:00",
         "file":  "/scan/poor-registry.deployment.yaml"
     },
     {
@@ -873,7 +873,7 @@
         "ResourceNamespace":  "default",
         "level":  "error",
         "msg":  "Security Context not set. The Security Context should be specified and all Capabilities should be dropped by setting the Drop list to ALL.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:06+02:00",
         "file":  "/scan/poor-registry.deployment.yaml"
     },
     {
@@ -885,7 +885,7 @@
         "ResourceNamespace":  "default",
         "level":  "error",
         "msg":  "runAsNonRoot should be set to true or runAsUser should be set to a value \u003e 0 either in the container SecurityContext or PodSecurityContext.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:06+02:00",
         "file":  "/scan/poor-registry.deployment.yaml"
     },
     {
@@ -897,7 +897,7 @@
         "ResourceNamespace":  "default",
         "level":  "error",
         "msg":  "allowPrivilegeEscalation not set which allows privilege escalation. It should be set to \u0027false\u0027.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:06+02:00",
         "file":  "/scan/poor-registry.deployment.yaml"
     },
     {
@@ -909,7 +909,7 @@
         "ResourceNamespace":  "default",
         "level":  "error",
         "msg":  "readOnlyRootFilesystem is not set in container SecurityContext. It should be set to \u0027true\u0027.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:06+02:00",
         "file":  "/scan/poor-registry.deployment.yaml"
     },
     {
@@ -920,7 +920,7 @@
         "ResourceNamespace":  "default",
         "level":  "error",
         "msg":  "Pod Seccomp profile is missing. Seccomp profile should be added to the pod SecurityContext.",
-        "time":  "2025-11-08T13:21:16+02:00",
+        "time":  "2025-11-09T15:57:06+02:00",
         "file":  "/scan/poor-registry.deployment.yaml"
     }
 ]

@@ -17,6 +17,7 @@ import os
 from pathlib import Path
 from typing import Dict, List, Tuple
 import re
+import difflib
 
 # Import from multi_llm_orchestrator
 sys.path.insert(0, str(Path(__file__).parent))
@@ -349,13 +350,16 @@ async def combine_patches_for_file(
         # Apply patch if consensus says fix
         best_patch = None
         best_model = None
+        used_fixed_file = False
+        model_fixed_file = consensus.get("final_fixed_file", "") if isinstance(consensus, dict) else ""
         
         if final_classification == "fix" and final_patch:
             # Apply the patch to current_content
             # Create the original file path structure in sandbox to match the diff target
             temp_file_path = sandbox_dir / original_path
             temp_file_path.parent.mkdir(parents=True, exist_ok=True)
-            temp_file_path.write_text(current_content, encoding="utf-8")
+            pre_patch_content = current_content
+            temp_file_path.write_text(pre_patch_content, encoding="utf-8")
             
             # Try to apply the consensus patch
             result = _validate_and_write_patch(
@@ -415,6 +419,37 @@ async def combine_patches_for_file(
                         print(f"  [WARN] Could not extract replacement line from patch")
                 except Exception as e:
                     print(f"  [WARN] Fallback replacement failed: {e}")
+            elif model_fixed_file:
+                # Attempt to derive patch from the full fixed file provided by the model
+                print("  [INFO] Patch failed; deriving diff from provided fixed manifest...")
+                diff_text = ''.join(difflib.unified_diff(
+                    pre_patch_content.splitlines(keepends=True),
+                    model_fixed_file.splitlines(keepends=True),
+                    fromfile=f"a/{target_file}",
+                    tofile=f"b/{target_file}"
+                ))
+                if diff_text:
+                    alt_result = _validate_and_write_patch(
+                        str(temp_file_path),
+                        diff_text,
+                        idx,
+                        str(sandbox_dir),
+                        "yaml",
+                        item.get("category", ""),
+                        autofix=autofix,
+                        hygiene=hygiene
+                    )
+                    if alt_result.get("status") == "pass":
+                        sandbox_path = Path(alt_result["sandbox_path"])
+                        if sandbox_path.exists():
+                            current_content = sandbox_path.read_text(encoding="utf-8")
+                            successful_patches += 1
+                            best_patch = diff_text
+                            best_model = from_model
+                            used_fixed_file = True
+                            print("  [OK] Applied diff derived from fixed manifest")
+                    else:
+                        print(f"  [WARN] Derived diff invalid: {alt_result.get('reason')}")
             else:
                 # Conservative fallback: if patch failed for PRIVILEGED, try direct toggle
                 cat = str(item.get("category", "")).upper()
@@ -441,6 +476,7 @@ async def combine_patches_for_file(
             "models_voted": list(votes.keys()),
             "selected_model": best_model,
             "patch_applied": best_patch is not None,
+            "used_fixed_manifest": used_fixed_file,
             "votes": {k: {"classification": v.get("classification")} for k, v in votes.items()}
         })
         

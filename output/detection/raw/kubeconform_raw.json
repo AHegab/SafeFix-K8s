@@ -63,7 +63,7 @@
       ]
     },
     {
-      "filename": "/scan/34.echo1_no_securitycontext.yaml",
+      "filename": "/scan/34.echo1_privileged.yaml",
       "kind": "Deployment",
       "name": "echo1",
       "version": "apps/v1",
@@ -71,7 +71,7 @@
       "msg": ""
     },
     {
-      "filename": "/scan/34.echo1_privileged.yaml",
+      "filename": "/scan/34.echo1_no_securitycontext.yaml",
       "kind": "Deployment",
       "name": "echo1",
       "version": "apps/v1",
@@ -112,9 +112,9 @@
     },
     {
       "filename": "/scan/insecure-rbac.setup.yaml",
-      "kind": "ServiceAccount",
+      "kind": "ClusterRoleBinding",
       "name": "superadmin",
-      "version": "v1",
+      "version": "rbac.authorization.k8s.io/v1",
       "status": "statusValid",
       "msg": ""
     },
@@ -127,18 +127,18 @@
       "msg": ""
     },
     {
-      "filename": "/scan/poor-registry.deployment.yaml",
-      "kind": "Service",
-      "name": "poor-registry-service",
+      "filename": "/scan/insecure-rbac.setup.yaml",
+      "kind": "ServiceAccount",
+      "name": "superadmin",
       "version": "v1",
       "status": "statusValid",
       "msg": ""
     },
     {
-      "filename": "/scan/insecure-rbac.setup.yaml",
-      "kind": "ClusterRoleBinding",
-      "name": "superadmin",
-      "version": "rbac.authorization.k8s.io/v1",
+      "filename": "/scan/poor-registry.deployment.yaml",
+      "kind": "Service",
+      "name": "poor-registry-service",
+      "version": "v1",
       "status": "statusValid",
       "msg": ""
     },

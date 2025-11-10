@@ -1,147 +1,45 @@
 ﻿[
 	{
-		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
+		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\28.role_overly_permissive.yaml",
 		"namespace": "main",
-		"successes": 18,
+		"successes": 36,
 		"failures": [
 			{
-				"msg": "HEALTH_PROBES: Container 'nginx' in Deployment 'nginx-deployment' must define livenessProbe",
-				"metadata": {
-					"query": "data.main.deny"
-				}
-			},
-			{
-				"msg": "HEALTH_PROBES: Container 'nginx' in Deployment 'nginx-deployment' must define readinessProbe",
-				"metadata": {
-					"query": "data.main.deny"
-				}
-			},
-			{
-				"msg": "IMAGE_PULL_POLICY: Container 'nginx' in Deployment 'nginx-deployment' should set imagePullPolicy: Always (unless using digest)",
-				"metadata": {
-					"query": "data.main.deny"
-				}
-			},
-			{
-				"msg": "KSV_ALLOW_PRIVILEGE_ESCALATION: Container 'nginx' in Deployment 'nginx-deployment' does not explicitly set allowPrivilegeEscalation: false",
-				"metadata": {
-					"query": "data.main.deny"
-				}
-			},
-			{
-				"msg": "KSV_CAP_DROP_MISSING: Container 'nginx' in Deployment 'nginx-deployment' does not drop ALL capabilities. Add securityContext.capabilities.drop: [ALL]",
-				"metadata": {
-					"query": "data.main.deny"
-				}
-			},
-			{
-				"msg": "KSV_DEFAULT_NAMESPACE: Deployment 'nginx-deployment' is deployed to default namespace. Specify metadata.namespace with a non-default value",
-				"metadata": {
-					"query": "data.main.deny"
-				}
-			},
-			{
-				"msg": "KSV_DEFAULT_SA_TOKEN: Deployment 'nginx-deployment' uses default service account with automountServiceAccountToken: true. Set serviceAccountName to non-default and automountServiceAccountToken: false",
-				"metadata": {
-					"query": "data.main.deny"
-				}
-			},
-			{
-				"msg": "KSV_IMAGE_NOT_PINNED: Container 'nginx' in Deployment 'nginx-deployment' uses :latest tag. Pin image with @sha256:\u003cdigest\u003e",
-				"metadata": {
-					"query": "data.main.deny"
-				}
-			},
-			{
-				"msg": "KSV_NO_APPARMOR: Container 'nginx' in Deployment 'nginx-deployment' has no AppArmor annotation. Add annotation container.apparmor.security.beta.kubernetes.io/nginx: runtime/default",
-				"metadata": {
-					"query": "data.main.deny"
-				}
-			},
-			{
-				"msg": "KSV_NO_LIMITS_NO_PROBES: Container 'nginx' in Deployment 'nginx-deployment' missing resource limits (cpu/memory) AND probes (liveness/readiness)",
-				"metadata": {
-					"query": "data.main.deny"
-				}
-			},
-			{
-				"msg": "KSV_NO_SECCOMP: Container 'nginx' in Deployment 'nginx-deployment' has no seccomp profile. Set securityContext.seccompProfile.type: RuntimeDefault",
-				"metadata": {
-					"query": "data.main.deny"
-				}
-			},
-			{
-				"msg": "KSV_PRIVILEGED: Container 'nginx' in Deployment 'nginx-deployment' runs in privileged mode. Set securityContext.privileged: false",
-				"metadata": {
-					"query": "data.main.deny"
-				}
-			},
-			{
-				"msg": "KSV_READONLY_ROOTFS_FALSE: Container 'nginx' in Deployment 'nginx-deployment' does not have readOnlyRootFilesystem: true",
-				"metadata": {
-					"query": "data.main.deny"
-				}
-			},
-			{
-				"msg": "NETWORK_POLICY: Deployment 'nginx-deployment' must be covered by a NetworkPolicy (add annotation network-policy-confirmed: true)",
-				"metadata": {
-					"query": "data.main.deny"
-				}
-			},
-			{
-				"msg": "RESOURCE_LIMITS: Container 'nginx' in Deployment 'nginx-deployment' must set CPU limit",
-				"metadata": {
-					"query": "data.main.deny"
-				}
-			},
-			{
-				"msg": "RESOURCE_LIMITS: Container 'nginx' in Deployment 'nginx-deployment' must set memory limit",
-				"metadata": {
-					"query": "data.main.deny"
-				}
-			},
-			{
-				"msg": "RESOURCE_REQUESTS: Container 'nginx' in Deployment 'nginx-deployment' must set CPU request",
-				"metadata": {
-					"query": "data.main.deny"
-				}
-			},
-			{
-				"msg": "RESOURCE_REQUESTS: Container 'nginx' in Deployment 'nginx-deployment' must set memory request",
-				"metadata": {
-					"query": "data.main.deny"
-				}
-			},
-			{
-				"msg": "RUN_AS_NON_ROOT: Container 'nginx' in Deployment 'nginx-deployment' must set runAsNonRoot: true at pod or container level",
+				"msg": "KSV_DEFAULT_NAMESPACE: Role 'frontend-role' is deployed to default namespace. Specify metadata.namespace with a non-default value",
 				"metadata": {
 					"query": "data.main.deny"
 				}
 			}
 		]
+	},
+	{
+		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\34.unencrypted_secret.yaml",
+		"namespace": "main",
+		"successes": 35,
+		"failures": [
+			{
+				"msg": "KSV_DEFAULT_NAMESPACE: Secret 'mysecret' is deployed to default namespace. Specify metadata.namespace with a non-default value",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "UNENCRYPTED_SECRET: Secret 'mysecret' is unencrypted - use encryption at rest or external secret management",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			}
+		]
+	},
+	{
+		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\27.Misconfiguration.yaml",
+		"namespace": "main",
+		"successes": 37
 	},
 	{
 		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\27.Valid.yaml",
 		"namespace": "main",
 		"successes": 37
-	},
-	{
-		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\29.helm_rabbitmq_hardcoded_credentials.yaml",
-		"namespace": "main",
-		"successes": 37
-	},
-	{
-		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\insecure-rbac.setup.yaml",
-		"namespace": "main",
-		"successes": 73,
-		"failures": [
-			{
-				"msg": "KSV_DEFAULT_NAMESPACE: ClusterRoleBinding 'superadmin' is deployed to default namespace. Specify metadata.namespace with a non-default value",
-				"metadata": {
-					"query": "data.main.deny"
-				}
-			}
-		]
 	},
 	{
 		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\31.example-nginx.yaml",
@@ -283,6 +181,163 @@
 		]
 	},
 	{
+		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\internal-proxy.deployment.yaml",
+		"namespace": "main",
+		"successes": 86,
+		"failures": [
+			{
+				"msg": "HEALTH_PROBES: Container 'info-app' in Deployment 'internal-proxy-deployment' must define livenessProbe",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "HEALTH_PROBES: Container 'info-app' in Deployment 'internal-proxy-deployment' must define readinessProbe",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "HEALTH_PROBES: Container 'internal-api' in Deployment 'internal-proxy-deployment' must define livenessProbe",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "HEALTH_PROBES: Container 'internal-api' in Deployment 'internal-proxy-deployment' must define readinessProbe",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "IMAGE_PULL_POLICY: Container 'info-app' in Deployment 'internal-proxy-deployment' should set imagePullPolicy: Always (unless using digest)",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "IMAGE_PULL_POLICY: Container 'internal-api' in Deployment 'internal-proxy-deployment' should set imagePullPolicy: Always (unless using digest)",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "KSV_ALLOW_PRIVILEGE_ESCALATION: Container 'info-app' in Deployment 'internal-proxy-deployment' does not explicitly set allowPrivilegeEscalation: false",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "KSV_ALLOW_PRIVILEGE_ESCALATION: Container 'internal-api' in Deployment 'internal-proxy-deployment' does not explicitly set allowPrivilegeEscalation: false",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "KSV_CAP_DROP_MISSING: Container 'info-app' in Deployment 'internal-proxy-deployment' does not drop ALL capabilities. Add securityContext.capabilities.drop: [ALL]",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "KSV_CAP_DROP_MISSING: Container 'internal-api' in Deployment 'internal-proxy-deployment' does not drop ALL capabilities. Add securityContext.capabilities.drop: [ALL]",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "KSV_DEFAULT_NAMESPACE: Deployment 'internal-proxy-deployment' is deployed to default namespace. Specify metadata.namespace with a non-default value",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "KSV_DEFAULT_SA_TOKEN: Deployment 'internal-proxy-deployment' uses default service account with automountServiceAccountToken: true. Set serviceAccountName to non-default and automountServiceAccountToken: false",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "KSV_IMAGE_NOT_PINNED: Container 'info-app' in internal-proxy-deployment '%!s(MISSING)' has no tag/digest. Pin image with @sha256:\u003cdigest\u003e",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "KSV_IMAGE_NOT_PINNED: Container 'internal-api' in internal-proxy-deployment '%!s(MISSING)' has no tag/digest. Pin image with @sha256:\u003cdigest\u003e",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "KSV_NO_APPARMOR: Container 'info-app' in Deployment 'internal-proxy-deployment' has no AppArmor annotation. Add annotation container.apparmor.security.beta.kubernetes.io/info-app: runtime/default",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "KSV_NO_APPARMOR: Container 'internal-api' in Deployment 'internal-proxy-deployment' has no AppArmor annotation. Add annotation container.apparmor.security.beta.kubernetes.io/internal-api: runtime/default",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "KSV_NO_SECCOMP: Container 'info-app' in Deployment 'internal-proxy-deployment' has no seccomp profile. Set securityContext.seccompProfile.type: RuntimeDefault",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "KSV_NO_SECCOMP: Container 'internal-api' in Deployment 'internal-proxy-deployment' has no seccomp profile. Set securityContext.seccompProfile.type: RuntimeDefault",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "KSV_READONLY_ROOTFS_FALSE: Container 'info-app' in Deployment 'internal-proxy-deployment' does not have readOnlyRootFilesystem: true",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "KSV_READONLY_ROOTFS_FALSE: Container 'internal-api' in Deployment 'internal-proxy-deployment' does not have readOnlyRootFilesystem: true",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "NETWORK_POLICY: Deployment 'internal-proxy-deployment' must be covered by a NetworkPolicy (add annotation network-policy-confirmed: true)",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "RUN_AS_NON_ROOT: Container 'info-app' in Deployment 'internal-proxy-deployment' must set runAsNonRoot: true at pod or container level",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "RUN_AS_NON_ROOT: Container 'internal-api' in Deployment 'internal-proxy-deployment' must set runAsNonRoot: true at pod or container level",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "KSV_DEFAULT_NAMESPACE: Service 'internal-proxy-api-service' is deployed to default namespace. Specify metadata.namespace with a non-default value",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "KSV_DEFAULT_NAMESPACE: Service 'internal-proxy-info-app-service' is deployed to default namespace. Specify metadata.namespace with a non-default value",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			}
+		]
+	},
+	{
 		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\34.echo1_load_balancer.yaml",
 		"namespace": "main",
 		"successes": 36,
@@ -296,9 +351,9 @@
 		]
 	},
 	{
-		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\34.echo1_privileged.yaml",
+		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\34.echo1_no_securitycontext.yaml",
 		"namespace": "main",
-		"successes": 25,
+		"successes": 24,
 		"failures": [
 			{
 				"msg": "HEALTH_PROBES: Container 'echo1' in Deployment 'echo1' must define livenessProbe",
@@ -361,6 +416,12 @@
 				}
 			},
 			{
+				"msg": "KSV_READONLY_ROOTFS_FALSE: Container 'echo1' in Deployment 'echo1' does not have readOnlyRootFilesystem: true",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
 				"msg": "NETWORK_POLICY: Deployment 'echo1' must be covered by a NetworkPolicy (add annotation network-policy-confirmed: true)",
 				"metadata": {
 					"query": "data.main.deny"
@@ -368,25 +429,6 @@
 			},
 			{
 				"msg": "RUN_AS_NON_ROOT: Container 'echo1' in Deployment 'echo1' must set runAsNonRoot: true at pod or container level",
-				"metadata": {
-					"query": "data.main.deny"
-				}
-			}
-		]
-	},
-	{
-		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\34.unencrypted_secret.yaml",
-		"namespace": "main",
-		"successes": 35,
-		"failures": [
-			{
-				"msg": "KSV_DEFAULT_NAMESPACE: Secret 'mysecret' is deployed to default namespace. Specify metadata.namespace with a non-default value",
-				"metadata": {
-					"query": "data.main.deny"
-				}
-			},
-			{
-				"msg": "UNENCRYPTED_SECRET: Secret 'mysecret' is unencrypted - use encryption at rest or external secret management",
 				"metadata": {
 					"query": "data.main.deny"
 				}
@@ -678,9 +720,88 @@
 		]
 	},
 	{
-		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\27.Misconfiguration.yaml",
+		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\29.helm_rabbitmq_hardcoded_credentials.yaml",
 		"namespace": "main",
 		"successes": 37
+	},
+	{
+		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\34.echo1_privileged.yaml",
+		"namespace": "main",
+		"successes": 25,
+		"failures": [
+			{
+				"msg": "HEALTH_PROBES: Container 'echo1' in Deployment 'echo1' must define livenessProbe",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "HEALTH_PROBES: Container 'echo1' in Deployment 'echo1' must define readinessProbe",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "IMAGE_PULL_POLICY: Container 'echo1' in Deployment 'echo1' should set imagePullPolicy: Always (unless using digest)",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "KSV_ALLOW_PRIVILEGE_ESCALATION: Container 'echo1' in Deployment 'echo1' does not explicitly set allowPrivilegeEscalation: false",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "KSV_CAP_DROP_MISSING: Container 'echo1' in Deployment 'echo1' does not drop ALL capabilities. Add securityContext.capabilities.drop: [ALL]",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "KSV_DEFAULT_NAMESPACE: Deployment 'echo1' is deployed to default namespace. Specify metadata.namespace with a non-default value",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "KSV_DEFAULT_SA_TOKEN: Deployment 'echo1' uses default service account with automountServiceAccountToken: true. Set serviceAccountName to non-default and automountServiceAccountToken: false",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "KSV_IMAGE_NOT_PINNED: Container 'echo1' in echo1 '%!s(MISSING)' has no tag/digest. Pin image with @sha256:\u003cdigest\u003e",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "KSV_NO_APPARMOR: Container 'echo1' in Deployment 'echo1' has no AppArmor annotation. Add annotation container.apparmor.security.beta.kubernetes.io/echo1: runtime/default",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "KSV_NO_SECCOMP: Container 'echo1' in Deployment 'echo1' has no seccomp profile. Set securityContext.seccompProfile.type: RuntimeDefault",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "NETWORK_POLICY: Deployment 'echo1' must be covered by a NetworkPolicy (add annotation network-policy-confirmed: true)",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			},
+			{
+				"msg": "RUN_AS_NON_ROOT: Container 'echo1' in Deployment 'echo1' must set runAsNonRoot: true at pod or container level",
+				"metadata": {
+					"query": "data.main.deny"
+				}
+			}
+		]
 	},
 	{
 		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\docker-bench-security.deployment.yaml",
@@ -834,12 +955,12 @@
 		]
 	},
 	{
-		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\28.role_overly_permissive.yaml",
+		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\insecure-rbac.setup.yaml",
 		"namespace": "main",
-		"successes": 36,
+		"successes": 73,
 		"failures": [
 			{
-				"msg": "KSV_DEFAULT_NAMESPACE: Role 'frontend-role' is deployed to default namespace. Specify metadata.namespace with a non-default value",
+				"msg": "KSV_DEFAULT_NAMESPACE: ClusterRoleBinding 'superadmin' is deployed to default namespace. Specify metadata.namespace with a non-default value",
 				"metadata": {
 					"query": "data.main.deny"
 				}
@@ -847,241 +968,120 @@
 		]
 	},
 	{
-		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\34.echo1_no_securitycontext.yaml",
+		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
 		"namespace": "main",
-		"successes": 24,
+		"successes": 18,
 		"failures": [
 			{
-				"msg": "HEALTH_PROBES: Container 'echo1' in Deployment 'echo1' must define livenessProbe",
+				"msg": "HEALTH_PROBES: Container 'nginx' in Deployment 'nginx-deployment' must define livenessProbe",
 				"metadata": {
 					"query": "data.main.deny"
 				}
 			},
 			{
-				"msg": "HEALTH_PROBES: Container 'echo1' in Deployment 'echo1' must define readinessProbe",
+				"msg": "HEALTH_PROBES: Container 'nginx' in Deployment 'nginx-deployment' must define readinessProbe",
 				"metadata": {
 					"query": "data.main.deny"
 				}
 			},
 			{
-				"msg": "IMAGE_PULL_POLICY: Container 'echo1' in Deployment 'echo1' should set imagePullPolicy: Always (unless using digest)",
+				"msg": "IMAGE_PULL_POLICY: Container 'nginx' in Deployment 'nginx-deployment' should set imagePullPolicy: Always (unless using digest)",
 				"metadata": {
 					"query": "data.main.deny"
 				}
 			},
 			{
-				"msg": "KSV_ALLOW_PRIVILEGE_ESCALATION: Container 'echo1' in Deployment 'echo1' does not explicitly set allowPrivilegeEscalation: false",
+				"msg": "KSV_ALLOW_PRIVILEGE_ESCALATION: Container 'nginx' in Deployment 'nginx-deployment' does not explicitly set allowPrivilegeEscalation: false",
 				"metadata": {
 					"query": "data.main.deny"
 				}
 			},
 			{
-				"msg": "KSV_CAP_DROP_MISSING: Container 'echo1' in Deployment 'echo1' does not drop ALL capabilities. Add securityContext.capabilities.drop: [ALL]",
+				"msg": "KSV_CAP_DROP_MISSING: Container 'nginx' in Deployment 'nginx-deployment' does not drop ALL capabilities. Add securityContext.capabilities.drop: [ALL]",
 				"metadata": {
 					"query": "data.main.deny"
 				}
 			},
 			{
-				"msg": "KSV_DEFAULT_NAMESPACE: Deployment 'echo1' is deployed to default namespace. Specify metadata.namespace with a non-default value",
+				"msg": "KSV_DEFAULT_NAMESPACE: Deployment 'nginx-deployment' is deployed to default namespace. Specify metadata.namespace with a non-default value",
 				"metadata": {
 					"query": "data.main.deny"
 				}
 			},
 			{
-				"msg": "KSV_DEFAULT_SA_TOKEN: Deployment 'echo1' uses default service account with automountServiceAccountToken: true. Set serviceAccountName to non-default and automountServiceAccountToken: false",
+				"msg": "KSV_DEFAULT_SA_TOKEN: Deployment 'nginx-deployment' uses default service account with automountServiceAccountToken: true. Set serviceAccountName to non-default and automountServiceAccountToken: false",
 				"metadata": {
 					"query": "data.main.deny"
 				}
 			},
 			{
-				"msg": "KSV_IMAGE_NOT_PINNED: Container 'echo1' in echo1 '%!s(MISSING)' has no tag/digest. Pin image with @sha256:\u003cdigest\u003e",
+				"msg": "KSV_IMAGE_NOT_PINNED: Container 'nginx' in Deployment 'nginx-deployment' uses :latest tag. Pin image with @sha256:\u003cdigest\u003e",
 				"metadata": {
 					"query": "data.main.deny"
 				}
 			},
 			{
-				"msg": "KSV_NO_APPARMOR: Container 'echo1' in Deployment 'echo1' has no AppArmor annotation. Add annotation container.apparmor.security.beta.kubernetes.io/echo1: runtime/default",
+				"msg": "KSV_NO_APPARMOR: Container 'nginx' in Deployment 'nginx-deployment' has no AppArmor annotation. Add annotation container.apparmor.security.beta.kubernetes.io/nginx: runtime/default",
 				"metadata": {
 					"query": "data.main.deny"
 				}
 			},
 			{
-				"msg": "KSV_NO_SECCOMP: Container 'echo1' in Deployment 'echo1' has no seccomp profile. Set securityContext.seccompProfile.type: RuntimeDefault",
+				"msg": "KSV_NO_LIMITS_NO_PROBES: Container 'nginx' in Deployment 'nginx-deployment' missing resource limits (cpu/memory) AND probes (liveness/readiness)",
 				"metadata": {
 					"query": "data.main.deny"
 				}
 			},
 			{
-				"msg": "KSV_READONLY_ROOTFS_FALSE: Container 'echo1' in Deployment 'echo1' does not have readOnlyRootFilesystem: true",
+				"msg": "KSV_NO_SECCOMP: Container 'nginx' in Deployment 'nginx-deployment' has no seccomp profile. Set securityContext.seccompProfile.type: RuntimeDefault",
 				"metadata": {
 					"query": "data.main.deny"
 				}
 			},
 			{
-				"msg": "NETWORK_POLICY: Deployment 'echo1' must be covered by a NetworkPolicy (add annotation network-policy-confirmed: true)",
+				"msg": "KSV_PRIVILEGED: Container 'nginx' in Deployment 'nginx-deployment' runs in privileged mode. Set securityContext.privileged: false",
 				"metadata": {
 					"query": "data.main.deny"
 				}
 			},
 			{
-				"msg": "RUN_AS_NON_ROOT: Container 'echo1' in Deployment 'echo1' must set runAsNonRoot: true at pod or container level",
-				"metadata": {
-					"query": "data.main.deny"
-				}
-			}
-		]
-	},
-	{
-		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\internal-proxy.deployment.yaml",
-		"namespace": "main",
-		"successes": 86,
-		"failures": [
-			{
-				"msg": "HEALTH_PROBES: Container 'info-app' in Deployment 'internal-proxy-deployment' must define livenessProbe",
+				"msg": "KSV_READONLY_ROOTFS_FALSE: Container 'nginx' in Deployment 'nginx-deployment' does not have readOnlyRootFilesystem: true",
 				"metadata": {
 					"query": "data.main.deny"
 				}
 			},
 			{
-				"msg": "HEALTH_PROBES: Container 'info-app' in Deployment 'internal-proxy-deployment' must define readinessProbe",
+				"msg": "NETWORK_POLICY: Deployment 'nginx-deployment' must be covered by a NetworkPolicy (add annotation network-policy-confirmed: true)",
 				"metadata": {
 					"query": "data.main.deny"
 				}
 			},
 			{
-				"msg": "HEALTH_PROBES: Container 'internal-api' in Deployment 'internal-proxy-deployment' must define livenessProbe",
+				"msg": "RESOURCE_LIMITS: Container 'nginx' in Deployment 'nginx-deployment' must set CPU limit",
 				"metadata": {
 					"query": "data.main.deny"
 				}
 			},
 			{
-				"msg": "HEALTH_PROBES: Container 'internal-api' in Deployment 'internal-proxy-deployment' must define readinessProbe",
+				"msg": "RESOURCE_LIMITS: Container 'nginx' in Deployment 'nginx-deployment' must set memory limit",
 				"metadata": {
 					"query": "data.main.deny"
 				}
 			},
 			{
-				"msg": "IMAGE_PULL_POLICY: Container 'info-app' in Deployment 'internal-proxy-deployment' should set imagePullPolicy: Always (unless using digest)",
+				"msg": "RESOURCE_REQUESTS: Container 'nginx' in Deployment 'nginx-deployment' must set CPU request",
 				"metadata": {
 					"query": "data.main.deny"
 				}
 			},
 			{
-				"msg": "IMAGE_PULL_POLICY: Container 'internal-api' in Deployment 'internal-proxy-deployment' should set imagePullPolicy: Always (unless using digest)",
+				"msg": "RESOURCE_REQUESTS: Container 'nginx' in Deployment 'nginx-deployment' must set memory request",
 				"metadata": {
 					"query": "data.main.deny"
 				}
 			},
 			{
-				"msg": "KSV_ALLOW_PRIVILEGE_ESCALATION: Container 'info-app' in Deployment 'internal-proxy-deployment' does not explicitly set allowPrivilegeEscalation: false",
-				"metadata": {
-					"query": "data.main.deny"
-				}
-			},
-			{
-				"msg": "KSV_ALLOW_PRIVILEGE_ESCALATION: Container 'internal-api' in Deployment 'internal-proxy-deployment' does not explicitly set allowPrivilegeEscalation: false",
-				"metadata": {
-					"query": "data.main.deny"
-				}
-			},
-			{
-				"msg": "KSV_CAP_DROP_MISSING: Container 'info-app' in Deployment 'internal-proxy-deployment' does not drop ALL capabilities. Add securityContext.capabilities.drop: [ALL]",
-				"metadata": {
-					"query": "data.main.deny"
-				}
-			},
-			{
-				"msg": "KSV_CAP_DROP_MISSING: Container 'internal-api' in Deployment 'internal-proxy-deployment' does not drop ALL capabilities. Add securityContext.capabilities.drop: [ALL]",
-				"metadata": {
-					"query": "data.main.deny"
-				}
-			},
-			{
-				"msg": "KSV_DEFAULT_NAMESPACE: Deployment 'internal-proxy-deployment' is deployed to default namespace. Specify metadata.namespace with a non-default value",
-				"metadata": {
-					"query": "data.main.deny"
-				}
-			},
-			{
-				"msg": "KSV_DEFAULT_SA_TOKEN: Deployment 'internal-proxy-deployment' uses default service account with automountServiceAccountToken: true. Set serviceAccountName to non-default and automountServiceAccountToken: false",
-				"metadata": {
-					"query": "data.main.deny"
-				}
-			},
-			{
-				"msg": "KSV_IMAGE_NOT_PINNED: Container 'info-app' in internal-proxy-deployment '%!s(MISSING)' has no tag/digest. Pin image with @sha256:\u003cdigest\u003e",
-				"metadata": {
-					"query": "data.main.deny"
-				}
-			},
-			{
-				"msg": "KSV_IMAGE_NOT_PINNED: Container 'internal-api' in internal-proxy-deployment '%!s(MISSING)' has no tag/digest. Pin image with @sha256:\u003cdigest\u003e",
-				"metadata": {
-					"query": "data.main.deny"
-				}
-			},
-			{
-				"msg": "KSV_NO_APPARMOR: Container 'info-app' in Deployment 'internal-proxy-deployment' has no AppArmor annotation. Add annotation container.apparmor.security.beta.kubernetes.io/info-app: runtime/default",
-				"metadata": {
-					"query": "data.main.deny"
-				}
-			},
-			{
-				"msg": "KSV_NO_APPARMOR: Container 'internal-api' in Deployment 'internal-proxy-deployment' has no AppArmor annotation. Add annotation container.apparmor.security.beta.kubernetes.io/internal-api: runtime/default",
-				"metadata": {
-					"query": "data.main.deny"
-				}
-			},
-			{
-				"msg": "KSV_NO_SECCOMP: Container 'info-app' in Deployment 'internal-proxy-deployment' has no seccomp profile. Set securityContext.seccompProfile.type: RuntimeDefault",
-				"metadata": {
-					"query": "data.main.deny"
-				}
-			},
-			{
-				"msg": "KSV_NO_SECCOMP: Container 'internal-api' in Deployment 'internal-proxy-deployment' has no seccomp profile. Set securityContext.seccompProfile.type: RuntimeDefault",
-				"metadata": {
-					"query": "data.main.deny"
-				}
-			},
-			{
-				"msg": "KSV_READONLY_ROOTFS_FALSE: Container 'info-app' in Deployment 'internal-proxy-deployment' does not have readOnlyRootFilesystem: true",
-				"metadata": {
-					"query": "data.main.deny"
-				}
-			},
-			{
-				"msg": "KSV_READONLY_ROOTFS_FALSE: Container 'internal-api' in Deployment 'internal-proxy-deployment' does not have readOnlyRootFilesystem: true",
-				"metadata": {
-					"query": "data.main.deny"
-				}
-			},
-			{
-				"msg": "NETWORK_POLICY: Deployment 'internal-proxy-deployment' must be covered by a NetworkPolicy (add annotation network-policy-confirmed: true)",
-				"metadata": {
-					"query": "data.main.deny"
-				}
-			},
-			{
-				"msg": "RUN_AS_NON_ROOT: Container 'info-app' in Deployment 'internal-proxy-deployment' must set runAsNonRoot: true at pod or container level",
-				"metadata": {
-					"query": "data.main.deny"
-				}
-			},
-			{
-				"msg": "RUN_AS_NON_ROOT: Container 'internal-api' in Deployment 'internal-proxy-deployment' must set runAsNonRoot: true at pod or container level",
-				"metadata": {
-					"query": "data.main.deny"
-				}
-			},
-			{
-				"msg": "KSV_DEFAULT_NAMESPACE: Service 'internal-proxy-api-service' is deployed to default namespace. Specify metadata.namespace with a non-default value",
-				"metadata": {
-					"query": "data.main.deny"
-				}
-			},
-			{
-				"msg": "KSV_DEFAULT_NAMESPACE: Service 'internal-proxy-info-app-service' is deployed to default namespace. Specify metadata.namespace with a non-default value",
+				"msg": "RUN_AS_NON_ROOT: Container 'nginx' in Deployment 'nginx-deployment' must set runAsNonRoot: true at pod or container level",
 				"metadata": {
 					"query": "data.main.deny"
 				}

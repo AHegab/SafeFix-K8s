@@ -1,0 +1,46 @@
+--- tests\31.example-nginx.yaml+++ output\combination\SECURED_tests_31.example-nginx.yaml@@ -1,21 +1,18 @@-# Sample Kubernetes manifest (example-nginx.yaml) with intentional security misconfigurations
+ apiVersion: v1
+ kind: Pod
+ metadata:
+   name: nginx
+ spec:
+-  # These host-level settings are overly permissive and should be avoided
+   hostPID: true
+   hostNetwork: true
+   hostIPC: true
+   containers:
+   - name: nginx
+-    image: nginx:latest
++    image: nginx:1.0.0
+     ports:
+     - containerPort: 80
+     securityContext:
+-      # Running privileged containers grants full root capabilities and should be disabled
+-      privileged: true
++      privileged: false
+       capabilities:
+         add:
+         - NET_ADMIN
+@@ -24,3 +21,23 @@         - SYSLOG
+         - NET_RAW
+         - CHOWN
++        drop:
++        - ALL
++      allowPrivilegeEscalation: false
++      readOnlyRootFilesystem: true
++      runAsNonRoot: true
++    resources:
++      requests:
++        cpu: 50m
++        memory: 64Mi
++      limits:
++        cpu: 200m
++        memory: 256Mi
++  automountServiceAccountToken: false
++  securityContext:
++    allowPrivilegeEscalation: false
++    readOnlyRootFilesystem: true
++    runAsNonRoot: true
++    capabilities:
++      drop:
++      - ALL

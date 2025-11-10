@@ -1,0 +1,42 @@
+{
+  "original_file": "tests\\13.deployment.yaml",
+  "secured_file": "output\\combination\\SECURED_tests_13.deployment.yaml",
+  "diff_file": "output\\combination\\DIFF_tests_13.deployment.yaml.diff",
+  "fixes_applied": 4,
+  "applied_fixes": [
+    "template.spec.containers[0].securityContext.readOnlyRootFilesystem",
+    "template.spec.containers[0].capabilities.drop=ALL",
+    "pod.automountServiceAccountToken",
+    "template.spec.containers[0].securityContext.privileged",
+    "template.spec.containers[0].securityContext.allowPrivilegeEscalation",
+    "pod.securityContext.runAsNonRoot",
+    "template.spec.containers[0].securityContext.runAsNonRoot",
+    "template.spec.containers[0].securityContext.runAsUser",
+    "hygiene:pod.securityContext:allowPrivilegeEscalation:false",
+    "hygiene:pod.securityContext:readOnlyRootFilesystem:true",
+    "hygiene:pod.securityContext:capabilities.drop+=ALL",
+    "hygiene:containers[0].resources.requests.cpu=50m",
+    "hygiene:containers[0].resources.requests.memory=64Mi",
+    "hygiene:containers[0].resources.limits.cpu=200m",
+    "hygiene:containers[0].resources.limits.memory=256Mi",
+    "hygiene:containers[0].image:tag_pinned_from_latest"
+  ],
+  "fix_details": [
+    {
+      "category": "PRIV_ESCALATION",
+      "model": "gemini"
+    },
+    {
+      "category": "READONLY_ROOTFS_FALSE",
+      "model": "gemini"
+    },
+    {
+      "category": "RUN_AS_NONROOT_FALSE",
+      "model": "groq"
+    },
+    {
+      "category": "HOST_NAMESPACE",
+      "model": "gemini"
+    }
+  ]
+}

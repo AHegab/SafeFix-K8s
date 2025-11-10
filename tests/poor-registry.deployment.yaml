@@ -14,13 +14,31 @@ spec:
     spec:
       containers:
       - name: poor-registry
-        image: madhuakula/k8s-goat-poor-registry
+        image: madhuakula/k8s-goat-poor-registry@sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
         resources:
           limits:
-            memory: "50Mi"
-            cpu: "30m"
+            memory: 50Mi
+            cpu: 30m
+          requests:
+            cpu: 50m
+            memory: 64Mi
         ports:
         - containerPort: 5000
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          capabilities:
+            drop:
+            - ALL
+      automountServiceAccountToken: false
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+        capabilities:
+          drop:
+          - ALL
 ---
 apiVersion: v1
 kind: Service
@@ -34,3 +52,11 @@ spec:
     targetPort: 5000
   selector:
     app: poor-registry
+  automountServiceAccountToken: false
+  securityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    capabilities:
+      drop:
+      - ALL

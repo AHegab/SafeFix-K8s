@@ -1,0 +1,51 @@
+{
+  "generated_at": "2025-11-10T11:05:05.334868Z",
+  "version": "raw-gitleaks",
+  "metadata": {
+    "raw_findings_count": 2,
+    "aggregated_count": 2,
+    "llm_items_count": 2,
+    "source_tool": "gitleaks",
+    "normalized": false
+  },
+  "items": [
+    {
+      "file": "29.helm_rabbitmq_hardcoded_credentials.yaml",
+      "category": "HARDCODED_PASSWORD",
+      "severity": "CRITICAL",
+      "tools": [
+        "GitLeaks"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "plaintext-password-key"
+      ],
+      "examples": [
+        "Hardcoded password in config (plaintext secret)"
+      ],
+      "occurrences": 1,
+      "message": "Hardcoded password in config (plaintext secret)",
+      "description": "Hardcoded password in config (plaintext secret)",
+      "line": 8
+    },
+    {
+      "file": "34.unencrypted_secret.yaml",
+      "category": "HARDCODED_PASSWORD",
+      "severity": "CRITICAL",
+      "tools": [
+        "GitLeaks"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "plaintext-password-key"
+      ],
+      "examples": [
+        "Hardcoded password in config (plaintext secret)"
+      ],
+      "occurrences": 1,
+      "message": "Hardcoded password in config (plaintext secret)",
+      "description": "Hardcoded password in config (plaintext secret)",
+      "line": 9
+    }
+  ]
+}

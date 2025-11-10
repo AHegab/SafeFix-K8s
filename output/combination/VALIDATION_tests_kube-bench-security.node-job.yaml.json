@@ -1,6 +1,0 @@
-{
-  "original_file": "tests\\kube-bench-security.node-job.yaml",
-  "status": "EFFECTIVE",
-  "issues": [],
-  "successful_patches": 1
-}

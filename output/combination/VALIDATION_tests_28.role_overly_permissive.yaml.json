@@ -1,8 +1,0 @@
-{
-  "original_file": "tests\\28.role_overly_permissive.yaml",
-  "status": "INEFFECTIVE",
-  "issues": [
-    "No material security improvement detected"
-  ],
-  "successful_patches": 0
-}

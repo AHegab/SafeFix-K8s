@@ -1,0 +1,51 @@
+{
+  "generated_at": "2025-11-10T11:23:45.186967Z",
+  "version": "raw-polaris",
+  "metadata": {
+    "raw_findings_count": 2,
+    "aggregated_count": 2,
+    "llm_items_count": 2,
+    "source_tool": "polaris",
+    "normalized": false
+  },
+  "items": [
+    {
+      "file": "clusterrolebinding_superadmin.yaml",
+      "category": "CLUSTERROLEBINDINGCLUSTERADMIN",
+      "severity": "MEDIUM",
+      "tools": [
+        "Polaris"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "clusterrolebindingClusterAdmin"
+      ],
+      "examples": [
+        "The ClusterRoleBinding references the default cluster-admin ClusterRole or one with wildcard permissions"
+      ],
+      "occurrences": 1,
+      "message": "The ClusterRoleBinding references the default cluster-admin ClusterRole or one with wildcard permissions",
+      "description": "The ClusterRoleBinding references the default cluster-admin ClusterRole or one with wildcard permissions",
+      "line": 0
+    },
+    {
+      "file": "clusterrolebinding_superadmin.yaml",
+      "category": "CLUSTERROLEBINDINGPODEXECATTACH",
+      "severity": "MEDIUM",
+      "tools": [
+        "Polaris"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "clusterrolebindingPodExecAttach"
+      ],
+      "examples": [
+        "The ClusterRoleBinding references a ClusterRole that allows Pods/exec, allows pods/attach, or that does not exist"
+      ],
+      "occurrences": 1,
+      "message": "The ClusterRoleBinding references a ClusterRole that allows Pods/exec, allows pods/attach, or that does not exist",
+      "description": "The ClusterRoleBinding references a ClusterRole that allows Pods/exec, allows pods/attach, or that does not exist",
+      "line": 0
+    }
+  ]
+}

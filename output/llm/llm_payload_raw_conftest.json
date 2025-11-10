@@ -1,0 +1,3148 @@
+{
+  "generated_at": "2025-11-10T11:20:45.549161Z",
+  "version": "raw-conftest",
+  "metadata": {
+    "raw_findings_count": 165,
+    "aggregated_count": 165,
+    "llm_items_count": 165,
+    "source_tool": "conftest",
+    "normalized": false
+  },
+  "items": [
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/34.echo1_load_balancer.yaml",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_DEFAULT_NAMESPACE"
+      ],
+      "examples": [
+        "KSV_DEFAULT_NAMESPACE: Service 'echo1-load-balancer' is deployed to default namespace. Specify metadata.namespace with a non-default value"
+      ],
+      "occurrences": 1,
+      "message": "KSV_DEFAULT_NAMESPACE: Service 'echo1-load-balancer' is deployed to default namespace. Specify metadata.namespace with a non-default value",
+      "description": "KSV_DEFAULT_NAMESPACE: Service 'echo1-load-balancer' is deployed to default namespace. Specify metadata.namespace with a non-default value",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/34.echo1_privileged.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "HEALTH_PROBES"
+      ],
+      "examples": [
+        "HEALTH_PROBES: Container 'echo1' in Deployment 'echo1' must define livenessProbe"
+      ],
+      "occurrences": 1,
+      "message": "HEALTH_PROBES: Container 'echo1' in Deployment 'echo1' must define livenessProbe",
+      "description": "HEALTH_PROBES: Container 'echo1' in Deployment 'echo1' must define livenessProbe",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/34.echo1_privileged.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "HEALTH_PROBES"
+      ],
+      "examples": [
+        "HEALTH_PROBES: Container 'echo1' in Deployment 'echo1' must define readinessProbe"
+      ],
+      "occurrences": 1,
+      "message": "HEALTH_PROBES: Container 'echo1' in Deployment 'echo1' must define readinessProbe",
+      "description": "HEALTH_PROBES: Container 'echo1' in Deployment 'echo1' must define readinessProbe",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/34.echo1_privileged.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "IMAGE_PULL_POLICY"
+      ],
+      "examples": [
+        "IMAGE_PULL_POLICY: Container 'echo1' in Deployment 'echo1' should set imagePullPolicy: Always (unless using digest)"
+      ],
+      "occurrences": 1,
+      "message": "IMAGE_PULL_POLICY: Container 'echo1' in Deployment 'echo1' should set imagePullPolicy: Always (unless using digest)",
+      "description": "IMAGE_PULL_POLICY: Container 'echo1' in Deployment 'echo1' should set imagePullPolicy: Always (unless using digest)",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/34.echo1_privileged.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_ALLOW_PRIVILEGE_ESCALATION"
+      ],
+      "examples": [
+        "KSV_ALLOW_PRIVILEGE_ESCALATION: Container 'echo1' in Deployment 'echo1' does not explicitly set allowPrivilegeEscalation: false"
+      ],
+      "occurrences": 1,
+      "message": "KSV_ALLOW_PRIVILEGE_ESCALATION: Container 'echo1' in Deployment 'echo1' does not explicitly set allowPrivilegeEscalation: false",
+      "description": "KSV_ALLOW_PRIVILEGE_ESCALATION: Container 'echo1' in Deployment 'echo1' does not explicitly set allowPrivilegeEscalation: false",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/34.echo1_privileged.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_CAP_DROP_MISSING"
+      ],
+      "examples": [
+        "KSV_CAP_DROP_MISSING: Container 'echo1' in Deployment 'echo1' does not drop ALL capabilities. Add securityContext.capabilities.drop: [ALL]"
+      ],
+      "occurrences": 1,
+      "message": "KSV_CAP_DROP_MISSING: Container 'echo1' in Deployment 'echo1' does not drop ALL capabilities. Add securityContext.capabilities.drop: [ALL]",
+      "description": "KSV_CAP_DROP_MISSING: Container 'echo1' in Deployment 'echo1' does not drop ALL capabilities. Add securityContext.capabilities.drop: [ALL]",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/34.echo1_privileged.yaml",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_DEFAULT_NAMESPACE"
+      ],
+      "examples": [
+        "KSV_DEFAULT_NAMESPACE: Deployment 'echo1' is deployed to default namespace. Specify metadata.namespace with a non-default value"
+      ],
+      "occurrences": 1,
+      "message": "KSV_DEFAULT_NAMESPACE: Deployment 'echo1' is deployed to default namespace. Specify metadata.namespace with a non-default value",
+      "description": "KSV_DEFAULT_NAMESPACE: Deployment 'echo1' is deployed to default namespace. Specify metadata.namespace with a non-default value",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/34.echo1_privileged.yaml",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_DEFAULT_SA_TOKEN"
+      ],
+      "examples": [
+        "KSV_DEFAULT_SA_TOKEN: Deployment 'echo1' uses default service account with automountServiceAccountToken: true. Set serviceAccountName to non-default and automountServiceAccountToken: false"
+      ],
+      "occurrences": 1,
+      "message": "KSV_DEFAULT_SA_TOKEN: Deployment 'echo1' uses default service account with automountServiceAccountToken: true. Set serviceAccountName to non-default and automountServiceAccountToken: false",
+      "description": "KSV_DEFAULT_SA_TOKEN: Deployment 'echo1' uses default service account with automountServiceAccountToken: true. Set serviceAccountName to non-default and automountServiceAccountToken: false",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/34.echo1_privileged.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_IMAGE_NOT_PINNED"
+      ],
+      "examples": [
+        "KSV_IMAGE_NOT_PINNED: Container 'echo1' in echo1 '%!s(MISSING)' has no tag/digest. Pin image with @sha256:<digest>"
+      ],
+      "occurrences": 1,
+      "message": "KSV_IMAGE_NOT_PINNED: Container 'echo1' in echo1 '%!s(MISSING)' has no tag/digest. Pin image with @sha256:<digest>",
+      "description": "KSV_IMAGE_NOT_PINNED: Container 'echo1' in echo1 '%!s(MISSING)' has no tag/digest. Pin image with @sha256:<digest>",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/34.echo1_privileged.yaml",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_NO_APPARMOR"
+      ],
+      "examples": [
+        "KSV_NO_APPARMOR: Container 'echo1' in Deployment 'echo1' has no AppArmor annotation. Add annotation container.apparmor.security.beta.kubernetes.io/echo1: runtime/default"
+      ],
+      "occurrences": 1,
+      "message": "KSV_NO_APPARMOR: Container 'echo1' in Deployment 'echo1' has no AppArmor annotation. Add annotation container.apparmor.security.beta.kubernetes.io/echo1: runtime/default",
+      "description": "KSV_NO_APPARMOR: Container 'echo1' in Deployment 'echo1' has no AppArmor annotation. Add annotation container.apparmor.security.beta.kubernetes.io/echo1: runtime/default",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/34.echo1_privileged.yaml",
+      "category": "NO_SECCOMP",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_NO_SECCOMP"
+      ],
+      "examples": [
+        "KSV_NO_SECCOMP: Container 'echo1' in Deployment 'echo1' has no seccomp profile. Set securityContext.seccompProfile.type: RuntimeDefault"
+      ],
+      "occurrences": 1,
+      "message": "KSV_NO_SECCOMP: Container 'echo1' in Deployment 'echo1' has no seccomp profile. Set securityContext.seccompProfile.type: RuntimeDefault",
+      "description": "KSV_NO_SECCOMP: Container 'echo1' in Deployment 'echo1' has no seccomp profile. Set securityContext.seccompProfile.type: RuntimeDefault",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/34.echo1_privileged.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "NETWORK_POLICY"
+      ],
+      "examples": [
+        "NETWORK_POLICY: Deployment 'echo1' must be covered by a NetworkPolicy (add annotation network-policy-confirmed: true)"
+      ],
+      "occurrences": 1,
+      "message": "NETWORK_POLICY: Deployment 'echo1' must be covered by a NetworkPolicy (add annotation network-policy-confirmed: true)",
+      "description": "NETWORK_POLICY: Deployment 'echo1' must be covered by a NetworkPolicy (add annotation network-policy-confirmed: true)",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/34.echo1_privileged.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "RUN_AS_NON_ROOT"
+      ],
+      "examples": [
+        "RUN_AS_NON_ROOT: Container 'echo1' in Deployment 'echo1' must set runAsNonRoot: true at pod or container level"
+      ],
+      "occurrences": 1,
+      "message": "RUN_AS_NON_ROOT: Container 'echo1' in Deployment 'echo1' must set runAsNonRoot: true at pod or container level",
+      "description": "RUN_AS_NON_ROOT: Container 'echo1' in Deployment 'echo1' must set runAsNonRoot: true at pod or container level",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/docker-bench-security.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "DOCKER_SOCKET"
+      ],
+      "examples": [
+        "DOCKER_SOCKET: DaemonSet 'docker-bench-security' mounts Docker socket - grants full cluster control"
+      ],
+      "occurrences": 1,
+      "message": "DOCKER_SOCKET: DaemonSet 'docker-bench-security' mounts Docker socket - grants full cluster control",
+      "description": "DOCKER_SOCKET: DaemonSet 'docker-bench-security' mounts Docker socket - grants full cluster control",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/docker-bench-security.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "HEALTH_PROBES"
+      ],
+      "examples": [
+        "HEALTH_PROBES: Container 'docker-bench' in DaemonSet 'docker-bench-security' must define livenessProbe"
+      ],
+      "occurrences": 1,
+      "message": "HEALTH_PROBES: Container 'docker-bench' in DaemonSet 'docker-bench-security' must define livenessProbe",
+      "description": "HEALTH_PROBES: Container 'docker-bench' in DaemonSet 'docker-bench-security' must define livenessProbe",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/docker-bench-security.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "HEALTH_PROBES"
+      ],
+      "examples": [
+        "HEALTH_PROBES: Container 'docker-bench' in DaemonSet 'docker-bench-security' must define readinessProbe"
+      ],
+      "occurrences": 1,
+      "message": "HEALTH_PROBES: Container 'docker-bench' in DaemonSet 'docker-bench-security' must define readinessProbe",
+      "description": "HEALTH_PROBES: Container 'docker-bench' in DaemonSet 'docker-bench-security' must define readinessProbe",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/docker-bench-security.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "HOST_IPC"
+      ],
+      "examples": [
+        "HOST_IPC: DaemonSet 'docker-bench-security' must not use hostIPC: true"
+      ],
+      "occurrences": 1,
+      "message": "HOST_IPC: DaemonSet 'docker-bench-security' must not use hostIPC: true",
+      "description": "HOST_IPC: DaemonSet 'docker-bench-security' must not use hostIPC: true",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/docker-bench-security.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "HOST_NETWORK"
+      ],
+      "examples": [
+        "HOST_NETWORK: DaemonSet 'docker-bench-security' must not use hostNetwork: true"
+      ],
+      "occurrences": 1,
+      "message": "HOST_NETWORK: DaemonSet 'docker-bench-security' must not use hostNetwork: true",
+      "description": "HOST_NETWORK: DaemonSet 'docker-bench-security' must not use hostNetwork: true",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/docker-bench-security.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "HOST_PATH"
+      ],
+      "examples": [
+        "HOST_PATH: DaemonSet 'docker-bench-security' uses hostPath volume 'docker-sock-volume' - avoid mounting host filesystem"
+      ],
+      "occurrences": 1,
+      "message": "HOST_PATH: DaemonSet 'docker-bench-security' uses hostPath volume 'docker-sock-volume' - avoid mounting host filesystem",
+      "description": "HOST_PATH: DaemonSet 'docker-bench-security' uses hostPath volume 'docker-sock-volume' - avoid mounting host filesystem",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/docker-bench-security.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "HOST_PATH"
+      ],
+      "examples": [
+        "HOST_PATH: DaemonSet 'docker-bench-security' uses hostPath volume 'etc-vol' - avoid mounting host filesystem"
+      ],
+      "occurrences": 1,
+      "message": "HOST_PATH: DaemonSet 'docker-bench-security' uses hostPath volume 'etc-vol' - avoid mounting host filesystem",
+      "description": "HOST_PATH: DaemonSet 'docker-bench-security' uses hostPath volume 'etc-vol' - avoid mounting host filesystem",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/docker-bench-security.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "HOST_PATH"
+      ],
+      "examples": [
+        "HOST_PATH: DaemonSet 'docker-bench-security' uses hostPath volume 'lib-systemd-system-vol' - avoid mounting host filesystem"
+      ],
+      "occurrences": 1,
+      "message": "HOST_PATH: DaemonSet 'docker-bench-security' uses hostPath volume 'lib-systemd-system-vol' - avoid mounting host filesystem",
+      "description": "HOST_PATH: DaemonSet 'docker-bench-security' uses hostPath volume 'lib-systemd-system-vol' - avoid mounting host filesystem",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/docker-bench-security.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "HOST_PATH"
+      ],
+      "examples": [
+        "HOST_PATH: DaemonSet 'docker-bench-security' uses hostPath volume 'usr-bin-contained-vol' - avoid mounting host filesystem"
+      ],
+      "occurrences": 1,
+      "message": "HOST_PATH: DaemonSet 'docker-bench-security' uses hostPath volume 'usr-bin-contained-vol' - avoid mounting host filesystem",
+      "description": "HOST_PATH: DaemonSet 'docker-bench-security' uses hostPath volume 'usr-bin-contained-vol' - avoid mounting host filesystem",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/docker-bench-security.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "HOST_PATH"
+      ],
+      "examples": [
+        "HOST_PATH: DaemonSet 'docker-bench-security' uses hostPath volume 'usr-bin-runc-vol' - avoid mounting host filesystem"
+      ],
+      "occurrences": 1,
+      "message": "HOST_PATH: DaemonSet 'docker-bench-security' uses hostPath volume 'usr-bin-runc-vol' - avoid mounting host filesystem",
+      "description": "HOST_PATH: DaemonSet 'docker-bench-security' uses hostPath volume 'usr-bin-runc-vol' - avoid mounting host filesystem",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/docker-bench-security.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "HOST_PATH"
+      ],
+      "examples": [
+        "HOST_PATH: DaemonSet 'docker-bench-security' uses hostPath volume 'usr-lib-systemd-vol' - avoid mounting host filesystem"
+      ],
+      "occurrences": 1,
+      "message": "HOST_PATH: DaemonSet 'docker-bench-security' uses hostPath volume 'usr-lib-systemd-vol' - avoid mounting host filesystem",
+      "description": "HOST_PATH: DaemonSet 'docker-bench-security' uses hostPath volume 'usr-lib-systemd-vol' - avoid mounting host filesystem",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/docker-bench-security.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "HOST_PATH"
+      ],
+      "examples": [
+        "HOST_PATH: DaemonSet 'docker-bench-security' uses hostPath volume 'var-lib-vol' - avoid mounting host filesystem"
+      ],
+      "occurrences": 1,
+      "message": "HOST_PATH: DaemonSet 'docker-bench-security' uses hostPath volume 'var-lib-vol' - avoid mounting host filesystem",
+      "description": "HOST_PATH: DaemonSet 'docker-bench-security' uses hostPath volume 'var-lib-vol' - avoid mounting host filesystem",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/docker-bench-security.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "HOST_PID"
+      ],
+      "examples": [
+        "HOST_PID: DaemonSet 'docker-bench-security' must not use hostPID: true"
+      ],
+      "occurrences": 1,
+      "message": "HOST_PID: DaemonSet 'docker-bench-security' must not use hostPID: true",
+      "description": "HOST_PID: DaemonSet 'docker-bench-security' must not use hostPID: true",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/docker-bench-security.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_ALLOW_PRIVILEGE_ESCALATION"
+      ],
+      "examples": [
+        "KSV_ALLOW_PRIVILEGE_ESCALATION: Container 'docker-bench' in DaemonSet 'docker-bench-security' does not explicitly set allowPrivilegeEscalation: false"
+      ],
+      "occurrences": 1,
+      "message": "KSV_ALLOW_PRIVILEGE_ESCALATION: Container 'docker-bench' in DaemonSet 'docker-bench-security' does not explicitly set allowPrivilegeEscalation: false",
+      "description": "KSV_ALLOW_PRIVILEGE_ESCALATION: Container 'docker-bench' in DaemonSet 'docker-bench-security' does not explicitly set allowPrivilegeEscalation: false",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/docker-bench-security.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_CAP_DROP_MISSING"
+      ],
+      "examples": [
+        "KSV_CAP_DROP_MISSING: Container 'docker-bench' in DaemonSet 'docker-bench-security' does not drop ALL capabilities. Add securityContext.capabilities.drop: [ALL]"
+      ],
+      "occurrences": 1,
+      "message": "KSV_CAP_DROP_MISSING: Container 'docker-bench' in DaemonSet 'docker-bench-security' does not drop ALL capabilities. Add securityContext.capabilities.drop: [ALL]",
+      "description": "KSV_CAP_DROP_MISSING: Container 'docker-bench' in DaemonSet 'docker-bench-security' does not drop ALL capabilities. Add securityContext.capabilities.drop: [ALL]",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/docker-bench-security.deployment.yaml",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_DEFAULT_NAMESPACE"
+      ],
+      "examples": [
+        "KSV_DEFAULT_NAMESPACE: DaemonSet 'docker-bench-security' is deployed to default namespace. Specify metadata.namespace with a non-default value"
+      ],
+      "occurrences": 1,
+      "message": "KSV_DEFAULT_NAMESPACE: DaemonSet 'docker-bench-security' is deployed to default namespace. Specify metadata.namespace with a non-default value",
+      "description": "KSV_DEFAULT_NAMESPACE: DaemonSet 'docker-bench-security' is deployed to default namespace. Specify metadata.namespace with a non-default value",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/docker-bench-security.deployment.yaml",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_DEFAULT_SA_TOKEN"
+      ],
+      "examples": [
+        "KSV_DEFAULT_SA_TOKEN: DaemonSet 'docker-bench-security' uses default service account with automountServiceAccountToken: true. Set serviceAccountName to non-default and automountServiceAccountToken: false"
+      ],
+      "occurrences": 1,
+      "message": "KSV_DEFAULT_SA_TOKEN: DaemonSet 'docker-bench-security' uses default service account with automountServiceAccountToken: true. Set serviceAccountName to non-default and automountServiceAccountToken: false",
+      "description": "KSV_DEFAULT_SA_TOKEN: DaemonSet 'docker-bench-security' uses default service account with automountServiceAccountToken: true. Set serviceAccountName to non-default and automountServiceAccountToken: false",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/docker-bench-security.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_IMAGE_NOT_PINNED"
+      ],
+      "examples": [
+        "KSV_IMAGE_NOT_PINNED: Container 'docker-bench' in docker-bench-security '%!s(MISSING)' has no tag/digest. Pin image with @sha256:<digest>"
+      ],
+      "occurrences": 1,
+      "message": "KSV_IMAGE_NOT_PINNED: Container 'docker-bench' in docker-bench-security '%!s(MISSING)' has no tag/digest. Pin image with @sha256:<digest>",
+      "description": "KSV_IMAGE_NOT_PINNED: Container 'docker-bench' in docker-bench-security '%!s(MISSING)' has no tag/digest. Pin image with @sha256:<digest>",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/docker-bench-security.deployment.yaml",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_NO_APPARMOR"
+      ],
+      "examples": [
+        "KSV_NO_APPARMOR: Container 'docker-bench' in DaemonSet 'docker-bench-security' has no AppArmor annotation. Add annotation container.apparmor.security.beta.kubernetes.io/docker-bench: runtime/default"
+      ],
+      "occurrences": 1,
+      "message": "KSV_NO_APPARMOR: Container 'docker-bench' in DaemonSet 'docker-bench-security' has no AppArmor annotation. Add annotation container.apparmor.security.beta.kubernetes.io/docker-bench: runtime/default",
+      "description": "KSV_NO_APPARMOR: Container 'docker-bench' in DaemonSet 'docker-bench-security' has no AppArmor annotation. Add annotation container.apparmor.security.beta.kubernetes.io/docker-bench: runtime/default",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/docker-bench-security.deployment.yaml",
+      "category": "NO_SECCOMP",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_NO_SECCOMP"
+      ],
+      "examples": [
+        "KSV_NO_SECCOMP: Container 'docker-bench' in DaemonSet 'docker-bench-security' has no seccomp profile. Set securityContext.seccompProfile.type: RuntimeDefault"
+      ],
+      "occurrences": 1,
+      "message": "KSV_NO_SECCOMP: Container 'docker-bench' in DaemonSet 'docker-bench-security' has no seccomp profile. Set securityContext.seccompProfile.type: RuntimeDefault",
+      "description": "KSV_NO_SECCOMP: Container 'docker-bench' in DaemonSet 'docker-bench-security' has no seccomp profile. Set securityContext.seccompProfile.type: RuntimeDefault",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/docker-bench-security.deployment.yaml",
+      "category": "PRIVILEGED",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_PRIVILEGED"
+      ],
+      "examples": [
+        "KSV_PRIVILEGED: Container 'docker-bench' in DaemonSet 'docker-bench-security' runs in privileged mode. Set securityContext.privileged: false"
+      ],
+      "occurrences": 1,
+      "message": "KSV_PRIVILEGED: Container 'docker-bench' in DaemonSet 'docker-bench-security' runs in privileged mode. Set securityContext.privileged: false",
+      "description": "KSV_PRIVILEGED: Container 'docker-bench' in DaemonSet 'docker-bench-security' runs in privileged mode. Set securityContext.privileged: false",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/docker-bench-security.deployment.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_READONLY_ROOTFS_FALSE"
+      ],
+      "examples": [
+        "KSV_READONLY_ROOTFS_FALSE: Container 'docker-bench' in DaemonSet 'docker-bench-security' does not have readOnlyRootFilesystem: true"
+      ],
+      "occurrences": 1,
+      "message": "KSV_READONLY_ROOTFS_FALSE: Container 'docker-bench' in DaemonSet 'docker-bench-security' does not have readOnlyRootFilesystem: true",
+      "description": "KSV_READONLY_ROOTFS_FALSE: Container 'docker-bench' in DaemonSet 'docker-bench-security' does not have readOnlyRootFilesystem: true",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/docker-bench-security.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "NETWORK_POLICY"
+      ],
+      "examples": [
+        "NETWORK_POLICY: DaemonSet 'docker-bench-security' must be covered by a NetworkPolicy (add annotation network-policy-confirmed: true)"
+      ],
+      "occurrences": 1,
+      "message": "NETWORK_POLICY: DaemonSet 'docker-bench-security' must be covered by a NetworkPolicy (add annotation network-policy-confirmed: true)",
+      "description": "NETWORK_POLICY: DaemonSet 'docker-bench-security' must be covered by a NetworkPolicy (add annotation network-policy-confirmed: true)",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/docker-bench-security.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "RUN_AS_NON_ROOT"
+      ],
+      "examples": [
+        "RUN_AS_NON_ROOT: Container 'docker-bench' in DaemonSet 'docker-bench-security' must set runAsNonRoot: true at pod or container level"
+      ],
+      "occurrences": 1,
+      "message": "RUN_AS_NON_ROOT: Container 'docker-bench' in DaemonSet 'docker-bench-security' must set runAsNonRoot: true at pod or container level",
+      "description": "RUN_AS_NON_ROOT: Container 'docker-bench' in DaemonSet 'docker-bench-security' must set runAsNonRoot: true at pod or container level",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/13.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "HEALTH_PROBES"
+      ],
+      "examples": [
+        "HEALTH_PROBES: Container 'nginx' in Deployment 'nginx-deployment' must define livenessProbe"
+      ],
+      "occurrences": 1,
+      "message": "HEALTH_PROBES: Container 'nginx' in Deployment 'nginx-deployment' must define livenessProbe",
+      "description": "HEALTH_PROBES: Container 'nginx' in Deployment 'nginx-deployment' must define livenessProbe",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/13.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "HEALTH_PROBES"
+      ],
+      "examples": [
+        "HEALTH_PROBES: Container 'nginx' in Deployment 'nginx-deployment' must define readinessProbe"
+      ],
+      "occurrences": 1,
+      "message": "HEALTH_PROBES: Container 'nginx' in Deployment 'nginx-deployment' must define readinessProbe",
+      "description": "HEALTH_PROBES: Container 'nginx' in Deployment 'nginx-deployment' must define readinessProbe",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/13.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "IMAGE_PULL_POLICY"
+      ],
+      "examples": [
+        "IMAGE_PULL_POLICY: Container 'nginx' in Deployment 'nginx-deployment' should set imagePullPolicy: Always (unless using digest)"
+      ],
+      "occurrences": 1,
+      "message": "IMAGE_PULL_POLICY: Container 'nginx' in Deployment 'nginx-deployment' should set imagePullPolicy: Always (unless using digest)",
+      "description": "IMAGE_PULL_POLICY: Container 'nginx' in Deployment 'nginx-deployment' should set imagePullPolicy: Always (unless using digest)",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/13.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_ALLOW_PRIVILEGE_ESCALATION"
+      ],
+      "examples": [
+        "KSV_ALLOW_PRIVILEGE_ESCALATION: Container 'nginx' in Deployment 'nginx-deployment' does not explicitly set allowPrivilegeEscalation: false"
+      ],
+      "occurrences": 1,
+      "message": "KSV_ALLOW_PRIVILEGE_ESCALATION: Container 'nginx' in Deployment 'nginx-deployment' does not explicitly set allowPrivilegeEscalation: false",
+      "description": "KSV_ALLOW_PRIVILEGE_ESCALATION: Container 'nginx' in Deployment 'nginx-deployment' does not explicitly set allowPrivilegeEscalation: false",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/13.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_CAP_DROP_MISSING"
+      ],
+      "examples": [
+        "KSV_CAP_DROP_MISSING: Container 'nginx' in Deployment 'nginx-deployment' does not drop ALL capabilities. Add securityContext.capabilities.drop: [ALL]"
+      ],
+      "occurrences": 1,
+      "message": "KSV_CAP_DROP_MISSING: Container 'nginx' in Deployment 'nginx-deployment' does not drop ALL capabilities. Add securityContext.capabilities.drop: [ALL]",
+      "description": "KSV_CAP_DROP_MISSING: Container 'nginx' in Deployment 'nginx-deployment' does not drop ALL capabilities. Add securityContext.capabilities.drop: [ALL]",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/13.deployment.yaml",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_DEFAULT_NAMESPACE"
+      ],
+      "examples": [
+        "KSV_DEFAULT_NAMESPACE: Deployment 'nginx-deployment' is deployed to default namespace. Specify metadata.namespace with a non-default value"
+      ],
+      "occurrences": 1,
+      "message": "KSV_DEFAULT_NAMESPACE: Deployment 'nginx-deployment' is deployed to default namespace. Specify metadata.namespace with a non-default value",
+      "description": "KSV_DEFAULT_NAMESPACE: Deployment 'nginx-deployment' is deployed to default namespace. Specify metadata.namespace with a non-default value",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/13.deployment.yaml",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_DEFAULT_SA_TOKEN"
+      ],
+      "examples": [
+        "KSV_DEFAULT_SA_TOKEN: Deployment 'nginx-deployment' uses default service account with automountServiceAccountToken: true. Set serviceAccountName to non-default and automountServiceAccountToken: false"
+      ],
+      "occurrences": 1,
+      "message": "KSV_DEFAULT_SA_TOKEN: Deployment 'nginx-deployment' uses default service account with automountServiceAccountToken: true. Set serviceAccountName to non-default and automountServiceAccountToken: false",
+      "description": "KSV_DEFAULT_SA_TOKEN: Deployment 'nginx-deployment' uses default service account with automountServiceAccountToken: true. Set serviceAccountName to non-default and automountServiceAccountToken: false",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/13.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_IMAGE_NOT_PINNED"
+      ],
+      "examples": [
+        "KSV_IMAGE_NOT_PINNED: Container 'nginx' in Deployment 'nginx-deployment' uses :latest tag. Pin image with @sha256:<digest>"
+      ],
+      "occurrences": 1,
+      "message": "KSV_IMAGE_NOT_PINNED: Container 'nginx' in Deployment 'nginx-deployment' uses :latest tag. Pin image with @sha256:<digest>",
+      "description": "KSV_IMAGE_NOT_PINNED: Container 'nginx' in Deployment 'nginx-deployment' uses :latest tag. Pin image with @sha256:<digest>",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/13.deployment.yaml",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_NO_APPARMOR"
+      ],
+      "examples": [
+        "KSV_NO_APPARMOR: Container 'nginx' in Deployment 'nginx-deployment' has no AppArmor annotation. Add annotation container.apparmor.security.beta.kubernetes.io/nginx: runtime/default"
+      ],
+      "occurrences": 1,
+      "message": "KSV_NO_APPARMOR: Container 'nginx' in Deployment 'nginx-deployment' has no AppArmor annotation. Add annotation container.apparmor.security.beta.kubernetes.io/nginx: runtime/default",
+      "description": "KSV_NO_APPARMOR: Container 'nginx' in Deployment 'nginx-deployment' has no AppArmor annotation. Add annotation container.apparmor.security.beta.kubernetes.io/nginx: runtime/default",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/13.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_NO_LIMITS_NO_PROBES"
+      ],
+      "examples": [
+        "KSV_NO_LIMITS_NO_PROBES: Container 'nginx' in Deployment 'nginx-deployment' missing resource limits (cpu/memory) AND probes (liveness/readiness)"
+      ],
+      "occurrences": 1,
+      "message": "KSV_NO_LIMITS_NO_PROBES: Container 'nginx' in Deployment 'nginx-deployment' missing resource limits (cpu/memory) AND probes (liveness/readiness)",
+      "description": "KSV_NO_LIMITS_NO_PROBES: Container 'nginx' in Deployment 'nginx-deployment' missing resource limits (cpu/memory) AND probes (liveness/readiness)",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/13.deployment.yaml",
+      "category": "NO_SECCOMP",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_NO_SECCOMP"
+      ],
+      "examples": [
+        "KSV_NO_SECCOMP: Container 'nginx' in Deployment 'nginx-deployment' has no seccomp profile. Set securityContext.seccompProfile.type: RuntimeDefault"
+      ],
+      "occurrences": 1,
+      "message": "KSV_NO_SECCOMP: Container 'nginx' in Deployment 'nginx-deployment' has no seccomp profile. Set securityContext.seccompProfile.type: RuntimeDefault",
+      "description": "KSV_NO_SECCOMP: Container 'nginx' in Deployment 'nginx-deployment' has no seccomp profile. Set securityContext.seccompProfile.type: RuntimeDefault",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/13.deployment.yaml",
+      "category": "PRIVILEGED",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_PRIVILEGED"
+      ],
+      "examples": [
+        "KSV_PRIVILEGED: Container 'nginx' in Deployment 'nginx-deployment' runs in privileged mode. Set securityContext.privileged: false"
+      ],
+      "occurrences": 1,
+      "message": "KSV_PRIVILEGED: Container 'nginx' in Deployment 'nginx-deployment' runs in privileged mode. Set securityContext.privileged: false",
+      "description": "KSV_PRIVILEGED: Container 'nginx' in Deployment 'nginx-deployment' runs in privileged mode. Set securityContext.privileged: false",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/13.deployment.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_READONLY_ROOTFS_FALSE"
+      ],
+      "examples": [
+        "KSV_READONLY_ROOTFS_FALSE: Container 'nginx' in Deployment 'nginx-deployment' does not have readOnlyRootFilesystem: true"
+      ],
+      "occurrences": 1,
+      "message": "KSV_READONLY_ROOTFS_FALSE: Container 'nginx' in Deployment 'nginx-deployment' does not have readOnlyRootFilesystem: true",
+      "description": "KSV_READONLY_ROOTFS_FALSE: Container 'nginx' in Deployment 'nginx-deployment' does not have readOnlyRootFilesystem: true",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/13.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "NETWORK_POLICY"
+      ],
+      "examples": [
+        "NETWORK_POLICY: Deployment 'nginx-deployment' must be covered by a NetworkPolicy (add annotation network-policy-confirmed: true)"
+      ],
+      "occurrences": 1,
+      "message": "NETWORK_POLICY: Deployment 'nginx-deployment' must be covered by a NetworkPolicy (add annotation network-policy-confirmed: true)",
+      "description": "NETWORK_POLICY: Deployment 'nginx-deployment' must be covered by a NetworkPolicy (add annotation network-policy-confirmed: true)",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/13.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "RESOURCE_LIMITS"
+      ],
+      "examples": [
+        "RESOURCE_LIMITS: Container 'nginx' in Deployment 'nginx-deployment' must set CPU limit"
+      ],
+      "occurrences": 1,
+      "message": "RESOURCE_LIMITS: Container 'nginx' in Deployment 'nginx-deployment' must set CPU limit",
+      "description": "RESOURCE_LIMITS: Container 'nginx' in Deployment 'nginx-deployment' must set CPU limit",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/13.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "RESOURCE_LIMITS"
+      ],
+      "examples": [
+        "RESOURCE_LIMITS: Container 'nginx' in Deployment 'nginx-deployment' must set memory limit"
+      ],
+      "occurrences": 1,
+      "message": "RESOURCE_LIMITS: Container 'nginx' in Deployment 'nginx-deployment' must set memory limit",
+      "description": "RESOURCE_LIMITS: Container 'nginx' in Deployment 'nginx-deployment' must set memory limit",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/13.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "RESOURCE_REQUESTS"
+      ],
+      "examples": [
+        "RESOURCE_REQUESTS: Container 'nginx' in Deployment 'nginx-deployment' must set CPU request"
+      ],
+      "occurrences": 1,
+      "message": "RESOURCE_REQUESTS: Container 'nginx' in Deployment 'nginx-deployment' must set CPU request",
+      "description": "RESOURCE_REQUESTS: Container 'nginx' in Deployment 'nginx-deployment' must set CPU request",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/13.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "RESOURCE_REQUESTS"
+      ],
+      "examples": [
+        "RESOURCE_REQUESTS: Container 'nginx' in Deployment 'nginx-deployment' must set memory request"
+      ],
+      "occurrences": 1,
+      "message": "RESOURCE_REQUESTS: Container 'nginx' in Deployment 'nginx-deployment' must set memory request",
+      "description": "RESOURCE_REQUESTS: Container 'nginx' in Deployment 'nginx-deployment' must set memory request",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/13.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "RUN_AS_NON_ROOT"
+      ],
+      "examples": [
+        "RUN_AS_NON_ROOT: Container 'nginx' in Deployment 'nginx-deployment' must set runAsNonRoot: true at pod or container level"
+      ],
+      "occurrences": 1,
+      "message": "RUN_AS_NON_ROOT: Container 'nginx' in Deployment 'nginx-deployment' must set runAsNonRoot: true at pod or container level",
+      "description": "RUN_AS_NON_ROOT: Container 'nginx' in Deployment 'nginx-deployment' must set runAsNonRoot: true at pod or container level",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/31.example-nginx.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "HEALTH_PROBES"
+      ],
+      "examples": [
+        "HEALTH_PROBES: Container 'nginx' in Pod 'nginx' must define livenessProbe"
+      ],
+      "occurrences": 1,
+      "message": "HEALTH_PROBES: Container 'nginx' in Pod 'nginx' must define livenessProbe",
+      "description": "HEALTH_PROBES: Container 'nginx' in Pod 'nginx' must define livenessProbe",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/31.example-nginx.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "HEALTH_PROBES"
+      ],
+      "examples": [
+        "HEALTH_PROBES: Container 'nginx' in Pod 'nginx' must define readinessProbe"
+      ],
+      "occurrences": 1,
+      "message": "HEALTH_PROBES: Container 'nginx' in Pod 'nginx' must define readinessProbe",
+      "description": "HEALTH_PROBES: Container 'nginx' in Pod 'nginx' must define readinessProbe",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/31.example-nginx.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "HOST_IPC"
+      ],
+      "examples": [
+        "HOST_IPC: Pod 'nginx' must not use hostIPC: true"
+      ],
+      "occurrences": 1,
+      "message": "HOST_IPC: Pod 'nginx' must not use hostIPC: true",
+      "description": "HOST_IPC: Pod 'nginx' must not use hostIPC: true",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/31.example-nginx.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "HOST_NETWORK"
+      ],
+      "examples": [
+        "HOST_NETWORK: Pod 'nginx' must not use hostNetwork: true"
+      ],
+      "occurrences": 1,
+      "message": "HOST_NETWORK: Pod 'nginx' must not use hostNetwork: true",
+      "description": "HOST_NETWORK: Pod 'nginx' must not use hostNetwork: true",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/31.example-nginx.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "HOST_PID"
+      ],
+      "examples": [
+        "HOST_PID: Pod 'nginx' must not use hostPID: true"
+      ],
+      "occurrences": 1,
+      "message": "HOST_PID: Pod 'nginx' must not use hostPID: true",
+      "description": "HOST_PID: Pod 'nginx' must not use hostPID: true",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/31.example-nginx.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "IMAGE_PULL_POLICY"
+      ],
+      "examples": [
+        "IMAGE_PULL_POLICY: Container 'nginx' in Pod 'nginx' should set imagePullPolicy: Always (unless using digest)"
+      ],
+      "occurrences": 1,
+      "message": "IMAGE_PULL_POLICY: Container 'nginx' in Pod 'nginx' should set imagePullPolicy: Always (unless using digest)",
+      "description": "IMAGE_PULL_POLICY: Container 'nginx' in Pod 'nginx' should set imagePullPolicy: Always (unless using digest)",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/31.example-nginx.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_ALLOW_PRIVILEGE_ESCALATION"
+      ],
+      "examples": [
+        "KSV_ALLOW_PRIVILEGE_ESCALATION: Container 'nginx' in Pod 'nginx' does not explicitly set allowPrivilegeEscalation: false"
+      ],
+      "occurrences": 1,
+      "message": "KSV_ALLOW_PRIVILEGE_ESCALATION: Container 'nginx' in Pod 'nginx' does not explicitly set allowPrivilegeEscalation: false",
+      "description": "KSV_ALLOW_PRIVILEGE_ESCALATION: Container 'nginx' in Pod 'nginx' does not explicitly set allowPrivilegeEscalation: false",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/31.example-nginx.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_CAP_DROP_MISSING"
+      ],
+      "examples": [
+        "KSV_CAP_DROP_MISSING: Container 'nginx' in Pod 'nginx' does not drop ALL capabilities. Add securityContext.capabilities.drop: [ALL]"
+      ],
+      "occurrences": 1,
+      "message": "KSV_CAP_DROP_MISSING: Container 'nginx' in Pod 'nginx' does not drop ALL capabilities. Add securityContext.capabilities.drop: [ALL]",
+      "description": "KSV_CAP_DROP_MISSING: Container 'nginx' in Pod 'nginx' does not drop ALL capabilities. Add securityContext.capabilities.drop: [ALL]",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/31.example-nginx.yaml",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_DEFAULT_NAMESPACE"
+      ],
+      "examples": [
+        "KSV_DEFAULT_NAMESPACE: Pod 'nginx' is deployed to default namespace. Specify metadata.namespace with a non-default value"
+      ],
+      "occurrences": 1,
+      "message": "KSV_DEFAULT_NAMESPACE: Pod 'nginx' is deployed to default namespace. Specify metadata.namespace with a non-default value",
+      "description": "KSV_DEFAULT_NAMESPACE: Pod 'nginx' is deployed to default namespace. Specify metadata.namespace with a non-default value",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/31.example-nginx.yaml",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_DEFAULT_SA_TOKEN"
+      ],
+      "examples": [
+        "KSV_DEFAULT_SA_TOKEN: Pod 'nginx' uses default service account with automountServiceAccountToken: true. Set serviceAccountName to non-default and automountServiceAccountToken: false"
+      ],
+      "occurrences": 1,
+      "message": "KSV_DEFAULT_SA_TOKEN: Pod 'nginx' uses default service account with automountServiceAccountToken: true. Set serviceAccountName to non-default and automountServiceAccountToken: false",
+      "description": "KSV_DEFAULT_SA_TOKEN: Pod 'nginx' uses default service account with automountServiceAccountToken: true. Set serviceAccountName to non-default and automountServiceAccountToken: false",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/31.example-nginx.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_IMAGE_NOT_PINNED"
+      ],
+      "examples": [
+        "KSV_IMAGE_NOT_PINNED: Container 'nginx' in Pod 'nginx' uses :latest tag. Pin image with @sha256:<digest>"
+      ],
+      "occurrences": 1,
+      "message": "KSV_IMAGE_NOT_PINNED: Container 'nginx' in Pod 'nginx' uses :latest tag. Pin image with @sha256:<digest>",
+      "description": "KSV_IMAGE_NOT_PINNED: Container 'nginx' in Pod 'nginx' uses :latest tag. Pin image with @sha256:<digest>",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/31.example-nginx.yaml",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_NO_APPARMOR"
+      ],
+      "examples": [
+        "KSV_NO_APPARMOR: Container 'nginx' in Pod 'nginx' has no AppArmor annotation. Add annotation container.apparmor.security.beta.kubernetes.io/nginx: runtime/default"
+      ],
+      "occurrences": 1,
+      "message": "KSV_NO_APPARMOR: Container 'nginx' in Pod 'nginx' has no AppArmor annotation. Add annotation container.apparmor.security.beta.kubernetes.io/nginx: runtime/default",
+      "description": "KSV_NO_APPARMOR: Container 'nginx' in Pod 'nginx' has no AppArmor annotation. Add annotation container.apparmor.security.beta.kubernetes.io/nginx: runtime/default",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/31.example-nginx.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_NO_LIMITS_NO_PROBES"
+      ],
+      "examples": [
+        "KSV_NO_LIMITS_NO_PROBES: Container 'nginx' in Pod 'nginx' missing resource limits (cpu/memory) AND probes (liveness/readiness)"
+      ],
+      "occurrences": 1,
+      "message": "KSV_NO_LIMITS_NO_PROBES: Container 'nginx' in Pod 'nginx' missing resource limits (cpu/memory) AND probes (liveness/readiness)",
+      "description": "KSV_NO_LIMITS_NO_PROBES: Container 'nginx' in Pod 'nginx' missing resource limits (cpu/memory) AND probes (liveness/readiness)",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/31.example-nginx.yaml",
+      "category": "NO_SECCOMP",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_NO_SECCOMP"
+      ],
+      "examples": [
+        "KSV_NO_SECCOMP: Container 'nginx' in Pod 'nginx' has no seccomp profile. Set securityContext.seccompProfile.type: RuntimeDefault"
+      ],
+      "occurrences": 1,
+      "message": "KSV_NO_SECCOMP: Container 'nginx' in Pod 'nginx' has no seccomp profile. Set securityContext.seccompProfile.type: RuntimeDefault",
+      "description": "KSV_NO_SECCOMP: Container 'nginx' in Pod 'nginx' has no seccomp profile. Set securityContext.seccompProfile.type: RuntimeDefault",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/31.example-nginx.yaml",
+      "category": "PRIVILEGED",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_PRIVILEGED"
+      ],
+      "examples": [
+        "KSV_PRIVILEGED: Container 'nginx' in Pod 'nginx' runs in privileged mode. Set securityContext.privileged: false"
+      ],
+      "occurrences": 1,
+      "message": "KSV_PRIVILEGED: Container 'nginx' in Pod 'nginx' runs in privileged mode. Set securityContext.privileged: false",
+      "description": "KSV_PRIVILEGED: Container 'nginx' in Pod 'nginx' runs in privileged mode. Set securityContext.privileged: false",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/31.example-nginx.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_READONLY_ROOTFS_FALSE"
+      ],
+      "examples": [
+        "KSV_READONLY_ROOTFS_FALSE: Container 'nginx' in Pod 'nginx' does not have readOnlyRootFilesystem: true"
+      ],
+      "occurrences": 1,
+      "message": "KSV_READONLY_ROOTFS_FALSE: Container 'nginx' in Pod 'nginx' does not have readOnlyRootFilesystem: true",
+      "description": "KSV_READONLY_ROOTFS_FALSE: Container 'nginx' in Pod 'nginx' does not have readOnlyRootFilesystem: true",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/31.example-nginx.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "NETWORK_POLICY"
+      ],
+      "examples": [
+        "NETWORK_POLICY: Pod 'nginx' must be covered by a NetworkPolicy (add annotation network-policy-confirmed: true)"
+      ],
+      "occurrences": 1,
+      "message": "NETWORK_POLICY: Pod 'nginx' must be covered by a NetworkPolicy (add annotation network-policy-confirmed: true)",
+      "description": "NETWORK_POLICY: Pod 'nginx' must be covered by a NetworkPolicy (add annotation network-policy-confirmed: true)",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/31.example-nginx.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "RESOURCE_LIMITS"
+      ],
+      "examples": [
+        "RESOURCE_LIMITS: Container 'nginx' in Pod 'nginx' must set CPU limit"
+      ],
+      "occurrences": 1,
+      "message": "RESOURCE_LIMITS: Container 'nginx' in Pod 'nginx' must set CPU limit",
+      "description": "RESOURCE_LIMITS: Container 'nginx' in Pod 'nginx' must set CPU limit",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/31.example-nginx.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "RESOURCE_LIMITS"
+      ],
+      "examples": [
+        "RESOURCE_LIMITS: Container 'nginx' in Pod 'nginx' must set memory limit"
+      ],
+      "occurrences": 1,
+      "message": "RESOURCE_LIMITS: Container 'nginx' in Pod 'nginx' must set memory limit",
+      "description": "RESOURCE_LIMITS: Container 'nginx' in Pod 'nginx' must set memory limit",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/31.example-nginx.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "RESOURCE_REQUESTS"
+      ],
+      "examples": [
+        "RESOURCE_REQUESTS: Container 'nginx' in Pod 'nginx' must set CPU request"
+      ],
+      "occurrences": 1,
+      "message": "RESOURCE_REQUESTS: Container 'nginx' in Pod 'nginx' must set CPU request",
+      "description": "RESOURCE_REQUESTS: Container 'nginx' in Pod 'nginx' must set CPU request",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/31.example-nginx.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "RESOURCE_REQUESTS"
+      ],
+      "examples": [
+        "RESOURCE_REQUESTS: Container 'nginx' in Pod 'nginx' must set memory request"
+      ],
+      "occurrences": 1,
+      "message": "RESOURCE_REQUESTS: Container 'nginx' in Pod 'nginx' must set memory request",
+      "description": "RESOURCE_REQUESTS: Container 'nginx' in Pod 'nginx' must set memory request",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/31.example-nginx.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "RUN_AS_NON_ROOT"
+      ],
+      "examples": [
+        "RUN_AS_NON_ROOT: Container 'nginx' in Pod 'nginx' must set runAsNonRoot: true at pod or container level"
+      ],
+      "occurrences": 1,
+      "message": "RUN_AS_NON_ROOT: Container 'nginx' in Pod 'nginx' must set runAsNonRoot: true at pod or container level",
+      "description": "RUN_AS_NON_ROOT: Container 'nginx' in Pod 'nginx' must set runAsNonRoot: true at pod or container level",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/34.echo1_no_securitycontext.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "HEALTH_PROBES"
+      ],
+      "examples": [
+        "HEALTH_PROBES: Container 'echo1' in Deployment 'echo1' must define livenessProbe"
+      ],
+      "occurrences": 1,
+      "message": "HEALTH_PROBES: Container 'echo1' in Deployment 'echo1' must define livenessProbe",
+      "description": "HEALTH_PROBES: Container 'echo1' in Deployment 'echo1' must define livenessProbe",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/34.echo1_no_securitycontext.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "HEALTH_PROBES"
+      ],
+      "examples": [
+        "HEALTH_PROBES: Container 'echo1' in Deployment 'echo1' must define readinessProbe"
+      ],
+      "occurrences": 1,
+      "message": "HEALTH_PROBES: Container 'echo1' in Deployment 'echo1' must define readinessProbe",
+      "description": "HEALTH_PROBES: Container 'echo1' in Deployment 'echo1' must define readinessProbe",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/34.echo1_no_securitycontext.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "IMAGE_PULL_POLICY"
+      ],
+      "examples": [
+        "IMAGE_PULL_POLICY: Container 'echo1' in Deployment 'echo1' should set imagePullPolicy: Always (unless using digest)"
+      ],
+      "occurrences": 1,
+      "message": "IMAGE_PULL_POLICY: Container 'echo1' in Deployment 'echo1' should set imagePullPolicy: Always (unless using digest)",
+      "description": "IMAGE_PULL_POLICY: Container 'echo1' in Deployment 'echo1' should set imagePullPolicy: Always (unless using digest)",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/34.echo1_no_securitycontext.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_ALLOW_PRIVILEGE_ESCALATION"
+      ],
+      "examples": [
+        "KSV_ALLOW_PRIVILEGE_ESCALATION: Container 'echo1' in Deployment 'echo1' does not explicitly set allowPrivilegeEscalation: false"
+      ],
+      "occurrences": 1,
+      "message": "KSV_ALLOW_PRIVILEGE_ESCALATION: Container 'echo1' in Deployment 'echo1' does not explicitly set allowPrivilegeEscalation: false",
+      "description": "KSV_ALLOW_PRIVILEGE_ESCALATION: Container 'echo1' in Deployment 'echo1' does not explicitly set allowPrivilegeEscalation: false",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/34.echo1_no_securitycontext.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_CAP_DROP_MISSING"
+      ],
+      "examples": [
+        "KSV_CAP_DROP_MISSING: Container 'echo1' in Deployment 'echo1' does not drop ALL capabilities. Add securityContext.capabilities.drop: [ALL]"
+      ],
+      "occurrences": 1,
+      "message": "KSV_CAP_DROP_MISSING: Container 'echo1' in Deployment 'echo1' does not drop ALL capabilities. Add securityContext.capabilities.drop: [ALL]",
+      "description": "KSV_CAP_DROP_MISSING: Container 'echo1' in Deployment 'echo1' does not drop ALL capabilities. Add securityContext.capabilities.drop: [ALL]",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/34.echo1_no_securitycontext.yaml",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_DEFAULT_NAMESPACE"
+      ],
+      "examples": [
+        "KSV_DEFAULT_NAMESPACE: Deployment 'echo1' is deployed to default namespace. Specify metadata.namespace with a non-default value"
+      ],
+      "occurrences": 1,
+      "message": "KSV_DEFAULT_NAMESPACE: Deployment 'echo1' is deployed to default namespace. Specify metadata.namespace with a non-default value",
+      "description": "KSV_DEFAULT_NAMESPACE: Deployment 'echo1' is deployed to default namespace. Specify metadata.namespace with a non-default value",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/34.echo1_no_securitycontext.yaml",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_DEFAULT_SA_TOKEN"
+      ],
+      "examples": [
+        "KSV_DEFAULT_SA_TOKEN: Deployment 'echo1' uses default service account with automountServiceAccountToken: true. Set serviceAccountName to non-default and automountServiceAccountToken: false"
+      ],
+      "occurrences": 1,
+      "message": "KSV_DEFAULT_SA_TOKEN: Deployment 'echo1' uses default service account with automountServiceAccountToken: true. Set serviceAccountName to non-default and automountServiceAccountToken: false",
+      "description": "KSV_DEFAULT_SA_TOKEN: Deployment 'echo1' uses default service account with automountServiceAccountToken: true. Set serviceAccountName to non-default and automountServiceAccountToken: false",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/34.echo1_no_securitycontext.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_IMAGE_NOT_PINNED"
+      ],
+      "examples": [
+        "KSV_IMAGE_NOT_PINNED: Container 'echo1' in echo1 '%!s(MISSING)' has no tag/digest. Pin image with @sha256:<digest>"
+      ],
+      "occurrences": 1,
+      "message": "KSV_IMAGE_NOT_PINNED: Container 'echo1' in echo1 '%!s(MISSING)' has no tag/digest. Pin image with @sha256:<digest>",
+      "description": "KSV_IMAGE_NOT_PINNED: Container 'echo1' in echo1 '%!s(MISSING)' has no tag/digest. Pin image with @sha256:<digest>",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/34.echo1_no_securitycontext.yaml",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_NO_APPARMOR"
+      ],
+      "examples": [
+        "KSV_NO_APPARMOR: Container 'echo1' in Deployment 'echo1' has no AppArmor annotation. Add annotation container.apparmor.security.beta.kubernetes.io/echo1: runtime/default"
+      ],
+      "occurrences": 1,
+      "message": "KSV_NO_APPARMOR: Container 'echo1' in Deployment 'echo1' has no AppArmor annotation. Add annotation container.apparmor.security.beta.kubernetes.io/echo1: runtime/default",
+      "description": "KSV_NO_APPARMOR: Container 'echo1' in Deployment 'echo1' has no AppArmor annotation. Add annotation container.apparmor.security.beta.kubernetes.io/echo1: runtime/default",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/34.echo1_no_securitycontext.yaml",
+      "category": "NO_SECCOMP",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_NO_SECCOMP"
+      ],
+      "examples": [
+        "KSV_NO_SECCOMP: Container 'echo1' in Deployment 'echo1' has no seccomp profile. Set securityContext.seccompProfile.type: RuntimeDefault"
+      ],
+      "occurrences": 1,
+      "message": "KSV_NO_SECCOMP: Container 'echo1' in Deployment 'echo1' has no seccomp profile. Set securityContext.seccompProfile.type: RuntimeDefault",
+      "description": "KSV_NO_SECCOMP: Container 'echo1' in Deployment 'echo1' has no seccomp profile. Set securityContext.seccompProfile.type: RuntimeDefault",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/34.echo1_no_securitycontext.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_READONLY_ROOTFS_FALSE"
+      ],
+      "examples": [
+        "KSV_READONLY_ROOTFS_FALSE: Container 'echo1' in Deployment 'echo1' does not have readOnlyRootFilesystem: true"
+      ],
+      "occurrences": 1,
+      "message": "KSV_READONLY_ROOTFS_FALSE: Container 'echo1' in Deployment 'echo1' does not have readOnlyRootFilesystem: true",
+      "description": "KSV_READONLY_ROOTFS_FALSE: Container 'echo1' in Deployment 'echo1' does not have readOnlyRootFilesystem: true",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/34.echo1_no_securitycontext.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "NETWORK_POLICY"
+      ],
+      "examples": [
+        "NETWORK_POLICY: Deployment 'echo1' must be covered by a NetworkPolicy (add annotation network-policy-confirmed: true)"
+      ],
+      "occurrences": 1,
+      "message": "NETWORK_POLICY: Deployment 'echo1' must be covered by a NetworkPolicy (add annotation network-policy-confirmed: true)",
+      "description": "NETWORK_POLICY: Deployment 'echo1' must be covered by a NetworkPolicy (add annotation network-policy-confirmed: true)",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/34.echo1_no_securitycontext.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "RUN_AS_NON_ROOT"
+      ],
+      "examples": [
+        "RUN_AS_NON_ROOT: Container 'echo1' in Deployment 'echo1' must set runAsNonRoot: true at pod or container level"
+      ],
+      "occurrences": 1,
+      "message": "RUN_AS_NON_ROOT: Container 'echo1' in Deployment 'echo1' must set runAsNonRoot: true at pod or container level",
+      "description": "RUN_AS_NON_ROOT: Container 'echo1' in Deployment 'echo1' must set runAsNonRoot: true at pod or container level",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/insecure-rbac.setup.yaml",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_DEFAULT_NAMESPACE"
+      ],
+      "examples": [
+        "KSV_DEFAULT_NAMESPACE: ClusterRoleBinding 'superadmin' is deployed to default namespace. Specify metadata.namespace with a non-default value"
+      ],
+      "occurrences": 1,
+      "message": "KSV_DEFAULT_NAMESPACE: ClusterRoleBinding 'superadmin' is deployed to default namespace. Specify metadata.namespace with a non-default value",
+      "description": "KSV_DEFAULT_NAMESPACE: ClusterRoleBinding 'superadmin' is deployed to default namespace. Specify metadata.namespace with a non-default value",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/kube-bench-security.node-job.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "HEALTH_PROBES"
+      ],
+      "examples": [
+        "HEALTH_PROBES: Container 'kube-bench' in Job 'kube-bench-node' must define livenessProbe"
+      ],
+      "occurrences": 1,
+      "message": "HEALTH_PROBES: Container 'kube-bench' in Job 'kube-bench-node' must define livenessProbe",
+      "description": "HEALTH_PROBES: Container 'kube-bench' in Job 'kube-bench-node' must define livenessProbe",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/kube-bench-security.node-job.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "HEALTH_PROBES"
+      ],
+      "examples": [
+        "HEALTH_PROBES: Container 'kube-bench' in Job 'kube-bench-node' must define readinessProbe"
+      ],
+      "occurrences": 1,
+      "message": "HEALTH_PROBES: Container 'kube-bench' in Job 'kube-bench-node' must define readinessProbe",
+      "description": "HEALTH_PROBES: Container 'kube-bench' in Job 'kube-bench-node' must define readinessProbe",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/kube-bench-security.node-job.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "HOST_PATH"
+      ],
+      "examples": [
+        "HOST_PATH: Job 'kube-bench-node' uses hostPath volume 'etc-cni-netd' - avoid mounting host filesystem"
+      ],
+      "occurrences": 1,
+      "message": "HOST_PATH: Job 'kube-bench-node' uses hostPath volume 'etc-cni-netd' - avoid mounting host filesystem",
+      "description": "HOST_PATH: Job 'kube-bench-node' uses hostPath volume 'etc-cni-netd' - avoid mounting host filesystem",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/kube-bench-security.node-job.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "HOST_PATH"
+      ],
+      "examples": [
+        "HOST_PATH: Job 'kube-bench-node' uses hostPath volume 'etc-kubernetes' - avoid mounting host filesystem"
+      ],
+      "occurrences": 1,
+      "message": "HOST_PATH: Job 'kube-bench-node' uses hostPath volume 'etc-kubernetes' - avoid mounting host filesystem",
+      "description": "HOST_PATH: Job 'kube-bench-node' uses hostPath volume 'etc-kubernetes' - avoid mounting host filesystem",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/kube-bench-security.node-job.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "HOST_PATH"
+      ],
+      "examples": [
+        "HOST_PATH: Job 'kube-bench-node' uses hostPath volume 'etc-systemd' - avoid mounting host filesystem"
+      ],
+      "occurrences": 1,
+      "message": "HOST_PATH: Job 'kube-bench-node' uses hostPath volume 'etc-systemd' - avoid mounting host filesystem",
+      "description": "HOST_PATH: Job 'kube-bench-node' uses hostPath volume 'etc-systemd' - avoid mounting host filesystem",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/kube-bench-security.node-job.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "HOST_PATH"
+      ],
+      "examples": [
+        "HOST_PATH: Job 'kube-bench-node' uses hostPath volume 'lib-systemd' - avoid mounting host filesystem"
+      ],
+      "occurrences": 1,
+      "message": "HOST_PATH: Job 'kube-bench-node' uses hostPath volume 'lib-systemd' - avoid mounting host filesystem",
+      "description": "HOST_PATH: Job 'kube-bench-node' uses hostPath volume 'lib-systemd' - avoid mounting host filesystem",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/kube-bench-security.node-job.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "HOST_PATH"
+      ],
+      "examples": [
+        "HOST_PATH: Job 'kube-bench-node' uses hostPath volume 'opt-cni-bin' - avoid mounting host filesystem"
+      ],
+      "occurrences": 1,
+      "message": "HOST_PATH: Job 'kube-bench-node' uses hostPath volume 'opt-cni-bin' - avoid mounting host filesystem",
+      "description": "HOST_PATH: Job 'kube-bench-node' uses hostPath volume 'opt-cni-bin' - avoid mounting host filesystem",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/kube-bench-security.node-job.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "HOST_PATH"
+      ],
+      "examples": [
+        "HOST_PATH: Job 'kube-bench-node' uses hostPath volume 'srv-kubernetes' - avoid mounting host filesystem"
+      ],
+      "occurrences": 1,
+      "message": "HOST_PATH: Job 'kube-bench-node' uses hostPath volume 'srv-kubernetes' - avoid mounting host filesystem",
+      "description": "HOST_PATH: Job 'kube-bench-node' uses hostPath volume 'srv-kubernetes' - avoid mounting host filesystem",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/kube-bench-security.node-job.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "HOST_PATH"
+      ],
+      "examples": [
+        "HOST_PATH: Job 'kube-bench-node' uses hostPath volume 'usr-bin' - avoid mounting host filesystem"
+      ],
+      "occurrences": 1,
+      "message": "HOST_PATH: Job 'kube-bench-node' uses hostPath volume 'usr-bin' - avoid mounting host filesystem",
+      "description": "HOST_PATH: Job 'kube-bench-node' uses hostPath volume 'usr-bin' - avoid mounting host filesystem",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/kube-bench-security.node-job.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "HOST_PATH"
+      ],
+      "examples": [
+        "HOST_PATH: Job 'kube-bench-node' uses hostPath volume 'var-lib-etcd' - avoid mounting host filesystem"
+      ],
+      "occurrences": 1,
+      "message": "HOST_PATH: Job 'kube-bench-node' uses hostPath volume 'var-lib-etcd' - avoid mounting host filesystem",
+      "description": "HOST_PATH: Job 'kube-bench-node' uses hostPath volume 'var-lib-etcd' - avoid mounting host filesystem",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/kube-bench-security.node-job.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "HOST_PATH"
+      ],
+      "examples": [
+        "HOST_PATH: Job 'kube-bench-node' uses hostPath volume 'var-lib-kube-controller-manager' - avoid mounting host filesystem"
+      ],
+      "occurrences": 1,
+      "message": "HOST_PATH: Job 'kube-bench-node' uses hostPath volume 'var-lib-kube-controller-manager' - avoid mounting host filesystem",
+      "description": "HOST_PATH: Job 'kube-bench-node' uses hostPath volume 'var-lib-kube-controller-manager' - avoid mounting host filesystem",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/kube-bench-security.node-job.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "HOST_PATH"
+      ],
+      "examples": [
+        "HOST_PATH: Job 'kube-bench-node' uses hostPath volume 'var-lib-kube-scheduler' - avoid mounting host filesystem"
+      ],
+      "occurrences": 1,
+      "message": "HOST_PATH: Job 'kube-bench-node' uses hostPath volume 'var-lib-kube-scheduler' - avoid mounting host filesystem",
+      "description": "HOST_PATH: Job 'kube-bench-node' uses hostPath volume 'var-lib-kube-scheduler' - avoid mounting host filesystem",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/kube-bench-security.node-job.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "HOST_PATH"
+      ],
+      "examples": [
+        "HOST_PATH: Job 'kube-bench-node' uses hostPath volume 'var-lib-kubelet' - avoid mounting host filesystem"
+      ],
+      "occurrences": 1,
+      "message": "HOST_PATH: Job 'kube-bench-node' uses hostPath volume 'var-lib-kubelet' - avoid mounting host filesystem",
+      "description": "HOST_PATH: Job 'kube-bench-node' uses hostPath volume 'var-lib-kubelet' - avoid mounting host filesystem",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/kube-bench-security.node-job.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "HOST_PID"
+      ],
+      "examples": [
+        "HOST_PID: Job 'kube-bench-node' must not use hostPID: true"
+      ],
+      "occurrences": 1,
+      "message": "HOST_PID: Job 'kube-bench-node' must not use hostPID: true",
+      "description": "HOST_PID: Job 'kube-bench-node' must not use hostPID: true",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/kube-bench-security.node-job.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "IMAGE_PULL_POLICY"
+      ],
+      "examples": [
+        "IMAGE_PULL_POLICY: Container 'kube-bench' in Job 'kube-bench-node' should set imagePullPolicy: Always (unless using digest)"
+      ],
+      "occurrences": 1,
+      "message": "IMAGE_PULL_POLICY: Container 'kube-bench' in Job 'kube-bench-node' should set imagePullPolicy: Always (unless using digest)",
+      "description": "IMAGE_PULL_POLICY: Container 'kube-bench' in Job 'kube-bench-node' should set imagePullPolicy: Always (unless using digest)",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/kube-bench-security.node-job.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_ALLOW_PRIVILEGE_ESCALATION"
+      ],
+      "examples": [
+        "KSV_ALLOW_PRIVILEGE_ESCALATION: Container 'kube-bench' in Job 'kube-bench-node' does not explicitly set allowPrivilegeEscalation: false"
+      ],
+      "occurrences": 1,
+      "message": "KSV_ALLOW_PRIVILEGE_ESCALATION: Container 'kube-bench' in Job 'kube-bench-node' does not explicitly set allowPrivilegeEscalation: false",
+      "description": "KSV_ALLOW_PRIVILEGE_ESCALATION: Container 'kube-bench' in Job 'kube-bench-node' does not explicitly set allowPrivilegeEscalation: false",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/kube-bench-security.node-job.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_CAP_DROP_MISSING"
+      ],
+      "examples": [
+        "KSV_CAP_DROP_MISSING: Container 'kube-bench' in Job 'kube-bench-node' does not drop ALL capabilities. Add securityContext.capabilities.drop: [ALL]"
+      ],
+      "occurrences": 1,
+      "message": "KSV_CAP_DROP_MISSING: Container 'kube-bench' in Job 'kube-bench-node' does not drop ALL capabilities. Add securityContext.capabilities.drop: [ALL]",
+      "description": "KSV_CAP_DROP_MISSING: Container 'kube-bench' in Job 'kube-bench-node' does not drop ALL capabilities. Add securityContext.capabilities.drop: [ALL]",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/kube-bench-security.node-job.yaml",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_DEFAULT_NAMESPACE"
+      ],
+      "examples": [
+        "KSV_DEFAULT_NAMESPACE: Job 'kube-bench-node' is deployed to default namespace. Specify metadata.namespace with a non-default value"
+      ],
+      "occurrences": 1,
+      "message": "KSV_DEFAULT_NAMESPACE: Job 'kube-bench-node' is deployed to default namespace. Specify metadata.namespace with a non-default value",
+      "description": "KSV_DEFAULT_NAMESPACE: Job 'kube-bench-node' is deployed to default namespace. Specify metadata.namespace with a non-default value",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/kube-bench-security.node-job.yaml",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_DEFAULT_SA_TOKEN"
+      ],
+      "examples": [
+        "KSV_DEFAULT_SA_TOKEN: Job 'kube-bench-node' uses default service account with automountServiceAccountToken: true. Set serviceAccountName to non-default and automountServiceAccountToken: false"
+      ],
+      "occurrences": 1,
+      "message": "KSV_DEFAULT_SA_TOKEN: Job 'kube-bench-node' uses default service account with automountServiceAccountToken: true. Set serviceAccountName to non-default and automountServiceAccountToken: false",
+      "description": "KSV_DEFAULT_SA_TOKEN: Job 'kube-bench-node' uses default service account with automountServiceAccountToken: true. Set serviceAccountName to non-default and automountServiceAccountToken: false",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/kube-bench-security.node-job.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_IMAGE_NOT_PINNED"
+      ],
+      "examples": [
+        "KSV_IMAGE_NOT_PINNED: Container 'kube-bench' in Job 'kube-bench-node' uses :latest tag. Pin image with @sha256:<digest>"
+      ],
+      "occurrences": 1,
+      "message": "KSV_IMAGE_NOT_PINNED: Container 'kube-bench' in Job 'kube-bench-node' uses :latest tag. Pin image with @sha256:<digest>",
+      "description": "KSV_IMAGE_NOT_PINNED: Container 'kube-bench' in Job 'kube-bench-node' uses :latest tag. Pin image with @sha256:<digest>",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/kube-bench-security.node-job.yaml",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_NO_APPARMOR"
+      ],
+      "examples": [
+        "KSV_NO_APPARMOR: Container 'kube-bench' in Job 'kube-bench-node' has no AppArmor annotation. Add annotation container.apparmor.security.beta.kubernetes.io/kube-bench: runtime/default"
+      ],
+      "occurrences": 1,
+      "message": "KSV_NO_APPARMOR: Container 'kube-bench' in Job 'kube-bench-node' has no AppArmor annotation. Add annotation container.apparmor.security.beta.kubernetes.io/kube-bench: runtime/default",
+      "description": "KSV_NO_APPARMOR: Container 'kube-bench' in Job 'kube-bench-node' has no AppArmor annotation. Add annotation container.apparmor.security.beta.kubernetes.io/kube-bench: runtime/default",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/kube-bench-security.node-job.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_NO_LIMITS_NO_PROBES"
+      ],
+      "examples": [
+        "KSV_NO_LIMITS_NO_PROBES: Container 'kube-bench' in Job 'kube-bench-node' missing resource limits (cpu/memory) AND probes (liveness/readiness)"
+      ],
+      "occurrences": 1,
+      "message": "KSV_NO_LIMITS_NO_PROBES: Container 'kube-bench' in Job 'kube-bench-node' missing resource limits (cpu/memory) AND probes (liveness/readiness)",
+      "description": "KSV_NO_LIMITS_NO_PROBES: Container 'kube-bench' in Job 'kube-bench-node' missing resource limits (cpu/memory) AND probes (liveness/readiness)",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/kube-bench-security.node-job.yaml",
+      "category": "NO_SECCOMP",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_NO_SECCOMP"
+      ],
+      "examples": [
+        "KSV_NO_SECCOMP: Container 'kube-bench' in Job 'kube-bench-node' has no seccomp profile. Set securityContext.seccompProfile.type: RuntimeDefault"
+      ],
+      "occurrences": 1,
+      "message": "KSV_NO_SECCOMP: Container 'kube-bench' in Job 'kube-bench-node' has no seccomp profile. Set securityContext.seccompProfile.type: RuntimeDefault",
+      "description": "KSV_NO_SECCOMP: Container 'kube-bench' in Job 'kube-bench-node' has no seccomp profile. Set securityContext.seccompProfile.type: RuntimeDefault",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/kube-bench-security.node-job.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_READONLY_ROOTFS_FALSE"
+      ],
+      "examples": [
+        "KSV_READONLY_ROOTFS_FALSE: Container 'kube-bench' in Job 'kube-bench-node' does not have readOnlyRootFilesystem: true"
+      ],
+      "occurrences": 1,
+      "message": "KSV_READONLY_ROOTFS_FALSE: Container 'kube-bench' in Job 'kube-bench-node' does not have readOnlyRootFilesystem: true",
+      "description": "KSV_READONLY_ROOTFS_FALSE: Container 'kube-bench' in Job 'kube-bench-node' does not have readOnlyRootFilesystem: true",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/kube-bench-security.node-job.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "RESOURCE_LIMITS"
+      ],
+      "examples": [
+        "RESOURCE_LIMITS: Container 'kube-bench' in Job 'kube-bench-node' must set CPU limit"
+      ],
+      "occurrences": 1,
+      "message": "RESOURCE_LIMITS: Container 'kube-bench' in Job 'kube-bench-node' must set CPU limit",
+      "description": "RESOURCE_LIMITS: Container 'kube-bench' in Job 'kube-bench-node' must set CPU limit",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/kube-bench-security.node-job.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "RESOURCE_LIMITS"
+      ],
+      "examples": [
+        "RESOURCE_LIMITS: Container 'kube-bench' in Job 'kube-bench-node' must set memory limit"
+      ],
+      "occurrences": 1,
+      "message": "RESOURCE_LIMITS: Container 'kube-bench' in Job 'kube-bench-node' must set memory limit",
+      "description": "RESOURCE_LIMITS: Container 'kube-bench' in Job 'kube-bench-node' must set memory limit",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/kube-bench-security.node-job.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "RESOURCE_REQUESTS"
+      ],
+      "examples": [
+        "RESOURCE_REQUESTS: Container 'kube-bench' in Job 'kube-bench-node' must set CPU request"
+      ],
+      "occurrences": 1,
+      "message": "RESOURCE_REQUESTS: Container 'kube-bench' in Job 'kube-bench-node' must set CPU request",
+      "description": "RESOURCE_REQUESTS: Container 'kube-bench' in Job 'kube-bench-node' must set CPU request",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/kube-bench-security.node-job.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "RESOURCE_REQUESTS"
+      ],
+      "examples": [
+        "RESOURCE_REQUESTS: Container 'kube-bench' in Job 'kube-bench-node' must set memory request"
+      ],
+      "occurrences": 1,
+      "message": "RESOURCE_REQUESTS: Container 'kube-bench' in Job 'kube-bench-node' must set memory request",
+      "description": "RESOURCE_REQUESTS: Container 'kube-bench' in Job 'kube-bench-node' must set memory request",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/kube-bench-security.node-job.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "RUN_AS_NON_ROOT"
+      ],
+      "examples": [
+        "RUN_AS_NON_ROOT: Container 'kube-bench' in Job 'kube-bench-node' must set runAsNonRoot: true at pod or container level"
+      ],
+      "occurrences": 1,
+      "message": "RUN_AS_NON_ROOT: Container 'kube-bench' in Job 'kube-bench-node' must set runAsNonRoot: true at pod or container level",
+      "description": "RUN_AS_NON_ROOT: Container 'kube-bench' in Job 'kube-bench-node' must set runAsNonRoot: true at pod or container level",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/28.role_overly_permissive.yaml",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_DEFAULT_NAMESPACE"
+      ],
+      "examples": [
+        "KSV_DEFAULT_NAMESPACE: Role 'frontend-role' is deployed to default namespace. Specify metadata.namespace with a non-default value"
+      ],
+      "occurrences": 1,
+      "message": "KSV_DEFAULT_NAMESPACE: Role 'frontend-role' is deployed to default namespace. Specify metadata.namespace with a non-default value",
+      "description": "KSV_DEFAULT_NAMESPACE: Role 'frontend-role' is deployed to default namespace. Specify metadata.namespace with a non-default value",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/34.unencrypted_secret.yaml",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_DEFAULT_NAMESPACE"
+      ],
+      "examples": [
+        "KSV_DEFAULT_NAMESPACE: Secret 'mysecret' is deployed to default namespace. Specify metadata.namespace with a non-default value"
+      ],
+      "occurrences": 1,
+      "message": "KSV_DEFAULT_NAMESPACE: Secret 'mysecret' is deployed to default namespace. Specify metadata.namespace with a non-default value",
+      "description": "KSV_DEFAULT_NAMESPACE: Secret 'mysecret' is deployed to default namespace. Specify metadata.namespace with a non-default value",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/34.unencrypted_secret.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "UNENCRYPTED_SECRET"
+      ],
+      "examples": [
+        "UNENCRYPTED_SECRET: Secret 'mysecret' is unencrypted - use encryption at rest or external secret management"
+      ],
+      "occurrences": 1,
+      "message": "UNENCRYPTED_SECRET: Secret 'mysecret' is unencrypted - use encryption at rest or external secret management",
+      "description": "UNENCRYPTED_SECRET: Secret 'mysecret' is unencrypted - use encryption at rest or external secret management",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/poor-registry.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "HEALTH_PROBES"
+      ],
+      "examples": [
+        "HEALTH_PROBES: Container 'poor-registry' in Deployment 'poor-registry-deployment' must define livenessProbe"
+      ],
+      "occurrences": 1,
+      "message": "HEALTH_PROBES: Container 'poor-registry' in Deployment 'poor-registry-deployment' must define livenessProbe",
+      "description": "HEALTH_PROBES: Container 'poor-registry' in Deployment 'poor-registry-deployment' must define livenessProbe",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/poor-registry.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "HEALTH_PROBES"
+      ],
+      "examples": [
+        "HEALTH_PROBES: Container 'poor-registry' in Deployment 'poor-registry-deployment' must define readinessProbe"
+      ],
+      "occurrences": 1,
+      "message": "HEALTH_PROBES: Container 'poor-registry' in Deployment 'poor-registry-deployment' must define readinessProbe",
+      "description": "HEALTH_PROBES: Container 'poor-registry' in Deployment 'poor-registry-deployment' must define readinessProbe",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/poor-registry.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "IMAGE_PULL_POLICY"
+      ],
+      "examples": [
+        "IMAGE_PULL_POLICY: Container 'poor-registry' in Deployment 'poor-registry-deployment' should set imagePullPolicy: Always (unless using digest)"
+      ],
+      "occurrences": 1,
+      "message": "IMAGE_PULL_POLICY: Container 'poor-registry' in Deployment 'poor-registry-deployment' should set imagePullPolicy: Always (unless using digest)",
+      "description": "IMAGE_PULL_POLICY: Container 'poor-registry' in Deployment 'poor-registry-deployment' should set imagePullPolicy: Always (unless using digest)",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/poor-registry.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_ALLOW_PRIVILEGE_ESCALATION"
+      ],
+      "examples": [
+        "KSV_ALLOW_PRIVILEGE_ESCALATION: Container 'poor-registry' in Deployment 'poor-registry-deployment' does not explicitly set allowPrivilegeEscalation: false"
+      ],
+      "occurrences": 1,
+      "message": "KSV_ALLOW_PRIVILEGE_ESCALATION: Container 'poor-registry' in Deployment 'poor-registry-deployment' does not explicitly set allowPrivilegeEscalation: false",
+      "description": "KSV_ALLOW_PRIVILEGE_ESCALATION: Container 'poor-registry' in Deployment 'poor-registry-deployment' does not explicitly set allowPrivilegeEscalation: false",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/poor-registry.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_CAP_DROP_MISSING"
+      ],
+      "examples": [
+        "KSV_CAP_DROP_MISSING: Container 'poor-registry' in Deployment 'poor-registry-deployment' does not drop ALL capabilities. Add securityContext.capabilities.drop: [ALL]"
+      ],
+      "occurrences": 1,
+      "message": "KSV_CAP_DROP_MISSING: Container 'poor-registry' in Deployment 'poor-registry-deployment' does not drop ALL capabilities. Add securityContext.capabilities.drop: [ALL]",
+      "description": "KSV_CAP_DROP_MISSING: Container 'poor-registry' in Deployment 'poor-registry-deployment' does not drop ALL capabilities. Add securityContext.capabilities.drop: [ALL]",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/poor-registry.deployment.yaml",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_DEFAULT_NAMESPACE"
+      ],
+      "examples": [
+        "KSV_DEFAULT_NAMESPACE: Deployment 'poor-registry-deployment' is deployed to default namespace. Specify metadata.namespace with a non-default value"
+      ],
+      "occurrences": 1,
+      "message": "KSV_DEFAULT_NAMESPACE: Deployment 'poor-registry-deployment' is deployed to default namespace. Specify metadata.namespace with a non-default value",
+      "description": "KSV_DEFAULT_NAMESPACE: Deployment 'poor-registry-deployment' is deployed to default namespace. Specify metadata.namespace with a non-default value",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/poor-registry.deployment.yaml",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_DEFAULT_SA_TOKEN"
+      ],
+      "examples": [
+        "KSV_DEFAULT_SA_TOKEN: Deployment 'poor-registry-deployment' uses default service account with automountServiceAccountToken: true. Set serviceAccountName to non-default and automountServiceAccountToken: false"
+      ],
+      "occurrences": 1,
+      "message": "KSV_DEFAULT_SA_TOKEN: Deployment 'poor-registry-deployment' uses default service account with automountServiceAccountToken: true. Set serviceAccountName to non-default and automountServiceAccountToken: false",
+      "description": "KSV_DEFAULT_SA_TOKEN: Deployment 'poor-registry-deployment' uses default service account with automountServiceAccountToken: true. Set serviceAccountName to non-default and automountServiceAccountToken: false",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/poor-registry.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_IMAGE_NOT_PINNED"
+      ],
+      "examples": [
+        "KSV_IMAGE_NOT_PINNED: Container 'poor-registry' in poor-registry-deployment '%!s(MISSING)' has no tag/digest. Pin image with @sha256:<digest>"
+      ],
+      "occurrences": 1,
+      "message": "KSV_IMAGE_NOT_PINNED: Container 'poor-registry' in poor-registry-deployment '%!s(MISSING)' has no tag/digest. Pin image with @sha256:<digest>",
+      "description": "KSV_IMAGE_NOT_PINNED: Container 'poor-registry' in poor-registry-deployment '%!s(MISSING)' has no tag/digest. Pin image with @sha256:<digest>",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/poor-registry.deployment.yaml",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_NO_APPARMOR"
+      ],
+      "examples": [
+        "KSV_NO_APPARMOR: Container 'poor-registry' in Deployment 'poor-registry-deployment' has no AppArmor annotation. Add annotation container.apparmor.security.beta.kubernetes.io/poor-registry: runtime/default"
+      ],
+      "occurrences": 1,
+      "message": "KSV_NO_APPARMOR: Container 'poor-registry' in Deployment 'poor-registry-deployment' has no AppArmor annotation. Add annotation container.apparmor.security.beta.kubernetes.io/poor-registry: runtime/default",
+      "description": "KSV_NO_APPARMOR: Container 'poor-registry' in Deployment 'poor-registry-deployment' has no AppArmor annotation. Add annotation container.apparmor.security.beta.kubernetes.io/poor-registry: runtime/default",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/poor-registry.deployment.yaml",
+      "category": "NO_SECCOMP",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_NO_SECCOMP"
+      ],
+      "examples": [
+        "KSV_NO_SECCOMP: Container 'poor-registry' in Deployment 'poor-registry-deployment' has no seccomp profile. Set securityContext.seccompProfile.type: RuntimeDefault"
+      ],
+      "occurrences": 1,
+      "message": "KSV_NO_SECCOMP: Container 'poor-registry' in Deployment 'poor-registry-deployment' has no seccomp profile. Set securityContext.seccompProfile.type: RuntimeDefault",
+      "description": "KSV_NO_SECCOMP: Container 'poor-registry' in Deployment 'poor-registry-deployment' has no seccomp profile. Set securityContext.seccompProfile.type: RuntimeDefault",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/poor-registry.deployment.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_READONLY_ROOTFS_FALSE"
+      ],
+      "examples": [
+        "KSV_READONLY_ROOTFS_FALSE: Container 'poor-registry' in Deployment 'poor-registry-deployment' does not have readOnlyRootFilesystem: true"
+      ],
+      "occurrences": 1,
+      "message": "KSV_READONLY_ROOTFS_FALSE: Container 'poor-registry' in Deployment 'poor-registry-deployment' does not have readOnlyRootFilesystem: true",
+      "description": "KSV_READONLY_ROOTFS_FALSE: Container 'poor-registry' in Deployment 'poor-registry-deployment' does not have readOnlyRootFilesystem: true",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/poor-registry.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "NETWORK_POLICY"
+      ],
+      "examples": [
+        "NETWORK_POLICY: Deployment 'poor-registry-deployment' must be covered by a NetworkPolicy (add annotation network-policy-confirmed: true)"
+      ],
+      "occurrences": 1,
+      "message": "NETWORK_POLICY: Deployment 'poor-registry-deployment' must be covered by a NetworkPolicy (add annotation network-policy-confirmed: true)",
+      "description": "NETWORK_POLICY: Deployment 'poor-registry-deployment' must be covered by a NetworkPolicy (add annotation network-policy-confirmed: true)",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/poor-registry.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "RESOURCE_REQUESTS"
+      ],
+      "examples": [
+        "RESOURCE_REQUESTS: Container 'poor-registry' in Deployment 'poor-registry-deployment' must set CPU request"
+      ],
+      "occurrences": 1,
+      "message": "RESOURCE_REQUESTS: Container 'poor-registry' in Deployment 'poor-registry-deployment' must set CPU request",
+      "description": "RESOURCE_REQUESTS: Container 'poor-registry' in Deployment 'poor-registry-deployment' must set CPU request",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/poor-registry.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "RESOURCE_REQUESTS"
+      ],
+      "examples": [
+        "RESOURCE_REQUESTS: Container 'poor-registry' in Deployment 'poor-registry-deployment' must set memory request"
+      ],
+      "occurrences": 1,
+      "message": "RESOURCE_REQUESTS: Container 'poor-registry' in Deployment 'poor-registry-deployment' must set memory request",
+      "description": "RESOURCE_REQUESTS: Container 'poor-registry' in Deployment 'poor-registry-deployment' must set memory request",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/poor-registry.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "RUN_AS_NON_ROOT"
+      ],
+      "examples": [
+        "RUN_AS_NON_ROOT: Container 'poor-registry' in Deployment 'poor-registry-deployment' must set runAsNonRoot: true at pod or container level"
+      ],
+      "occurrences": 1,
+      "message": "RUN_AS_NON_ROOT: Container 'poor-registry' in Deployment 'poor-registry-deployment' must set runAsNonRoot: true at pod or container level",
+      "description": "RUN_AS_NON_ROOT: Container 'poor-registry' in Deployment 'poor-registry-deployment' must set runAsNonRoot: true at pod or container level",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/poor-registry.deployment.yaml",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_DEFAULT_NAMESPACE"
+      ],
+      "examples": [
+        "KSV_DEFAULT_NAMESPACE: Service 'poor-registry-service' is deployed to default namespace. Specify metadata.namespace with a non-default value"
+      ],
+      "occurrences": 1,
+      "message": "KSV_DEFAULT_NAMESPACE: Service 'poor-registry-service' is deployed to default namespace. Specify metadata.namespace with a non-default value",
+      "description": "KSV_DEFAULT_NAMESPACE: Service 'poor-registry-service' is deployed to default namespace. Specify metadata.namespace with a non-default value",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/internal-proxy.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "HEALTH_PROBES"
+      ],
+      "examples": [
+        "HEALTH_PROBES: Container 'info-app' in Deployment 'internal-proxy-deployment' must define livenessProbe"
+      ],
+      "occurrences": 1,
+      "message": "HEALTH_PROBES: Container 'info-app' in Deployment 'internal-proxy-deployment' must define livenessProbe",
+      "description": "HEALTH_PROBES: Container 'info-app' in Deployment 'internal-proxy-deployment' must define livenessProbe",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/internal-proxy.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "HEALTH_PROBES"
+      ],
+      "examples": [
+        "HEALTH_PROBES: Container 'info-app' in Deployment 'internal-proxy-deployment' must define readinessProbe"
+      ],
+      "occurrences": 1,
+      "message": "HEALTH_PROBES: Container 'info-app' in Deployment 'internal-proxy-deployment' must define readinessProbe",
+      "description": "HEALTH_PROBES: Container 'info-app' in Deployment 'internal-proxy-deployment' must define readinessProbe",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/internal-proxy.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "HEALTH_PROBES"
+      ],
+      "examples": [
+        "HEALTH_PROBES: Container 'internal-api' in Deployment 'internal-proxy-deployment' must define livenessProbe"
+      ],
+      "occurrences": 1,
+      "message": "HEALTH_PROBES: Container 'internal-api' in Deployment 'internal-proxy-deployment' must define livenessProbe",
+      "description": "HEALTH_PROBES: Container 'internal-api' in Deployment 'internal-proxy-deployment' must define livenessProbe",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/internal-proxy.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "HEALTH_PROBES"
+      ],
+      "examples": [
+        "HEALTH_PROBES: Container 'internal-api' in Deployment 'internal-proxy-deployment' must define readinessProbe"
+      ],
+      "occurrences": 1,
+      "message": "HEALTH_PROBES: Container 'internal-api' in Deployment 'internal-proxy-deployment' must define readinessProbe",
+      "description": "HEALTH_PROBES: Container 'internal-api' in Deployment 'internal-proxy-deployment' must define readinessProbe",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/internal-proxy.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "IMAGE_PULL_POLICY"
+      ],
+      "examples": [
+        "IMAGE_PULL_POLICY: Container 'info-app' in Deployment 'internal-proxy-deployment' should set imagePullPolicy: Always (unless using digest)"
+      ],
+      "occurrences": 1,
+      "message": "IMAGE_PULL_POLICY: Container 'info-app' in Deployment 'internal-proxy-deployment' should set imagePullPolicy: Always (unless using digest)",
+      "description": "IMAGE_PULL_POLICY: Container 'info-app' in Deployment 'internal-proxy-deployment' should set imagePullPolicy: Always (unless using digest)",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/internal-proxy.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "IMAGE_PULL_POLICY"
+      ],
+      "examples": [
+        "IMAGE_PULL_POLICY: Container 'internal-api' in Deployment 'internal-proxy-deployment' should set imagePullPolicy: Always (unless using digest)"
+      ],
+      "occurrences": 1,
+      "message": "IMAGE_PULL_POLICY: Container 'internal-api' in Deployment 'internal-proxy-deployment' should set imagePullPolicy: Always (unless using digest)",
+      "description": "IMAGE_PULL_POLICY: Container 'internal-api' in Deployment 'internal-proxy-deployment' should set imagePullPolicy: Always (unless using digest)",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/internal-proxy.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_ALLOW_PRIVILEGE_ESCALATION"
+      ],
+      "examples": [
+        "KSV_ALLOW_PRIVILEGE_ESCALATION: Container 'info-app' in Deployment 'internal-proxy-deployment' does not explicitly set allowPrivilegeEscalation: false"
+      ],
+      "occurrences": 1,
+      "message": "KSV_ALLOW_PRIVILEGE_ESCALATION: Container 'info-app' in Deployment 'internal-proxy-deployment' does not explicitly set allowPrivilegeEscalation: false",
+      "description": "KSV_ALLOW_PRIVILEGE_ESCALATION: Container 'info-app' in Deployment 'internal-proxy-deployment' does not explicitly set allowPrivilegeEscalation: false",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/internal-proxy.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_ALLOW_PRIVILEGE_ESCALATION"
+      ],
+      "examples": [
+        "KSV_ALLOW_PRIVILEGE_ESCALATION: Container 'internal-api' in Deployment 'internal-proxy-deployment' does not explicitly set allowPrivilegeEscalation: false"
+      ],
+      "occurrences": 1,
+      "message": "KSV_ALLOW_PRIVILEGE_ESCALATION: Container 'internal-api' in Deployment 'internal-proxy-deployment' does not explicitly set allowPrivilegeEscalation: false",
+      "description": "KSV_ALLOW_PRIVILEGE_ESCALATION: Container 'internal-api' in Deployment 'internal-proxy-deployment' does not explicitly set allowPrivilegeEscalation: false",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/internal-proxy.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_CAP_DROP_MISSING"
+      ],
+      "examples": [
+        "KSV_CAP_DROP_MISSING: Container 'info-app' in Deployment 'internal-proxy-deployment' does not drop ALL capabilities. Add securityContext.capabilities.drop: [ALL]"
+      ],
+      "occurrences": 1,
+      "message": "KSV_CAP_DROP_MISSING: Container 'info-app' in Deployment 'internal-proxy-deployment' does not drop ALL capabilities. Add securityContext.capabilities.drop: [ALL]",
+      "description": "KSV_CAP_DROP_MISSING: Container 'info-app' in Deployment 'internal-proxy-deployment' does not drop ALL capabilities. Add securityContext.capabilities.drop: [ALL]",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/internal-proxy.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_CAP_DROP_MISSING"
+      ],
+      "examples": [
+        "KSV_CAP_DROP_MISSING: Container 'internal-api' in Deployment 'internal-proxy-deployment' does not drop ALL capabilities. Add securityContext.capabilities.drop: [ALL]"
+      ],
+      "occurrences": 1,
+      "message": "KSV_CAP_DROP_MISSING: Container 'internal-api' in Deployment 'internal-proxy-deployment' does not drop ALL capabilities. Add securityContext.capabilities.drop: [ALL]",
+      "description": "KSV_CAP_DROP_MISSING: Container 'internal-api' in Deployment 'internal-proxy-deployment' does not drop ALL capabilities. Add securityContext.capabilities.drop: [ALL]",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/internal-proxy.deployment.yaml",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_DEFAULT_NAMESPACE"
+      ],
+      "examples": [
+        "KSV_DEFAULT_NAMESPACE: Deployment 'internal-proxy-deployment' is deployed to default namespace. Specify metadata.namespace with a non-default value"
+      ],
+      "occurrences": 1,
+      "message": "KSV_DEFAULT_NAMESPACE: Deployment 'internal-proxy-deployment' is deployed to default namespace. Specify metadata.namespace with a non-default value",
+      "description": "KSV_DEFAULT_NAMESPACE: Deployment 'internal-proxy-deployment' is deployed to default namespace. Specify metadata.namespace with a non-default value",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/internal-proxy.deployment.yaml",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_DEFAULT_SA_TOKEN"
+      ],
+      "examples": [
+        "KSV_DEFAULT_SA_TOKEN: Deployment 'internal-proxy-deployment' uses default service account with automountServiceAccountToken: true. Set serviceAccountName to non-default and automountServiceAccountToken: false"
+      ],
+      "occurrences": 1,
+      "message": "KSV_DEFAULT_SA_TOKEN: Deployment 'internal-proxy-deployment' uses default service account with automountServiceAccountToken: true. Set serviceAccountName to non-default and automountServiceAccountToken: false",
+      "description": "KSV_DEFAULT_SA_TOKEN: Deployment 'internal-proxy-deployment' uses default service account with automountServiceAccountToken: true. Set serviceAccountName to non-default and automountServiceAccountToken: false",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/internal-proxy.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_IMAGE_NOT_PINNED"
+      ],
+      "examples": [
+        "KSV_IMAGE_NOT_PINNED: Container 'info-app' in internal-proxy-deployment '%!s(MISSING)' has no tag/digest. Pin image with @sha256:<digest>"
+      ],
+      "occurrences": 1,
+      "message": "KSV_IMAGE_NOT_PINNED: Container 'info-app' in internal-proxy-deployment '%!s(MISSING)' has no tag/digest. Pin image with @sha256:<digest>",
+      "description": "KSV_IMAGE_NOT_PINNED: Container 'info-app' in internal-proxy-deployment '%!s(MISSING)' has no tag/digest. Pin image with @sha256:<digest>",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/internal-proxy.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_IMAGE_NOT_PINNED"
+      ],
+      "examples": [
+        "KSV_IMAGE_NOT_PINNED: Container 'internal-api' in internal-proxy-deployment '%!s(MISSING)' has no tag/digest. Pin image with @sha256:<digest>"
+      ],
+      "occurrences": 1,
+      "message": "KSV_IMAGE_NOT_PINNED: Container 'internal-api' in internal-proxy-deployment '%!s(MISSING)' has no tag/digest. Pin image with @sha256:<digest>",
+      "description": "KSV_IMAGE_NOT_PINNED: Container 'internal-api' in internal-proxy-deployment '%!s(MISSING)' has no tag/digest. Pin image with @sha256:<digest>",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/internal-proxy.deployment.yaml",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_NO_APPARMOR"
+      ],
+      "examples": [
+        "KSV_NO_APPARMOR: Container 'info-app' in Deployment 'internal-proxy-deployment' has no AppArmor annotation. Add annotation container.apparmor.security.beta.kubernetes.io/info-app: runtime/default"
+      ],
+      "occurrences": 1,
+      "message": "KSV_NO_APPARMOR: Container 'info-app' in Deployment 'internal-proxy-deployment' has no AppArmor annotation. Add annotation container.apparmor.security.beta.kubernetes.io/info-app: runtime/default",
+      "description": "KSV_NO_APPARMOR: Container 'info-app' in Deployment 'internal-proxy-deployment' has no AppArmor annotation. Add annotation container.apparmor.security.beta.kubernetes.io/info-app: runtime/default",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/internal-proxy.deployment.yaml",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_NO_APPARMOR"
+      ],
+      "examples": [
+        "KSV_NO_APPARMOR: Container 'internal-api' in Deployment 'internal-proxy-deployment' has no AppArmor annotation. Add annotation container.apparmor.security.beta.kubernetes.io/internal-api: runtime/default"
+      ],
+      "occurrences": 1,
+      "message": "KSV_NO_APPARMOR: Container 'internal-api' in Deployment 'internal-proxy-deployment' has no AppArmor annotation. Add annotation container.apparmor.security.beta.kubernetes.io/internal-api: runtime/default",
+      "description": "KSV_NO_APPARMOR: Container 'internal-api' in Deployment 'internal-proxy-deployment' has no AppArmor annotation. Add annotation container.apparmor.security.beta.kubernetes.io/internal-api: runtime/default",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/internal-proxy.deployment.yaml",
+      "category": "NO_SECCOMP",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_NO_SECCOMP"
+      ],
+      "examples": [
+        "KSV_NO_SECCOMP: Container 'info-app' in Deployment 'internal-proxy-deployment' has no seccomp profile. Set securityContext.seccompProfile.type: RuntimeDefault"
+      ],
+      "occurrences": 1,
+      "message": "KSV_NO_SECCOMP: Container 'info-app' in Deployment 'internal-proxy-deployment' has no seccomp profile. Set securityContext.seccompProfile.type: RuntimeDefault",
+      "description": "KSV_NO_SECCOMP: Container 'info-app' in Deployment 'internal-proxy-deployment' has no seccomp profile. Set securityContext.seccompProfile.type: RuntimeDefault",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/internal-proxy.deployment.yaml",
+      "category": "NO_SECCOMP",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_NO_SECCOMP"
+      ],
+      "examples": [
+        "KSV_NO_SECCOMP: Container 'internal-api' in Deployment 'internal-proxy-deployment' has no seccomp profile. Set securityContext.seccompProfile.type: RuntimeDefault"
+      ],
+      "occurrences": 1,
+      "message": "KSV_NO_SECCOMP: Container 'internal-api' in Deployment 'internal-proxy-deployment' has no seccomp profile. Set securityContext.seccompProfile.type: RuntimeDefault",
+      "description": "KSV_NO_SECCOMP: Container 'internal-api' in Deployment 'internal-proxy-deployment' has no seccomp profile. Set securityContext.seccompProfile.type: RuntimeDefault",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/internal-proxy.deployment.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_READONLY_ROOTFS_FALSE"
+      ],
+      "examples": [
+        "KSV_READONLY_ROOTFS_FALSE: Container 'info-app' in Deployment 'internal-proxy-deployment' does not have readOnlyRootFilesystem: true"
+      ],
+      "occurrences": 1,
+      "message": "KSV_READONLY_ROOTFS_FALSE: Container 'info-app' in Deployment 'internal-proxy-deployment' does not have readOnlyRootFilesystem: true",
+      "description": "KSV_READONLY_ROOTFS_FALSE: Container 'info-app' in Deployment 'internal-proxy-deployment' does not have readOnlyRootFilesystem: true",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/internal-proxy.deployment.yaml",
+      "category": "READONLY_ROOTFS_FALSE",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_READONLY_ROOTFS_FALSE"
+      ],
+      "examples": [
+        "KSV_READONLY_ROOTFS_FALSE: Container 'internal-api' in Deployment 'internal-proxy-deployment' does not have readOnlyRootFilesystem: true"
+      ],
+      "occurrences": 1,
+      "message": "KSV_READONLY_ROOTFS_FALSE: Container 'internal-api' in Deployment 'internal-proxy-deployment' does not have readOnlyRootFilesystem: true",
+      "description": "KSV_READONLY_ROOTFS_FALSE: Container 'internal-api' in Deployment 'internal-proxy-deployment' does not have readOnlyRootFilesystem: true",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/internal-proxy.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "NETWORK_POLICY"
+      ],
+      "examples": [
+        "NETWORK_POLICY: Deployment 'internal-proxy-deployment' must be covered by a NetworkPolicy (add annotation network-policy-confirmed: true)"
+      ],
+      "occurrences": 1,
+      "message": "NETWORK_POLICY: Deployment 'internal-proxy-deployment' must be covered by a NetworkPolicy (add annotation network-policy-confirmed: true)",
+      "description": "NETWORK_POLICY: Deployment 'internal-proxy-deployment' must be covered by a NetworkPolicy (add annotation network-policy-confirmed: true)",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/internal-proxy.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "RUN_AS_NON_ROOT"
+      ],
+      "examples": [
+        "RUN_AS_NON_ROOT: Container 'info-app' in Deployment 'internal-proxy-deployment' must set runAsNonRoot: true at pod or container level"
+      ],
+      "occurrences": 1,
+      "message": "RUN_AS_NON_ROOT: Container 'info-app' in Deployment 'internal-proxy-deployment' must set runAsNonRoot: true at pod or container level",
+      "description": "RUN_AS_NON_ROOT: Container 'info-app' in Deployment 'internal-proxy-deployment' must set runAsNonRoot: true at pod or container level",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/internal-proxy.deployment.yaml",
+      "category": "OPA_VIOLATION",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "RUN_AS_NON_ROOT"
+      ],
+      "examples": [
+        "RUN_AS_NON_ROOT: Container 'internal-api' in Deployment 'internal-proxy-deployment' must set runAsNonRoot: true at pod or container level"
+      ],
+      "occurrences": 1,
+      "message": "RUN_AS_NON_ROOT: Container 'internal-api' in Deployment 'internal-proxy-deployment' must set runAsNonRoot: true at pod or container level",
+      "description": "RUN_AS_NON_ROOT: Container 'internal-api' in Deployment 'internal-proxy-deployment' must set runAsNonRoot: true at pod or container level",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/internal-proxy.deployment.yaml",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_DEFAULT_NAMESPACE"
+      ],
+      "examples": [
+        "KSV_DEFAULT_NAMESPACE: Service 'internal-proxy-api-service' is deployed to default namespace. Specify metadata.namespace with a non-default value"
+      ],
+      "occurrences": 1,
+      "message": "KSV_DEFAULT_NAMESPACE: Service 'internal-proxy-api-service' is deployed to default namespace. Specify metadata.namespace with a non-default value",
+      "description": "KSV_DEFAULT_NAMESPACE: Service 'internal-proxy-api-service' is deployed to default namespace. Specify metadata.namespace with a non-default value",
+      "line": 0
+    },
+    {
+      "file": "C:/Users/Ahmed/OneDrive - GIU AS - German International University of Applied Sciences/Desktop/Bsc Thesis/Implementaions/SafeFixK8s/tests/internal-proxy.deployment.yaml",
+      "category": "POD_DEFAULT_NAMESPACE",
+      "severity": "HIGH",
+      "tools": [
+        "Conftest"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "KSV_DEFAULT_NAMESPACE"
+      ],
+      "examples": [
+        "KSV_DEFAULT_NAMESPACE: Service 'internal-proxy-info-app-service' is deployed to default namespace. Specify metadata.namespace with a non-default value"
+      ],
+      "occurrences": 1,
+      "message": "KSV_DEFAULT_NAMESPACE: Service 'internal-proxy-info-app-service' is deployed to default namespace. Specify metadata.namespace with a non-default value",
+      "description": "KSV_DEFAULT_NAMESPACE: Service 'internal-proxy-info-app-service' is deployed to default namespace. Specify metadata.namespace with a non-default value",
+      "line": 0
+    }
+  ]
+}
