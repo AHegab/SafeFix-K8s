@@ -1,49 +1,23 @@
 ﻿{
   "resources": [
     {
-      "filename": "/scan/27.Misconfiguration.yaml",
-      "kind": "NetworkPolicy",
-      "name": "egress-product",
-      "version": "",
-      "status": "statusError",
-      "msg": "error while parsing: missing 'apiVersion' key"
+      "filename": "/scan/13.nginx_privileged_deployment.yaml",
+      "kind": "Deployment",
+      "name": "nginx-deployment",
+      "version": "apps/v1",
+      "status": "statusInvalid",
+      "msg": "problem validating schema. Check JSON formatting: jsonschema validation failed with 'https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/master-standalone-strict/deployment-apps-v1.json#' - at '/spec': missing property 'selector'",
+      "validationErrors": [
+        {
+          "path": "/spec",
+          "msg": "missing property 'selector'"
+        }
+      ]
     },
     {
-      "filename": "/scan/27.Valid.yaml",
-      "kind": "NetworkPolicy",
-      "name": "egress-product",
-      "version": "",
-      "status": "statusError",
-      "msg": "error while parsing: missing 'apiVersion' key"
-    },
-    {
-      "filename": "/scan/29.helm_rabbitmq_hardcoded_credentials.yaml",
-      "kind": "",
-      "name": "",
-      "version": "",
-      "status": "statusError",
-      "msg": "error while parsing: missing 'kind' key"
-    },
-    {
-      "filename": "/scan/34.echo1_load_balancer.yaml",
-      "kind": "Service",
-      "name": "echo1-load-balancer",
-      "version": "v1",
-      "status": "statusValid",
-      "msg": ""
-    },
-    {
-      "filename": "/scan/28.role_overly_permissive.yaml",
-      "kind": "Role",
-      "name": "frontend-role",
-      "version": "rbac.authorization.k8s.io/v1",
-      "status": "statusValid",
-      "msg": ""
-    },
-    {
-      "filename": "/scan/31.example-nginx.yaml",
+      "filename": "/scan/13.jenkins_agent_pod.yaml",
       "kind": "Pod",
-      "name": "nginx",
+      "name": "",
       "version": "v1",
       "status": "statusValid",
       "msg": ""
@@ -63,7 +37,127 @@
       ]
     },
     {
-      "filename": "/scan/34.echo1_privileged.yaml",
+      "filename": "/scan/14.deployment_single_replica.yaml",
+      "kind": "Deployment",
+      "name": "single-replica-deployment",
+      "version": "apps/v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/15.pod_privilege_escalation.yaml",
+      "kind": "Pod",
+      "name": "example-pod",
+      "version": "v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/16.busybox_pod_missing_memory.yaml",
+      "kind": "Pod",
+      "name": "busybox-pod",
+      "version": "v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/20.wordpress_mariadb_compose.yaml",
+      "kind": "",
+      "name": "",
+      "version": "",
+      "status": "statusError",
+      "msg": "error while parsing: missing 'kind' key"
+    },
+    {
+      "filename": "/scan/26.flink_port_mismatch.yaml",
+      "kind": "Deployment",
+      "name": "flink",
+      "version": "apps/v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/26.values.yaml",
+      "kind": "",
+      "name": "",
+      "version": "",
+      "status": "statusError",
+      "msg": "error while parsing: missing 'kind' key"
+    },
+    {
+      "filename": "/scan/27.Misconfiguration.yaml",
+      "kind": "NetworkPolicy",
+      "name": "egress-product",
+      "version": "",
+      "status": "statusError",
+      "msg": "error while parsing: missing 'apiVersion' key"
+    },
+    {
+      "filename": "/scan/27.Valid.yaml",
+      "kind": "NetworkPolicy",
+      "name": "egress-product",
+      "version": "",
+      "status": "statusError",
+      "msg": "error while parsing: missing 'apiVersion' key"
+    },
+    {
+      "filename": "/scan/14.ingress_deprecated_api.yaml",
+      "kind": "Ingress",
+      "name": "gateway-ingress",
+      "version": "extensions/v1beta1",
+      "status": "statusSkipped",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/29.helm_rabbitmq_hardcoded_credentials.yaml",
+      "kind": "",
+      "name": "",
+      "version": "",
+      "status": "statusError",
+      "msg": "error while parsing: missing 'kind' key"
+    },
+    {
+      "filename": "/scan/27.kubeteus_misconfigured_policy.yaml",
+      "kind": "NetworkPolicy",
+      "name": "egress-product",
+      "version": "crd.projectcalico.org/v1",
+      "status": "statusSkipped",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/28.role_overly_permissive.yaml",
+      "kind": "Role",
+      "name": "frontend-role",
+      "version": "rbac.authorization.k8s.io/v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/3.efs_plugin_misconfig.yaml",
+      "kind": "Pod",
+      "name": "efs-plugin",
+      "version": "v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/3.nginx_pod_example.yaml",
+      "kind": "Pod",
+      "name": "nginx",
+      "version": "v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/31.example-nginx.yaml",
+      "kind": "Pod",
+      "name": "nginx",
+      "version": "v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/34.echo1_no_resources.yaml",
       "kind": "Deployment",
       "name": "echo1",
       "version": "apps/v1",
@@ -79,9 +173,241 @@
       "msg": ""
     },
     {
+      "filename": "/scan/34.echo1_privileged.yaml",
+      "kind": "Deployment",
+      "name": "echo1",
+      "version": "apps/v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/34.echo_no_schemes.yaml",
+      "kind": "",
+      "name": "",
+      "version": "",
+      "status": "statusError",
+      "msg": "error while parsing: missing 'kind' key"
+    },
+    {
+      "filename": "/scan/34.echo_no_security.yaml",
+      "kind": "",
+      "name": "",
+      "version": "",
+      "status": "statusError",
+      "msg": "error while parsing: missing 'kind' key"
+    },
+    {
+      "filename": "/scan/14.genkubesec_privileged_pod.yaml",
+      "kind": "Pod",
+      "name": "pod-name",
+      "version": "v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/34.echo_security_override.yaml",
+      "kind": "",
+      "name": "",
+      "version": "",
+      "status": "statusError",
+      "msg": "error while parsing: missing 'kind' key"
+    },
+    {
+      "filename": "/scan/34.gateway_multiple_auth.yaml",
+      "kind": "",
+      "name": "",
+      "version": "",
+      "status": "statusError",
+      "msg": "error while parsing: missing 'kind' key"
+    },
+    {
+      "filename": "/scan/3.multus_cni_misconfig.yaml",
+      "kind": "ConfigMap",
+      "name": "multus-cni-config",
+      "version": "v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/34.mock-config.yaml",
+      "kind": "",
+      "name": "Ms mock application",
+      "version": "",
+      "status": "statusError",
+      "msg": "error while parsing: missing 'kind' key"
+    },
+    {
+      "filename": "/scan/34.secrets-holder.yaml",
+      "kind": "Pod",
+      "name": "secrets-holder",
+      "version": "v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/34.mTLS-disable.yaml",
+      "kind": "PeerAuthentication",
+      "name": "default",
+      "version": "security.istio.io/v1beta1",
+      "status": "statusSkipped",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/34.mTLS-strict.yaml",
+      "kind": "PeerAuthentication",
+      "name": "default",
+      "version": "security.istio.io/v1beta1",
+      "status": "statusSkipped",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/34.echo1_load_balancer.yaml",
+      "kind": "Service",
+      "name": "echo1-load-balancer",
+      "version": "v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/build-code.deployment.yaml",
+      "kind": "Deployment",
+      "name": "build-code-deployment",
+      "version": "apps/v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/build-code.deployment.yaml",
+      "kind": "Service",
+      "name": "build-code-service",
+      "version": "v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/cache-store.deployment.yaml",
+      "kind": "Service",
+      "name": "cache-store-service",
+      "version": "v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/cache-store.deployment.yaml",
+      "kind": "Deployment",
+      "name": "cache-store-deployment",
+      "version": "apps/v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
       "filename": "/scan/34.unencrypted_secret.yaml",
       "kind": "Secret",
       "name": "mysecret",
+      "version": "v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/health-check.deployment.yaml",
+      "kind": "Deployment",
+      "name": "health-check-deployment",
+      "version": "apps/v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/health-check.deployment.yaml",
+      "kind": "Service",
+      "name": "health-check-service",
+      "version": "v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/cache-store.deployment.yaml",
+      "kind": "Namespace",
+      "name": "secure-middleware",
+      "version": "v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/hunger-check.deployment.yaml",
+      "kind": "Namespace",
+      "name": "big-monolith",
+      "version": "v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/hunger-check.deployment.yaml",
+      "kind": "Role",
+      "name": "secret-reader",
+      "version": "rbac.authorization.k8s.io/v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/docker-bench-security.deployment.yaml",
+      "kind": "DaemonSet",
+      "name": "docker-bench-security",
+      "version": "apps/v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/batch-checkjob.yaml",
+      "kind": "Job",
+      "name": "batch-check-job",
+      "version": "batch/v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/hunger-check.deployment.yaml",
+      "kind": "Secret",
+      "name": "vaultapikey",
+      "version": "v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/hunger-check.deployment.yaml",
+      "kind": "Secret",
+      "name": "webhookapikey",
+      "version": "v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/hunger-check.deployment.yaml",
+      "kind": "Deployment",
+      "name": "hunger-check-deployment",
+      "version": "apps/v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/hunger-check.deployment.yaml",
+      "kind": "Service",
+      "name": "hunger-check-service",
+      "version": "v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/hunger-check.deployment.yaml",
+      "kind": "RoleBinding",
+      "name": "secret-reader-binding",
+      "version": "rbac.authorization.k8s.io/v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/hunger-check.deployment.yaml",
+      "kind": "ServiceAccount",
+      "name": "big-monolith-sa",
       "version": "v1",
       "status": "statusValid",
       "msg": ""
@@ -111,18 +437,10 @@
       "msg": ""
     },
     {
-      "filename": "/scan/insecure-rbac.setup.yaml",
-      "kind": "ClusterRoleBinding",
-      "name": "superadmin",
-      "version": "rbac.authorization.k8s.io/v1",
-      "status": "statusValid",
-      "msg": ""
-    },
-    {
-      "filename": "/scan/poor-registry.deployment.yaml",
-      "kind": "Deployment",
-      "name": "poor-registry-deployment",
-      "version": "apps/v1",
+      "filename": "/scan/kube-bench-security.master-job.yaml",
+      "kind": "Job",
+      "name": "kube-bench-master",
+      "version": "batch/v1",
       "status": "statusValid",
       "msg": ""
     },
@@ -135,6 +453,46 @@
       "msg": ""
     },
     {
+      "filename": "/scan/kube-bench-security.node-job.yaml",
+      "kind": "Job",
+      "name": "kube-bench-node",
+      "version": "batch/v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/insecure-rbac.setup.yaml",
+      "kind": "ClusterRoleBinding",
+      "name": "superadmin",
+      "version": "rbac.authorization.k8s.io/v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/kubernetes-goat-home.deployment.yaml",
+      "kind": "Deployment",
+      "name": "kubernetes-goat-home-deployment",
+      "version": "apps/v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/kubernetes-goat-home.deployment.yaml",
+      "kind": "Service",
+      "name": "kubernetes-goat-home-service",
+      "version": "v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/poor-registry.deployment.yaml",
+      "kind": "Deployment",
+      "name": "poor-registry-deployment",
+      "version": "apps/v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
       "filename": "/scan/poor-registry.deployment.yaml",
       "kind": "Service",
       "name": "poor-registry-service",
@@ -143,26 +501,50 @@
       "msg": ""
     },
     {
-      "filename": "/scan/docker-bench-security.deployment.yaml",
-      "kind": "DaemonSet",
-      "name": "docker-bench-security",
+      "filename": "/scan/system-monitor.deployment.yaml",
+      "kind": "Secret",
+      "name": "goatvault",
+      "version": "v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/system-monitor.deployment.yaml",
+      "kind": "Deployment",
+      "name": "system-monitor-deployment",
       "version": "apps/v1",
       "status": "statusValid",
       "msg": ""
     },
     {
-      "filename": "/scan/kube-bench-security.node-job.yaml",
+      "filename": "/scan/system-monitor.deployment.yaml",
+      "kind": "Service",
+      "name": "system-monitor-service",
+      "version": "v1",
+      "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/hidden-in-layers.deployment.yaml",
       "kind": "Job",
-      "name": "kube-bench-node",
+      "name": "hidden-in-layers",
       "version": "batch/v1",
       "status": "statusValid",
+      "msg": ""
+    },
+    {
+      "filename": "/scan/kyverno-block-pod-exec-by-namespace.yaml",
+      "kind": "ClusterPolicy",
+      "name": "deny-exec-in-vault-namespace",
+      "version": "kyverno.io/v1",
+      "status": "statusSkipped",
       "msg": ""
     }
   ],
   "summary": {
-    "valid": 15,
-    "invalid": 1,
-    "errors": 3,
-    "skipped": 0
+    "valid": 49,
+    "invalid": 2,
+    "errors": 10,
+    "skipped": 5
   }
 }

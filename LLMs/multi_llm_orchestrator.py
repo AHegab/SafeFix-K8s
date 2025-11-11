@@ -1,418 +1,668 @@
 #!/usr/bin/env python3
 """
-SafeFix-K8s: Multi-LLM Orchestrator (hardened)
-- Fan-out to multiple LLM providers to get a "fixed" YAML.
-- Apply secure-by-default hygiene (kind-aware placement, resources rule, seccomp).
-- Reject illegal edits (e.g., security fields on Services).
-- Validate with kubeconform + kubectl --dry-run=server + kube-linter + polaris.
-- Choose the first candidate that passes all checks; otherwise fall back to hygiene-only fix.
+multi_llm_orchestrator.py  — resilient raw-mode
 
-CLI (examples)
---------------
-python multi_llm_orchestrator.py --input input.yaml --models groq,openrouter --timeout 30
-python multi_llm_orchestrator.py --input dir/ --models openrouter --hygiene-only
+- Accepts classic SafeFix payloads ({"files":[...]}) AND raw tool payloads ({"version": "...", "items":[...]}).
+- Adds YAML context (snippet + derived hints) to prompts so LLMs can output valid RFC-6902 ops.
+- Robustly extracts JSON arrays from messy LLM outputs.
+- Provides a deterministic local fallback for common schema categories when providers return nothing.
+- Writes SECURED_*, DIFF_*, REPORT_*.json, REPORT_ALL.csv (with provider errors).
 
-Notes
------
-- Wire your own provider logic in call_model_provider().
-- Requires: PyYAML, and external CLIs: kubeconform, kubectl, kube-linter, polaris.
+Env / flags: same as before.
 """
 
-from __future__ import annotations
-import re
-import argparse
-import subprocess
+import argparse, json, os, re, difflib, time, random
 from pathlib import Path
-from typing import List, Tuple, Optional
-
+from typing import Any, Dict, List, Optional, Tuple
+import requests
 import yaml
 
-# ======================================================================================
-# Kind map & constants
-# ======================================================================================
+# ---------------------- Simple .env loader ----------------------
+def load_dotenv_from_root() -> None:
+    here = Path.cwd()
+    candidates = [here / ".env", here.parent / ".env", Path(__file__).resolve().parent.parent / ".env"]
+    for p in candidates:
+        if p.exists():
+            for line in p.read_text(encoding="utf-8").splitlines():
+                line = line.strip()
+                if not line or line.startswith("#") or "=" not in line: continue
+                k, v = line.split("=", 1)
+                k = k.strip(); v = v.strip().strip('"').strip("'")
+                if k and (k not in os.environ):
+                    os.environ[k] = v
+            break
 
-KIND_MAP = {
-    ("apps/v1", "Deployment"):   {"pod_spec": ("spec", "template", "spec"), "containers": ("spec", "template", "spec", "containers")},
-    ("apps/v1", "StatefulSet"):  {"pod_spec": ("spec", "template", "spec"), "containers": ("spec", "template", "spec", "containers")},
-    ("apps/v1", "DaemonSet"):    {"pod_spec": ("spec", "template", "spec"), "containers": ("spec", "template", "spec", "containers")},
-    ("batch/v1", "Job"):         {"pod_spec": ("spec", "template", "spec"), "containers": ("spec", "template", "spec", "containers")},
-    ("batch/v1", "CronJob"):     {"pod_spec": ("spec","jobTemplate","spec","template","spec"), "containers": ("spec","jobTemplate","spec","template","spec","containers")},
-    ("v1", "Pod"):               {"pod_spec": ("spec",), "containers": ("spec", "containers")},
-}
+load_dotenv_from_root()
 
-CONTAINER_SECURITY_FIELDS = {"runAsNonRoot", "allowPrivilegeEscalation", "readOnlyRootFilesystem", "capabilities", "seccompProfile"}
-POD_SECURITY_FIELDS = {"runAsUser", "runAsGroup", "fsGroup", "seccompProfile"}
+# ------------------------- Helpers ------------------------------
+def read_json(path: Path) -> Any:
+    return json.loads(path.read_text(encoding="utf-8"))
 
-# order set used for rough CPU compare
-_CPU_ORDER = ["n", "u", "m", "", "k"]  # trivial ordering for units; good enough for >= check
+def read_text(p: Path) -> str:
+    return p.read_text(encoding="utf-8", errors="ignore")
 
+def write_text(p: Path, s: str) -> None:
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(s, encoding="utf-8")
 
-# ======================================================================================
-# Utilities
-# ======================================================================================
+def yaml_load_all(s: str) -> List[Any]:
+    try:
+        docs = list(yaml.safe_load_all(s))
+        return [d for d in docs if d is not None]
+    except yaml.YAMLError:
+        return []
 
-def read_text(path: Path) -> str:
-    return path.read_text(encoding="utf-8")
+def yaml_dump_all(docs: List[Any]) -> str:
+    return yaml.safe_dump_all(docs, sort_keys=False, default_flow_style=False)
 
-def write_text(path: Path, text: str) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(text, encoding="utf-8")
+def unified_diff_text(original: str, fixed: str, orig_path: str, fixed_path: str) -> str:
+    a = original.splitlines(keepends=True)
+    b = fixed.splitlines(keepends=True)
+    return "".join(difflib.unified_diff(a, b, fromfile=orig_path, tofile=fixed_path, lineterm="", n=3))
 
-def npath(p: str) -> str:
-    return p.replace("\\", "/").strip()
-
-def run(cmd: List[str], input_text: Optional[str] = None) -> Tuple[int, str, str]:
-    p = subprocess.Popen(cmd, stdin=subprocess.PIPE if input_text else None,
-                         stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-    out, err = p.communicate(input_text)
-    return p.returncode, out, err
-
-def yaml_load_all(text: str) -> List[dict]:
-    docs = list(yaml.safe_load_all(text))
-    return [d for d in docs if isinstance(d, dict)]
-
-def yaml_dump_all(docs: List[dict]) -> str:
-    return "\n---\n".join(yaml.safe_dump(d, sort_keys=False).rstrip() for d in docs if isinstance(d, dict)) + ("\n" if docs else "")
-
-def deep_get(d: dict, path: Tuple[str, ...]) -> Optional[dict]:
-    cur = d
-    for seg in path:
-        if not isinstance(cur, dict) or seg not in cur:
-            return None
-        cur = cur[seg]
-    return cur
-
-def deep_ensure(d: dict, path: Tuple[str, ...]) -> dict:
-    cur = d
-    for seg in path:
-        nxt = cur.get(seg)
-        if not isinstance(nxt, dict):
-            nxt = {}
-            cur[seg] = nxt
-        cur = nxt
-    return cur
-
-def first_container_list(d: dict, containers_path: Tuple[str, ...]) -> Optional[List[dict]]:
-    cur = deep_get(d, containers_path)
-    if isinstance(cur, list):
-        return cur
+def get_pod_spec(workload: Dict) -> Optional[Dict]:
+    if not isinstance(workload, dict): return None
+    spec = workload.get("spec")
+    if not isinstance(spec, dict): return None
+    if str(workload.get("kind") or "") == "Pod": return spec
+    tmpl = spec.get("template")
+    if isinstance(tmpl, dict) and isinstance(tmpl.get("spec"), dict): return tmpl["spec"]
     return None
 
+# -------------------- JSON Pointer helpers ----------------------
+def _pointer_walk(doc: Any, pointer: str, create_missing: bool=False):
+    if pointer == "" or pointer == "/":
+        return None, None
+    parts = [p for p in pointer.split("/") if p != ""]
+    cur = doc
+    for part in parts[:-1]:
+        key = part.replace("~1","/").replace("~0","~")
+        if isinstance(cur, list):
+            idx = int(key)
+            if idx >= len(cur):
+                if create_missing:
+                    while len(cur) <= idx: cur.append({})
+                else:
+                    raise KeyError(pointer)
+            cur = cur[idx]
+        else:
+            if key not in cur:
+                if create_missing:
+                    cur[key] = {}
+                else:
+                    raise KeyError(pointer)
+            cur = cur[key]
+    last = parts[-1].replace("~1","/").replace("~0","~")
+    return cur, last
 
-# ======================================================================================
-# Resource normalization
-# ======================================================================================
-
-def _cmp_cpu(a: str, b: str) -> int:
-    def norm(x: str) -> Tuple[float, str]:
-        x = str(x).strip().lower()
-        for suf in ["n", "u", "m", "k"]:
-            if x.endswith(suf):
-                try:
-                    return float(x[:-len(suf)] or "0"), suf
-                except (ValueError, TypeError):
-                    return 0.0, suf
-        try:
-            return float(x), ""
-        except (ValueError, TypeError):
-            return 0.0, ""
-    va, sa = norm(a)
-    vb, sb = norm(b)
-    if sa == sb:
-        return (va > vb) - (va < vb)
-    return (_CPU_ORDER.index(sa) > _CPU_ORDER.index(sb)) - (_CPU_ORDER.index(sa) < _CPU_ORDER.index(sb))
-
-def _cmp_mem(a: str, b: str) -> int:
-    SCALE = {"ki": 1e3, "k": 1e3, "mi": 1e6, "m": 1e6, "gi": 1e9, "g": 1e9}
-    def val(x: str) -> float:
-        x = str(x).strip().lower()
-        for suf, mul in SCALE.items():
-            if x.endswith(suf):
-                try:
-                    return float(x[:-len(suf)] or "0") * mul
-                except (ValueError, TypeError):
-                    return 0.0
-        try:
-            return float(x)
-        except (ValueError, TypeError):
-            return 0.0
-    va, vb = val(a), val(b)
-    return (va > vb) - (va < vb)
-
-def normalize_resources(container: dict) -> List[str]:
-    changes = []
-    res = container.setdefault("resources", {})
-    req = res.setdefault("requests", {})
-    lim = res.setdefault("limits", {})
-    # defaults
-    req.setdefault("cpu", "50m")
-    req.setdefault("memory", "64Mi")
-    lim.setdefault("cpu", "200m")
-    lim.setdefault("memory", "128Mi")
-    # ensure limits >= requests
-    if _cmp_cpu(lim["cpu"], req["cpu"]) < 0:
-        lim["cpu"] = req["cpu"]
-        changes.append("resources.limits.cpu>=requests.cpu")
-    if _cmp_mem(lim["memory"], req["memory"]) < 0:
-        lim["memory"] = req["memory"]
-        changes.append("resources.limits.memory>=requests.memory")
-    return changes
-
-
-# ======================================================================================
-# Hygiene (kind-aware placement, seccomp, container SC, SA token)
-# ======================================================================================
-
-def apply_hygiene(text: str, secure_defaults: bool = True) -> str:
-    docs = yaml_load_all(text)
-    changed = False
-
-    for d in docs:
-        if not isinstance(d, dict):
+def apply_json_patch(doc: Any, patch_ops: List[Dict[str,Any]]) -> Any:
+    for op in patch_ops:
+        op_type = op.get("op")
+        path = op.get("path")
+        if not isinstance(op_type, str) or not isinstance(path, str):
             continue
-        av = str(d.get("apiVersion", "")).strip()
-        kd = str(d.get("kind", "")).strip()
-        paths = KIND_MAP.get((av, kd))
-        if not paths:
-            # Non-workload kinds: never touch them
+        parent, key = _pointer_walk(doc, path, create_missing=(op_type=="add"))
+        if parent is None:
+            if op_type in ("add", "replace"): doc = op.get("value")
+            elif op_type == "remove": doc = None
             continue
+        if isinstance(parent, list):
+            idx = int(key)
+            if op_type == "add":
+                val = op.get("value")
+                if idx == len(parent): parent.append(val)
+                elif 0 <= idx < len(parent): parent.insert(idx, val)
+            elif op_type == "replace":
+                parent[idx] = op.get("value")
+            elif op_type == "remove":
+                if 0 <= idx < len(parent): parent.pop(idx)
+        else:
+            if op_type in ("add","replace"):
+                parent[key] = op.get("value")
+            elif op_type == "remove":
+                if key in parent: del parent[key]
+    return doc
 
-        # Pod-level security context & SA token
-        psc_path = paths["pod_spec"] + ("securityContext",)
-        psc = deep_ensure(d, psc_path)
+# ------------------ Providers & Prompting -----------------------
+SYSTEM_PROMPT = (
+    "You are SafeFix, a Kubernetes YAML repair assistant. "
+    "Only output a STRICT JSON array of RFC-6902 patch objects. "
+    "Each object must include: op, path, value (for add/replace). "
+    "Never wrap in markdown fences; no prose."
+)
 
-        # Seccomp at pod level (RuntimeDefault)
-        if secure_defaults and not isinstance(psc.get("seccompProfile"), dict):
-            psc["seccompProfile"] = {"type": "RuntimeDefault"}
-            changed = True
+USER_PROMPT_TEMPLATE = """\
+Context:
+{context}
 
-        # automountServiceAccountToken at pod spec
-        podspec = deep_ensure(d, paths["pod_spec"])
-        if "automountServiceAccountToken" not in podspec:
-            podspec["automountServiceAccountToken"] = False
-            changed = True
+Target file (relative): {file}
+YAML snippet (truncated):
+---
+{yaml_snippet}
+---
 
-        # Optional identity defaults (non-breaking)
-        if secure_defaults:
-            if "runAsUser" not in psc:
-                psc["runAsUser"] = 1000
-                changed = True
-            if "runAsGroup" not in psc:
-                psc["runAsGroup"] = 1000
-                changed = True
-            if "fsGroup" not in psc:
-                psc["fsGroup"] = 2000
-                changed = True
+Derived hints:
+{derived_hints}
 
-        # Container-level securityContext and resources
-        containers = first_container_list(d, paths["containers"]) or []
-        for c in containers:
-            csc = c.setdefault("securityContext", {})
-            # Normalize drop: ["ALL"]
-            caps = csc.setdefault("capabilities", {})
-            drop = caps.get("drop")
-            if drop is None:
-                caps["drop"] = ["ALL"]
-                changed = True
-            else:
-                if not isinstance(drop, list):
-                    drop = [drop]
-                drop_set = {str(x).upper() for x in drop}
-                if "ALL" not in drop_set:
-                    drop_set.add("ALL")
-                    caps["drop"] = sorted(drop_set)
-                    changed = True
+Categories to fix in THIS file only:
+{categories}
 
-            # APE, RO rootfs, non-root
-            if "allowPrivilegeEscalation" not in csc:
-                csc["allowPrivilegeEscalation"] = False
-                changed = True
-            if "readOnlyRootFilesystem" not in csc:
-                csc["readOnlyRootFilesystem"] = True
-                changed = True
-            if "runAsNonRoot" not in csc:
-                csc["runAsNonRoot"] = True
-                changed = True
+Rules:
+- Keep behavior unchanged except for the fixes listed.
+- Make minimal, surgical changes; do NOT touch unrelated fields.
+- If image not pinned, only set imagePullPolicy: IfNotPresent (never invent digests).
+- If hostPath mount, remove or replace with emptyDir if safe.
+- For RBAC wildcards, narrow verbs to ['get','list'] and resources to the minimal safe baseline.
+- JSON array only; no markdown; no comments.
 
-            # Container seccomp is optional because pod-level is set; skip to reduce noise
+Special guidance (based on categories):
+{special_guidance}
 
-            # Resources rule
-            if normalize_resources(c):
-                changed = True
-
-    return yaml_dump_all(docs) if changed else text
-
-
-# ======================================================================================
-# Structural sanity checks (reject illegal fields on non-workload kinds)
-# ======================================================================================
-
-def structural_sanity(text: str) -> bool:
-    try:
-        docs = yaml_load_all(text)
-        for d in docs:
-            if not isinstance(d, dict):
-                continue
-            av = str(d.get("apiVersion", "")).strip()
-            kd = str(d.get("kind", "")).strip()
-            spec = d.get("spec", {})
-            if (av, kd) not in KIND_MAP:
-                # Non-workload kinds must not have pod-only fields at top spec level
-                if isinstance(spec, dict) and ("securityContext" in spec or "automountServiceAccountToken" in spec):
-                    return False
-        return True
-    except (yaml.YAMLError, TypeError, ValueError):
-        return False
-
-
-# ======================================================================================
-# Validators: kubeconform → kubectl server-dry-run → kube-linter → polaris
-# ======================================================================================
-
-def validate_chain(text: str, kubeconform_args: List[str] | None = None) -> Tuple[bool, str]:
-    kubeconform_args = kubeconform_args or ["-strict", "-ignore-missing-schemas"]
-    ok, reasons = True, []
-
-    code, _, _ = run(["kubeconform", *kubeconform_args], input_text=text)
-    if code != 0:
-        ok = False; reasons.append("kubeconform")
-    # server dry-run
-    code, _, _ = run(["kubectl", "apply", "--dry-run=server", "-f", "-"], input_text=text)
-    if code != 0:
-        ok = False; reasons.append("kubectl-dry-run")
-    # kube-linter
-    code, _, _ = run(["kube-linter", "lint", "-"], input_text=text)
-    if code != 0:
-        ok = False; reasons.append("kube-linter")
-    # polaris
-    # polaris does not read from stdin; write a temp file
-    tmp = Path(".safefix_tmp.yaml")
-    write_text(tmp, text)
-    code, _, _ = run(["polaris", "audit", "--audit-path", str(tmp)])
-    try:
-        tmp.unlink(missing_ok=True)
-    except (OSError, FileNotFoundError):
-        pass
-    if code != 0:
-        ok = False; reasons.append("polaris")
-
-    return ok, ",".join(reasons)
-
-
-# ======================================================================================
-# LLM providers (hook your own logic here)
-# ======================================================================================
-
-def call_model_provider(_model: str, _prompt: str, _timeout_s: int) -> Optional[str]:
-    """
-    TODO: Replace this stub with your existing provider calls.
-    It must return a YAML string (single or multi-doc) OR None on failure.
-
-    Suggested contract:
-    - Return only YAML text (no code fences).
-    - Ensure models are instructed to keep original metadata (name/labels/selectors).
-    - Ask the model to avoid adding fields to non-workload kinds.
-
-    For now, we return None to force hygiene-only fallback if no providers are wired.
-    """
-    return None  # <-- wire your real logic
-
-
-# ======================================================================================
-# Orchestrator
-# ======================================================================================
-
-DEFAULT_PROMPT = """You are a Kubernetes security engineer. Return ONLY a Kubernetes YAML that:
-- Preserves original object names, labels, selectors, containers and ports.
-- Adds secure-by-default settings where valid: pod-level seccompProfile RuntimeDefault, automountServiceAccountToken: false;
-  per-container: runAsNonRoot: true, allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities.drop: [ALL].
-- Do NOT add securityContext or automountServiceAccountToken to non-workload kinds (e.g., Service, ConfigMap).
-- Do NOT invent RBAC unless strictly required by existing fields.
-- Keep image references unchanged (do not pin or retag).
-Return YAML only, no explanations.
+Return ONLY a JSON array with RFC-6902 ops.
 """
 
-def process_one_file(in_path: Path, out_dir: Path, models: List[str], timeout: int, hygiene_only: bool) -> None:
-    raw = read_text(in_path)
+def derive_special_guidance(categories: List[str]) -> str:
+    cats = set([c for c in categories if c])
+    g: List[str] = []
+    if "MISSING_KIND" in cats or "SCHEMA_VALIDATION_ERROR" in cats:
+        g += [
+            "- Ensure required top-level keys exist: apiVersion, kind, metadata.name.",
+            "- Choose apiVersion/kind consistent with the present fields; never change existing names.",
+        ]
+    if "MISSING_SELECTOR" in cats:
+        g += [
+            "- For Deployment: add spec.selector.matchLabels that EXACTLY equals spec.template.metadata.labels.",
+            "- Do not modify replicas, image, or other fields.",
+        ]
+    return "\n".join(g) if g else "- None."
 
-    candidates: List[Tuple[str, str]] = []  # (origin, yaml_text)
+def derive_hints_from_yaml(docs: List[Dict[str,Any]]) -> str:
+    if not docs: return "- Could not parse YAML."
+    d = docs[0]
+    hints = []
+    kind = d.get("kind","")
+    if kind: hints.append(f"- kind: {kind}")
+    apiv = d.get("apiVersion","")
+    if apiv: hints.append(f"- apiVersion: {apiv}")
+    name = ((d.get("metadata") or {}).get("name")) or ""
+    if name: hints.append(f"- metadata.name: {name}")
+    if (d.get("spec") or {}).get("template"):
+        hints.append("- Looks like a controller with spec.template (e.g., Deployment).")
+        tmpl = (d.get("spec") or {}).get("template") or {}
+        tlabels = ((tmpl.get("metadata") or {}).get("labels") or {})
+        if tlabels:
+            hints.append(f"- template.labels keys: {', '.join(sorted(tlabels.keys()))}")
+    rules = (d.get("rules") or [])
+    if rules: hints.append(f"- Has RBAC rules (Role/ClusterRole), rules count={len(rules)}.")
+    return "\n".join(hints) if hints else "- No obvious structure."
 
-    if not hygiene_only and models:
-        for m in models:
-            result = call_model_provider(m, DEFAULT_PROMPT + "\n\n---\n" + raw, timeout)
-            if result is None:
-                continue
-            candidates.append((f"model:{m}", result))
+def first_yaml_snippet(text: str, max_chars: int = 1500) -> str:
+    if not text: return "(empty file or unreadable)"
+    s = text.strip()
+    return s[:max_chars]
 
-    # Always add hygiene-only candidate (deterministic fallback)
-    candidates.append(("hygiene", apply_hygiene(raw, secure_defaults=True)))
+# ---------- Robust HTTP (retry/backoff + tolerant JSON parsing) ----------
+def _extract_retry_secs_from_text(text: str) -> Optional[float]:
+    m = re.search(r"try again in\s+([0-9]+(?:\.[0-9]+)?)s", text or "", re.IGNORECASE)
+    if m:
+        try: return float(m.group(1))
+        except: return None
+    return None
 
-    # Evaluate candidates
-    chosen: Optional[Tuple[str, str]] = None
-    last_reject_reason = ""
-    for origin, cand in candidates:
-        # strip code fences if the model returned them
-        cfix = re.sub(r"^\s*```(?:yaml)?\s*|\s*```\s*$", "", cand.strip(), flags=re.IGNORECASE | re.DOTALL)
+def _post_json(url: str, headers: Dict[str,str], payload: Dict[str,Any], *, provider: Optional[str]=None, max_retries: int=6) -> Tuple[Optional[dict], Optional[str]]:
+    session = requests.Session()
+    attempt = 0
+    lowered_tokens_once = False
+    last_err = None
 
-        # quick structural sanity
-        if not structural_sanity(cfix):
-            last_reject_reason = f"{origin}: structural_sanity"
-            continue
+    while True:
+        attempt += 1
+        try:
+            r = session.post(url, headers=headers, json=payload, timeout=90)
+            status = r.status_code
+            if 200 <= status < 300:
+                return r.json(), None
 
-        # validate chain
-        ok, reason = validate_chain(cfix)
-        if ok:
-            chosen = (origin, cfix)
-            break
-        else:
-            last_reject_reason = f"{origin}: {reason}"
+            if status == 402 and provider == "openrouter":
+                if not lowered_tokens_once:
+                    lowered_tokens_once = True
+                    if isinstance(payload, dict) and "max_tokens" in payload:
+                        payload["max_tokens"] = max(256, int(payload.get("max_tokens", 512) // 2))
+                    else:
+                        payload["max_tokens"] = 256
+                    continue
+                last_err = f"{status} OpenRouter credit/limit"
+                return None, last_err
 
-    if not chosen:
-        # As a last resort, enforce hygiene again (idempotent) and try validate once more
-        h2 = apply_hygiene(raw, secure_defaults=True)
-        ok, reason = validate_chain(h2)
-        if ok:
-            chosen = ("hygiene-final", h2)
-        else:
-            raise SystemExit(f"Failed to produce a valid fix for {in_path.name}. Last reason: {last_reject_reason or reason}")
+            if status == 429:
+                wait = _extract_retry_secs_from_text(r.text) or (min(2**attempt, 30) + random.uniform(0, 0.5))
+                time.sleep(wait)
+            elif 500 <= status < 600:
+                wait = min(2**attempt, 30) + random.uniform(0, 0.5)
+                time.sleep(wait)
+            else:
+                last_err = f"{status} {r.text[:200]}"
+                return None, last_err
 
-    origin, fixed = chosen
-    # Write outputs
-    rel = in_path.name
-    out_path = out_dir / rel
-    write_text(out_path, fixed)
-    print(f"[OK] {rel} <- {origin}")
+        except requests.RequestException as e:
+            last_err = f"network {e}"
+            wait = min(2**attempt, 30) + random.uniform(0, 0.5)
+            time.sleep(wait)
 
-def discover_inputs(inp: Path) -> List[Path]:
-    if inp.is_dir():
-        return sorted([p for p in inp.rglob("*") if p.is_file() and p.suffix.lower() in {".yaml", ".yml"}])
-    return [inp]
+        if attempt >= max_retries:
+            return None, last_err or "retries exhausted"
 
+def _extract_json_array(text: str) -> Optional[List[dict]]:
+    """
+    Be tolerant to models returning prose or code fences. Find the first [...] array and parse it.
+    """
+    if not text: return None
+    # Strip markdown fences if present
+    text = text.strip()
+    text = re.sub(r"^```(?:json)?", "", text).strip()
+    text = re.sub(r"```$", "", text).strip()
+    # Try direct parse
+    try:
+        obj = json.loads(text)
+        if isinstance(obj, list): return obj
+    except Exception:
+        pass
+    # Fallback: find first array
+    m = re.search(r"\[.*\]", text, flags=re.S)
+    if not m: return None
+    frag = m.group(0)
+    try:
+        arr = json.loads(frag)
+        return arr if isinstance(arr, list) else None
+    except Exception:
+        return None
+
+# ---------------- Provider calls ----------------
+def call_openrouter(model: str, prompt: str) -> Tuple[Optional[List[dict]], Optional[str]]:
+    key = os.environ.get("OPENROUTER_API_KEY")
+    if not key or not model: return None, "missing key or model"
+    url = "https://openrouter.ai/api/v1/chat/completions"
+    body = {"model": model,
+            "messages":[{"role":"system","content":SYSTEM_PROMPT},
+                        {"role":"user","content":prompt}],
+            "temperature": 0.1, "max_tokens": 640}
+    headers = {"Authorization": f"Bearer {key}", "Content-Type":"application/json",
+               "User-Agent": "SafeFix-K8s/1.0", "HTTP-Referer": "https://safefix.local"}
+    js, err = _post_json(url, headers, body, provider="openrouter")
+    if not js: return None, err or "no json"
+    try:
+        txt = js["choices"][0]["message"]["content"].strip()
+        ops = _extract_json_array(txt)
+        return ops, None if ops is not None else "parse-failed"
+    except Exception as e:
+        return None, f"extract-error {e}"
+
+def call_groq(model: str, prompt: str) -> Tuple[Optional[List[dict]], Optional[str]]:
+    key = os.environ.get("GROQ_API_KEY")
+    if not key or not model: return None, "missing key or model"
+    url = "https://api.groq.com/openai/v1/chat/completions"
+    body = {"model": model,
+            "messages":[{"role":"system","content":SYSTEM_PROMPT},
+                        {"role":"user","content":prompt}],
+            "temperature": 0.1, "max_tokens": 1024}
+    js, err = _post_json(url, {"Authorization": f"Bearer {key}", "Content-Type":"application/json"}, body, provider="groq")
+    if not js: return None, err or "no json"
+    try:
+        txt = js["choices"][0]["message"]["content"].strip()
+        ops = _extract_json_array(txt)
+        return ops, None if ops is not None else "parse-failed"
+    except Exception as e:
+        return None, f"extract-error {e}"
+
+def call_gemini(model: str, prompt: str) -> Tuple[Optional[List[dict]], Optional[str]]:
+    key = os.environ.get("GEMINI_API_KEY")
+    if not key or not model: return None, "missing key or model"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={key}"
+    body = {"contents":[{"parts":[{"text": SYSTEM_PROMPT + "\n\n" + prompt}]}],
+            "generationConfig":{"temperature":0.1}}
+    js_err = None
+    try:
+        r = requests.post(url, json=body, timeout=90)
+        if 200 <= r.status_code < 300:
+            js = r.json()
+            txt = js["candidates"][0]["content"]["parts"][0]["text"].strip()
+            ops = _extract_json_array(txt)
+            return ops, None if ops is not None else "parse-failed"
+        js_err = f"{r.status_code} {r.text[:160]}"
+    except Exception as e:
+        js_err = f"network {e}"
+    return None, js_err
+
+def call_ollama(model: str, prompt: str) -> Tuple[Optional[List[dict]], Optional[str]]:
+    base = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434")
+    if not model or not base: return None, "missing base or model"
+    url = f"{base.rstrip('/')}/api/chat"
+    body = {"model": model, "messages":[{"role":"system","content":SYSTEM_PROMPT},
+                                        {"role":"user","content":prompt}], "stream": False}
+    try:
+        r = requests.post(url, json=body, timeout=90)
+        if 200 <= r.status_code < 300:
+            js = r.json()
+            txt = js.get("message",{}).get("content","").strip()
+            ops = _extract_json_array(txt)
+            if ops is not None: return ops, None
+    except Exception as e:
+        pass
+    # fallback endpoint
+    try:
+        url2 = f"{base.rstrip('/')}/api/generate"
+        r2 = requests.post(url2, json={"model":model,"prompt":SYSTEM_PROMPT+"\n\n"+prompt,"stream":False}, timeout=90)
+        if 200 <= r2.status_code < 300:
+            js2 = r2.json()
+            txt2 = js2.get("response","").strip()
+            ops = _extract_json_array(txt2)
+            return ops, None if ops is not None else "parse-failed"
+        return None, f"{r2.status_code} {r2.text[:160]}"
+    except Exception as e:
+        return None, f"network {e}"
+
+# ------------------ Voting & Application ------------------------
+def sanitize_ops(ops: Any) -> List[Dict[str,Any]]:
+    out: List[Dict[str,Any]] = []
+    if not isinstance(ops, list): return out
+    for o in ops:
+        if not isinstance(o, dict): continue
+        op = o.get("op"); path = o.get("path")
+        if not isinstance(op, str) or not isinstance(path, str): continue
+        if op not in ("add","replace","remove"): continue
+        if op in ("add","replace") and "value" not in o: continue
+        out.append({"op":op,"path":path,"value":o.get("value")})
+    return out
+
+def vote_merge(provider_ops: List[Tuple[str, List[Dict[str,Any]]]]) -> List[Dict[str,Any]]:
+    priority = ["openrouter","groq","gemini","ollama"]
+    seen: Dict[str, Dict[str,Any]] = {}
+    counts: Dict[str, int] = {}
+    first_provider: Dict[str, str] = {}
+    for provider, ops in provider_ops:
+        for op in ops:
+            key = json.dumps(op, sort_keys=True)
+            counts[key] = counts.get(key, 0) + 1
+            if key not in first_provider:
+                first_provider[key] = provider
+            if key not in seen:
+                seen[key] = op
+    if not counts: return []
+    max_votes = max(counts.values())
+    winners = [k for k,v in counts.items() if v == max_votes]
+    winners.sort(key=lambda k: priority.index(first_provider.get(k,"ollama")) if first_provider.get(k,"ollama") in priority else 99)
+    return [seen[k] for k in winners]
+
+# --------- Local deterministic fallback for common raw categories ----------
+def _fallback_ops_for_missing_selector(doc: Dict[str,Any]) -> List[Dict[str,Any]]:
+    if not isinstance(doc, dict): return []
+    if (doc.get("kind") != "Deployment") or not isinstance(doc.get("spec"), dict): return []
+    tmpl = (doc["spec"].get("template") or {})
+    tmeta = (tmpl.get("metadata") or {})
+    tlabels = (tmeta.get("labels") or {})
+    if not tlabels: return []
+    return [
+        {"op":"add","path":"/spec/selector","value":{"matchLabels": tlabels}}
+    ]
+
+def local_fallback_ops(categories: List[str], docs: List[Dict[str,Any]]) -> List[Dict[str,Any]]:
+    ops: List[Dict[str,Any]] = []
+    cats = set([c for c in categories if c])
+    if not docs: return ops
+    d0 = docs[0]
+    if "MISSING_SELECTOR" in cats:
+        ops += _fallback_ops_for_missing_selector(d0)
+    # (We intentionally avoid guessing kind/apiVersion; too risky without provider agreement)
+    return ops
+
+# ---------------- Payload normalizer ----------------
+def normalize_payload_to_files(payload: Dict[str,Any]) -> Tuple[Dict[str,Any], List[Dict[str,Any]]]:
+    context = payload.get("context") or {}
+    meta = payload.get("metadata") or {}
+    if not context:
+        context = {
+            "source_tool": meta.get("source_tool") or payload.get("version") or "unknown",
+            "generated_at": payload.get("generated_at") or "",
+            "raw_findings_count": meta.get("raw_findings_count") or 0,
+            "note": "Auto-derived context from raw payload."
+        }
+    files = payload.get("files")
+    if isinstance(files, list) and files:
+        return context, files
+    items = payload.get("items") or []
+    if not isinstance(items, list) or not items:
+        return context, []
+    by_file: Dict[str, List[Dict[str,Any]]] = {}
+    for it in items:
+        file_rel = it.get("file") or it.get("filename") or "UNKNOWN_FILE"
+        finding = {
+            "category": it.get("category") or it.get("rule") or "UNKNOWN",
+            "severity": it.get("severity"),
+            "message": it.get("message") or it.get("description"),
+            "resourceRef": {"kind": it.get("kind",""), "name": it.get("name",""), "namespace": it.get("namespace","") or "default"},
+            "raw": {"tools": it.get("tools"), "rule_ids": it.get("rule_ids"), "examples": it.get("examples"), "line": it.get("line")}
+        }
+        by_file.setdefault(file_rel, []).append(finding)
+    files_list = [{"file": f, "findings": v} for f, v in sorted(by_file.items())]
+    return context, files_list
+
+# ---------------- Prompt builder (now includes YAML context) ----------------
+def build_prompt(context: Dict[str,Any], file_entry: Dict[str,Any], original_text: str) -> str:
+    file_rel = file_entry.get("file","")
+    findings = file_entry.get("findings") or []
+    if findings:
+        rr = findings[0].get("resourceRef") or {}
+        kind = rr.get("kind",""); name = rr.get("name",""); ns = rr.get("namespace","") or "default"
+    else:
+        kind = name = ""; ns = "default"
+    cats = sorted(set(f["category"] for f in findings if f.get("category")))
+    categories = "- " + "\n- ".join(cats) if cats else "- "
+    docs = yaml_load_all(original_text)
+    snippet = first_yaml_snippet(original_text)
+    hints = derive_hints_from_yaml(docs)
+    special = derive_special_guidance(cats)
+    return USER_PROMPT_TEMPLATE.format(
+        context=json.dumps(context, ensure_ascii=False, indent=2),
+        file=file_rel,
+        yaml_snippet=snippet,
+        derived_hints=hints,
+        categories=categories,
+        special_guidance=special,
+        kind=kind, name=name, namespace=ns
+    )
+
+# ------------------------------ Main -----------------------------
 def main():
-    ap = argparse.ArgumentParser(description="SafeFix-K8s Multi-LLM Orchestrator (hardened)")
-    ap.add_argument("--input", required=True, help="YAML file or directory")
-    ap.add_argument("--output", default="output/fixed", help="Output directory for fixed YAMLs")
-    ap.add_argument("--models", default="", help="Comma-separated provider names (e.g., groq,openrouter)")
-    ap.add_argument("--timeout", type=int, default=30, help="Per-model timeout seconds")
-    ap.add_argument("--hygiene-only", action="store_true", help="Skip model calls; apply hygiene/validation only")
+    ap = argparse.ArgumentParser(description="Vote across multiple LLMs to fix payload categories and write secured YAMLs.")
+    ap.add_argument("--payload", required=True, help="Path to output_llm_payload.json OR raw tool payload (e.g., raw-kubeconform).")
+    ap.add_argument("--tests-dir", required=True, help="Directory containing original YAML files (as referenced in payload)")
+    ap.add_argument("--out-dir", default="output/llm_fixes", help="Output directory")
+    ap.add_argument("--or-model", default=os.environ.get("OPENROUTER_MODEL","openai/gpt-4o-mini"))
+    ap.add_argument("--groq-model", default=os.environ.get("GROQ_MODEL","llama-3.1-8b-instant"))
+    ap.add_argument("--gemini-model", default=os.environ.get("GEMINI_MODEL","gemini-2.5-flash"))
+    ap.add_argument("--ollama-model", default=os.environ.get("OLLAMA_MODEL","meta-llama/llama-3-8b"))
     args = ap.parse_args()
 
-    in_path = Path(args.input)
-    out_dir = Path(args.output)
-    models = [m.strip() for m in args.models.split(",") if m.strip()]
+    payload = read_json(Path(args.payload))
+    context, files = normalize_payload_to_files(payload)
 
-    inputs = discover_inputs(in_path)
-    if not inputs:
-        raise SystemExit("No YAML files found.")
-
+    tests_dir = Path(args.tests_dir).resolve()
+    out_dir   = Path(args.out_dir).resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
-    for f in inputs:
-        try:
-            process_one_file(f, out_dir, models, args.timeout, args.hygiene_only)
-        except SystemExit as e:
-            print(f"[FAIL] {f.name}: {e}")
-        except (SystemExit, KeyboardInterrupt, RuntimeError) as e:
-            print(f"[ERR ] {f.name}: {e}")
+
+    rows: List[Tuple[str,str,str,int,int]] = []  # file, provider, status, applied, skipped
+
+    for f in files:
+        file_rel = f.get("file")
+        findings = f.get("findings") or []
+        if not file_rel or not findings:
+            continue
+
+        file_path = tests_dir / file_rel
+        original = read_text(file_path) if file_path.exists() else ""
+        prompt = build_prompt(context, f, original)
+
+        provider_ops: List[Tuple[str,List[Dict[str,Any]]]] = []
+        provider_errs: Dict[str,str] = {}
+
+        # space calls slightly (helps with bursty 429s)
+        if os.environ.get("OPENROUTER_API_KEY"):
+            ops, err = call_openrouter(args.or_model, prompt); time.sleep(1.1)
+            provider_ops.append(("openrouter", sanitize_ops(ops or [])))
+            if err: provider_errs["openrouter"] = err
+        if os.environ.get("GROQ_API_KEY"):
+            ops, err = call_groq(args.groq_model, prompt); time.sleep(1.1)
+            provider_ops.append(("groq", sanitize_ops(ops or [])))
+            if err: provider_errs["groq"] = err
+        if os.environ.get("GEMINI_API_KEY"):
+            ops, err = call_gemini(args.gemini_model, prompt); time.sleep(1.1)
+            provider_ops.append(("gemini", sanitize_ops(ops or [])))
+            if err: provider_errs["gemini"] = err
+        if os.environ.get("OLLAMA_BASE_URL"):
+            ops, err = call_ollama(args.ollama_model, prompt); time.sleep(1.1)
+            provider_ops.append(("ollama", sanitize_ops(ops or [])))
+            if err: provider_errs["ollama"] = err
+
+        have_any = any(len(ops)>0 for _,ops in provider_ops)
+        merged: List[Dict[str,Any]] = []
+
+        if have_any:
+            merged = vote_merge(provider_ops)
+        else:
+            # local deterministic fallback for a few raw categories
+            cats = sorted(set(ff.get("category") for ff in findings if ff.get("category")))
+            merged = local_fallback_ops(cats, yaml_load_all(original))
+
+        applied: List[Dict[str,Any]] = []
+        skipped: List[Dict[str,Any]] = []
+        fixed = ""
+
+        if merged:
+            # apply
+            docs = yaml_load_all(original) if original else []
+            if docs:
+                # assign to likely target doc (first workload / podspec)
+                def target_doc_index(path: str) -> int:
+                    if re.search(r"/(spec|template)/", path):
+                        for i, d in enumerate(docs):
+                            if get_pod_spec(d): return i
+                    return 0
+                for op in merged:
+                    try:
+                        idx = target_doc_index(op.get("path",""))
+                        docs[idx] = apply_json_patch(docs[idx], [op])
+                        applied.append(op)
+                    except Exception as e:
+                        skipped.append({"op": op, "reason": f"apply error: {e}"})
+                fixed = yaml_dump_all(docs)
+            else:
+                # could not parse original; skip applying but still report ops
+                skipped = [{"op": op, "reason": "original YAML not parseable"} for op in merged]
+
+        safe = file_rel.replace("\\","_").replace("/","_").replace("..","")
+        secured_path = out_dir / f"SECURED_{safe}"
+        diff_path    = out_dir / f"DIFF_{safe}.diff"
+        report_path  = out_dir / f"REPORT_{safe}.json"
+
+        if fixed:
+            write_text(secured_path, fixed)
+            write_text(diff_path, unified_diff_text(original, fixed, str(Path(args.tests_dir)/file_rel), str(secured_path)))
+
+        rows.extend([(file_rel, prov, "ok" if ops else "empty", len(ops), 0) for prov, ops in provider_ops])
+
+        reason = None
+        if not have_any and not merged:
+            reason = "No provider produced valid JSON Patch ops (and no local fallback applicable)."
+        elif not have_any and merged:
+            reason = "Providers empty; used local deterministic fallback."
+
+        cats = sorted(set(ff.get("category") for ff in findings if ff.get("category")))
+        summary = {
+            "file": file_rel,
+            "categories_fixed": cats,
+            "providers": [{ "name": n, "ops": ops } for n,ops in provider_ops],
+            "provider_errors": provider_errs,
+            "applied_ops_count": len(applied),
+            "skipped_ops_count": len(skipped),
+            "reason": reason,
+            "notes": [
+                "Prompt included YAML snippet and derived hints to increase JSON compliance.",
+                "Ties resolved by provider priority: openrouter > groq > gemini > ollama.",
+                "Local fallback currently covers MISSING_SELECTOR (Deployment)."
+            ]
+        }
+        write_text(report_path, json.dumps(summary, indent=2))
+
+    csv_lines = ["file,provider,status,ops_applied,ops_skipped"]
+    for file_rel, prov, status, a, s in rows:
+        csv_lines.append(",".join([file_rel.replace(",",";"), prov, status, str(a), str(s)]))
+    write_text(out_dir / "REPORT_ALL.csv", "\n".join(csv_lines))
+
+    print(f"[OK] Wrote secured files, diffs and reports to: {out_dir}")
+
+# ---------------- Raw single-file runner (still available) ----------------
+def run_llm_on_raw_file(raw_path: Path, tests_dir: Path, out_dir: Path):
+    raw = read_json(raw_path)
+    context, files = normalize_payload_to_files(raw)
+    out_dir = Path(out_dir).resolve(); out_dir.mkdir(parents=True, exist_ok=True)
+    for idx, fe in enumerate(files):
+        file_rel = fe.get("file") or f"RAW_{idx}.yaml"
+        file_path = Path(tests_dir)/file_rel
+        original = read_text(file_path) if file_path.exists() else ""
+        prompt = build_prompt(context, {"file": file_rel, "findings": fe.get("findings") or []}, original)
+
+        provider_ops: List[Tuple[str, List[Dict[str,Any]]]] = []
+        if os.environ.get("OPENROUTER_API_KEY"):
+            ops, _ = call_openrouter(os.environ.get("OPENROUTER_MODEL","openai/gpt-4o-mini"), prompt); time.sleep(1.1)
+            provider_ops.append(("openrouter", sanitize_ops(ops or [])))
+        if os.environ.get("GROQ_API_KEY"):
+            ops, _ = call_groq(os.environ.get("GROQ_MODEL","llama-3.1-8b-instant"), prompt); time.sleep(1.1)
+            provider_ops.append(("groq", sanitize_ops(ops or [])))
+        if os.environ.get("GEMINI_API_KEY"):
+            ops, _ = call_gemini(os.environ.get("GEMINI_MODEL","gemini-2.5-flash"), prompt); time.sleep(1.1)
+            provider_ops.append(("gemini", sanitize_ops(ops or [])))
+        if os.environ.get("OLLAMA_BASE_URL"):
+            ops, _ = call_ollama(os.environ.get("OLLAMA_MODEL","meta-llama/llama-3-8b"), prompt); time.sleep(1.1)
+            provider_ops.append(("ollama", sanitize_ops(ops or [])))
+
+        merged = vote_merge(provider_ops) if any(len(ops)>0 for _,ops in provider_ops) else local_fallback_ops(
+            sorted(set(ff.get("category") for ff in (fe.get("findings") or []) if ff.get("category"))),
+            yaml_load_all(original)
+        )
+
+        applied, skipped = [], []
+        docs = yaml_load_all(original) if original else []
+        if docs and merged:
+            def target_doc_index(path: str) -> int:
+                if re.search(r"/(spec|template)/", path):
+                    for i, d in enumerate(docs):
+                        if get_pod_spec(d): return i
+                return 0
+            for op in merged:
+                try:
+                    idx = target_doc_index(op.get("path",""))
+                    docs[idx] = apply_json_patch(docs[idx], [op])
+                    applied.append(op)
+                except Exception as e:
+                    skipped.append({"op": op, "reason": f"apply error: {e}"})
+        fixed = yaml_dump_all(docs) if docs else ""
+
+        sanitized_file = file_rel.replace("\\", "_").replace("/", "_").replace("..", "")
+        safe = f"RAW_{idx}_{sanitized_file}"
+        secured_path = out_dir / f"SECURED_{safe}"
+        diff_path    = out_dir / f"DIFF_{safe}.diff"
+        report_path  = out_dir / f"REPORT_{safe}.json"
+        if fixed:
+            write_text(secured_path, fixed)
+            write_text(diff_path, unified_diff_text(original, fixed, str(file_path), str(secured_path)))
+        write_text(report_path, json.dumps({
+            "file": file_rel,
+            "categories_fixed": sorted(set(ff.get("category") for ff in (fe.get("findings") or []) if ff.get("category"))),
+            "providers": [{ "name": n, "ops": ops } for n,ops in provider_ops],
+            "applied_ops_count": len(applied),
+            "skipped_ops_count": len(skipped),
+            "notes": ["Processed via raw runner with YAML context and tolerant JSON extraction."]
+        }, indent=2))
 
 if __name__ == "__main__":
     main()

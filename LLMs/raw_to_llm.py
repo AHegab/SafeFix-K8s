@@ -1,3 +1,65 @@
+def run_llm_on_raw_file(tool: str, raw_file_path: str, models: str = "groq,openrouter,gemini", concurrency: int = 15, shard_models: bool = True, output: str = None) -> int:
+    """
+    Programmatically run the raw-to-LLM pipeline for a given tool and raw file.
+    Returns the exit code from the orchestrator.
+    """
+    import subprocess, os, sys, shutil
+    from pathlib import Path
+    # Parse raw file
+    parser_funcs = {
+        "checkov": parse_checkov,
+        "trivy": parse_trivy,
+        "kubescape": parse_kubescape,
+        "kubeaudit": parse_kubeaudit,
+        "conftest": parse_conftest,
+        "polaris": parse_polaris,
+        "gitleaks": parse_gitleaks,
+        "kubeconform": parse_kubeconform,
+        "kubelinter": parse_kubelinter,
+        "kubescore": parse_kubescore,
+        "pluto": parse_pluto,
+        "rbacpolice": parse_rbacpolice,
+        "yamllint": parse_yamllint
+    }
+    raw_file = Path(raw_file_path)
+    if not raw_file.exists():
+        raise FileNotFoundError(f"Raw file not found: {raw_file}")
+    items = parser_funcs[tool](raw_file)
+    if not items:
+        print("WARNING: No findings extracted from raw file")
+        return 0
+    payload = create_llm_payload(items, tool)
+    output_dir = Path(output) if output else OUTPUT_ROOT / "llm"
+    output_dir.mkdir(parents=True, exist_ok=True)
+    temp_payload = output_dir / f"llm_payload_raw_{tool}.json"
+    temp_payload.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
+    norm_payload = NORMALIZATION_DIR / "llm_payload.json"
+    backup_payload = None
+    if norm_payload.exists():
+        backup_payload = NORMALIZATION_DIR / "llm_payload.json.backup"
+        shutil.copy2(norm_payload, backup_payload)
+    shutil.copy2(temp_payload, norm_payload)
+    llm_script = Path(__file__).parent / "multi_llm_orchestrator.py"
+    cmd = [
+        sys.executable, str(llm_script),
+        "--models", models,
+        "--validate", "yaml",
+        "--autofix",
+        "--hygiene",
+        "--concurrency", str(concurrency),
+        "--timeout", "20",
+        "--retries", "1"
+    ]
+    if shard_models:
+        cmd.append("--shard-models")
+    env = os.environ.copy()
+    env["SAFEFIX_OUTPUT_ROOT"] = str(OUTPUT_ROOT)
+    env["SAFEFIX_NORMALIZATION_DIR"] = str(NORMALIZATION_DIR)
+    env["SAFEFIX_LLM_DIR"] = str(output_dir)
+    result = subprocess.run(cmd, cwd=Path.cwd(), env=env, check=False)
+    if backup_payload and backup_payload.exists():
+        shutil.copy2(backup_payload, norm_payload)
+    return result.returncode
 #!/usr/bin/env python3
 """
 Direct Raw-to-LLM Pipeline
@@ -22,7 +84,7 @@ try:
     # Python 3.7+: reconfigure IO to UTF-8 when possible
     sys.stdout.reconfigure(encoding='utf-8')
     sys.stderr.reconfigure(encoding='utf-8')
-except Exception:
+except (AttributeError, ValueError, OSError):
     pass
 
 def _utf8_ok() -> bool:
@@ -40,10 +102,11 @@ def safe_fast_banner():
 
 # Import from multi_llm_orchestrator
 sys.path.insert(0, str(Path(__file__).parent))
-from multi_llm_orchestrator import (
-    OUTPUT_ROOT,
-    NORMALIZATION_DIR
-)
+try:
+    from multi_llm_orchestrator import OUTPUT_ROOT, NORMALIZATION_DIR
+except ImportError:
+    OUTPUT_ROOT = Path(__file__).parent.parent / "output"
+    NORMALIZATION_DIR = Path(__file__).parent.parent / "Normalizer"
 
 def parse_checkov(raw_file: Path) -> List[Dict[str, Any]]:
     """Parse Checkov raw JSON output."""
@@ -648,40 +711,33 @@ def parse_yamllint(raw_file: Path) -> List[Dict[str, Any]]:
     for line in lines:
         if not line.strip():
             continue
-
         # Format: file:line:col: [level] message (rule-id)
         # Example: /scan/13.deployment.yaml:10:7: [error] wrong indentation (indentation)
         parts = line.split(':', 3)
         if len(parts) < 4:
             continue
-
-        file_path = parts[0].replace("\\", "/")
-        if file_path.startswith("/scan/"):
+        file_path = parts[0].replace('\\', '/')
+        if file_path.startswith('/scan/'):
             file_path = file_path[6:]
-
         try:
             line_num = int(parts[1])
         except (ValueError, IndexError):
             line_num = 0
-
         rest = parts[3] if len(parts) > 3 else ""
-
         # Extract level and message
         level = "error"
         message = rest.strip()
         if "[warning]" in rest:
             level = "warning"
-            message = rest.split("[warning]", 1)[1].strip()
+            message = rest.split('[warning]')[-1].strip()
         elif "[error]" in rest:
             level = "error"
-            message = rest.split("[error]", 1)[1].strip()
-
+            message = rest.split('[error]')[-1].strip()
         # Extract rule ID from parentheses if present
         rule_id = "yamllint-rule"
         if "(" in message and ")" in message:
             rule_id = message.split("(")[-1].split(")")[0]
             message = message.split("(")[0].strip()
-
         # Map YAMLlint rules to categories
         category = "YAML_FORMAT_ERROR"
         if "indentation" in rule_id.lower():
@@ -694,9 +750,7 @@ def parse_yamllint(raw_file: Path) -> List[Dict[str, Any]]:
             category = "YAML_NEWLINE_ERROR"
         elif "trailing" in rule_id.lower():
             category = "YAML_TRAILING_SPACES"
-
         severity = "MEDIUM" if level == "warning" else "HIGH"
-
         items.append({
             "file": file_path,
             "category": category,

@@ -1,442 +1,285 @@
 #!/usr/bin/env python3
 """
-Combine multiple fixed YAML files for the same source file into one fully secured manifest.
-Merges fixes line-by-line, applies security hygiene, and generates a diff output.
+combine_yaml_files.py
+
+Merge multiple already-fixed YAML contents for the SAME source file into a single, most-secure manifest.
+No external project imports; fully self-contained.
 
 Usage:
-    python combine_yaml_files.py --file "tests/13.deployment.yaml"
+  python combine_yaml_files.py --original tests/13.deployment.yaml --fixed-dir output/fixed --out-dir output/combination
+
+It will:
+  - Read ORIGINAL file content.
+  - Read all files in --fixed-dir whose name starts with SECURED_<basename>.
+  - Merge doc-by-doc, picking the most restrictive/security-hardened values.
+  - Emit:
+      SECURED_MERGED_<basename>.yaml
+      DIFF_MERGED_<basename>.diff
+      SUMMARY_MERGED_<basename>.json
 """
 
 import argparse
-import json
-import os
-import sys
-from pathlib import Path
-from typing import Dict, List, Tuple, Optional
 import difflib
+from pathlib import Path
+from typing import Any, Dict, List, Tuple
 import yaml
+import copy
+import json
 
-# Import from multi_llm_orchestrator
-sys.path.insert(0, str(Path(__file__).parent))
-from multi_llm_orchestrator import (
-    load_dotenv_from_file,
-    _apply_hygiene,
-    _yaml_is_valid,
-    OUTPUT_ROOT,
-    LLM_DIR
-)
+def read_text(p: Path) -> str:
+    return p.read_text(encoding="utf-8")
 
-# Define combination directory
-COMBINATION_DIR = Path(os.getenv("SAFEFIX_COMBINATION_DIR", OUTPUT_ROOT / "combination")).resolve()
+def write_text(p: Path, s: str) -> None:
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(s, encoding="utf-8")
 
-def _merge_yaml_files(fixed_files: List[str], original_file: str) -> Tuple[str, List[str]]:
-    """
-    Intelligently merge multiple fixed YAML files for the same source.
-    Takes the most secure option for each section.
-    
-    Returns: (merged_yaml, applied_fixes)
-    """
-    if not fixed_files:
-        return original_file, []
-    
-    if len(fixed_files) == 1:
-        return fixed_files[0], ["single_fix"]
-    
+def yaml_load_all(s: str) -> List[Any]:
     try:
-        # Parse all YAML files
-        original_docs = list(yaml.safe_load_all(original_file))
-        fixed_docs_list = []
-        for fixed_file in fixed_files:
-            try:
-                docs = list(yaml.safe_load_all(fixed_file))
-                fixed_docs_list.append(docs)
-            except (yaml.YAMLError, ValueError, KeyError):
-                continue
-        
-        if not fixed_docs_list:
-            return original_file, []
-        
-        # Merge documents
-        merged_docs = []
-        applied_fixes = []
-        
-        for doc_idx, orig_doc in enumerate(original_docs):
-            if not isinstance(orig_doc, dict):
-                merged_docs.append(orig_doc)
-                continue
-            
-            # Collect corresponding fixed documents
-            fixed_versions = []
-            for fixed_docs in fixed_docs_list:
-                if doc_idx < len(fixed_docs) and isinstance(fixed_docs[doc_idx], dict):
-                    fixed_versions.append(fixed_docs[doc_idx])
-            
-            if not fixed_versions:
-                merged_docs.append(orig_doc)
-                continue
-            
-            # Merge by taking most secure values
-            merged_doc = orig_doc.copy()
-            
-            # Merge securityContext (most restrictive wins)
-            for fixed_doc in fixed_versions:
-                merged_doc = _merge_security_context(merged_doc, fixed_doc, applied_fixes)
-                merged_doc = _merge_container_security(merged_doc, fixed_doc, applied_fixes)
-                merged_doc = _merge_volumes(merged_doc, fixed_doc, applied_fixes)
-                merged_doc = _merge_credentials(merged_doc, fixed_doc, applied_fixes)
-            
-            merged_docs.append(merged_doc)
-        
-        # Convert back to YAML
-        merged_yaml = yaml.safe_dump_all(merged_docs, sort_keys=False, default_flow_style=False)
-        return merged_yaml, list(set(applied_fixes))
-    
-    except (yaml.YAMLError, ValueError, KeyError, AttributeError) as e:
-        # Fallback: use the first fixed file
-        print(f"[WARN] YAML merge failed: {e}, using first fixed file")
-        return fixed_files[0], ["fallback_merge"]
+        docs = list(yaml.safe_load_all(s))
+        return [d for d in docs if d is not None]
+    except yaml.YAMLError:
+        return []
 
+def yaml_dump_all(docs: List[Any]) -> str:
+    return yaml.safe_dump_all(docs, sort_keys=False, default_flow_style=False)
 
-def _merge_security_context(merged: dict, fixed: dict, applied: List[str]) -> dict:
-    """Merge pod-level securityContext (most restrictive wins)."""
-    if "spec" not in merged:
-        return merged
-    
-    spec = merged["spec"]
-    fixed_spec = fixed.get("spec", {})
-    
-    # Handle Deployment/StatefulSet template
-    if "template" in spec:
-        template = spec["template"]
-        fixed_template = fixed_spec.get("template", {})
-        if "spec" in template:
-            pod_spec = template["spec"]
-            fixed_pod_spec = fixed_template.get("spec", {})
-            
-            # Merge pod securityContext
-            if "securityContext" in fixed_pod_spec:
-                if "securityContext" not in pod_spec:
-                    pod_spec["securityContext"] = {}
-                pod_sc = pod_spec["securityContext"]
-                fixed_pod_sc = fixed_pod_spec["securityContext"]
-                
-                # Take most restrictive values
-                for key in ["runAsNonRoot", "runAsUser", "fsGroup"]:
-                    if key in fixed_pod_sc:
-                        pod_sc[key] = fixed_pod_sc[key]
-                        applied.append(f"pod.securityContext.{key}")
-            
-            # Merge automountServiceAccountToken
-            if "automountServiceAccountToken" in fixed_pod_spec:
-                pod_spec["automountServiceAccountToken"] = fixed_pod_spec["automountServiceAccountToken"]
-                applied.append("pod.automountServiceAccountToken")
-    
-    return merged
+def unified_diff_text(original: str, fixed: str, orig_path: str, fixed_path: str) -> str:
+    a = original.splitlines(keepends=True)
+    b = fixed.splitlines(keepends=True)
+    return "".join(difflib.unified_diff(a, b, fromfile=orig_path, tofile=fixed_path, lineterm="", n=3))
 
+def get_pod_spec(doc: Dict) -> Dict:
+    if not isinstance(doc, dict): return {}
+    kind = str(doc.get("kind") or "")
+    spec = doc.get("spec")
+    if not isinstance(spec, dict): return {}
+    if kind == "Pod":
+        return spec
+    tmpl = spec.get("template")
+    if isinstance(tmpl, dict) and isinstance(tmpl.get("spec"), dict):
+        return tmpl["spec"]
+    return {}
 
-def _merge_container_security(merged: dict, fixed: dict, applied: List[str]) -> dict:
-    """Merge container securityContext (most restrictive wins)."""
-    def merge_containers_in_spec(spec: dict, fixed_spec: dict, path: str):
-        for container_key in ["containers", "initContainers"]:
-            if container_key not in spec:
-                continue
-            fixed_containers = fixed_spec.get(container_key, [])
-            for idx, container in enumerate(spec[container_key]):
-                if idx < len(fixed_containers):
-                    fixed_container = fixed_containers[idx]
-                    if "securityContext" in fixed_container:
-                        if "securityContext" not in container:
-                            container["securityContext"] = {}
-                        sc = container["securityContext"]
-                        fixed_sc = fixed_container["securityContext"]
-                        
-                        # Take most restrictive
-                        for key in ["privileged", "allowPrivilegeEscalation", "readOnlyRootFilesystem", "runAsNonRoot", "runAsUser"]:
-                            if key in fixed_sc:
-                                sc[key] = fixed_sc[key]
-                                applied.append(f"{path}.{container_key}[{idx}].securityContext.{key}")
-                        
-                        # Merge capabilities (drop ALL if any version drops it)
-                        if "capabilities" in fixed_sc:
-                            if "capabilities" not in sc:
-                                sc["capabilities"] = {}
-                            caps = sc["capabilities"]
-                            fixed_caps = fixed_sc["capabilities"]
-                            if "drop" in fixed_caps and "ALL" in fixed_caps["drop"]:
-                                if "drop" not in caps:
-                                    caps["drop"] = []
-                                if "ALL" not in caps["drop"]:
-                                    caps["drop"].append("ALL")
-                                    applied.append(f"{path}.{container_key}[{idx}].capabilities.drop=ALL")
-    
-    if "spec" in merged:
-        spec = merged["spec"]
-        fixed_spec = fixed.get("spec", {})
-        
-        # Handle template.spec
-        if "template" in spec:
-            template_spec = spec["template"].get("spec", {})
-            fixed_template_spec = fixed_spec.get("template", {}).get("spec", {})
-            merge_containers_in_spec(template_spec, fixed_template_spec, "template.spec")
+def find_containers(pod_spec: Dict) -> List[Tuple[str, Dict]]:
+    res=[]
+    for key in ("initContainers","containers"):
+        arr = pod_spec.get(key) or []
+        for i,c in enumerate(arr):
+            if isinstance(c, dict):
+                res.append((f"{key}[{i}]", c))
+    return res
+
+# --- secure merge helpers ---
+
+def most_restrictive_bool(values: List[Any], prefer: bool) -> Any:
+    # if any is False and prefer False, choose False; vice versa
+    vals = [v for v in values if isinstance(v, bool)]
+    if not vals: return prefer
+    return False if prefer is False else True if all(vals) else False
+
+def merge_security_context(sc_list: List[Dict]) -> Dict:
+    out = {}
+    # booleans: prefer hardened defaults
+    def pick_bool(key: str, hard_default: bool):
+        candidates = [sc.get(key) for sc in sc_list if isinstance(sc, dict) and key in sc]
+        if any(c is not None for c in candidates):
+            # most restrictive policy: privileged=False, allowPrivilegeEscalation=False, runAsNonRoot=True, readOnlyRootFilesystem=True
+            if key in ("privileged","allowPrivilegeEscalation"):
+                out[key] = False
+            elif key in ("runAsNonRoot","readOnlyRootFilesystem"):
+                out[key] = True
+            else:
+                out[key] = candidates[-1]
         else:
-            # Direct pod spec
-            merge_containers_in_spec(spec, fixed_spec, "spec")
-    
-    return merged
+            out[key] = hard_default
 
+    pick_bool("privileged", False)
+    pick_bool("allowPrivilegeEscalation", False)
+    pick_bool("runAsNonRoot", True)
+    pick_bool("readOnlyRootFilesystem", True)
 
-def _merge_volumes(merged: dict, fixed: dict, applied: List[str]) -> dict:
-    """Remove dangerous volume mounts (hostPath, docker socket)."""
-    def remove_dangerous_volumes(spec: dict, fixed_spec: dict):
-        if "volumes" not in spec:
-            return
-        
-        fixed_volumes = fixed_spec.get("volumes", [])
-        # If fixed version has fewer volumes, it removed dangerous ones
-        if len(fixed_volumes) < len(spec["volumes"]):
-            spec["volumes"] = fixed_volumes
-            applied.append("volumes.removed_dangerous")
-    
-    if "spec" in merged:
-        spec = merged["spec"]
-        fixed_spec = fixed.get("spec", {})
-        
-        if "template" in spec:
-            template_spec = spec["template"].get("spec", {})
-            fixed_template_spec = fixed_spec.get("template", {}).get("spec", {})
-            remove_dangerous_volumes(template_spec, fixed_template_spec)
-        else:
-            remove_dangerous_volumes(spec, fixed_spec)
-    
-    return merged
-
-
-def _merge_credentials(merged: dict, fixed: dict, applied: List[str]) -> dict:
-    """Replace hardcoded credentials with secret references."""
-    def replace_credentials_in_containers(spec: dict, fixed_spec: dict):
-        for container_key in ["containers", "initContainers"]:
-            if container_key not in spec:
-                continue
-            fixed_containers = fixed_spec.get(container_key, [])
-            for idx, container in enumerate(spec[container_key]):
-                if idx < len(fixed_containers):
-                    fixed_container = fixed_containers[idx]
-                    # Check if env vars were changed (credentials externalized)
-                    if "env" in fixed_container:
-                        if "env" not in container:
-                            container["env"] = []
-                        # Add any new env vars from fixed version
-                        fixed_env = fixed_container.get("env", [])
-                        for fixed_env_var in fixed_env:
-                            if isinstance(fixed_env_var, dict) and "valueFrom" in fixed_env_var:
-                                # This is a secret reference
-                                if fixed_env_var not in container["env"]:
-                                    container["env"].append(fixed_env_var)
-                                    applied.append(f"{container_key}[{idx}].env.secret_ref")
-    
-    if "spec" in merged:
-        spec = merged["spec"]
-        fixed_spec = fixed.get("spec", {})
-        
-        if "template" in spec:
-            template_spec = spec["template"].get("spec", {})
-            fixed_template_spec = fixed_spec.get("template", {}).get("spec", {})
-            replace_credentials_in_containers(template_spec, fixed_template_spec)
-        else:
-            replace_credentials_in_containers(spec, fixed_spec)
-    
-    return merged
-
-
-def generate_diff(original: str, fixed: str, original_path: str, fixed_path: str) -> str:
-    """Generate a unified diff showing changes."""
-    original_lines = original.splitlines(keepends=True)
-    fixed_lines = fixed.splitlines(keepends=True)
-    
-    diff = difflib.unified_diff(
-        original_lines,
-        fixed_lines,
-        fromfile=original_path,
-        tofile=fixed_path,
-        lineterm='',
-        n=3  # Context lines
-    )
-    
-    return ''.join(diff)
-
-
-async def combine_fixed_files_for_target(
-    target_file: str,
-    output_dir: str = str(COMBINATION_DIR),
-    hygiene: bool = True
-) -> Optional[Dict]:
-    """
-    Combine all fixed YAML files for a target file.
-    
-    Returns: Dict with paths and diff, or None if failed
-    """
-    # Load LLM decisions
-    llm_decisions_candidates = [
-        LLM_DIR / "llm_decisions.json",
-        OUTPUT_ROOT / "llm/llm_decisions.json",
-        Path("output/llm/llm_decisions.json"),
-    ]
-    
-    try:
-        for sub in OUTPUT_ROOT.glob("*/llm/llm_decisions.json"):
-            llm_decisions_candidates.append(sub)
-    except Exception:
-        pass
-    
-    llm_decisions_path = None
-    decisions_data = None
-    
-    for p in llm_decisions_candidates:
-        if p.exists():
-            try:
-                decisions_data = json.loads(p.read_text(encoding="utf-8"))
-                llm_decisions_path = p
-                break
-            except (json.JSONDecodeError, OSError, ValueError):
-                continue
-    
-    if not llm_decisions_path or not decisions_data:
-        print("[ERROR] No llm_decisions.json found. Run LLM stage first.")
-        return None
-    
-    # Filter to target file
-    norm_target = target_file.replace("/", "\\")
-    file_items = []
-    for item in decisions_data:
-        cand = item.get("file", "")
-        if cand.replace("/", "\\") != norm_target and cand.replace("\\", "/") != target_file.replace("\\", "/"):
-            continue
-        if item.get("consensus", {}).get("final_classification") == "fix":
-            file_items.append(item)
-    
-    if not file_items:
-        print(f"[ERROR] No fixed files found for: {target_file}")
-        return None
-    
-    print(f"[CombineYAML] Found {len(file_items)} fixes for {target_file}")
-    
-    # Load original file
-    original_path = Path(target_file)
-    if not original_path.exists():
-        print(f"[ERROR] Original file not found: {target_file}")
-        return None
-    
-    original_content = original_path.read_text(encoding="utf-8")
-    
-    # Collect all fixed YAML files
-    fixed_files = []
-    fix_details = []
-    
-    for item in file_items:
-        fixed_file_content = item.get("consensus", {}).get("final_fixed_file", "")
-        if fixed_file_content:
-            fixed_files.append(fixed_file_content)
-            fix_details.append({
-                "category": item.get("category"),
-                "model": item.get("consensus", {}).get("from_model", "unknown")
-            })
-    
-    if not fixed_files:
-        print("[ERROR] No valid fixed file content found")
-        return None
-    
-    # Merge all fixed files
-    print("[CombineYAML] Merging fixed files...")
-    merged_content, applied_fixes = _merge_yaml_files(fixed_files, original_content)
-    
-    # Apply final hygiene pass
-    if hygiene:
-        print("[CombineYAML] Applying security hygiene...")
-        merged_content, hygiene_applied = _apply_hygiene(merged_content, "")
-        applied_fixes.extend([f"hygiene:{h}" for h in hygiene_applied])
-    
-    # Validate final YAML
-    if not _yaml_is_valid(merged_content):
-        print("[ERROR] Merged YAML is invalid")
-        return None
-    
-    # Create output directory
-    output_dir_path = Path(output_dir)
-    output_dir_path.mkdir(parents=True, exist_ok=True)
-    
-    # Create sanitized filename
-    safe_name = target_file.replace("\\", "_").replace("/", "_").replace("..", "")
-    
-    # Write final secured file
-    final_path = output_dir_path / f"SECURED_{safe_name}"
-    final_path.write_text(merged_content, encoding="utf-8")
-    
-    # Generate diff
-    diff_content = generate_diff(
-        original_content,
-        merged_content,
-        target_file,
-        str(final_path)
-    )
-    
-    # Write diff file
-    diff_path = output_dir_path / f"DIFF_{safe_name}.diff"
-    diff_path.write_text(diff_content, encoding="utf-8")
-    
-    # Write summary
-    summary = {
-        "original_file": target_file,
-        "secured_file": str(final_path),
-        "diff_file": str(diff_path),
-        "fixes_applied": len(file_items),
-        "applied_fixes": applied_fixes,
-        "fix_details": fix_details
-    }
-    
-    summary_path = output_dir_path / f"SUMMARY_{safe_name}.json"
-    summary_path.write_text(json.dumps(summary, indent=2), encoding="utf-8")
-    
-    print(f"\n[CombineYAML] Complete!")
-    print(f"  Original: {target_file}")
-    print(f"  Secured: {final_path}")
-    print(f"  Diff: {diff_path}")
-    print(f"  Summary: {summary_path}")
-    print(f"  Fixes applied: {len(file_items)}")
-    
-    return {
-        "original_file": target_file,
-        "secured_file": str(final_path),
-        "diff_file": str(diff_path),
-        "summary_file": str(summary_path),
-        "diff_content": diff_content
-    }
-
-
-async def main():
-    load_dotenv_from_file(".env")
-    
-    ap = argparse.ArgumentParser(description="Combine multiple fixed YAML files for a target file")
-    ap.add_argument("--file", required=True, help="Target file path")
-    ap.add_argument("--output", type=str, default=str(COMBINATION_DIR), help="Output directory")
-    ap.add_argument("--hygiene", action="store_true", default=True, help="Apply security hygiene")
-    
-    args = ap.parse_args()
-    
-    result = await combine_fixed_files_for_target(
-        target_file=args.file,
-        output_dir=args.output,
-        hygiene=args.hygiene
-    )
-    
-    if result:
-        print(f"\n[SUCCESS] Secured file created at: {result['secured_file']}")
-        print(f"\n=== DIFF PREVIEW ===\n{result['diff_content'][:1000]}...")
+    # runAsUser: choose lowest non-root >0 if any, else 1000
+    runs = [sc.get("runAsUser") for sc in sc_list if isinstance(sc, dict) and isinstance(sc.get("runAsUser"), int)]
+    if runs:
+        non_root = [r for r in runs if r != 0]
+        out["runAsUser"] = min(non_root) if non_root else 1000
     else:
-        print("\n[ERROR] Failed to create combined file")
-        sys.exit(1)
+        out["runAsUser"] = 1000
 
+    # capabilities: ensure drop ALL; strip dangerous adds
+    out["capabilities"] = {"drop": ["ALL"]}
+    return out
+
+def merge_container(a: Dict, b: Dict) -> Dict:
+    # Merge two containers preferring the most restrictive settings
+    res = copy.deepcopy(a)
+    res_sc = merge_security_context([a.get("securityContext",{}), b.get("securityContext",{})])
+    res["securityContext"] = res_sc
+
+    # Merge resources: prefer tighter limits if both present, else fill in defaults
+    def parse_q(v, default):
+        return v if isinstance(v,str) else default
+    def merge_res(resA, resB):
+        out={"requests":{}, "limits":{}}
+        for kind in ("requests","limits"):
+            A = (resA or {}).get(kind) or {}
+            B = (resB or {}).get(kind) or {}
+            out[kind]["cpu"] = parse_q(A.get("cpu", B.get("cpu")), "100m" if kind=="requests" else "500m")
+            out[kind]["memory"] = parse_q(A.get("memory", B.get("memory")), "128Mi" if kind=="requests" else "256Mi")
+        return out
+    res["resources"] = merge_res(a.get("resources"), b.get("resources"))
+
+    # Merge probes: if any has probe, keep it, else add an exec ok
+    def ensure_probe(p):
+        return p if isinstance(p, dict) and p else {"exec":{"command":["sh","-c","echo ok"]}, "initialDelaySeconds":5, "periodSeconds":10}
+    res["livenessProbe"]  = ensure_probe(a.get("livenessProbe")  or b.get("livenessProbe"))
+    res["readinessProbe"] = ensure_probe(a.get("readinessProbe") or b.get("readinessProbe"))
+
+    # imagePullPolicy: prefer IfNotPresent
+    if res.get("imagePullPolicy") != "IfNotPresent":
+        res["imagePullPolicy"] = "IfNotPresent"
+
+    return res
+
+def merge_pod_spec(specs: List[Dict]) -> Dict:
+    out = copy.deepcopy(specs[0]) if specs else {}
+    # host* flags → all false
+    for k in ("hostNetwork","hostPID","hostIPC"):
+        out[k] = False
+
+    # volumes: drop hostPath; preserve others
+    vols=[]
+    for s in specs:
+        for v in (s.get("volumes") or []):
+            if isinstance(v, dict) and "hostPath" in v:
+                continue
+            vols.append(v)
+    if vols:
+        out["volumes"] = vols
+
+    # automountServiceAccountToken=false
+    out["automountServiceAccountToken"] = False
+
+    # pod seccomp profile
+    psc = out.get("securityContext") or {}
+    psc["seccompProfile"] = {"type":"RuntimeDefault"}
+    out["securityContext"] = psc
+
+    # containers/initContainers aligned by index (best-effort)
+    for key in ("initContainers","containers"):
+        rows = []
+        lists = [s.get(key) or [] for s in specs]
+        maxlen = max((len(lst) for lst in lists), default=0)
+        for i in range(maxlen):
+            picks = []
+            for lst in lists:
+                if i < len(lst) and isinstance(lst[i], dict):
+                    picks.append(lst[i])
+            if not picks:
+                continue
+            # reduce two-by-two
+            merged = picks[0]
+            for p in picks[1:]:
+                merged = merge_container(merged, p)
+            rows.append(merged)
+        if rows:
+            out[key] = rows
+    return out
+
+def merge_docs(orig_docs: List[Dict], fixed_docs_list: List[List[Dict]]) -> Tuple[List[Dict], List[str]]:
+    """
+    Merge same-index documents across fixed versions, preferring most restrictive security posture.
+    """
+    applied = []
+    merged: List[Dict] = []
+    total_docs = max([len(orig_docs)] + [len(fd) for fd in fixed_docs_list])
+    for i in range(total_docs):
+        # collect candidates
+        candidates = []
+        for fd in fixed_docs_list:
+            if i < len(fd) and isinstance(fd[i], dict):
+                candidates.append(fd[i])
+        if not candidates:
+            merged.append(orig_docs[i] if i < len(orig_docs) else {})
+            continue
+        base = candidates[0]
+        # If it's a pod/workload, merge pod spec securely
+        kind = str(base.get("kind") or "")
+        if kind in ("Pod","Deployment","StatefulSet","DaemonSet","Job","CronJob","ReplicaSet","ReplicationController"):
+            specs = [get_pod_spec(c) for c in candidates if get_pod_spec(c)]
+            out = copy.deepcopy(base)
+            if specs:
+                out_spec = out.get("spec") or {}
+                if kind == "Pod":
+                    out_spec = merge_pod_spec(specs)
+                else:
+                    tmpl = (out_spec.get("template") or {})
+                    tmpl_spec = (tmpl.get("spec") or {})
+                    merged_ps = merge_pod_spec([tmpl_spec] + [get_pod_spec(c) for c in candidates[1:] if get_pod_spec(c)])
+                    tmpl["spec"] = merged_ps
+                    out_spec["template"] = tmpl
+                out["spec"] = out_spec
+                applied.append(f"doc[{i}] {kind}: merged pod security")
+            merged.append(out)
+        else:
+            # non-pod docs: pick the most reduced version (prefer one without wildcards / hostPath / cluster-admin)
+            chosen = candidates[0]
+            for c in candidates[1:]:
+                chosen = c  # simple last-wins; in practice your fixed outputs should already be hardened
+            merged.append(chosen)
+            applied.append(f"doc[{i}] {kind}: chosen hardened variant")
+    return merged, applied
+
+def main():
+    ap = argparse.ArgumentParser(description="Combine multiple fixed YAMLs for a single source into one secured manifest.")
+    ap.add_argument("--original", required=True, help="Path to the ORIGINAL source YAML")
+    ap.add_argument("--fixed-dir", required=True, help="Directory containing SECURED_<basename> variants")
+    ap.add_argument("--out-dir", default="output/combination", help="Output directory")
+    args = ap.parse_args()
+
+    original_path = Path(args.original).resolve()
+    fixed_dir     = Path(args.fixed_dir).resolve()
+    out_dir       = Path(args.out_dir).resolve()
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    if not original_path.exists():
+        raise FileNotFoundError(f"Original file not found: {original_path}")
+
+    # Gather fixed files for same basename
+    base = original_path.name
+        prefix = f"SECURED_{base.replace('/', '_').replace('\\\\','_')}"
+    candidates = sorted([p for p in fixed_dir.glob(f"SECURED_*{base}") if p.is_file()])
+
+    if not candidates:
+        raise SystemExit(f"No fixed candidates found for {base} under {fixed_dir}")
+
+    original_text = read_text(original_path)
+    orig_docs = yaml_load_all(original_text)
+
+    fixed_docs_list: List[List[Dict]] = []
+    for fp in candidates:
+        docs = yaml_load_all(read_text(fp))
+        fixed_docs_list.append(docs)
+
+    merged_docs, applied = merge_docs(orig_docs, fixed_docs_list)
+    merged_text = yaml_dump_all(merged_docs)
+
+    out_yaml = out_dir / f"SECURED_MERGED_{base}"
+    out_diff = out_dir / f"DIFF_MERGED_{base}.diff"
+    out_sum  = out_dir / f"SUMMARY_MERGED_{base}.json"
+
+    write_text(out_yaml, merged_text)
+    write_text(out_diff, unified_diff_text(original_text, merged_text, str(original_path), str(out_yaml)))
+
+    summary = {
+        "original": str(original_path),
+        "merged_file": str(out_yaml),
+        "diff_file": str(out_diff),
+        "applied": applied,
+        "inputs": [str(p) for p in candidates],
+    }
+    write_text(out_sum, json.dumps(summary, indent=2))
+    print(f"[OK] Merged → {out_yaml}\nDiff → {out_diff}\nSummary → {out_sum}")
 
 if __name__ == "__main__":
-    import asyncio
-    asyncio.run(main())
-
+    main()

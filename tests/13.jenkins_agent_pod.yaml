@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: jenkins-agent
+    image: jenkins/inbound-agent:latest
+    # This container mounts the host's Docker socket, which gives it full
+    # control over the Docker daemon on the host and breaks isolation.
+    volumeMounts:
+    - name: docker-sock
+      mountPath: /var/run/docker.sock
+  volumes:
+  - name: docker-sock
+    hostPath:
+      path: /var/run/docker.sock

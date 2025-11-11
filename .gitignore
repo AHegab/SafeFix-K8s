@@ -282,3 +282,26 @@ credentials/
 *.bak
 *.backup
 *~
+
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# PowerShell logs
+*.log
+
+# VSCode or IDE
+.vscode/
+.idea/
+
+# Output directories
+output/
+detection/output/
+validations/evidence/
+validations/reports/
+
+# System
+.DS_Store
+

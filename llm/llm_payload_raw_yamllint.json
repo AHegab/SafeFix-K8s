@@ -1,0 +1,3281 @@
+{
+  "generated_at": "2025-11-10T20:35:59.099908Z",
+  "version": "raw-yamllint",
+  "metadata": {
+    "raw_findings_count": 172,
+    "aggregated_count": 172,
+    "llm_items_count": 172,
+    "source_tool": "yamllint",
+    "normalized": false
+  },
+  "items": [
+    {
+      "file": "﻿/scan/13.deployment.yaml",
+      "category": "YAML_DOCUMENT_START",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "document-start"
+      ],
+      "examples": [
+        "missing document start \"---\""
+      ],
+      "occurrences": 1,
+      "message": "missing document start \"---\"",
+      "description": "missing document start \"---\"",
+      "line": 1
+    },
+    {
+      "file": "13.deployment.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 8 but found 6"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 8 but found 6",
+      "description": "wrong indentation: expected 8 but found 6",
+      "line": 10
+    },
+    {
+      "file": "13.jenkins_agent_pod.yaml",
+      "category": "YAML_DOCUMENT_START",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "document-start"
+      ],
+      "examples": [
+        "missing document start \"---\""
+      ],
+      "occurrences": 1,
+      "message": "missing document start \"---\"",
+      "description": "missing document start \"---\"",
+      "line": 1
+    },
+    {
+      "file": "13.jenkins_agent_pod.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 4 but found 2"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 4 but found 2",
+      "description": "wrong indentation: expected 4 but found 2",
+      "line": 5
+    },
+    {
+      "file": "13.jenkins_agent_pod.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 6 but found 4"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 6 but found 4",
+      "description": "wrong indentation: expected 6 but found 4",
+      "line": 10
+    },
+    {
+      "file": "13.jenkins_agent_pod.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 4 but found 2"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 4 but found 2",
+      "description": "wrong indentation: expected 4 but found 2",
+      "line": 13
+    },
+    {
+      "file": "13.jenkins_agent_pod.yaml",
+      "category": "YAML_NEWLINE_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "new-line-at-end-of-file"
+      ],
+      "examples": [
+        "no new line character at the end of file"
+      ],
+      "occurrences": 1,
+      "message": "no new line character at the end of file",
+      "description": "no new line character at the end of file",
+      "line": 15
+    },
+    {
+      "file": "13.nginx_privileged_deployment.yaml",
+      "category": "YAML_DOCUMENT_START",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "document-start"
+      ],
+      "examples": [
+        "missing document start \"---\""
+      ],
+      "occurrences": 1,
+      "message": "missing document start \"---\"",
+      "description": "missing document start \"---\"",
+      "line": 1
+    },
+    {
+      "file": "13.nginx_privileged_deployment.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 8 but found 6"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 8 but found 6",
+      "description": "wrong indentation: expected 8 but found 6",
+      "line": 10
+    },
+    {
+      "file": "13.nginx_privileged_deployment.yaml",
+      "category": "YAML_NEWLINE_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "new-line-at-end-of-file"
+      ],
+      "examples": [
+        "no new line character at the end of file"
+      ],
+      "occurrences": 1,
+      "message": "no new line character at the end of file",
+      "description": "no new line character at the end of file",
+      "line": 13
+    },
+    {
+      "file": "14.deployment_single_replica.yaml",
+      "category": "YAML_DOCUMENT_START",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "document-start"
+      ],
+      "examples": [
+        "missing document start \"---\""
+      ],
+      "occurrences": 1,
+      "message": "missing document start \"---\"",
+      "description": "missing document start \"---\"",
+      "line": 1
+    },
+    {
+      "file": "14.deployment_single_replica.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 8 but found 6"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 8 but found 6",
+      "description": "wrong indentation: expected 8 but found 6",
+      "line": 16
+    },
+    {
+      "file": "14.deployment_single_replica.yaml",
+      "category": "YAML_NEWLINE_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "new-line-at-end-of-file"
+      ],
+      "examples": [
+        "no new line character at the end of file"
+      ],
+      "occurrences": 1,
+      "message": "no new line character at the end of file",
+      "description": "no new line character at the end of file",
+      "line": 17
+    },
+    {
+      "file": "14.genkubesec_privileged_pod.yaml",
+      "category": "YAML_DOCUMENT_START",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "document-start"
+      ],
+      "examples": [
+        "missing document start \"---\""
+      ],
+      "occurrences": 1,
+      "message": "missing document start \"---\"",
+      "description": "missing document start \"---\"",
+      "line": 1
+    },
+    {
+      "file": "14.genkubesec_privileged_pod.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 4 but found 2"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 4 but found 2",
+      "description": "wrong indentation: expected 4 but found 2",
+      "line": 7
+    },
+    {
+      "file": "14.genkubesec_privileged_pod.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 6 but found 4"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 6 but found 4",
+      "description": "wrong indentation: expected 6 but found 4",
+      "line": 10
+    },
+    {
+      "file": "14.genkubesec_privileged_pod.yaml",
+      "category": "YAML_NEWLINE_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "new-line-at-end-of-file"
+      ],
+      "examples": [
+        "no new line character at the end of file"
+      ],
+      "occurrences": 1,
+      "message": "no new line character at the end of file",
+      "description": "no new line character at the end of file",
+      "line": 12
+    },
+    {
+      "file": "14.ingress_deprecated_api.yaml",
+      "category": "YAML_LINE_LENGTH",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "line-length"
+      ],
+      "examples": [
+        "line too long"
+      ],
+      "occurrences": 1,
+      "message": "line too long",
+      "description": "line too long",
+      "line": 1
+    },
+    {
+      "file": "14.ingress_deprecated_api.yaml",
+      "category": "YAML_DOCUMENT_START",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "document-start"
+      ],
+      "examples": [
+        "missing document start \"---\""
+      ],
+      "occurrences": 1,
+      "message": "missing document start \"---\"",
+      "description": "missing document start \"---\"",
+      "line": 2
+    },
+    {
+      "file": "14.ingress_deprecated_api.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 4 but found 2"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 4 but found 2",
+      "description": "wrong indentation: expected 4 but found 2",
+      "line": 9
+    },
+    {
+      "file": "14.ingress_deprecated_api.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 8 but found 6"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 8 but found 6",
+      "description": "wrong indentation: expected 8 but found 6",
+      "line": 12
+    },
+    {
+      "file": "14.ingress_deprecated_api.yaml",
+      "category": "YAML_NEWLINE_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "new-line-at-end-of-file"
+      ],
+      "examples": [
+        "no new line character at the end of file"
+      ],
+      "occurrences": 1,
+      "message": "no new line character at the end of file",
+      "description": "no new line character at the end of file",
+      "line": 15
+    },
+    {
+      "file": "15.pod_privilege_escalation.yaml",
+      "category": "YAML_DOCUMENT_START",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "document-start"
+      ],
+      "examples": [
+        "missing document start \"---\""
+      ],
+      "occurrences": 1,
+      "message": "missing document start \"---\"",
+      "description": "missing document start \"---\"",
+      "line": 1
+    },
+    {
+      "file": "15.pod_privilege_escalation.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 4 but found 2"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 4 but found 2",
+      "description": "wrong indentation: expected 4 but found 2",
+      "line": 7
+    },
+    {
+      "file": "15.pod_privilege_escalation.yaml",
+      "category": "YAML_NEWLINE_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "new-line-at-end-of-file"
+      ],
+      "examples": [
+        "no new line character at the end of file"
+      ],
+      "occurrences": 1,
+      "message": "no new line character at the end of file",
+      "description": "no new line character at the end of file",
+      "line": 10
+    },
+    {
+      "file": "16.busybox_pod_missing_memory.yaml",
+      "category": "YAML_DOCUMENT_START",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "document-start"
+      ],
+      "examples": [
+        "missing document start \"---\""
+      ],
+      "occurrences": 1,
+      "message": "missing document start \"---\"",
+      "description": "missing document start \"---\"",
+      "line": 1
+    },
+    {
+      "file": "16.busybox_pod_missing_memory.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 4 but found 2"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 4 but found 2",
+      "description": "wrong indentation: expected 4 but found 2",
+      "line": 8
+    },
+    {
+      "file": "16.busybox_pod_missing_memory.yaml",
+      "category": "YAML_NEWLINE_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "new-line-at-end-of-file"
+      ],
+      "examples": [
+        "no new line character at the end of file"
+      ],
+      "occurrences": 1,
+      "message": "no new line character at the end of file",
+      "description": "no new line character at the end of file",
+      "line": 15
+    },
+    {
+      "file": "20.wordpress_mariadb_compose.yaml",
+      "category": "YAML_LINE_LENGTH",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "line-length"
+      ],
+      "examples": [
+        "line too long"
+      ],
+      "occurrences": 1,
+      "message": "line too long",
+      "description": "line too long",
+      "line": 2
+    },
+    {
+      "file": "20.wordpress_mariadb_compose.yaml",
+      "category": "YAML_LINE_LENGTH",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "line-length"
+      ],
+      "examples": [
+        "line too long"
+      ],
+      "occurrences": 1,
+      "message": "line too long",
+      "description": "line too long",
+      "line": 3
+    },
+    {
+      "file": "20.wordpress_mariadb_compose.yaml",
+      "category": "YAML_DOCUMENT_START",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "document-start"
+      ],
+      "examples": [
+        "missing document start \"---\""
+      ],
+      "occurrences": 1,
+      "message": "missing document start \"---\"",
+      "description": "missing document start \"---\"",
+      "line": 5
+    },
+    {
+      "file": "20.wordpress_mariadb_compose.yaml",
+      "category": "YAML_NEWLINE_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "new-line-at-end-of-file"
+      ],
+      "examples": [
+        "no new line character at the end of file"
+      ],
+      "occurrences": 1,
+      "message": "no new line character at the end of file",
+      "description": "no new line character at the end of file",
+      "line": 36
+    },
+    {
+      "file": "26.flink_port_mismatch.yaml",
+      "category": "YAML_DOCUMENT_START",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "document-start"
+      ],
+      "examples": [
+        "missing document start \"---\""
+      ],
+      "occurrences": 1,
+      "message": "missing document start \"---\"",
+      "description": "missing document start \"---\"",
+      "line": 1
+    },
+    {
+      "file": "26.flink_port_mismatch.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 8 but found 6"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 8 but found 6",
+      "description": "wrong indentation: expected 8 but found 6",
+      "line": 18
+    },
+    {
+      "file": "26.flink_port_mismatch.yaml",
+      "category": "YAML_LINE_LENGTH",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "line-length"
+      ],
+      "examples": [
+        "line too long"
+      ],
+      "occurrences": 1,
+      "message": "line too long",
+      "description": "line too long",
+      "line": 20
+    },
+    {
+      "file": "26.flink_port_mismatch.yaml",
+      "category": "YAML_LINE_LENGTH",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "line-length"
+      ],
+      "examples": [
+        "line too long"
+      ],
+      "occurrences": 1,
+      "message": "line too long",
+      "description": "line too long",
+      "line": 21
+    },
+    {
+      "file": "26.flink_port_mismatch.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 10 but found 8"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 10 but found 8",
+      "description": "wrong indentation: expected 10 but found 8",
+      "line": 24
+    },
+    {
+      "file": "26.flink_port_mismatch.yaml",
+      "category": "YAML_NEWLINE_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "new-line-at-end-of-file"
+      ],
+      "examples": [
+        "no new line character at the end of file"
+      ],
+      "occurrences": 1,
+      "message": "no new line character at the end of file",
+      "description": "no new line character at the end of file",
+      "line": 26
+    },
+    {
+      "file": "26.values.yaml",
+      "category": "YAML_LINE_LENGTH",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "line-length"
+      ],
+      "examples": [
+        "line too long"
+      ],
+      "occurrences": 1,
+      "message": "line too long",
+      "description": "line too long",
+      "line": 1
+    },
+    {
+      "file": "26.values.yaml",
+      "category": "YAML_DOCUMENT_START",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "document-start"
+      ],
+      "examples": [
+        "missing document start \"---\""
+      ],
+      "occurrences": 1,
+      "message": "missing document start \"---\"",
+      "description": "missing document start \"---\"",
+      "line": 2
+    },
+    {
+      "file": "27.kubeteus_misconfigured_policy.yaml",
+      "category": "YAML_DOCUMENT_START",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "document-start"
+      ],
+      "examples": [
+        "missing document start \"---\""
+      ],
+      "occurrences": 1,
+      "message": "missing document start \"---\"",
+      "description": "missing document start \"---\"",
+      "line": 1
+    },
+    {
+      "file": "27.kubeteus_misconfigured_policy.yaml",
+      "category": "YAML_LINE_LENGTH",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "line-length"
+      ],
+      "examples": [
+        "line too long"
+      ],
+      "occurrences": 1,
+      "message": "line too long",
+      "description": "line too long",
+      "line": 7
+    },
+    {
+      "file": "27.kubeteus_misconfigured_policy.yaml",
+      "category": "YAML_LINE_LENGTH",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "line-length"
+      ],
+      "examples": [
+        "line too long"
+      ],
+      "occurrences": 1,
+      "message": "line too long",
+      "description": "line too long",
+      "line": 12
+    },
+    {
+      "file": "27.kubeteus_misconfigured_policy.yaml",
+      "category": "YAML_NEWLINE_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "new-line-at-end-of-file"
+      ],
+      "examples": [
+        "no new line character at the end of file"
+      ],
+      "occurrences": 1,
+      "message": "no new line character at the end of file",
+      "description": "no new line character at the end of file",
+      "line": 18
+    },
+    {
+      "file": "27.Misconfiguration.yaml",
+      "category": "YAML_LINE_LENGTH",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "line-length"
+      ],
+      "examples": [
+        "line too long"
+      ],
+      "occurrences": 1,
+      "message": "line too long",
+      "description": "line too long",
+      "line": 1
+    },
+    {
+      "file": "27.Misconfiguration.yaml",
+      "category": "YAML_LINE_LENGTH",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "line-length"
+      ],
+      "examples": [
+        "line too long"
+      ],
+      "occurrences": 1,
+      "message": "line too long",
+      "description": "line too long",
+      "line": 2
+    },
+    {
+      "file": "27.Misconfiguration.yaml",
+      "category": "YAML_DOCUMENT_START",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "document-start"
+      ],
+      "examples": [
+        "missing document start \"---\""
+      ],
+      "occurrences": 1,
+      "message": "missing document start \"---\"",
+      "description": "missing document start \"---\"",
+      "line": 3
+    },
+    {
+      "file": "27.Misconfiguration.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 4 but found 2"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 4 but found 2",
+      "description": "wrong indentation: expected 4 but found 2",
+      "line": 10
+    },
+    {
+      "file": "27.Misconfiguration.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 8 but found 6"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 8 but found 6",
+      "description": "wrong indentation: expected 8 but found 6",
+      "line": 16
+    },
+    {
+      "file": "27.Valid.yaml",
+      "category": "YAML_LINE_LENGTH",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "line-length"
+      ],
+      "examples": [
+        "line too long"
+      ],
+      "occurrences": 1,
+      "message": "line too long",
+      "description": "line too long",
+      "line": 2
+    },
+    {
+      "file": "27.Valid.yaml",
+      "category": "YAML_DOCUMENT_START",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "document-start"
+      ],
+      "examples": [
+        "missing document start \"---\""
+      ],
+      "occurrences": 1,
+      "message": "missing document start \"---\"",
+      "description": "missing document start \"---\"",
+      "line": 3
+    },
+    {
+      "file": "27.Valid.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 4 but found 2"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 4 but found 2",
+      "description": "wrong indentation: expected 4 but found 2",
+      "line": 10
+    },
+    {
+      "file": "27.Valid.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 8 but found 6"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 8 but found 6",
+      "description": "wrong indentation: expected 8 but found 6",
+      "line": 16
+    },
+    {
+      "file": "28.role_overly_permissive.yaml",
+      "category": "YAML_DOCUMENT_START",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "document-start"
+      ],
+      "examples": [
+        "missing document start \"---\""
+      ],
+      "occurrences": 1,
+      "message": "missing document start \"---\"",
+      "description": "missing document start \"---\"",
+      "line": 1
+    },
+    {
+      "file": "28.role_overly_permissive.yaml",
+      "category": "YAML_LINE_LENGTH",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "line-length"
+      ],
+      "examples": [
+        "line too long"
+      ],
+      "occurrences": 1,
+      "message": "line too long",
+      "description": "line too long",
+      "line": 7
+    },
+    {
+      "file": "28.role_overly_permissive.yaml",
+      "category": "YAML_LINE_LENGTH",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "line-length"
+      ],
+      "examples": [
+        "line too long"
+      ],
+      "occurrences": 1,
+      "message": "line too long",
+      "description": "line too long",
+      "line": 8
+    },
+    {
+      "file": "28.role_overly_permissive.yaml",
+      "category": "YAML_NEWLINE_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "new-line-at-end-of-file"
+      ],
+      "examples": [
+        "no new line character at the end of file"
+      ],
+      "occurrences": 1,
+      "message": "no new line character at the end of file",
+      "description": "no new line character at the end of file",
+      "line": 13
+    },
+    {
+      "file": "29.helm_rabbitmq_hardcoded_credentials.yaml",
+      "category": "YAML_DOCUMENT_START",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "document-start"
+      ],
+      "examples": [
+        "missing document start \"---\""
+      ],
+      "occurrences": 1,
+      "message": "missing document start \"---\"",
+      "description": "missing document start \"---\"",
+      "line": 5
+    },
+    {
+      "file": "29.helm_rabbitmq_hardcoded_credentials.yaml",
+      "category": "YAML_NEWLINE_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "new-line-at-end-of-file"
+      ],
+      "examples": [
+        "no new line character at the end of file"
+      ],
+      "occurrences": 1,
+      "message": "no new line character at the end of file",
+      "description": "no new line character at the end of file",
+      "line": 10
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "YAML_DOCUMENT_START",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "document-start"
+      ],
+      "examples": [
+        "missing document start \"---\""
+      ],
+      "occurrences": 1,
+      "message": "missing document start \"---\"",
+      "description": "missing document start \"---\"",
+      "line": 1
+    },
+    {
+      "file": "3.efs_plugin_misconfig.yaml",
+      "category": "YAML_NEWLINE_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "new-line-at-end-of-file"
+      ],
+      "examples": [
+        "no new line character at the end of file"
+      ],
+      "occurrences": 1,
+      "message": "no new line character at the end of file",
+      "description": "no new line character at the end of file",
+      "line": 13
+    },
+    {
+      "file": "3.multus_cni_misconfig.yaml",
+      "category": "YAML_DOCUMENT_START",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "document-start"
+      ],
+      "examples": [
+        "missing document start \"---\""
+      ],
+      "occurrences": 1,
+      "message": "missing document start \"---\"",
+      "description": "missing document start \"---\"",
+      "line": 1
+    },
+    {
+      "file": "3.multus_cni_misconfig.yaml",
+      "category": "YAML_NEWLINE_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "new-line-at-end-of-file"
+      ],
+      "examples": [
+        "no new line character at the end of file"
+      ],
+      "occurrences": 1,
+      "message": "no new line character at the end of file",
+      "description": "no new line character at the end of file",
+      "line": 22
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "YAML_DOCUMENT_START",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "document-start"
+      ],
+      "examples": [
+        "missing document start \"---\""
+      ],
+      "occurrences": 1,
+      "message": "missing document start \"---\"",
+      "description": "missing document start \"---\"",
+      "line": 1
+    },
+    {
+      "file": "3.nginx_pod_example.yaml",
+      "category": "YAML_NEWLINE_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "new-line-at-end-of-file"
+      ],
+      "examples": [
+        "no new line character at the end of file"
+      ],
+      "occurrences": 1,
+      "message": "no new line character at the end of file",
+      "description": "no new line character at the end of file",
+      "line": 10
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "YAML_LINE_LENGTH",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "line-length"
+      ],
+      "examples": [
+        "line too long"
+      ],
+      "occurrences": 1,
+      "message": "line too long",
+      "description": "line too long",
+      "line": 1
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "YAML_DOCUMENT_START",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "document-start"
+      ],
+      "examples": [
+        "missing document start \"---\""
+      ],
+      "occurrences": 1,
+      "message": "missing document start \"---\"",
+      "description": "missing document start \"---\"",
+      "line": 2
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 4 but found 2"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 4 but found 2",
+      "description": "wrong indentation: expected 4 but found 2",
+      "line": 12
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 6 but found 4"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 6 but found 4",
+      "description": "wrong indentation: expected 6 but found 4",
+      "line": 15
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "YAML_LINE_LENGTH",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "line-length"
+      ],
+      "examples": [
+        "line too long"
+      ],
+      "occurrences": 1,
+      "message": "line too long",
+      "description": "line too long",
+      "line": 17
+    },
+    {
+      "file": "31.example-nginx.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 10 but found 8"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 10 but found 8",
+      "description": "wrong indentation: expected 10 but found 8",
+      "line": 21
+    },
+    {
+      "file": "34.echo1_load_balancer.yaml",
+      "category": "YAML_DOCUMENT_START",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "document-start"
+      ],
+      "examples": [
+        "missing document start \"---\""
+      ],
+      "occurrences": 1,
+      "message": "missing document start \"---\"",
+      "description": "missing document start \"---\"",
+      "line": 1
+    },
+    {
+      "file": "34.echo1_no_resources.yaml",
+      "category": "YAML_DOCUMENT_START",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "document-start"
+      ],
+      "examples": [
+        "missing document start \"---\""
+      ],
+      "occurrences": 1,
+      "message": "missing document start \"---\"",
+      "description": "missing document start \"---\"",
+      "line": 1
+    },
+    {
+      "file": "34.echo1_no_securitycontext.yaml",
+      "category": "YAML_DOCUMENT_START",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "document-start"
+      ],
+      "examples": [
+        "missing document start \"---\""
+      ],
+      "occurrences": 1,
+      "message": "missing document start \"---\"",
+      "description": "missing document start \"---\"",
+      "line": 1
+    },
+    {
+      "file": "34.echo1_privileged.yaml",
+      "category": "YAML_DOCUMENT_START",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "document-start"
+      ],
+      "examples": [
+        "missing document start \"---\""
+      ],
+      "occurrences": 1,
+      "message": "missing document start \"---\"",
+      "description": "missing document start \"---\"",
+      "line": 1
+    },
+    {
+      "file": "34.echo_no_schemes.yaml",
+      "category": "YAML_DOCUMENT_START",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "document-start"
+      ],
+      "examples": [
+        "missing document start \"---\""
+      ],
+      "occurrences": 1,
+      "message": "missing document start \"---\"",
+      "description": "missing document start \"---\"",
+      "line": 1
+    },
+    {
+      "file": "34.echo_no_schemes.yaml",
+      "category": "YAML_LINE_LENGTH",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "line-length"
+      ],
+      "examples": [
+        "line too long"
+      ],
+      "occurrences": 1,
+      "message": "line too long",
+      "description": "line too long",
+      "line": 4
+    },
+    {
+      "file": "34.echo_no_security.yaml",
+      "category": "YAML_DOCUMENT_START",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "document-start"
+      ],
+      "examples": [
+        "missing document start \"---\""
+      ],
+      "occurrences": 1,
+      "message": "missing document start \"---\"",
+      "description": "missing document start \"---\"",
+      "line": 1
+    },
+    {
+      "file": "34.echo_no_security.yaml",
+      "category": "YAML_LINE_LENGTH",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "line-length"
+      ],
+      "examples": [
+        "line too long"
+      ],
+      "occurrences": 1,
+      "message": "line too long",
+      "description": "line too long",
+      "line": 4
+    },
+    {
+      "file": "34.echo_security_override.yaml",
+      "category": "YAML_DOCUMENT_START",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "document-start"
+      ],
+      "examples": [
+        "missing document start \"---\""
+      ],
+      "occurrences": 1,
+      "message": "missing document start \"---\"",
+      "description": "missing document start \"---\"",
+      "line": 1
+    },
+    {
+      "file": "34.echo_security_override.yaml",
+      "category": "YAML_LINE_LENGTH",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "line-length"
+      ],
+      "examples": [
+        "line too long"
+      ],
+      "occurrences": 1,
+      "message": "line too long",
+      "description": "line too long",
+      "line": 4
+    },
+    {
+      "file": "34.gateway_multiple_auth.yaml",
+      "category": "YAML_DOCUMENT_START",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "document-start"
+      ],
+      "examples": [
+        "missing document start \"---\""
+      ],
+      "occurrences": 1,
+      "message": "missing document start \"---\"",
+      "description": "missing document start \"---\"",
+      "line": 1
+    },
+    {
+      "file": "34.mock-config.yaml",
+      "category": "YAML_DOCUMENT_START",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "document-start"
+      ],
+      "examples": [
+        "missing document start \"---\""
+      ],
+      "occurrences": 1,
+      "message": "missing document start \"---\"",
+      "description": "missing document start \"---\"",
+      "line": 1
+    },
+    {
+      "file": "34.mTLS-disable.yaml",
+      "category": "YAML_DOCUMENT_START",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "document-start"
+      ],
+      "examples": [
+        "missing document start \"---\""
+      ],
+      "occurrences": 1,
+      "message": "missing document start \"---\"",
+      "description": "missing document start \"---\"",
+      "line": 1
+    },
+    {
+      "file": "34.mTLS-strict.yaml",
+      "category": "YAML_DOCUMENT_START",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "document-start"
+      ],
+      "examples": [
+        "missing document start \"---\""
+      ],
+      "occurrences": 1,
+      "message": "missing document start \"---\"",
+      "description": "missing document start \"---\"",
+      "line": 1
+    },
+    {
+      "file": "34.secrets-holder.yaml",
+      "category": "YAML_DOCUMENT_START",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "document-start"
+      ],
+      "examples": [
+        "missing document start \"---\""
+      ],
+      "occurrences": 1,
+      "message": "missing document start \"---\"",
+      "description": "missing document start \"---\"",
+      "line": 1
+    },
+    {
+      "file": "34.secrets-holder.yaml",
+      "category": "YAML_LINE_LENGTH",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "line-length"
+      ],
+      "examples": [
+        "line too long"
+      ],
+      "occurrences": 1,
+      "message": "line too long",
+      "description": "line too long",
+      "line": 15
+    },
+    {
+      "file": "34.secrets-holder.yaml",
+      "category": "YAML_LINE_LENGTH",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "line-length"
+      ],
+      "examples": [
+        "line too long"
+      ],
+      "occurrences": 1,
+      "message": "line too long",
+      "description": "line too long",
+      "line": 17
+    },
+    {
+      "file": "34.unencrypted_secret.yaml",
+      "category": "YAML_DOCUMENT_START",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "document-start"
+      ],
+      "examples": [
+        "missing document start \"---\""
+      ],
+      "occurrences": 1,
+      "message": "missing document start \"---\"",
+      "description": "missing document start \"---\"",
+      "line": 1
+    },
+    {
+      "file": "batch-checkjob.yaml",
+      "category": "YAML_DOCUMENT_START",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "document-start"
+      ],
+      "examples": [
+        "missing document start \"---\""
+      ],
+      "occurrences": 1,
+      "message": "missing document start \"---\"",
+      "description": "missing document start \"---\"",
+      "line": 1
+    },
+    {
+      "file": "batch-checkjob.yaml",
+      "category": "YAML_NEWLINE_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "new-lines"
+      ],
+      "examples": [
+        "wrong new line character: expected \\n"
+      ],
+      "occurrences": 1,
+      "message": "wrong new line character: expected \\n",
+      "description": "wrong new line character: expected \\n",
+      "line": 1
+    },
+    {
+      "file": "batch-checkjob.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 8 but found 6"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 8 but found 6",
+      "description": "wrong indentation: expected 8 but found 6",
+      "line": 11
+    },
+    {
+      "file": "batch-checkjob.yaml",
+      "category": "YAML_NEWLINE_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "new-line-at-end-of-file"
+      ],
+      "examples": [
+        "no new line character at the end of file"
+      ],
+      "occurrences": 1,
+      "message": "no new line character at the end of file",
+      "description": "no new line character at the end of file",
+      "line": 18
+    },
+    {
+      "file": "batch-checkjob.yaml",
+      "category": "YAML_TRAILING_SPACES",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "trailing-spaces"
+      ],
+      "examples": [
+        "trailing spaces"
+      ],
+      "occurrences": 1,
+      "message": "trailing spaces",
+      "description": "trailing spaces",
+      "line": 18
+    },
+    {
+      "file": "build-code.deployment.yaml",
+      "category": "YAML_DOCUMENT_START",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "document-start"
+      ],
+      "examples": [
+        "missing document start \"---\""
+      ],
+      "occurrences": 1,
+      "message": "missing document start \"---\"",
+      "description": "missing document start \"---\"",
+      "line": 1
+    },
+    {
+      "file": "build-code.deployment.yaml",
+      "category": "YAML_NEWLINE_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "new-lines"
+      ],
+      "examples": [
+        "wrong new line character: expected \\n"
+      ],
+      "occurrences": 1,
+      "message": "wrong new line character: expected \\n",
+      "description": "wrong new line character: expected \\n",
+      "line": 1
+    },
+    {
+      "file": "build-code.deployment.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 8 but found 6"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 8 but found 6",
+      "description": "wrong indentation: expected 8 but found 6",
+      "line": 16
+    },
+    {
+      "file": "build-code.deployment.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 10 but found 8"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 10 but found 8",
+      "description": "wrong indentation: expected 10 but found 8",
+      "line": 23
+    },
+    {
+      "file": "build-code.deployment.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 4 but found 2"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 4 but found 2",
+      "description": "wrong indentation: expected 4 but found 2",
+      "line": 32
+    },
+    {
+      "file": "cache-store.deployment.yaml",
+      "category": "YAML_DOCUMENT_START",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "document-start"
+      ],
+      "examples": [
+        "missing document start \"---\""
+      ],
+      "occurrences": 1,
+      "message": "missing document start \"---\"",
+      "description": "missing document start \"---\"",
+      "line": 1
+    },
+    {
+      "file": "cache-store.deployment.yaml",
+      "category": "YAML_NEWLINE_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "new-lines"
+      ],
+      "examples": [
+        "wrong new line character: expected \\n"
+      ],
+      "occurrences": 1,
+      "message": "wrong new line character: expected \\n",
+      "description": "wrong new line character: expected \\n",
+      "line": 1
+    },
+    {
+      "file": "cache-store.deployment.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 4 but found 2"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 4 but found 2",
+      "description": "wrong indentation: expected 4 but found 2",
+      "line": 13
+    },
+    {
+      "file": "cache-store.deployment.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 8 but found 6"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 8 but found 6",
+      "description": "wrong indentation: expected 8 but found 6",
+      "line": 36
+    },
+    {
+      "file": "cache-store.deployment.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 10 but found 8"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 10 but found 8",
+      "description": "wrong indentation: expected 10 but found 8",
+      "line": 39
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "YAML_NEWLINE_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "new-lines"
+      ],
+      "examples": [
+        "wrong new line character: expected \\n"
+      ],
+      "occurrences": 1,
+      "message": "wrong new line character: expected \\n",
+      "description": "wrong new line character: expected \\n",
+      "line": 1
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "YAML_DOCUMENT_START",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "document-start"
+      ],
+      "examples": [
+        "missing document start \"---\""
+      ],
+      "occurrences": 1,
+      "message": "missing document start \"---\"",
+      "description": "missing document start \"---\"",
+      "line": 12
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 12 but found 14"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 12 but found 14",
+      "description": "wrong indentation: expected 12 but found 14",
+      "line": 82
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 12 but found 14"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 12 but found 14",
+      "description": "wrong indentation: expected 12 but found 14",
+      "line": 85
+    },
+    {
+      "file": "docker-bench-security.deployment.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 12 but found 14"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 12 but found 14",
+      "description": "wrong indentation: expected 12 but found 14",
+      "line": 88
+    },
+    {
+      "file": "health-check.deployment.yaml",
+      "category": "YAML_DOCUMENT_START",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "document-start"
+      ],
+      "examples": [
+        "missing document start \"---\""
+      ],
+      "occurrences": 1,
+      "message": "missing document start \"---\"",
+      "description": "missing document start \"---\"",
+      "line": 1
+    },
+    {
+      "file": "health-check.deployment.yaml",
+      "category": "YAML_NEWLINE_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "new-lines"
+      ],
+      "examples": [
+        "wrong new line character: expected \\n"
+      ],
+      "occurrences": 1,
+      "message": "wrong new line character: expected \\n",
+      "description": "wrong new line character: expected \\n",
+      "line": 1
+    },
+    {
+      "file": "health-check.deployment.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 8 but found 6"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 8 but found 6",
+      "description": "wrong indentation: expected 8 but found 6",
+      "line": 15
+    },
+    {
+      "file": "health-check.deployment.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 10 but found 8"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 10 but found 8",
+      "description": "wrong indentation: expected 10 but found 8",
+      "line": 22
+    },
+    {
+      "file": "health-check.deployment.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "comments-indentation"
+      ],
+      "examples": [
+        "comment not indented like content"
+      ],
+      "occurrences": 1,
+      "message": "comment not indented like content",
+      "description": "comment not indented like content",
+      "line": 23
+    },
+    {
+      "file": "health-check.deployment.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 4 but found 2"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 4 but found 2",
+      "description": "wrong indentation: expected 4 but found 2",
+      "line": 41
+    },
+    {
+      "file": "hidden-in-layers.deployment.yaml",
+      "category": "YAML_DOCUMENT_START",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "document-start"
+      ],
+      "examples": [
+        "missing document start \"---\""
+      ],
+      "occurrences": 1,
+      "message": "missing document start \"---\"",
+      "description": "missing document start \"---\"",
+      "line": 1
+    },
+    {
+      "file": "hidden-in-layers.deployment.yaml",
+      "category": "YAML_NEWLINE_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "new-lines"
+      ],
+      "examples": [
+        "wrong new line character: expected \\n"
+      ],
+      "occurrences": 1,
+      "message": "wrong new line character: expected \\n",
+      "description": "wrong new line character: expected \\n",
+      "line": 1
+    },
+    {
+      "file": "hidden-in-layers.deployment.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 8 but found 6"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 8 but found 6",
+      "description": "wrong indentation: expected 8 but found 6",
+      "line": 11
+    },
+    {
+      "file": "hunger-check.deployment.yaml",
+      "category": "YAML_NEWLINE_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "new-lines"
+      ],
+      "examples": [
+        "wrong new line character: expected \\n"
+      ],
+      "occurrences": 1,
+      "message": "wrong new line character: expected \\n",
+      "description": "wrong new line character: expected \\n",
+      "line": 1
+    },
+    {
+      "file": "hunger-check.deployment.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 2 but found 0"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 2 but found 0",
+      "description": "wrong indentation: expected 2 but found 0",
+      "line": 13
+    },
+    {
+      "file": "hunger-check.deployment.yaml",
+      "category": "YAML_FORMAT_ERROR",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "comments"
+      ],
+      "examples": [
+        "too few spaces before comment"
+      ],
+      "occurrences": 1,
+      "message": "too few spaces before comment",
+      "description": "too few spaces before comment",
+      "line": 13
+    },
+    {
+      "file": "hunger-check.deployment.yaml",
+      "category": "YAML_FORMAT_ERROR",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "comments"
+      ],
+      "examples": [
+        "too few spaces before comment"
+      ],
+      "occurrences": 1,
+      "message": "too few spaces before comment",
+      "description": "too few spaces before comment",
+      "line": 14
+    },
+    {
+      "file": "hunger-check.deployment.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 2 but found 0"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 2 but found 0",
+      "description": "wrong indentation: expected 2 but found 0",
+      "line": 24
+    },
+    {
+      "file": "hunger-check.deployment.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 2 but found 4"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 2 but found 4",
+      "description": "wrong indentation: expected 2 but found 4",
+      "line": 34
+    },
+    {
+      "file": "hunger-check.deployment.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 8 but found 6"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 8 but found 6",
+      "description": "wrong indentation: expected 8 but found 6",
+      "line": 71
+    },
+    {
+      "file": "hunger-check.deployment.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 10 but found 8"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 10 but found 8",
+      "description": "wrong indentation: expected 10 but found 8",
+      "line": 81
+    },
+    {
+      "file": "hunger-check.deployment.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 4 but found 2"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 4 but found 2",
+      "description": "wrong indentation: expected 4 but found 2",
+      "line": 90
+    },
+    {
+      "file": "insecure-rbac.setup.yaml",
+      "category": "YAML_DOCUMENT_START",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "document-start"
+      ],
+      "examples": [
+        "missing document start \"---\""
+      ],
+      "occurrences": 1,
+      "message": "missing document start \"---\"",
+      "description": "missing document start \"---\"",
+      "line": 1
+    },
+    {
+      "file": "insecure-rbac.setup.yaml",
+      "category": "YAML_NEWLINE_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "new-lines"
+      ],
+      "examples": [
+        "wrong new line character: expected \\n"
+      ],
+      "occurrences": 1,
+      "message": "wrong new line character: expected \\n",
+      "description": "wrong new line character: expected \\n",
+      "line": 1
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "YAML_DOCUMENT_START",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "document-start"
+      ],
+      "examples": [
+        "missing document start \"---\""
+      ],
+      "occurrences": 1,
+      "message": "missing document start \"---\"",
+      "description": "missing document start \"---\"",
+      "line": 1
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "YAML_NEWLINE_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "new-lines"
+      ],
+      "examples": [
+        "wrong new line character: expected \\n"
+      ],
+      "occurrences": 1,
+      "message": "wrong new line character: expected \\n",
+      "description": "wrong new line character: expected \\n",
+      "line": 1
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 8 but found 6"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 8 but found 6",
+      "description": "wrong indentation: expected 8 but found 6",
+      "line": 18
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 10 but found 8"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 10 but found 8",
+      "description": "wrong indentation: expected 10 but found 8",
+      "line": 28
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 10 but found 8"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 10 but found 8",
+      "description": "wrong indentation: expected 10 but found 8",
+      "line": 39
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "YAML_TRAILING_SPACES",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "trailing-spaces"
+      ],
+      "examples": [
+        "trailing spaces"
+      ],
+      "occurrences": 1,
+      "message": "trailing spaces",
+      "description": "trailing spaces",
+      "line": 39
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 4 but found 2"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 4 but found 2",
+      "description": "wrong indentation: expected 4 but found 2",
+      "line": 48
+    },
+    {
+      "file": "internal-proxy.deployment.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 4 but found 2"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 4 but found 2",
+      "description": "wrong indentation: expected 4 but found 2",
+      "line": 62
+    },
+    {
+      "file": "kube-bench-security.master-job.yaml",
+      "category": "YAML_NEWLINE_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "new-lines"
+      ],
+      "examples": [
+        "wrong new line character: expected \\n"
+      ],
+      "occurrences": 1,
+      "message": "wrong new line character: expected \\n",
+      "description": "wrong new line character: expected \\n",
+      "line": 1
+    },
+    {
+      "file": "kube-bench-security.master-job.yaml",
+      "category": "YAML_LINE_LENGTH",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "line-length"
+      ],
+      "examples": [
+        "line too long"
+      ],
+      "occurrences": 1,
+      "message": "line too long",
+      "description": "line too long",
+      "line": 56
+    },
+    {
+      "file": "kube-bench-security.master-job.yaml",
+      "category": "YAML_LINE_LENGTH",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "line-length"
+      ],
+      "examples": [
+        "line too long"
+      ],
+      "occurrences": 1,
+      "message": "line too long",
+      "description": "line too long",
+      "line": 57
+    },
+    {
+      "file": "kube-bench-security.node-job.yaml",
+      "category": "YAML_NEWLINE_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "new-lines"
+      ],
+      "examples": [
+        "wrong new line character: expected \\n"
+      ],
+      "occurrences": 1,
+      "message": "wrong new line character: expected \\n",
+      "description": "wrong new line character: expected \\n",
+      "line": 1
+    },
+    {
+      "file": "kube-bench-security.node-job.yaml",
+      "category": "YAML_LINE_LENGTH",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "line-length"
+      ],
+      "examples": [
+        "line too long"
+      ],
+      "occurrences": 1,
+      "message": "line too long",
+      "description": "line too long",
+      "line": 39
+    },
+    {
+      "file": "kube-bench-security.node-job.yaml",
+      "category": "YAML_LINE_LENGTH",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "line-length"
+      ],
+      "examples": [
+        "line too long"
+      ],
+      "occurrences": 1,
+      "message": "line too long",
+      "description": "line too long",
+      "line": 40
+    },
+    {
+      "file": "kubernetes-goat-home.deployment.yaml",
+      "category": "YAML_DOCUMENT_START",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "document-start"
+      ],
+      "examples": [
+        "missing document start \"---\""
+      ],
+      "occurrences": 1,
+      "message": "missing document start \"---\"",
+      "description": "missing document start \"---\"",
+      "line": 1
+    },
+    {
+      "file": "kubernetes-goat-home.deployment.yaml",
+      "category": "YAML_NEWLINE_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "new-lines"
+      ],
+      "examples": [
+        "wrong new line character: expected \\n"
+      ],
+      "occurrences": 1,
+      "message": "wrong new line character: expected \\n",
+      "description": "wrong new line character: expected \\n",
+      "line": 1
+    },
+    {
+      "file": "kubernetes-goat-home.deployment.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 8 but found 6"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 8 but found 6",
+      "description": "wrong indentation: expected 8 but found 6",
+      "line": 16
+    },
+    {
+      "file": "kubernetes-goat-home.deployment.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 10 but found 8"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 10 but found 8",
+      "description": "wrong indentation: expected 10 but found 8",
+      "line": 23
+    },
+    {
+      "file": "kubernetes-goat-home.deployment.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 4 but found 2"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 4 but found 2",
+      "description": "wrong indentation: expected 4 but found 2",
+      "line": 32
+    },
+    {
+      "file": "kyverno-block-pod-exec-by-namespace.yaml",
+      "category": "YAML_DOCUMENT_START",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "document-start"
+      ],
+      "examples": [
+        "missing document start \"---\""
+      ],
+      "occurrences": 1,
+      "message": "missing document start \"---\"",
+      "description": "missing document start \"---\"",
+      "line": 1
+    },
+    {
+      "file": "kyverno-block-pod-exec-by-namespace.yaml",
+      "category": "YAML_NEWLINE_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "new-lines"
+      ],
+      "examples": [
+        "wrong new line character: expected \\n"
+      ],
+      "occurrences": 1,
+      "message": "wrong new line character: expected \\n",
+      "description": "wrong new line character: expected \\n",
+      "line": 1
+    },
+    {
+      "file": "kyverno-block-pod-exec-by-namespace.yaml",
+      "category": "YAML_LINE_LENGTH",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "line-length"
+      ],
+      "examples": [
+        "line too long"
+      ],
+      "occurrences": 1,
+      "message": "line too long",
+      "description": "line too long",
+      "line": 11
+    },
+    {
+      "file": "kyverno-block-pod-exec-by-namespace.yaml",
+      "category": "YAML_LINE_LENGTH",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "line-length"
+      ],
+      "examples": [
+        "line too long"
+      ],
+      "occurrences": 1,
+      "message": "line too long",
+      "description": "line too long",
+      "line": 12
+    },
+    {
+      "file": "kyverno-block-pod-exec-by-namespace.yaml",
+      "category": "YAML_LINE_LENGTH",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "line-length"
+      ],
+      "examples": [
+        "line too long"
+      ],
+      "occurrences": 1,
+      "message": "line too long",
+      "description": "line too long",
+      "line": 13
+    },
+    {
+      "file": "kyverno-block-pod-exec-by-namespace.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 4 but found 2"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 4 but found 2",
+      "description": "wrong indentation: expected 4 but found 2",
+      "line": 18
+    },
+    {
+      "file": "kyverno-block-pod-exec-by-namespace.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 8 but found 6"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 8 but found 6",
+      "description": "wrong indentation: expected 8 but found 6",
+      "line": 21
+    },
+    {
+      "file": "kyverno-block-pod-exec-by-namespace.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 12 but found 10"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 12 but found 10",
+      "description": "wrong indentation: expected 12 but found 10",
+      "line": 23
+    },
+    {
+      "file": "kyverno-block-pod-exec-by-namespace.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 8 but found 6"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 8 but found 6",
+      "description": "wrong indentation: expected 8 but found 6",
+      "line": 26
+    },
+    {
+      "file": "kyverno-block-pod-exec-by-namespace.yaml",
+      "category": "YAML_LINE_LENGTH",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "line-length"
+      ],
+      "examples": [
+        "line too long"
+      ],
+      "occurrences": 1,
+      "message": "line too long",
+      "description": "line too long",
+      "line": 30
+    },
+    {
+      "file": "kyverno-block-pod-exec-by-namespace.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 12 but found 10"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 12 but found 10",
+      "description": "wrong indentation: expected 12 but found 10",
+      "line": 34
+    },
+    {
+      "file": "poor-registry.deployment.yaml",
+      "category": "YAML_DOCUMENT_START",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "document-start"
+      ],
+      "examples": [
+        "missing document start \"---\""
+      ],
+      "occurrences": 1,
+      "message": "missing document start \"---\"",
+      "description": "missing document start \"---\"",
+      "line": 1
+    },
+    {
+      "file": "poor-registry.deployment.yaml",
+      "category": "YAML_NEWLINE_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "new-lines"
+      ],
+      "examples": [
+        "wrong new line character: expected \\n"
+      ],
+      "occurrences": 1,
+      "message": "wrong new line character: expected \\n",
+      "description": "wrong new line character: expected \\n",
+      "line": 1
+    },
+    {
+      "file": "poor-registry.deployment.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 8 but found 6"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 8 but found 6",
+      "description": "wrong indentation: expected 8 but found 6",
+      "line": 16
+    },
+    {
+      "file": "poor-registry.deployment.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 10 but found 8"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 10 but found 8",
+      "description": "wrong indentation: expected 10 but found 8",
+      "line": 23
+    },
+    {
+      "file": "poor-registry.deployment.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 4 but found 2"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 4 but found 2",
+      "description": "wrong indentation: expected 4 but found 2",
+      "line": 32
+    },
+    {
+      "file": "system-monitor.deployment.yaml",
+      "category": "YAML_DOCUMENT_START",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "document-start"
+      ],
+      "examples": [
+        "missing document start \"---\""
+      ],
+      "occurrences": 1,
+      "message": "missing document start \"---\"",
+      "description": "missing document start \"---\"",
+      "line": 1
+    },
+    {
+      "file": "system-monitor.deployment.yaml",
+      "category": "YAML_NEWLINE_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "new-lines"
+      ],
+      "examples": [
+        "wrong new line character: expected \\n"
+      ],
+      "occurrences": 1,
+      "message": "wrong new line character: expected \\n",
+      "description": "wrong new line character: expected \\n",
+      "line": 1
+    },
+    {
+      "file": "system-monitor.deployment.yaml",
+      "category": "YAML_FORMAT_ERROR",
+      "severity": "MEDIUM",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "comments"
+      ],
+      "examples": [
+        "missing starting space in comment"
+      ],
+      "occurrences": 1,
+      "message": "missing starting space in comment",
+      "description": "missing starting space in comment",
+      "line": 27
+    },
+    {
+      "file": "system-monitor.deployment.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 8 but found 6"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 8 but found 6",
+      "description": "wrong indentation: expected 8 but found 6",
+      "line": 29
+    },
+    {
+      "file": "system-monitor.deployment.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 8 but found 6"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 8 but found 6",
+      "description": "wrong indentation: expected 8 but found 6",
+      "line": 33
+    },
+    {
+      "file": "system-monitor.deployment.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 10 but found 8"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 10 but found 8",
+      "description": "wrong indentation: expected 10 but found 8",
+      "line": 43
+    },
+    {
+      "file": "system-monitor.deployment.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 10 but found 8"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 10 but found 8",
+      "description": "wrong indentation: expected 10 but found 8",
+      "line": 45
+    },
+    {
+      "file": "system-monitor.deployment.yaml",
+      "category": "YAML_INDENTATION_ERROR",
+      "severity": "HIGH",
+      "tools": [
+        "YAMLlint"
+      ],
+      "support_count": 1,
+      "rule_ids": [
+        "indentation"
+      ],
+      "examples": [
+        "wrong indentation: expected 4 but found 2"
+      ],
+      "occurrences": 1,
+      "message": "wrong indentation: expected 4 but found 2",
+      "description": "wrong indentation: expected 4 but found 2",
+      "line": 61
+    }
+  ]
+}
