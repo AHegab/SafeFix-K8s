@@ -590,6 +590,10 @@ def normalize(args):
 
     normalized: List[Dict[str,Any]] = []
     for key, b in refined.items():
+        # Skip unanchored findings that could not be mapped to a real test file
+        if not b.get("file") or b["file"] == "UNKNOWN_FILE":
+            continue
+
         cat = b["category"]
         meta = CATEGORY_META[cat]
         tools = set(b["tools"])

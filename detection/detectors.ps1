@@ -255,62 +255,64 @@ function Det-TrivyConfig {
 }
 
 function Det-Kubescape {
-    [CmdletBinding()]
   param(
-    # Path to the directory of YAMLs to scan
-    [Parameter(Mandatory=$true)][string]$Path
+    [string]$Path = ".",
+    [string]$Out  = "$OutDir\kubescape_raw.json"
   )
 
-    # Resolve absolute paths and ensure output dir exists
-    $abs = Resolve-ScanPath -Path $Path
-  # Always use Detection/output/detection/raw for output
-  $outDir = Join-Path $RepoRoot "Detection/output/detection/raw"
-  if (-not (Test-Path $outDir)) { New-Item -ItemType Directory -Force -Path $outDir | Out-Null }
+  # Resolve scan path and disable git info telemetry
+  $abs = Resolve-ScanPath -Path $Path
+  $env:KUBESCAPE_DISABLE_GIT_INFO = "true"
 
-  $v1Out = Join-Path $outDir "kubescape_raw_v1.json"
-  $v2Out = Join-Path $outDir "kubescape_raw_v2.json"
+  $ks = $null
+  try { 
+    $ks = (Get-Command kubescape -ErrorAction Stop).Source 
+  } catch { }
 
-    # Speed up / avoid git info noise
-    $env:KUBESCAPE_DISABLE_GIT_INFO = "true"
+  $prevEA = $ErrorActionPreference
+  $ErrorActionPreference = "Continue"
 
-    $prevEA = $ErrorActionPreference
-    $ErrorActionPreference = "Continue"
-
-    # Prefer local binary if present; otherwise use Docker
-    $ks = $null
-    try { $ks = (Get-Command kubescape -ErrorAction Stop).Source } catch { }
-
-    try {
-        if ($ks) {
-            # Local binary
-            & kubescape scan $abs --format json --format-version v2 --output $v2Out 2>$null | Out-Null
-            & kubescape scan $abs --format json --format-version v1 --output $v1Out 2>$null | Out-Null
-        } else {
-            $img = "quay.io/kubescape/kubescape:latest"
-
-            # IMPORTANT: Use ${} around variables before ":" to avoid PS drive parsing
-            docker run --rm -e "KUBESCAPE_DISABLE_GIT_INFO=true" `
-                -v "${abs}:/scan:ro" `
-                -v "${outDir}:/out" `
-                $img scan /scan --format json --format-version v2 --output /out/kubescape_raw_v2.json
-
-            docker run --rm -e "KUBESCAPE_DISABLE_GIT_INFO=true" `
-                -v "${abs}:/scan:ro" `
-                -v "${outDir}:/out" `
-                $img scan /scan --format json --format-version v1 --output /out/kubescape_raw_v1.json
-        }
-
-  Write-NonEmpty $v1Out
-  Write-NonEmpty $v2Out
-  Write-Host "[kubescape] -> $v1Out (paths) + $v2Out (rich)"
+  try {
+    if ($ks) {
+      # ---- Local kubescape binary ------------------------------------------
+      Write-Host "[kubescape] Using local kubescape at $ks" -ForegroundColor Cyan
+      & kubescape scan $abs --format json --format-version v2 --output $Out 2>$null | Out-Null
     }
-  catch {
-    Write-Host "[kubescape] error: $($_.Exception.Message)" -ForegroundColor Red
+    else {
+      # ---- Docker fallback -------------------------------------------------
+      Write-Host "[kubescape] Using Docker image quay.io/kubescape/kubescape:latest" -ForegroundColor Cyan
+
+      # Kubescape will write inside the mounted /scan directory
+      $tmpOutInScan = "/scan/kubescape_raw.json"
+      docker run --rm `
+        -e "KUBESCAPE_DISABLE_GIT_INFO=true" `
+        -v "${abs}:/scan:ro" `
+        quay.io/kubescape/kubescape:latest `
+        scan /scan --format json --format-version v2 --output $tmpOutInScan 2>$null | Out-Null
+
+      # Move /scan/kubescape_raw.json back to our detection output dir
+      $tempOut = Join-Path $abs "kubescape_raw.json"
+      if ((Test-Path $tempOut) -and ($tempOut -ne $Out)) {
+        Move-Item -Force $tempOut $Out
+      }
+    }
+
+    $ErrorActionPreference = $prevEA
+
+    # Final sanity check – if kubescape gave us nothing, drop a placeholder
+    if ((Test-Path $Out) -and ((Get-Item $Out).Length -gt 3)) {
+      Write-Host "[kubescape] -> $Out"
+    }
+    else {
+      _WrapPlaceholder $Out "kubescape" "failed: kubescape produced no usable output"
+    }
   }
-    finally {
-        $ErrorActionPreference = $prevEA
-    }
+  catch {
+    $ErrorActionPreference = $prevEA
+    _WrapPlaceholder $Out "kubescape" $_.Exception.Message
+  }
 }
+
 
 
 
@@ -863,7 +865,7 @@ function Det-RunExtended {
         "Polaris" { Det-Polaris     -Path $abs }
         "Checkov" { Det-Checkov     -Path $abs }
         "TrivyConfig" { Det-TrivyConfig -Path $abs }
-        # "Kubescape" { Det-Kubescape   -Path $abs }
+        "Kubescape" { Det-Kubescape   -Path $abs }
         "KubeScore" { Det-KubeScore   -Path $abs }
         "Yamllint" { Det-Yamllint    -Path $abs }
         "KubeAudit" { Det-KubeAudit   -Path $abs }
@@ -886,7 +888,7 @@ function Det-RunExtended {
       Polaris     = "$OutDir\polaris_raw.json";
       Checkov     = "$OutDir\checkov_raw.json";
       TrivyConfig = "$OutDir\trivy_config_raw.json";
-      # Kubescape   = "$OutDir\kubescape_raw.json";
+      Kubescape   = "$OutDir\kubescape_raw.json";
       KubeScore   = "$OutDir\kubescore_raw.json";
       Yamllint    = "$OutDir\yamllint_raw.txt";
       KubeAudit   = "$OutDir\kubeaudit_raw.json";
@@ -911,7 +913,7 @@ function Det-RunExtended {
           "Polaris" { Det-Polaris     -Path $extracted -Out $embeddedOut }
           "Checkov" { Det-Checkov     -Path $extracted -Out $embeddedOut }
           "TrivyConfig" { Det-TrivyConfig -Path $extracted -Out $embeddedOut }
-          # "Kubescape" { Det-Kubescape   -Path $extracted -Out $embeddedOut }
+          "Kubescape" { Det-Kubescape   -Path $extracted -Out $embeddedOut }
           "KubeScore" { Det-KubeScore   -Path $extracted -Out $embeddedOut }
           "Yamllint" { Det-Yamllint    -Path $extracted -Out $embeddedOut }
           "KubeAudit" { Det-KubeAudit   -Path $extracted -Out $embeddedOut }

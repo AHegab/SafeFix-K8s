@@ -203,73 +203,68 @@ def parse_trivy(raw_file: Path) -> List[Dict[str, Any]]:
 
 
 def parse_kubescape(raw_file: Path) -> List[Dict[str, Any]]:
-    """Parse Kubescape raw JSON output."""
+    """Parse Kubescape v3 raw JSON output."""
     with open(raw_file, 'r', encoding='utf-8-sig') as f:
         data = json.load(f)
 
     items = []
 
-    if isinstance(data, dict):
-        # Kubescape format v2: summaryDetails.controls contains control results
-        summary = data.get("summaryDetails", {})
-        controls = summary.get("controls", {})
-        resources = data.get("resources", [])
+    # --- Build resourceID → file path map ---
+    resource_lookup = {}
+    for res in data.get("resources", []):
+        rid = res.get("resourceID", "")
+        obj = res.get("object", {})
+        source_path = obj.get("sourcePath", "")
 
-        # Create resource lookup by resourceID
-        resource_lookup = {}
-        for resource in resources:
-            resource_id = resource.get("resourceID", "")
-            source = resource.get("source", {})
-            file_path = source.get("path", "").replace("\\", "/")
-            if file_path.startswith("/scan/"):
-                file_path = file_path[6:]
-            resource_lookup[resource_id] = file_path
+        # Normalize Windows paths
+        if ":" in source_path:
+            source_path = source_path.split(":", 1)[0]
 
-        # Process failed controls
-        for control_id, control_data in controls.items():
-            status = control_data.get("status", "")
+        source_path = source_path.replace("\\", "/")
+        resource_lookup[rid] = source_path
+
+    # --- Parse failures from results[] (Kubescape v3 actual failures) ---
+    for res in data.get("results", []):
+        rid = res.get("resourceID", "")
+        file_path = resource_lookup.get(rid, "")
+
+        for control in res.get("controls", []):
+            ctrl_id = control.get("controlID", "")
+            status = control.get("status", {}).get("status", "")
+
             if status != "failed":
                 continue
 
-            # Get failed resources for this control
-            resource_ids = control_data.get("resourceIDs", {})
-            failed_resources = resource_ids.get("failed", [])
+            # Map control to category
+            category = "UNKNOWN"
+            if "C-0016" in ctrl_id:
+                category = "PRIV_ESCALATION"
+            elif "C-0013" in ctrl_id:
+                category = "RUN_AS_NONROOT_FALSE"
+            elif "C-0017" in ctrl_id:
+                category = "READONLY_ROOTFS_FALSE"
+            elif "C-0055" in ctrl_id:
+                category = "NO_SECCOMP"
+            elif "C-0260" in ctrl_id:
+                category = "MISSING_NETWORK_POLICY"
+            elif "C-0077" in ctrl_id:
+                category = "LABEL_ISSUE"
+            elif "C-0030" in ctrl_id:
+                category = "INGRESS_EGRESS_BLOCKED"
 
-            control_name = control_data.get("name", control_id)
-
-            for resource_id in failed_resources:
-                file_path = resource_lookup.get(resource_id, "")
-                if not file_path:
-                    continue
-
-                # Map control ID to category
-                category = control_id
-                if "C-0057" in control_id or "C-0034" in control_id:
-                    category = "PRIVILEGED"
-                elif "C-0016" in control_id:
-                    category = "PRIV_ESCALATION"
-                elif "C-0013" in control_id:
-                    category = "RUN_AS_NONROOT_FALSE"
-                elif "C-0017" in control_id:
-                    category = "READONLY_ROOTFS_FALSE"
-                elif "C-0055" in control_id:
-                    category = "NO_SECCOMP"
-                elif "C-0048" in control_id:
-                    category = "HOSTPATH"
-
-                items.append({
-                    "file": file_path,
-                    "category": category,
-                    "severity": "HIGH",
-                    "tools": ["Kubescape"],
-                    "support_count": 1,
-                    "rule_ids": [control_id],
-                    "examples": [control_name],
-                    "occurrences": 1,
-                    "message": control_name,
-                    "description": control_name,
-                    "line": 0
-                })
+            items.append({
+                "file": file_path,
+                "category": category,
+                "severity": "HIGH",
+                "tools": ["Kubescape"],
+                "support_count": 1,
+                "rule_ids": [ctrl_id],
+                "examples": [control.get("name", ctrl_id)],
+                "occurrences": 1,
+                "message": control.get("name", ctrl_id),
+                "description": control.get("name", ctrl_id),
+                "line": 0
+            })
 
     return items
 
@@ -609,42 +604,118 @@ def parse_kubescore(raw_file: Path) -> List[Dict[str, Any]]:
 
 
 def parse_pluto(raw_file: Path) -> List[Dict[str, Any]]:
-    """Parse Pluto raw JSON output."""
+    """Parse Pluto raw JSON output (deprecation findings)."""
     with open(raw_file, 'r', encoding='utf-8-sig') as f:
         data = json.load(f)
 
-    items = []
-    # Pluto typically outputs version info, not findings
-    # If there are actual findings, they would be in a different format
-    # For now, return empty as Pluto is mainly for deprecation detection
+    items: List[Dict[str, Any]] = []
 
-    if isinstance(data, dict):
+    # --- Case 1: Newer Pluto format: {"items": [...], "target-versions": {...}} ---
+    if isinstance(data, dict) and "items" in data:
+        target_versions = data.get("target-versions", {}) or {}
+        target_k8s = target_versions.get("k8s", "")
+
+        for entry in data.get("items", []):
+            if not isinstance(entry, dict):
+                continue
+
+            raw_file_path = entry.get("filePath") or entry.get("name", "")
+            file_path = str(raw_file_path).replace("\\", "/")
+
+            # Try to trim to something sane (e.g., tests/14.ingress_deprecated_api.yaml)
+            # If "tests/" appears, keep from there, else just use the basename.
+            if "tests/" in file_path:
+                file_path = "tests/" + file_path.split("tests/", 1)[1]
+            else:
+                from pathlib import Path as _Path
+                file_path = _Path(file_path).name
+
+            api = entry.get("api", {}) or {}
+            version = api.get("version", "")
+            kind = api.get("kind", "")
+            deprecated_in = api.get("deprecated-in")
+            removed_in = api.get("removed-in")
+            replacement_api = api.get("replacement-api")
+            deprecated = bool(entry.get("deprecated", False))
+            removed = bool(entry.get("removed", False))
+            replacement_available = bool(entry.get("replacementAvailable", False))
+
+            # Build human-friendly message
+            parts = []
+            if kind or version:
+                parts.append(f"{kind} {version}".strip())
+
+            if deprecated:
+                if deprecated_in:
+                    parts.append(f"is deprecated since Kubernetes {deprecated_in}")
+                else:
+                    parts.append("is deprecated")
+
+            if removed:
+                if removed_in:
+                    parts.append(f"and removed in {removed_in}")
+                else:
+                    parts.append("and removed in the target version")
+
+            if replacement_api:
+                # e.g., "Use networking.k8s.io/v1 instead."
+                parts.append(f"Use {replacement_api} instead.")
+
+            if target_k8s:
+                parts.append(f"(cluster target version: {target_k8s})")
+
+            message = " ".join(parts).strip() or "Deprecated Kubernetes API in use"
+            rule_id = f"{(kind or 'resource').lower()}-{(version or 'api').lower()}-deprecated"
+
+            # Simple severity heuristic: removed APIs are more serious
+            severity = "HIGH" if removed else "MEDIUM"
+
+            items.append({
+                "file": file_path,
+                "category": "DEPRECATED_API_VERSION",
+                "severity": severity,
+                "tools": ["Pluto"],
+                "support_count": 1,
+                "rule_ids": [rule_id],
+                "examples": [message],
+                "occurrences": 1,
+                "message": message,
+                "description": message,
+                "line": 0
+            })
+
         return items
-    elif isinstance(data, list):
+
+    # --- Case 2: Older / different Pluto formats (list of dicts) ---
+    if isinstance(data, list):
         for item in data:
-            if isinstance(item, dict):
-                file_path = item.get("file", "").replace("\\", "/")
-                if file_path.startswith("/scan/"):
-                    file_path = file_path[6:]
+            if not isinstance(item, dict):
+                continue
 
-                message = item.get("message", "") or item.get("description", "")
-                if message:
-                    items.append({
-                        "file": file_path,
-                        "category": "DEPRECATED_API_VERSION",
-                        "severity": "MEDIUM",
-                        "tools": ["Pluto"],
-                        "support_count": 1,
-                        "rule_ids": [item.get("rule", "deprecated")],
-                        "examples": [message],
-                        "occurrences": 1,
-                        "message": message,
-                        "description": message,
-                        "line": 0
-                    })
+            file_path = str(item.get("file", "")).replace("\\", "/")
+            if file_path.startswith("/scan/"):
+                file_path = file_path[6:]
 
+            message = item.get("message", "") or item.get("description", "")
+            if not message:
+                continue
+
+            items.append({
+                "file": file_path,
+                "category": "DEPRECATED_API_VERSION",
+                "severity": "MEDIUM",
+                "tools": ["Pluto"],
+                "support_count": 1,
+                "rule_ids": [item.get("rule", "deprecated")],
+                "examples": [message],
+                "occurrences": 1,
+                "message": message,
+                "description": message,
+                "line": 0
+            })
+
+    # If Pluto returned only version info or something non-finding, items will legitimately be empty.
     return items
-
 
 def parse_rbacpolice(raw_file: Path) -> List[Dict[str, Any]]:
     """Parse RBAC-Police raw JSON output."""
@@ -777,89 +848,66 @@ def parse_polaris(raw_file: Path) -> List[Dict[str, Any]]:
     results = data.get("Results", [])
 
     for result in results:
-        # Polaris doesn't always have Filename, need to extract from PodResult or use Name
-        pod_result = result.get("PodResult")
-        if pod_result:
-            # PodResult has YamlContent or we can use Name/Namespace
-            name = result.get("Name", "")
-            namespace = result.get("Namespace", "")
-            kind = result.get("Kind", "")
-
-            # Try to construct file path (Polaris doesn't always provide it)
-            file_path = f"{kind.lower()}_{name}.yaml"
-            if namespace and namespace != "default":
-                file_path = f"{namespace}/{file_path}"
-
-            checks = pod_result.get("Checks", {})
-            for check_id, check_data in checks.items():
-                if check_data.get("Success", True):  # Skip successful checks
+        name = result.get("Name", "")
+        kind = result.get("Kind", "")
+        namespace = result.get("Namespace", "")
+        # Top-level deployment checks
+        for check_id, check in (result.get("Results", {}) or {}).items():
+            if not check or check.get("Success", True):
+                continue
+            items.append({
+                "file": name,
+                "category": check_id,
+                "severity": check.get("Severity", "MEDIUM").upper(),
+                "tools": ["Polaris"],
+                "support_count": 1,
+                "rule_ids": [check_id],
+                "examples": [check.get("Message", "")],
+                "occurrences": 1,
+                "message": check.get("Message", ""),
+                "description": check.get("Message", ""),
+                "line": 0
+            })
+        # Pod-level checks
+        pod_result = result.get("PodResult", {})
+        if pod_result is None:
+            pod_result = {}
+        for check_id, check in (pod_result.get("Results", {}) or {}).items():
+            if not check or check.get("Success", True):
+                continue
+            items.append({
+                "file": name,
+                "category": check_id,
+                "severity": check.get("Severity", "MEDIUM").upper(),
+                "tools": ["Polaris"],
+                "support_count": 1,
+                "rule_ids": [check_id],
+                "examples": [check.get("Message", "")],
+                "occurrences": 1,
+                "message": check.get("Message", ""),
+                "description": check.get("Message", ""),
+                "line": 0
+            })
+        # Container-level checks
+        for container in (pod_result.get("ContainerResults", []) or []):
+            cname = container.get("Name", "")
+            for check_id, check in (container.get("Results", {}) or {}).items():
+                if not check or check.get("Success", True):
                     continue
-
-                message = check_data.get("Message", check_id)
-                severity = check_data.get("Severity", "warning")
-
-                # Map Polaris checks to categories
-                category = check_id.upper().replace(" ", "_")
-                if "privileged" in check_id.lower():
-                    category = "PRIVILEGED"
-                elif "readOnlyRootFilesystem" in check_id or "readOnlyRoot" in check_id:
-                    category = "READONLY_ROOTFS_FALSE"
-                elif "runAsNonRoot" in check_id or "runAsRoot" in check_id:
-                    category = "RUN_AS_NONROOT_FALSE"
-                elif "allowPrivilegeEscalation" in check_id:
-                    category = "PRIV_ESCALATION"
-                elif "cpuLimitsMissing" in check_id or "memoryLimitsMissing" in check_id:
-                    category = "NO_RES_LIMITS"
-                elif "hostNetworkSet" in check_id:
-                    category = "HOST_NAMESPACE"
-
-                severity_map = {
-                    "danger": "CRITICAL",
-                    "warning": "HIGH",
-                    "info": "MEDIUM"
-                }
-                mapped_severity = severity_map.get(severity.lower(), "MEDIUM")
-
                 items.append({
-                    "file": file_path,
-                    "category": category,
-                    "severity": mapped_severity,
+                    "file": f"{name}:{cname}",
+                    "category": check_id,
+                    "severity": check.get("Severity", "MEDIUM").upper(),
                     "tools": ["Polaris"],
                     "support_count": 1,
                     "rule_ids": [check_id],
-                    "examples": [message],
+                    "examples": [check.get("Message", "")],
                     "occurrences": 1,
-                    "message": message,
-                    "description": message,
+                    "message": check.get("Message", ""),
+                    "description": check.get("Message", ""),
                     "line": 0
                 })
-        else:
-            # Fallback: check Results directly
-            checks = result.get("Results", {})
-            for check_id, check_data in checks.items():
-                if check_data.get("Success", True):
-                    continue
-
-                name = result.get("Name", "")
-                file_path = f"{result.get('Kind', 'Resource').lower()}_{name}.yaml"
-
-                items.append({
-                    "file": file_path,
-                    "category": check_id.upper().replace(" ", "_"),
-                    "severity": "MEDIUM",
-                    "tools": ["Polaris"],
-                    "support_count": 1,
-                    "rule_ids": [check_id],
-                    "examples": [check_data.get("Message", "")],
-                    "occurrences": 1,
-                    "message": check_data.get("Message", ""),
-                    "description": check_data.get("Message", ""),
-                    "line": 0
-                })
-
     return items
-
-
 def create_llm_payload(items: List[Dict[str, Any]], tool_name: str) -> Dict[str, Any]:
     """Create LLM payload from parsed items."""
     return {
