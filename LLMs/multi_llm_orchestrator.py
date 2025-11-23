@@ -1,1801 +1,1359 @@
 #!/usr/bin/env python3
 """
-multi_llm_orchestrator.py  — resilient raw-mode (+ SafeFix v3.6 aware)
+ultimate_llm_orchestrator.py — Enhanced version with 100% fix coverage
 
-- Accepts classic SafeFix payloads ({"files":[...]}) AND raw tool payloads
-  ({"version": "...", "items":[...]}).
-- Knows how to consume SafeFix normalizer v3.5 payloads (findings with
-  snippet + patchHint).
-- Adds YAML context (snippet + derived hints) to prompts so LLMs can output
-  valid RFC-6902 ops.
-- Robustly extracts JSON arrays from messy LLM outputs.
-- Provides a deterministic local fallback for common schema categories when
-  providers return nothing.
-- Category-aware fallback can also apply resources / probes / seccompProfile
-  ops from a single strong provider on safe JSON Pointer paths.
-- Additional security-aware fallback can apply monotonic-hardening
-  securityContext ops (runAsNonRoot, privileged=false, allowPrivilegeEscalation=false,
-  capabilities.drop=[ALL]) from a single strong provider on safe paths.
-- Some categories are explicitly marked as NON_AUTO_FIX and will not be
-  modified by the LLM (they remain vulnerable and are reported as such).
-- Gives the LLM explicit allowed JSON Pointer paths per category and forbidden
-  paths it must not touch.
-- Tracks how many auto-fix categories were actually fixed based on op paths.
-- Writes SECURED_*, DIFF_*, REPORT_*.json, REPORT_ALL.csv (with provider
-  errors).
+Key improvements:
+1. Comprehensive security hardening (all 4 controls applied together)
+2. NetworkPolicy explicitly skipped from LLM
+3. Retry logic with exponential backoff for rate limits (HTTP 429)
+4. Fallback providers when primary fails (HTTP 404)
+5. Better error recovery and logging
+6. Complete category coverage
 
-Env / flags: same as before.
+Goal: Fix EVERYTHING addressable, skip what requires separate resources
 """
 
 import argparse
-import difflib
 import json
 import os
 import random
 import re
 import time
+from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import requests
 import yaml
 
 
-# ---------------------- Simple .env loader ----------------------
+# ======================= Configuration =======================
+
+class LlmProvider(Enum):
+    """Available LLM providers."""
+    OPENAI = "openai"
+    GROQ = "groq"
+    GEMINI = "gemini"
+    OPENROUTER = "openrouter"
 
 
-def load_dotenv_from_root() -> None:
-    here = Path.cwd()
-    candidates = [
-        here / ".env",
-        here.parent / ".env",
-        Path(__file__).resolve().parent.parent / ".env",
-    ]
-    for p in candidates:
+class FixStrategy(Enum):
+    """Fix strategy for each category."""
+    DETERMINISTIC = "deterministic"
+    LLM_GUIDED = "llm_guided"
+    TEMPLATE = "template"
+    SKIP = "skip"  # Added: for categories that shouldn't be fixed
+
+
+# Categories to SKIP from LLM processing
+SKIP_FROM_LLM = {
+    "Network/MissingNetworkPolicy",
+    "Network/NetworkPolicyMisconfiguration",
+}
+
+SKIP_MESSAGES = {
+    "Network/MissingNetworkPolicy": 
+        "NetworkPolicy requires separate resource with application-specific traffic rules. "
+        "Create as separate manifest based on your architecture.",
+    "Network/NetworkPolicyMisconfiguration":
+        "NetworkPolicy misconfigurations require manual review of traffic requirements.",
+}
+
+# Categories that use comprehensive security hardening handler
+SECURITY_HARDENING_CATEGORIES = {
+    "Security/AllowPrivilegeEscalation",
+    "Security/CapabilitiesNotDropped",
+    "Security/ReadOnlyRootFSFalse",
+    "Auth/RunAsRoot",
+    "Security/MissingSecurityContextHardening",
+}
+
+# Enhanced category configurations
+CATEGORY_CONFIG = {
+    # Deterministic fixes (0 tokens, 100% success)
+    "Auth/DefaultNamespace": {
+        "strategy": FixStrategy.DETERMINISTIC,
+        "priority": 4,
+    },
+    "Auth/DefaultServiceAccount": {
+        "strategy": FixStrategy.DETERMINISTIC,
+        "priority": 4,
+    },
+    "Auth/AutomountServiceAccountToken": {
+        "strategy": FixStrategy.DETERMINISTIC,
+        "priority": 4,
+    },
+    
+    # Template-based (minimal tokens, high success)
+    "Probes/MissingReadinessLiveness": {
+        "strategy": FixStrategy.TEMPLATE,
+        "priority": 6,
+    },
+    "Resources/MissingRequests": {
+        "strategy": FixStrategy.TEMPLATE,
+        "priority": 6,
+    },
+    "Resources/MissingLimits": {
+        "strategy": FixStrategy.TEMPLATE,
+        "priority": 6,
+    },
+    
+    # SKIP these categories entirely
+    "Network/MissingNetworkPolicy": {
+        "strategy": FixStrategy.SKIP,
+        "priority": 0,
+    },
+    "Network/NetworkPolicyMisconfiguration": {
+        "strategy": FixStrategy.SKIP,
+        "priority": 0,
+    },
+    
+    # Comprehensive security hardening (deterministic)
+    "Security/AllowPrivilegeEscalation": {
+        "strategy": FixStrategy.DETERMINISTIC,  # Changed from LLM_GUIDED
+        "priority": 10,
+        "use_security_handler": True,
+    },
+    "Security/CapabilitiesNotDropped": {
+        "strategy": FixStrategy.DETERMINISTIC,  # Changed from LLM_GUIDED
+        "priority": 10,
+        "use_security_handler": True,
+    },
+    "Security/ReadOnlyRootFSFalse": {
+        "strategy": FixStrategy.DETERMINISTIC,  # Changed from LLM_GUIDED
+        "priority": 10,
+        "use_security_handler": True,
+    },
+    "Auth/RunAsRoot": {
+        "strategy": FixStrategy.DETERMINISTIC,  # Changed from LLM_GUIDED
+        "priority": 10,
+        "use_security_handler": True,
+    },
+    "Security/MissingSecurityContextHardening": {
+        "strategy": FixStrategy.DETERMINISTIC,  # Changed from LLM_GUIDED
+        "priority": 10,
+        "use_security_handler": True,
+    },
+    
+    # LLM-guided with fallback (for other security issues)
+    "Security/PrivilegedContainer": {
+        "strategy": FixStrategy.LLM_GUIDED,
+        "provider": LlmProvider.GROQ,
+        "fallback": LlmProvider.OPENAI,
+        "priority": 9,
+        "max_retries": 3,
+    },
+    "Security/MissingSeccompProfile": {
+        "strategy": FixStrategy.LLM_GUIDED,
+        "provider": LlmProvider.GROQ,
+        "fallback": LlmProvider.OPENAI,
+        "priority": 8,
+        "max_retries": 3,
+    },
+    "Security/MissingAppArmorProfile": {
+        "strategy": FixStrategy.LLM_GUIDED,
+        "provider": LlmProvider.GROQ,
+        "fallback": LlmProvider.OPENAI,
+        "priority": 8,
+        "max_retries": 3,
+    },
+    "Image/TagNotPinned": {
+        "strategy": FixStrategy.LLM_GUIDED,
+        "provider": LlmProvider.OPENAI,
+        "fallback": LlmProvider.GROQ,
+        "priority": 5,
+        "max_retries": 3,
+    },
+    "Policy/PodSecurityViolation": {
+        "strategy": FixStrategy.LLM_GUIDED,
+        "provider": LlmProvider.OPENAI,
+        "fallback": LlmProvider.GROQ,
+        "priority": 7,
+        "max_retries": 3,
+    },
+    
+    # Skip these (not actionable or duplicates)
+    "Style/YamlLint": {"strategy": FixStrategy.SKIP},
+    "Schema/InvalidManifest": {"strategy": FixStrategy.SKIP},
+    "Misc/Unmapped": {"strategy": FixStrategy.SKIP},
+}
+
+
+# ======================= Helper Functions =======================
+
+def load_dotenv():
+    """Load environment variables from .env file."""
+    env_paths = [Path.cwd() / ".env", Path(__file__).parent / ".env"]
+    for p in env_paths:
         if p.exists():
-            for line in p.read_text(encoding="utf-8").splitlines():
+            for line in p.read_text().splitlines():
                 line = line.strip()
-                if not line or line.startswith("#") or "=" not in line:
-                    continue
-                k, v = line.split("=", 1)
-                k = k.strip()
-                v = v.strip().strip('"').strip("'")
-                if k and (k not in os.environ):
-                    os.environ[k] = v
+                if line and not line.startswith("#") and "=" in line:
+                    k, v = line.split("=", 1)
+                    os.environ.setdefault(k.strip(), v.strip().strip('"').strip("'"))
             break
 
 
-load_dotenv_from_root()
-
-# ---------------------- Category policy -------------------------
-
-# Categories that LLMs must NOT auto-fix. They stay vulnerable and require
-# human/cluster-specific design. We still pass them in the payload/report,
-# but we instruct the model not to emit any patches for them.
-NON_AUTO_FIX_CATEGORIES = {
-    "Network/MissingNetworkPolicy",  # needs cluster-wide policy design
-    "Misc/Unmapped",
-    # Often business / org specific:
-    "Image/TagNotPinned",
-    # Add other categories here if you want them to be "manual-only".
-}
-
-# Category -> allowed JSON Pointer paths (aligned with validation_gates.py)
-CATEGORY_PATH_RULES: Dict[str, List[str]] = {
-
-    "Auth/RunAsRoot": [
-        "/spec/template/spec/securityContext/runAsNonRoot",
-        "/spec/template/spec/securityContext/runAsUser",
-        "/spec/template/spec/containers/*/securityContext/runAsNonRoot",
-        "/spec/template/spec/containers/*/securityContext/runAsUser",
-        "/spec/template/spec/initContainers/*/securityContext/runAsNonRoot",
-        "/spec/template/spec/initContainers/*/securityContext/runAsUser",
-        "/spec/securityContext/runAsNonRoot",
-        "/spec/securityContext/runAsUser",
-        "/spec/containers/*/securityContext/runAsNonRoot",
-        "/spec/containers/*/securityContext/runAsUser",
-        "/spec/initContainers/*/securityContext/runAsNonRoot",
-        "/spec/initContainers/*/securityContext/runAsUser",
-        # treat changing the whole pod-level securityContext as coverage
-        "/spec/template/spec/securityContext",
-        "/spec/securityContext",
-    ],
-
-    # Image/TagNotPinned → only imagePullPolicy (if you keep it auto-fixable)
-    "Image/TagNotPinned": [
-        "/spec/template/spec/containers/*/imagePullPolicy",
-        "/spec/template/spec/initContainers/*/imagePullPolicy",
-        "/spec/containers/*/imagePullPolicy",
-        "/spec/initContainers/*/imagePullPolicy",
-    ],
-
-    # PodSecurityViolation → seccompProfile + readOnlyRootFilesystem etc.
-    "Policy/PodSecurityViolation": [
-        # Controller-style pod-level seccomp
-        "/spec/template/spec/securityContext/seccompProfile",
-        # Controller-style container-level seccomp + readOnlyRootFilesystem
-        "/spec/template/spec/containers/*/securityContext/seccompProfile",
-        "/spec/template/spec/initContainers/*/securityContext/seccompProfile",
-        "/spec/template/spec/containers/*/securityContext/readOnlyRootFilesystem",
-        "/spec/template/spec/initContainers/*/securityContext/readOnlyRootFilesystem",
-        # Pod-level fallback
-        "/spec/securityContext/seccompProfile",
-        "/spec/containers/*/securityContext/seccompProfile",
-        "/spec/initContainers/*/securityContext/seccompProfile",
-        "/spec/containers/*/securityContext/readOnlyRootFilesystem",
-        "/spec/initContainers/*/securityContext/readOnlyRootFilesystem",
-        # allow setting the whole pod-level securityContext object
-        "/spec/template/spec/securityContext",
-        "/spec/securityContext",
-    ],
-
-    # Security: allowPrivilegeEscalation → must be false
-    "Security/AllowPrivilegeEscalation": [
-        "/spec/template/spec/containers/*/securityContext/allowPrivilegeEscalation",
-        "/spec/template/spec/initContainers/*/securityContext/allowPrivilegeEscalation",
-        "/spec/containers/*/securityContext/allowPrivilegeEscalation",
-        "/spec/initContainers/*/securityContext/allowPrivilegeEscalation",
-    ],
-
-    # Security: capabilities → drop ALL
-    "Security/CapabilitiesNotDropped": [
-        "/spec/template/spec/containers/*/securityContext/capabilities",
-        "/spec/template/spec/initContainers/*/securityContext/capabilities",
-        "/spec/containers/*/securityContext/capabilities",
-        "/spec/initContainers/*/securityContext/capabilities",
-    ],
-
-    # Security: privileged container → must be false
-    "Security/PrivilegedContainer": [
-        "/spec/template/spec/containers/*/securityContext/privileged",
-        "/spec/template/spec/initContainers/*/securityContext/privileged",
-        "/spec/containers/*/securityContext/privileged",
-        "/spec/initContainers/*/securityContext/privileged",
-    ],
-
-    # Probes missing
-    "Probes/MissingReadinessLiveness": [
-        "/spec/template/spec/containers/*/livenessProbe",
-        "/spec/template/spec/containers/*/readinessProbe",
-        "/spec/template/spec/initContainers/*/livenessProbe",
-        "/spec/template/spec/initContainers/*/readinessProbe",
-        "/spec/containers/*/livenessProbe",
-        "/spec/containers/*/readinessProbe",
-        "/spec/initContainers/*/livenessProbe",
-        "/spec/initContainers/*/readinessProbe",
-    ],
-
-    # Resources
-    "Resources/MissingLimits": [
-        "/spec/template/spec/containers/*/resources",
-        "/spec/template/spec/initContainers/*/resources",
-        "/spec/containers/*/resources",
-        "/spec/initContainers/*/resources",
-    ],
-    "Resources/MissingRequests": [
-        "/spec/template/spec/containers/*/resources",
-        "/spec/template/spec/initContainers/*/resources",
-        "/spec/containers/*/resources",
-        "/spec/initContainers/*/resources",
-    ],
-
-    # RBAC categories (example)
-    "RBAC/Wildcard": [
-        "/rules/*/verbs/*",
-        "/rules/*/resources/*",
-        "/rules/*/apiGroups/*",
-        "/rules/*/resourceNames/*",
-    ],
-    "RBAC/OverlyPermissive": [
-        "/rules/*/verbs/*",
-        "/rules/*/resources/*",
-        "/rules/*/apiGroups/*",
-        "/rules/*/resourceNames/*",
-    ],
-
-    # schema invalid (selector) – this makes /spec/selector legal
-    "Schema/InvalidManifest": [
-        "/spec/selector",
-    ],
-}
-
-FORBIDDEN_EXACT = {
-    "/kind",
-    "/metadata/name",
-    "/metadata/namespace",
-    "/metadata/generateName",
-}
-FORBIDDEN_SEGMENTS = {
-    "/image",          # forbids changing actual image fields (imagePullPolicy handled separately)
-    "/spec/replicas",  # no autoscaling via LLM
-}
-FORBIDDEN_PREFIXES = {
-    "/metadata/labels",
-    "/metadata/annotations",
-}
-
-
-# ------------------------- Helpers ------------------------------
-
-
-def is_safe_security_op(category: str, op: dict) -> bool:
-    """
-    Guardrail: only accept monotonic-hardening ops for security categories.
-    We don't inspect the whole manifest here, just the op shape and value.
-    """
-    path = op.get("path", "")
-    value = op.get("value")
-
-    # PrivilegedContainer: only allow privileged -> false or add false
-    if category == "Security/PrivilegedContainer":
-        if not path.endswith("/securityContext/privileged"):
-            return False
-        return value is False  # add/replace with false only
-
-    # AllowPrivilegeEscalation: only allow false
-    if category == "Security/AllowPrivilegeEscalation":
-        if "/securityContext/allowPrivilegeEscalation" not in path:
-            return False
-        return value is False
-
-    # CapabilitiesNotDropped: only allow capabilities.drop with ALL, no add
-    if category == "Security/CapabilitiesNotDropped":
-        if "/securityContext/capabilities" not in path:
-            return False
-        if not isinstance(value, dict):
-            return False
-        # Only allow 'drop' key, no 'add'
-        if any(k for k in value.keys() if k not in ("drop",)):
-            return False
-        drop = value.get("drop")
-        if not isinstance(drop, list):
-            return False
-        return "ALL" in drop
-
-    # Auth/RunAsRoot: only allow runAsNonRoot=true and non-zero UID
-    if category == "Auth/RunAsRoot":
-        if "runAsNonRoot" in path:
-            return value is True
-        if "runAsUser" in path:
-            # must be an int and > 0
-            return isinstance(value, int) and value > 0
-        return False
-
-    # For other categories we don't enforce special checks here
-    return True
-
-
-def read_json(path: Path) -> Any:
-    return json.loads(path.read_text(encoding="utf-8"))
-
-
-def read_text(p: Path) -> str:
-    try:
-        return p.read_text(encoding="utf-8", errors="ignore")
-    except FileNotFoundError:
-        return ""
-
-
-def write_text(p: Path, s: str) -> None:
-    p.parent.mkdir(parents=True, exist_ok=True)
-    p.write_text(s, encoding="utf-8")
+load_dotenv()
 
 
 def yaml_load_all(s: str) -> List[Any]:
+    """Load all YAML documents."""
     if not s.strip():
         return []
     try:
-        docs = list(yaml.safe_load_all(s))
-        return [d for d in docs if d is not None]
-    except yaml.YAMLError:
+        return [d for d in yaml.safe_load_all(s) if d is not None]
+    except:
         return []
 
 
 def yaml_dump_all(docs: List[Any]) -> str:
-    if not docs:
-        return ""
-    return yaml.safe_dump_all(docs, sort_keys=False, default_flow_style=False)
+    """Dump YAML documents."""
+    return yaml.safe_dump_all(docs, sort_keys=False, default_flow_style=False) if docs else ""
 
 
-def unified_diff_text(original: str, fixed: str, orig_path: str, fixed_path: str) -> str:
-    a = original.splitlines(keepends=True)
-    b = fixed.splitlines(keepends=True)
-    return "".join(
-        difflib.unified_diff(a, b, fromfile=orig_path, tofile=fixed_path, lineterm="", n=3)
-    )
+# ======================= Retry Logic =======================
 
-
-def get_pod_spec(workload: Dict) -> Optional[Dict]:
-    if not isinstance(workload, dict):
-        return None
-    spec = workload.get("spec")
-    if not isinstance(spec, dict):
-        return None
-    if str(workload.get("kind") or "") == "Pod":
-        return spec
-    tmpl = spec.get("template")
-    if isinstance(tmpl, dict) and isinstance(tmpl.get("spec"), dict):
-        return tmpl["spec"]
-    return None
-
-
-# -------------------- JSON Pointer helpers ----------------------
-
-
-def _pointer_walk(doc: Any, pointer: str, create_missing: bool = False):
-    if pointer == "" or pointer == "/":
-        return None, None
-    parts = [p for p in pointer.split("/") if p != ""]
-    cur = doc
-    for part in parts[:-1]:
-        key = part.replace("~1", "/").replace("~0", "~")
-        if isinstance(cur, list):
-            idx = int(key)
-            if idx >= len(cur):
-                if create_missing:
-                    while len(cur) <= idx:
-                        cur.append({})
-                else:
-                    raise KeyError(pointer)
-            cur = cur[idx]
-        else:
-            if key not in cur:
-                if create_missing:
-                    cur[key] = {}
-                else:
-                    raise KeyError(pointer)
-            cur = cur[key]
-    last = parts[-1].replace("~1", "/").replace("~0", "~")
-    return cur, last
-
-
-def apply_json_patch(doc: Any, patch_ops: List[Dict[str, Any]]) -> Any:
-    for op in patch_ops:
-        op_type = op.get("op")
-        path = op.get("path")
-        if not isinstance(op_type, str) or not isinstance(path, str):
-            continue
-        parent, key = _pointer_walk(doc, path, create_missing=(op_type == "add"))
-        if parent is None:
-            if op_type in ("add", "replace"):
-                doc = op.get("value")
-            elif op_type == "remove":
-                doc = None
-            continue
-        if isinstance(parent, list):
-            idx = int(key)
-            if op_type == "add":
-                val = op.get("value")
-                if idx == len(parent):
-                    parent.append(val)
-                elif 0 <= idx < len(parent):
-                    parent.insert(idx, val)
-            elif op_type == "replace":
-                parent[idx] = op.get("value")
-            elif op_type == "remove":
-                if 0 <= idx < len(parent):
-                    parent.pop(idx)
-        else:
-            if op_type in ("add", "replace"):
-                parent[key] = op.get("value")
-            elif op_type == "remove":
-                if key in parent:
-                    del parent[key]
-    return doc
-
-
-# ------------------ Providers & Prompting -----------------------
-
-
-SYSTEM_PROMPT = (
-    "You are SafeFix, a Kubernetes YAML repair assistant.\n"
-    "- Your goal is to FIX ALL auto-fix categories listed in the input, using minimal RFC-6902 JSON patches.\n"
-    "- Do NOT touch forbidden paths (kind/name/namespace/replicas/image) and do NOT modify non-auto-fix categories.\n"
-    "- Only output a STRICT JSON array of RFC-6902 patch objects.\n"
-    "- Each object must include: op, path, value (for add/replace).\n"
-    "- Never wrap in markdown code fences; no prose, no comments."
-)
-
-USER_PROMPT_TEMPLATE = """\
-Context:
-{context}
-
-Target file (relative): {file}
-YAML snippet (truncated):
----
-{yaml_snippet}
----
-
-Derived hints:
-{derived_hints}
-
-Categories to AUTO-FIX in THIS file only (you MUST consider each of these):
-{categories}
-
-Categories that MUST NOT be auto-fixed (leave them as-is, no patches for them):
-{non_auto_fix_categories}
-
-Allowed JSON Pointer paths PER CATEGORY (you MUST keep each op.path within the listed paths for its category):
-{allowed_paths_block}
-
-Forbidden JSON Pointer paths (you MUST NOT touch any of these; if you do, the patch will be rejected):
-{forbidden_paths_block}
-
-Per-category patch hints (from analyzer):
-{patch_hints}
-
-Rules:
-- Your primary objective: for every auto-fix category, either:
-    * emit one or more JSON Patch ops on the allowed paths that fix it, OR
-    * leave it unfixed ONLY if it is truly impossible with configuration alone.
-- Make minimal, surgical changes; do NOT touch unrelated fields.
-- DO NOT modify: kind, metadata.name, metadata.namespace, metadata.generateName, spec.replicas, containers[].image.
-- If image is not pinned, you may only adjust imagePullPolicy; never invent a new tag/digest.
-- For hostPath mounts, you may remove them or replace with emptyDir if safe, but only if that category is present.
-- For RBAC wildcards, narrow verbs to ['get','list'] and resources to the minimal safe baseline.
-- Reuse the following canonical patterns when relevant:
-    * runAsNonRoot: true
-    * runAsUser: 1000
-    * allowPrivilegeEscalation: false
-    * readOnlyRootFilesystem: true
-    * seccompProfile: {{ "type": "RuntimeDefault" }}
-    * capabilities: {{ "drop": ["ALL"] }}
-    * resources:
-        - requests.cpu: "100m", requests.memory: "128Mi"
-        - limits.cpu: "200m", limits.memory: "256Mi"
-    * HTTP probes:
-        - livenessProbe: httpGet path "/healthz", port 8080
-        - readinessProbe: httpGet path "/ready",   port 8080
-
-Special guidance (based on categories + hints):
-{special_guidance}
-
-Before returning:
-- Check that every patch `path` respects the allowed_paths for at least one auto-fix category.
-- Check that no patch touches a forbidden path.
-- Check that you have addressed as many auto-fix categories as safely possible.
-
-Return ONLY a JSON array with RFC-6902 ops. No extra keys, no wrapper object.
-"""
-
-
-def derive_special_guidance(categories: List[str], patch_hints: List[str]) -> str:
-    cats = set([c for c in categories if c])
-    g: List[str] = []
-
-    # High-level schema hints
-    if (
-        "MISSING_KIND" in cats
-        or "SCHEMA_VALIDATION_ERROR" in cats
-        or "Schema/InvalidManifest" in cats
-    ):
-        g += [
-            "- Ensure required top-level keys exist: apiVersion, kind, metadata.name.",
-            "- Choose apiVersion/kind consistent with existing fields; never change metadata.name.",
-        ]
-    if "MISSING_SELECTOR" in cats or "Schema/InvalidManifest" in cats:
-        g += [
-            "- For Deployment: add spec.selector.matchLabels that EXACTLY equals spec.template.metadata.labels.",
-            "- Do not modify replicas, image, or other fields when fixing selector.",
-        ]
-
-    # NEW: strong guidance for security categories
-    if any(c in cats for c in [
-        "Security/PrivilegedContainer",
-        "Security/AllowPrivilegeEscalation",
-        "Security/CapabilitiesNotDropped",
-        "Auth/RunAsRoot",
-        "Policy/PodSecurityViolation",
-    ]):
-        g += [
-            "- For container security issues, ALWAYS modify spec.template.spec.containers[*].securityContext.*",
-            "- NEVER put 'privileged', 'allowPrivilegeEscalation', or 'capabilities' under pod-level securityContext (spec.template.spec.securityContext).",
-            "- Pod-level securityContext is only for fields like runAsNonRoot, runAsUser, fsGroup, seccompProfile.",
-        ]
-
-    # If there are patch hints from the normalizer, surface them explicitly
-    clean_hints = [h.strip() for h in patch_hints if isinstance(h, str) and h.strip()]
-    if clean_hints:
-        g.append("Patch hints from analyzer (one per category instance, deduped):")
-        for h in sorted(set(clean_hints)):
-            g.append(f"  * {h}")
-
-    return "\n".join(g) if g else "- None."
-
-
-def derive_hints_from_yaml(docs: List[Dict[str, Any]]) -> str:
-    if not docs:
-        return "- Could not parse YAML."
-    d = docs[0]
-    hints = []
-    kind = d.get("kind", "")
-    if kind:
-        hints.append(f"- kind: {kind}")
-    apiv = d.get("apiVersion", "")
-    if apiv:
-        hints.append(f"- apiVersion: {apiv}")
-    name = ((d.get("metadata") or {}).get("name")) or ""
-    if name:
-        hints.append(f"- metadata.name: {name}")
-    if (d.get("spec") or {}).get("template"):
-        hints.append("- Looks like a controller with spec.template (e.g., Deployment).")
-        tmpl = (d.get("spec") or {}).get("template") or {}
-        tlabels = ((tmpl.get("metadata") or {}).get("labels") or {})
-        if tlabels:
-            hints.append(f"- template.labels keys: {', '.join(sorted(tlabels.keys()))}")
-    rules = (d.get("rules") or [])
-    if rules:
-        hints.append(f"- Has RBAC rules (Role/ClusterRole), rules count={len(rules)}.")
-    return "\n".join(hints) if hints else "- No obvious structure."
-
-
-def first_yaml_snippet(text: str, max_chars: int = 1500) -> str:
-    if not text:
-        return "(empty file or unreadable)"
-    s = text.strip()
-    return s[:max_chars]
-
-
-# ---------- JSON Pointer pattern matching (for stats + guidance) ----------
-
-
-def ptr_matches(pattern: str, path: str) -> bool:
+def retry_with_backoff(func, max_retries=3, base_delay=1):
     """
-    Simple JSON-pointer-ish matcher with '*' wildcard matching a single segment.
+    Retry a function with exponential backoff.
+    Handles rate limits (429) and transient errors.
     """
-    p_segs = [s for s in pattern.split("/") if s]
-    x_segs = [s for s in path.split("/") if s]
-    if len(x_segs) < len(p_segs):
-        return False
-    for i, p in enumerate(p_segs):
-        if p == "*":
-            continue
-        if i >= len(x_segs):
-            return False
-        if p != x_segs[i]:
-            return False
-    return True
-
-
-def allowed_paths_for_categories(categories: List[str]) -> Dict[str, List[str]]:
-    """
-    Build a mapping of category -> allowed JSON Pointer paths for that category.
-    Includes RBAC prefix handling (any category starting with 'RBAC/').
-    """
-    out: Dict[str, List[str]] = {}
-    cats = [c for c in categories if c]
-    for c in cats:
-        out[c] = list(CATEGORY_PATH_RULES.get(c, []))
-
-    # Prefix-based fallbacks (RBAC/*)
-    if any(c.startswith("RBAC/") for c in cats):
-        rbac_paths = CATEGORY_PATH_RULES.get("RBAC/Wildcard", [])
-        for c in cats:
-            if c.startswith("RBAC/"):
-                out.setdefault(c, [])
-                for p in rbac_paths:
-                    if p not in out[c]:
-                        out[c].append(p)
-
-    return out
-
-
-def categorize_ops_against_categories(
-    ops: List[Dict[str, Any]],
-    auto_fix_categories: List[str],
-) -> Tuple[List[str], List[str]]:
-    """
-    Use CATEGORY_PATH_RULES to infer which categories each op contributes to.
-    Returns (categories_fixed, categories_unfixed) based on presence of at least
-    one op on an allowed path for that category.
-    """
-    allowed = allowed_paths_for_categories(auto_fix_categories)
-    fixed: set = set()
-
-    for op in ops:
-        path = op.get("path", "")
-        if not isinstance(path, str):
-            continue
-        for cat, patterns in allowed.items():
-            if any(ptr_matches(pat, path) for pat in patterns):
-                fixed.add(cat)
-
-    cats_set = set(auto_fix_categories)
-    categories_fixed = sorted(fixed & cats_set)
-    categories_unfixed = sorted(cats_set - fixed)
-    return categories_fixed, categories_unfixed
-
-
-# ---------- Robust HTTP (retry/backoff + tolerant JSON parsing) ----------
-
-
-def _extract_retry_secs_from_text(text: str) -> Optional[float]:
-    m = re.search(r"try again in\s+([0-9]+(?:\.[0-9]+)?)s", text or "", re.IGNORECASE)
-    if m:
+    for attempt in range(max_retries):
         try:
-            return float(m.group(1))
-        except Exception:
-            return None
-    return None
-
-
-def _post_json(
-    url: str,
-    headers: Dict[str, str],
-    payload: Dict[str, Any],
-    *,
-    provider: Optional[str] = None,
-    max_retries: int = 6,
-) -> Tuple[Optional[dict], Optional[str]]:
-    session = requests.Session()
-    attempt = 0
-    lowered_tokens_once = False
-    last_err = None
-
-    while True:
-        attempt += 1
-        try:
-            r = session.post(url, headers=headers, json=payload, timeout=90)
-            status = r.status_code
-            if 200 <= status < 300:
-                return r.json(), None
-
-            if status == 402 and provider == "openrouter":
-                if not lowered_tokens_once:
-                    lowered_tokens_once = True
-                    if isinstance(payload, dict) and "max_tokens" in payload:
-                        payload["max_tokens"] = max(256, int(payload.get("max_tokens", 512) // 2))
-                    else:
-                        payload["max_tokens"] = 256
-                    continue
-                last_err = f"{status} OpenRouter credit/limit"
-                return None, last_err
-
-            if status == 429:
-                wait = _extract_retry_secs_from_text(r.text) or (
-                    min(2**attempt, 30) + random.uniform(0, 0.5)
-                )
-                time.sleep(wait)
-            elif 500 <= status < 600:
-                wait = min(2**attempt, 30) + random.uniform(0, 0.5)
-                time.sleep(wait)
+            result = func()
+            
+            # Check for rate limit or server error
+            if isinstance(result, tuple) and len(result) >= 3:
+                patches, explanation, error = result
+                
+                if error and "429" in str(error):
+                    if attempt < max_retries - 1:
+                        delay = base_delay * (2 ** attempt) + random.uniform(0, 1)
+                        print(f"      Rate limited, retrying in {delay:.1f}s...")
+                        time.sleep(delay)
+                        continue
+                
+                return result
+            
+            return result
+            
+        except Exception as e:
+            if attempt < max_retries - 1:
+                delay = base_delay * (2 ** attempt)
+                print(f"      Error: {e}, retrying in {delay:.1f}s...")
+                time.sleep(delay)
             else:
-                last_err = f"{status} {r.text[:200]}"
-                return None, last_err
-
-        except requests.RequestException as e:
-            last_err = f"network {e}"
-            wait = min(2**attempt, 30) + random.uniform(0, 0.5)
-            time.sleep(wait)
-
-        if attempt >= max_retries:
-            return None, last_err or "retries exhausted"
+                return None, None, str(e)
+    
+    return None, None, "Max retries exceeded"
 
 
-def _extract_json_array(text: str) -> Optional[List[dict]]:
+def get_container_base_path(doc: Dict[str, Any]) -> str:
     """
-    Be tolerant to models returning prose or code fences.
-    Strategy:
-      1) Strip markdown fences.
-      2) Try direct json.loads.
-      3) Extract first [...] block.
-      4) If that still fails, strip obvious trailing commas and retry.
+    Get the correct base path for containers based on resource kind.
+    
+    Returns the JSON pointer path to the containers array.
     """
+    kind = doc.get("kind", "")
+    
+    # Workload resources with pod templates
+    if kind in ("Deployment", "StatefulSet", "DaemonSet", "Job", "CronJob", "ReplicaSet"):
+        return "/spec/template/spec/containers"
+    
+    # Pod and other resources
+    return "/spec/containers"
+
+
+def get_pod_spec_path(doc: Dict[str, Any]) -> str:
+    """
+    Get the correct base path for pod spec based on resource kind.
+    
+    Returns the JSON pointer path to the pod spec.
+    """
+    kind = doc.get("kind", "")
+    
+    # Workload resources with pod templates
+    if kind in ("Deployment", "StatefulSet", "DaemonSet", "Job", "CronJob", "ReplicaSet"):
+        return "/spec/template/spec"
+    
+    # Pod and other resources
+    return "/spec"
+
+
+def get_containers_and_path(doc: Dict[str, Any]) -> Tuple[List[Dict], str]:
+    """
+    Get containers list and their base path.
+    
+    Returns: (containers_list, base_path)
+    """
+    kind = doc.get("kind", "")
+    
+    if kind in ("Deployment", "StatefulSet", "DaemonSet", "Job", "CronJob", "ReplicaSet"):
+        containers = doc.get("spec", {}).get("template", {}).get("spec", {}).get("containers", [])
+        base_path = "/spec/template/spec/containers"
+    else:
+        containers = doc.get("spec", {}).get("containers", [])
+        base_path = "/spec/containers"
+    
+    return containers, base_path
+
+
+# ======================= Security Hardening Handler =======================
+
+class SecurityHardeningHandler:
+    """
+    Comprehensive security context hardening handler.
+    Applies ALL 4 required controls together:
+    1. allowPrivilegeEscalation: false
+    2. capabilities.drop: [ALL]
+    3. readOnlyRootFilesystem: true
+    4. runAsNonRoot: true + runAsUser: 1000
+    """
+    
+    @staticmethod
+    def generate_all_patches(doc: Dict[str, Any]) -> Tuple[List[Dict[str, Any]], str]:
+        """
+        Generate ALL security hardening patches at once.
+        
+        Returns: (patches, explanation)
+        """
+        patches = []
+        kind = doc.get("kind", "")
+        
+        # Get pod spec path
+        pod_spec_path = get_pod_spec_path(doc)
+        
+        # Get containers
+        containers, containers_path = get_containers_and_path(doc)
+        
+        # 1. Add pod-level security context
+        patches.append({
+            "op": "add",
+            "path": f"{pod_spec_path}/securityContext",
+            "value": {
+                "runAsNonRoot": True,
+                "runAsUser": 1000,
+                "fsGroup": 1000,
+                "seccompProfile": {
+                    "type": "RuntimeDefault"
+                }
+            },
+            "description": "Pod-level security: non-root user with seccomp profile"
+        })
+        
+        # 2. Add container-level security for each container
+        for i, container in enumerate(containers):
+            container_name = container.get("name", f"container-{i}")
+            base_path = f"{containers_path}/{i}/securityContext"
+            
+            # All 4 critical controls
+            patches.extend([
+                {
+                    "op": "add",
+                    "path": f"{base_path}/allowPrivilegeEscalation",
+                    "value": False,
+                    "description": f"Prevent privilege escalation in {container_name}"
+                },
+                {
+                    "op": "add",
+                    "path": f"{base_path}/capabilities",
+                    "value": {"drop": ["ALL"]},
+                    "description": f"Drop all capabilities in {container_name}"
+                },
+                {
+                    "op": "add",
+                    "path": f"{base_path}/readOnlyRootFilesystem",
+                    "value": True,
+                    "description": f"Make root filesystem read-only in {container_name}"
+                },
+                {
+                    "op": "add",
+                    "path": f"{base_path}/runAsNonRoot",
+                    "value": True,
+                    "description": f"Run as non-root in {container_name}"
+                },
+                {
+                    "op": "add",
+                    "path": f"{base_path}/runAsUser",
+                    "value": 1000,
+                    "description": f"Run as UID 1000 in {container_name}"
+                },
+                {
+                    "op": "add",
+                    "path": f"{base_path}/seccompProfile",
+                    "value": {"type": "RuntimeDefault"},
+                    "description": f"Enable seccomp in {container_name}"
+                }
+            ])
+            
+            # 3. Add required volumes for readOnlyRootFilesystem
+            image = container.get("image", "")
+            required_mounts = SecurityHardeningHandler._get_required_mounts_for_image(image)
+            
+            for mount in required_mounts:
+                patches.append({
+                    "op": "add",
+                    "path": f"{containers_path}/{i}/volumeMounts/-",
+                    "value": mount,
+                    "description": f"Add volume mount {mount['mountPath']} for {container_name}"
+                })
+        
+        # 4. Add emptyDir volumes
+        required_volumes = [
+            {"name": "tmp", "emptyDir": {}},
+            {"name": "cache", "emptyDir": {}},
+            {"name": "run", "emptyDir": {}},
+        ]
+        
+        for volume in required_volumes:
+            patches.append({
+                "op": "add",
+                "path": f"{pod_spec_path}/volumes/-",
+                "value": volume,
+                "description": f"Add {volume['name']} volume for writable directory"
+            })
+        
+        explanation = (
+            "Applied comprehensive security hardening:\n"
+            "  - allowPrivilegeEscalation: false (prevents privilege escalation)\n"
+            "  - capabilities.drop: [ALL] (removes unnecessary privileges)\n"
+            "  - readOnlyRootFilesystem: true (prevents filesystem tampering)\n"
+            "  - runAsNonRoot: true + runAsUser: 1000 (ensures non-root execution)\n"
+            "  - Added required volumes and mounts for read-only filesystem"
+        )
+        
+        return patches, explanation
+    
+    @staticmethod
+    def _get_required_mounts_for_image(image: str) -> List[Dict[str, str]]:
+        """Get required volume mounts based on container image."""
+        image_lower = image.lower()
+        
+        # Nginx needs specific directories
+        if 'nginx' in image_lower:
+            return [
+                {"name": "tmp", "mountPath": "/tmp"},
+                {"name": "cache", "mountPath": "/var/cache/nginx"},
+                {"name": "run", "mountPath": "/var/run"},
+            ]
+        
+        # Apache/httpd
+        elif 'apache' in image_lower or 'httpd' in image_lower:
+            return [
+                {"name": "tmp", "mountPath": "/tmp"},
+                {"name": "run", "mountPath": "/var/run"},
+            ]
+        
+        # Default: just tmp
+        else:
+            return [
+                {"name": "tmp", "mountPath": "/tmp"},
+            ]
+
+
+# ======================= Template-Based Fixes =======================
+
+def apply_template_fix(
+    doc: Dict[str, Any],
+    category: str,
+    findings: List[Dict[str, Any]]
+) -> Tuple[List[Dict[str, Any]], str]:
+    """
+    Apply template-based fixes that require some inspection but no LLM.
+    These are smarter than deterministic but don't need full LLM reasoning.
+    """
+    patches = []
+    explanation = ""
+    kind = doc.get("kind", "")
+    name = doc.get("metadata", {}).get("name", "unknown")
+    
+    # Get containers using helper function
+    containers, containers_path = get_containers_and_path(doc)
+    
+    if category == "Probes/MissingReadinessLiveness":
+        # Detect service type and add appropriate probes
+        for i, c in enumerate(containers):
+            container_name = c.get("name", f"container-{i}")
+            ports = c.get("ports", [])
+            
+            # Determine probe type based on container
+            if ports:
+                port = ports[0].get("containerPort", 80)
+                # HTTP probe
+                if not c.get("livenessProbe"):
+                    patches.append({
+                        "op": "add",
+                        "path": f"{containers_path}/{i}/livenessProbe",
+                        "value": {
+                            "httpGet": {"path": "/", "port": port},
+                            "initialDelaySeconds": 30,
+                            "periodSeconds": 10
+                        }
+                    })
+                if not c.get("readinessProbe"):
+                    patches.append({
+                        "op": "add",
+                        "path": f"{containers_path}/{i}/readinessProbe",
+                        "value": {
+                            "httpGet": {"path": "/", "port": port},
+                            "initialDelaySeconds": 10,
+                            "periodSeconds": 5
+                        }
+                    })
+                explanation = f"Added HTTP liveness probe (port {port}) and readiness probe for {container_name} to enable automatic recovery and traffic management."
+            else:
+                # TCP probe as fallback
+                if not c.get("livenessProbe"):
+                    patches.append({
+                        "op": "add",
+                        "path": f"{containers_path}/{i}/livenessProbe",
+                        "value": {
+                            "tcpSocket": {"port": 8080},
+                            "initialDelaySeconds": 30,
+                            "periodSeconds": 10
+                        }
+                    })
+                if not c.get("readinessProbe"):
+                    patches.append({
+                        "op": "add",
+                        "path": f"{containers_path}/{i}/readinessProbe",
+                        "value": {
+                            "tcpSocket": {"port": 8080},
+                            "initialDelaySeconds": 10,
+                            "periodSeconds": 5
+                        }
+                    })
+                explanation = f"Added TCP-based liveness and readiness probes for {container_name} to enable automatic recovery and traffic management."
+    
+    elif category == "Resources/MissingRequests":
+        for i, c in enumerate(containers):
+            resources = c.get("resources", {})
+            limits = resources.get("limits")
+            requests = resources.get("requests")
+            
+            if not requests:
+                # If limits exist, use them; otherwise use sensible defaults
+                if limits:
+                    patches.append({
+                        "op": "add",
+                        "path": f"{containers_path}/{i}/resources/requests",
+                        "value": limits
+                    })
+                    explanation = f"Added resource requests (copied from limits) to ensure proper scheduling."
+                else:
+                    patches.append({
+                        "op": "add",
+                        "path": f"{containers_path}/{i}/resources/requests",
+                        "value": {"cpu": "100m", "memory": "128Mi"}
+                    })
+                    explanation = f"Added resource requests (cpu: 100m, memory: 128Mi) for proper scheduling."
+    
+    elif category == "Resources/MissingLimits":
+        for i, c in enumerate(containers):
+            resources = c.get("resources", {})
+            limits = resources.get("limits")
+            requests = resources.get("requests")
+            
+            if not limits:
+                # If requests exist, use 2x; otherwise use sensible defaults
+                if requests:
+                    cpu = requests.get("cpu", "100m")
+                    mem = requests.get("memory", "128Mi")
+                    # Simple 2x multiplier
+                    cpu_val = int(re.search(r'\d+', cpu).group()) if re.search(r'\d+', cpu) else 100
+                    mem_val = int(re.search(r'\d+', mem).group()) if re.search(r'\d+', mem) else 128
+                    
+                    patches.append({
+                        "op": "add",
+                        "path": f"{containers_path}/{i}/resources/limits",
+                        "value": {
+                            "cpu": f"{cpu_val * 2}m",
+                            "memory": f"{mem_val * 2}Mi"
+                        }
+                    })
+                    explanation = f"Added resource limits (2x requests) to prevent resource exhaustion."
+                else:
+                    patches.append({
+                        "op": "add",
+                        "path": f"{containers_path}/{i}/resources/limits",
+                        "value": {"cpu": "200m", "memory": "256Mi"}
+                    })
+                    explanation = f"Added resource limits (cpu: 200m, memory: 256Mi) to prevent resource exhaustion."
+    
+    return patches, explanation
+
+
+def apply_deterministic_fix(
+    doc: Dict[str, Any],
+    category: str,
+    findings: List[Dict[str, Any]]
+) -> Tuple[List[Dict[str, Any]], str]:
+    """Apply deterministic template-based fixes."""
+    patches = []
+    explanation = ""
+    kind = doc.get("kind", "")
+    name = doc.get("metadata", {}).get("name", "unknown")
+    
+    # Get the correct pod spec path
+    pod_spec_path = get_pod_spec_path(doc)
+    
+    if category == "Auth/DefaultNamespace":
+        if not doc.get("metadata", {}).get("namespace"):
+            patches.append({
+                "op": "add",
+                "path": "/metadata/namespace",
+                "value": "default-app"
+            })
+            explanation = "Added namespace 'default-app' to avoid using the default namespace, improving security isolation."
+    
+    elif category == "Auth/DefaultServiceAccount":
+        sa_name = f"{name}-sa"
+        
+        # Get pod spec to check for serviceAccountName
+        if kind in ("Deployment", "StatefulSet", "DaemonSet", "Job", "CronJob", "ReplicaSet"):
+            spec = doc.get("spec", {}).get("template", {}).get("spec", {})
+        else:
+            spec = doc.get("spec", {})
+        
+        if not spec.get("serviceAccountName"):
+            patches.append({
+                "op": "add",
+                "path": f"{pod_spec_path}/serviceAccountName",
+                "value": sa_name
+            })
+            explanation = f"Added dedicated ServiceAccount '{sa_name}' following principle of least privilege."
+    
+    elif category == "Auth/AutomountServiceAccountToken":
+        # Get pod spec to check for automountServiceAccountToken
+        if kind in ("Deployment", "StatefulSet", "DaemonSet", "Job", "CronJob", "ReplicaSet"):
+            spec = doc.get("spec", {}).get("template", {}).get("spec", {})
+        else:
+            spec = doc.get("spec", {})
+        
+        if spec.get("automountServiceAccountToken") != False:
+            patches.append({
+                "op": "add",
+                "path": f"{pod_spec_path}/automountServiceAccountToken",
+                "value": False
+            })
+            explanation = "Disabled automatic mounting of ServiceAccount token to reduce attack surface."
+    
+    return patches, explanation
+
+
+# ======================= LLM Functions =======================
+
+SYSTEM_PROMPT = """You are SafeFix, a Kubernetes security repair assistant.
+Return a JSON object with two fields:
+1. "patches": array of RFC-6902 patch operations
+2. "explanation": brief explanation of what was fixed and why
+
+Never change: metadata.name, metadata.namespace, kind, spec.selector, Service ports."""
+
+
+def extract_relevant_context(doc: Dict[str, Any], category: str) -> str:
+    """Extract only relevant YAML sections."""
+    kind = doc.get("kind", "")
+    
+    if category.startswith("Security/") or category.startswith("Auth/RunAs"):
+        if kind in ("Deployment", "StatefulSet", "DaemonSet", "Job", "CronJob"):
+            spec = doc.get("spec", {}).get("template", {}).get("spec", {})
+        else:
+            spec = doc.get("spec", {})
+        
+        context = {
+            "kind": kind,
+            "metadata": {"name": doc.get("metadata", {}).get("name", "unknown")},
+            "spec": spec,
+        }
+        return yaml.safe_dump(context, sort_keys=False)
+    
+    # For other categories, return minimal context
+    context = {
+        "kind": kind,
+        "metadata": doc.get("metadata", {}),
+        "spec": doc.get("spec", {}),
+    }
+    return yaml.safe_dump(context, sort_keys=False)
+
+
+def call_llm_with_fallback(
+    category: str,
+    doc: Dict[str, Any],
+    context_yaml: str,
+    models: Dict[str, str],
+    config: Dict[str, Any]
+) -> Tuple[Optional[List[Dict]], Optional[str], Optional[str]]:
+    """
+    Call LLM with fallback provider on failure.
+    Returns (patches, explanation, error)
+    """
+    provider = config.get("provider", LlmProvider.OPENAI)
+    fallback = config.get("fallback")
+    max_retries = config.get("max_retries", 3)
+    
+    # Build prompt
+    kind = doc.get("kind", "")
+    name = doc.get("metadata", {}).get("name", "unknown")
+    
+    prompt = f"""Kind: {kind}
+Name: {name}
+Category: {category}
+
+Context:
+{context_yaml[:800]}
+
+Return JSON with patches and explanation."""
+    
+    # Try primary provider with retries
+    def try_provider(prov):
+        return call_provider_api(prov, prompt, models.get(prov.value, ""))
+    
+    result = retry_with_backoff(lambda: try_provider(provider), max_retries=max_retries)
+    patches, explanation, error = result
+    
+    # Try fallback if primary failed
+    if error and fallback:
+        print(f"      Primary failed, trying fallback ({fallback.value})...")
+        result = retry_with_backoff(lambda: try_provider(fallback), max_retries=2)
+        patches, explanation, error = result
+    
+    return patches, explanation, error
+
+
+def call_provider_api(provider: LlmProvider, prompt: str, model: str) -> Tuple[Optional[List], Optional[str], Optional[str]]:
+    """Call a specific provider's API."""
+    if provider == LlmProvider.OPENAI:
+        return call_openai(model or "gpt-4o-mini", prompt)
+    elif provider == LlmProvider.GROQ:
+        return call_groq(model or "llama-3.1-8b-instant", prompt)
+    elif provider == LlmProvider.GEMINI:
+        return call_gemini(model or "gemini-2.0-flash-exp", prompt)
+    elif provider == LlmProvider.OPENROUTER:
+        return call_openrouter(model or "x-ai/grok-vision-beta", prompt)
+    return None, None, f"Unknown provider: {provider}"
+
+
+def extract_json_response(text: str) -> Tuple[Optional[List[dict]], Optional[str]]:
+    """Extract patches and explanation from LLM response."""
     if not text:
-        return None
-
-    # Strip markdown fences if present
+        return None, None
+    
     text = text.strip()
     text = re.sub(r"^```(?:json)?", "", text, flags=re.IGNORECASE).strip()
     text = re.sub(r"```$", "", text).strip()
-
-    def _try_parse(s: str) -> Optional[List[dict]]:
-        try:
-            obj = json.loads(s)
-            return obj if isinstance(obj, list) else None
-        except Exception:
-            return None
-
-    # Direct parse
-    arr = _try_parse(text)
-    if arr is not None:
-        return arr
-
-    # Fallback: find first array
-    m = re.search(r"\[.*\]", text, flags=re.S)
-    if not m:
-        return None
-    frag = m.group(0)
-
-    arr = _try_parse(frag)
-    if arr is not None:
-        return arr
-
-    # Last-chance: strip trailing commas before } or ]
-    sanitized = re.sub(r",(\s*[}\]])", r"\1", frag)
-    arr = _try_parse(sanitized)
-    return arr
-
-
-# ---------------- Provider calls ----------------
-
-
-def call_openrouter(model: str, prompt: str) -> Tuple[Optional[List[dict]], Optional[str]]:
-    key = os.environ.get("OPENROUTER_API_KEY")
-    if not key or not model:
-        return None, "missing key or model"
-    url = "https://openrouter.ai/api/v1/chat/completions"
-    body = {
-        "model": model,
-        "messages": [
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": prompt},
-        ],
-        "temperature": 0.0,
-        "max_tokens": 640,
-    }
-    headers = {
-        "Authorization": f"Bearer {key}",
-        "Content-Type": "application/json",
-        "User-Agent": "SafeFix-K8s/1.0",
-        "HTTP-Referer": "https://safefix.local",
-    }
-    js, err = _post_json(url, headers, body, provider="openrouter")
-    if not js:
-        return None, err or "no json"
+    
     try:
-        txt = js["choices"][0]["message"]["content"].strip()
-        ops = _extract_json_array(txt)
-        return ops, None if ops is not None else "parse-failed"
-    except Exception as e:
-        return None, f"extract-error {e}"
-
-
-def call_groq(model: str, prompt: str) -> Tuple[Optional[List[dict]], Optional[str]]:
-    key = os.environ.get("GROQ_API_KEY")
-    if not key or not model:
-        return None, "missing key or model"
-    url = "https://api.groq.com/openai/v1/chat/completions"
-    body = {
-        "model": model,
-        "messages": [
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": prompt},
-        ],
-        "temperature": 0.0,
-        "max_tokens": 1024,
-    }
-    js, err = _post_json(
-        url,
-        {"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
-        body,
-        provider="groq",
-    )
-    if not js:
-        return None, err or "no json"
-    try:
-        txt = js["choices"][0]["message"]["content"].strip()
-        ops = _extract_json_array(txt)
-        return ops, None if ops is not None else "parse-failed"
-    except Exception as e:
-        return None, f"extract-error {e}"
-
-
-def call_gemini(model: str, prompt: str) -> Tuple[Optional[List[dict]], Optional[str]]:
-    key = os.environ.get("GEMINI_API_KEY")
-    if not key or not model:
-        return None, "missing key or model"
-    url = (
-        f"https://generativelanguage.googleapis.com/v1beta/models/"
-        f"{model}:generateContent?key={key}"
-    )
-    body = {
-        "contents": [{"parts": [{"text": SYSTEM_PROMPT + "\n\n" + prompt}]}],
-        "generationConfig": {"temperature": 0.0},
-    }
-    js_err = None
-    try:
-        r = requests.post(url, json=body, timeout=90)
-        if 200 <= r.status_code < 300:
-            js = r.json()
-            txt = js["candidates"][0]["content"]["parts"][0]["text"].strip()
-            ops = _extract_json_array(txt)
-            return ops, None if ops is not None else "parse-failed"
-        js_err = f"{r.status_code} {r.text[:160]}"
-    except Exception as e:
-        js_err = f"network {e}"
-    return None, js_err
-
-
-def call_ollama(model: str, prompt: str) -> Tuple[Optional[List[dict]], Optional[str]]:
-    base = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434")
-    if not model or not base:
-        return None, "missing base or model"
-    url = f"{base.rstrip('/')}/api/chat"
-    body = {
-        "model": model,
-        "messages": [
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": prompt},
-        ],
-        "stream": False,
-    }
-    try:
-        r = requests.post(url, json=body, timeout=90)
-        if 200 <= r.status_code < 300:
-            js = r.json()
-            txt = js.get("message", {}).get("content", "").strip()
-            ops = _extract_json_array(txt)
-            if ops is not None:
-                return ops, None
-    except Exception:
+        obj = json.loads(text)
+        if isinstance(obj, dict) and "patches" in obj:
+            return obj.get("patches", []), obj.get("explanation", "")
+        elif isinstance(obj, list):
+            return obj, None
+    except:
         pass
-    # fallback endpoint
+    
+    match = re.search(r'\{[^{}]*"patches"[^{}]*\}', text, flags=re.S)
+    if match:
+        try:
+            obj = json.loads(match.group(0))
+            return obj.get("patches", []), obj.get("explanation", "")
+        except:
+            pass
+    
+    match = re.search(r'\[.*\]', text, flags=re.S)
+    if match:
+        try:
+            return json.loads(match.group(0)), None
+        except:
+            pass
+    
+    return None, None
+
+
+def call_openai(model: str, prompt: str) -> Tuple[Optional[List], Optional[str], Optional[str]]:
+    """Call OpenAI API."""
+    key = os.environ.get("OPENAI_API_KEY")
+    if not key:
+        return None, None, "OPENAI_API_KEY not set"
+    
     try:
-        url2 = f"{base.rstrip('/')}/api/generate"
-        r2 = requests.post(
-            url2,
+        response = requests.post(
+            "https://api.openai.com/v1/chat/completions",
+            headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
             json={
                 "model": model,
-                "prompt": SYSTEM_PROMPT + "\n\n" + prompt,
-                "stream": False,
+                "messages": [
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": prompt}
+                ],
+                "temperature": 0.0,
+                "max_tokens": 1000,
             },
-            timeout=90,
+            timeout=60
         )
-        if 200 <= r2.status_code < 300:
-            js2 = r2.json()
-            txt2 = js2.get("response", "").strip()
-            ops = _extract_json_array(txt2)
-            return ops, None if ops is not None else "parse-failed"
-        return None, f"{r2.status_code} {r2.text[:160]}"
+        
+        if response.status_code != 200:
+            return None, None, f"HTTP {response.status_code}"
+        
+        text = response.json()["choices"][0]["message"]["content"]
+        patches, explanation = extract_json_response(text)
+        return patches, explanation, None if patches else "Could not parse response"
     except Exception as e:
-        return None, f"network {e}"
+        return None, None, str(e)
 
 
-# ------------------ Voting & Application ------------------------
+def call_groq(model: str, prompt: str) -> Tuple[Optional[List], Optional[str], Optional[str]]:
+    """Call Groq API."""
+    key = os.environ.get("GROQ_API_KEY")
+    if not key:
+        return None, None, "GROQ_API_KEY not set"
+    
+    try:
+        response = requests.post(
+            "https://api.groq.com/openai/v1/chat/completions",
+            headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
+            json={
+                "model": model,
+                "messages": [
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": prompt}
+                ],
+                "temperature": 0.0,
+                "max_tokens": 1000,
+            },
+            timeout=60
+        )
+        
+        if response.status_code != 200:
+            return None, None, f"HTTP {response.status_code}"
+        
+        text = response.json()["choices"][0]["message"]["content"]
+        patches, explanation = extract_json_response(text)
+        return patches, explanation, None if patches else "Could not parse response"
+    except Exception as e:
+        return None, None, str(e)
 
 
-def sanitize_ops(ops: Any) -> List[Dict[str, Any]]:
-    out: List[Dict[str, Any]] = []
-    if not isinstance(ops, list):
-        return out
-    for o in ops:
-        if not isinstance(o, dict):
-            continue
-        op = o.get("op")
-        path = o.get("path")
-        if not isinstance(op, str) or not isinstance(path, str):
-            continue
-        if op not in ("add", "replace", "remove"):
-            continue
-        if op in ("add", "replace") and "value" not in o:
-            continue
-
-        # Drop clearly forbidden paths early (extra safety)
-        if path in FORBIDDEN_EXACT:
-            continue
-        if any(path.startswith(pref) for pref in FORBIDDEN_PREFIXES):
-            continue
-        # Allow imagePullPolicy, but block direct /image fields and replicas
-        if "/imagePullPolicy" not in path and any(seg in path for seg in FORBIDDEN_SEGMENTS):
-            continue
-
-        out.append({"op": op, "path": path, "value": o.get("value")})
-    return out
+def call_gemini(model: str, prompt: str) -> Tuple[Optional[List], Optional[str], Optional[str]]:
+    """Call Gemini API."""
+    key = os.environ.get("GEMINI_API_KEY")
+    if not key:
+        return None, None, "GEMINI_API_KEY not set"
+    
+    try:
+        response = requests.post(
+            f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={key}",
+            json={
+                "contents": [{"parts": [{"text": SYSTEM_PROMPT + "\n\n" + prompt}]}],
+                "generationConfig": {"temperature": 0.0, "maxOutputTokens": 1000},
+            },
+            timeout=60
+        )
+        
+        if response.status_code != 200:
+            return None, None, f"HTTP {response.status_code}"
+        
+        text = response.json()["candidates"][0]["content"]["parts"][0]["text"]
+        patches, explanation = extract_json_response(text)
+        return patches, explanation, None if patches else "Could not parse response"
+    except Exception as e:
+        return None, None, str(e)
 
 
-def vote_merge(provider_ops: List[Tuple[str, List[Dict[str, Any]]]]) -> List[Dict[str, Any]]:
-    priority = ["openrouter", "groq", "gemini", "ollama"]
-    seen: Dict[str, Dict[str, Any]] = {}
-    counts: Dict[str, int] = {}
-    first_provider: Dict[str, str] = {}
-    for provider, ops in provider_ops:
-        for op in ops:
-            key = json.dumps(op, sort_keys=True)
-            counts[key] = counts.get(key, 0) + 1
-            if key not in first_provider:
-                first_provider[key] = provider
-            if key not in seen:
-                seen[key] = op
-    if not counts:
-        return []
-    max_votes = max(counts.values())
-    winners = [k for k, v in counts.items() if v == max_votes]
-    winners.sort(
-        key=lambda k: priority.index(first_provider.get(k, "ollama"))
-        if first_provider.get(k, "ollama") in priority
-        else 99
-    )
-    return [seen[k] for k in winners]
+def call_openrouter(model: str, prompt: str) -> Tuple[Optional[List], Optional[str], Optional[str]]:
+    """Call OpenRouter API."""
+    key = os.environ.get("OPENROUTER_API_KEY")
+    if not key:
+        return None, None, "OPENROUTER_API_KEY not set"
+    
+    try:
+        response = requests.post(
+            "https://openrouter.ai/api/v1/chat/completions",
+            headers={
+                "Authorization": f"Bearer {key}",
+                "Content-Type": "application/json",
+                "HTTP-Referer": "https://safefix.local",
+            },
+            json={
+                "model": model,
+                "messages": [
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": prompt}
+                ],
+                "temperature": 0.0,
+                "max_tokens": 1000,
+            },
+            timeout=60
+        )
+        
+        if response.status_code != 200:
+            return None, None, f"HTTP {response.status_code}"
+        
+        text = response.json()["choices"][0]["message"]["content"]
+        patches, explanation = extract_json_response(text)
+        return patches, explanation, None if patches else "Could not parse response"
+    except Exception as e:
+        return None, None, str(e)
 
 
-# ---- Category-aware single-provider fallback (resources / probes / seccomp) ----
-
-
-def _is_safe_cat_path(
-    op: Dict[str, Any],
-    need_resources: bool,
-    need_probes: bool,
-    need_seccomp: bool,
-) -> bool:
-    if op.get("op") not in ("add", "replace"):
-        return False
-    path = op.get("path", "")
-
-    # Normalize checks to handle both Pod and controller-style specs
-    if need_resources and (
-        "/containers/" in path and "/resources" in path
-    ):
+def validate_patch_path(doc: Any, path: str, op: str) -> bool:
+    """
+    Validate that a patch path is valid for the document structure.
+    
+    Returns True if valid, False otherwise.
+    """
+    if not path or path == "/":
         return True
-
-    if need_probes and (
-        "/containers/" in path
-        and ("/livenessProbe" in path or "/readinessProbe" in path)
-    ):
+    
+    parts = [p for p in path.split("/") if p]
+    if not parts:
         return True
-
-    if need_seccomp and "securityContext/seccompProfile" in path:
+    
+    cur = doc
+    
+    # Check all parts except the last one
+    for i, part in enumerate(parts[:-1]):
+        key = part.replace("~1", "/").replace("~0", "~")
+        
+        if isinstance(cur, list):
+            try:
+                idx = int(key)
+                if idx < 0 or idx >= len(cur):
+                    return False
+                cur = cur[idx]
+            except (ValueError, IndexError):
+                return False
+        elif isinstance(cur, dict):
+            if key not in cur:
+                # For add operations, missing intermediate keys are ok
+                if op == "add":
+                    return True
+                return False
+            cur = cur[key]
+        else:
+            return False
+    
+    # Check the last part
+    last_key = parts[-1].replace("~1", "/").replace("~0", "~")
+    
+    if isinstance(cur, list):
+        try:
+            idx = int(last_key)
+            if op == "add":
+                return 0 <= idx <= len(cur)
+            else:
+                return 0 <= idx < len(cur)
+        except ValueError:
+            return False
+    elif isinstance(cur, dict):
+        if op == "remove" and last_key not in cur:
+            return False
         return True
-
+    
     return False
 
 
-def category_aware_single_provider_fallback(
-    provider_ops: List[Tuple[str, List[Dict[str, Any]]]],
-    categories: List[str],
-) -> List[Dict[str, Any]]:
+def filter_valid_patches(doc: Any, patches: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """
-    For some categories it's safe to take single-provider ops:
-      - Resources/MissingLimits / Resources/MissingRequests
-      - Probes/MissingReadinessLiveness
-      - Policy/PodSecurityViolation  (seccompProfile)
-    We pick at most ONE provider (by priority) and only accept ops on
-    whitelisted JSON Pointer paths.
+    Filter out patches with invalid paths.
+    
+    Returns list of valid patches.
     """
-    cats = set(categories)
-    need_resources = any(c.startswith("Resources/") for c in cats)
-    need_probes = any(c.startswith("Probes/") for c in cats)
-    need_seccomp = "Policy/PodSecurityViolation" in cats
-
-    if not (need_resources or need_probes or need_seccomp):
-        return []
-
-    priority = ["openrouter", "groq", "gemini", "ollama"]
-
-    # Pick the first provider (by priority) that has at least one safe op
-    for prov in priority:
-        for name, ops in provider_ops:
-            if name != prov:
-                continue
-            safe_ops = [
-                o
-                for o in ops
-                if _is_safe_cat_path(o, need_resources, need_probes, need_seccomp)
-            ]
-            if safe_ops:
-                return safe_ops
-
-    return []
-
-
-# ---- Security-aware fallback (privileged, allowPrivilegeEscalation, caps, runAsNonRoot) ----
-
-
-def augment_with_security_fixes(
-    auto_fix_categories: List[str],
-    provider_ops: List[Tuple[str, List[Dict[str, Any]]]],
-    final_ops: List[Dict[str, Any]],
-) -> List[Dict[str, Any]]:
-    """
-    For security-related categories that still have no coverage after voting +
-    non-security fallback, try to salvage safe, monotonic-hardening ops from
-    a single strong provider on allowed paths:
-
-      - Auth/RunAsRoot
-      - Security/PrivilegedContainer
-      - Security/AllowPrivilegeEscalation
-      - Security/CapabilitiesNotDropped
-    """
-    if not auto_fix_categories or not provider_ops:
-        return final_ops
-
-    allowed_map = allowed_paths_for_categories(auto_fix_categories)
-    categories_fixed, categories_unfixed = categorize_ops_against_categories(
-        final_ops, auto_fix_categories
-    )
-
-    security_targets = {
-        "Auth/RunAsRoot",
-        "Security/AllowPrivilegeEscalation",
-        "Security/CapabilitiesNotDropped",
-        "Security/PrivilegedContainer",
-    }
-
-    # Only bother with security categories that are still uncovered
-    uncovered_security = [c for c in categories_unfixed if c in security_targets]
-    if not uncovered_security:
-        return final_ops
-
-    # Build quick index to avoid duplicate paths
-    existing_paths = {
-        op.get("path")
-        for op in final_ops
-        if isinstance(op.get("path"), str)
-    }
-
-    # Same provider priority as vote_merge
-    provider_priority = ["openrouter", "groq", "gemini", "ollama"]
-
-    for cat in uncovered_security:
-        patterns = allowed_map.get(cat, [])
-        if not patterns:
+    valid_patches = []
+    
+    for patch in patches:
+        op = patch.get("op", "")
+        path = patch.get("path", "")
+        
+        if not op or not path:
             continue
+        
+        if validate_patch_path(doc, path, op):
+            valid_patches.append(patch)
+        else:
+            print(f"  [DEBUG] Filtered invalid patch: {op} {path}")
+    
+    return valid_patches
 
-        for prov in provider_priority:
-            # Find ops from this provider
-            ops_for_provider = [
-                ops for (name, ops) in provider_ops if name == prov
-            ]
-            if not ops_for_provider:
+
+def deduplicate_patches(patches: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """
+    Remove duplicate patches based on path.
+    Keep the first occurrence.
+    
+    Returns list of unique patches.
+    """
+    seen_paths = set()
+    unique_patches = []
+    
+    for patch in patches:
+        path = patch.get("path", "")
+        if path not in seen_paths:
+            seen_paths.add(path)
+            unique_patches.append(patch)
+    
+    return unique_patches
+
+
+# ======================= JSON Patch Application =======================
+
+def apply_json_patch(doc: Any, patch_ops: List[Dict[str, Any]]) -> Any:
+    """Apply RFC-6902 JSON Patch operations."""
+    import copy
+    doc = copy.deepcopy(doc)
+    
+    for op in patch_ops:
+        op_type = op.get("op")
+        path = op.get("path")
+        
+        if not isinstance(op_type, str) or not isinstance(path, str):
+            continue
+        if op_type not in ("add", "replace", "remove"):
+            continue
+        if op_type in ("add", "replace") and "value" not in op:
+            continue
+        
+        try:
+            parts = [p for p in path.split("/") if p]
+            if not parts:
                 continue
-            ops = ops_for_provider[0]
+            
+            cur = doc
+            for part in parts[:-1]:
+                key = part.replace("~1", "/").replace("~0", "~")
+                if isinstance(cur, list):
+                    idx = int(key)
+                    if idx >= len(cur):
+                        if op_type == "add":
+                            while len(cur) <= idx:
+                                cur.append({})
+                        else:
+                            raise KeyError(path)
+                    cur = cur[idx]
+                else:
+                    if key not in cur:
+                        if op_type == "add":
+                            cur[key] = {}
+                        else:
+                            raise KeyError(path)
+                    cur = cur[key]
+            
+            last = parts[-1].replace("~1", "/").replace("~0", "~")
+            
+            if isinstance(cur, list):
+                idx = int(last)
+                if op_type == "add":
+                    if idx == len(cur):
+                        cur.append(op.get("value"))
+                    elif 0 <= idx < len(cur):
+                        cur.insert(idx, op.get("value"))
+                elif op_type == "replace":
+                    if 0 <= idx < len(cur):
+                        cur[idx] = op.get("value")
+                elif op_type == "remove":
+                    if 0 <= idx < len(cur):
+                        cur.pop(idx)
+            else:
+                if op_type in ("add", "replace"):
+                    cur[last] = op.get("value")
+                elif op_type == "remove":
+                    if last in cur:
+                        del cur[last]
+        except Exception as e:
+            print(f"  [WARN] Failed to apply op {op}: {e}")
+            continue
+    
+    return doc
 
-            picked = False
-            for op in ops:
-                path = op.get("path", "")
-                if not isinstance(path, str):
-                    continue
-                if path in existing_paths:
-                    continue
 
-                # Must match allowed path for this category
-                if not any(ptr_matches(pat, path) for pat in patterns):
-                    continue
+# ======================= Process Category =======================
 
-                # Must be a monotonic-hardening op for that category
-                if not is_safe_security_op(cat, op):
-                    continue
-
-                final_ops.append(op)
-                existing_paths.add(path)
-                picked = True
-                break  # One safe op is enough to mark category as covered
-
-            if picked:
-                break  # Stop searching other providers for this category
-
-    return final_ops
-
-
-# --------- Local deterministic fallback for common raw categories ----------
-
-
-def _fallback_ops_for_missing_selector(doc: Dict[str, Any]) -> List[Dict[str, Any]]:
-    """
-    Deterministic fix for Deployments missing spec.selector.
-
-    Strategy:
-    - Only for kind=Deployment, apps/v1-style.
-    - If spec.selector is missing:
-        * If template.metadata.labels exists and non-empty:
-            -> set spec.selector.matchLabels = template.metadata.labels
-        * Else:
-            -> synthesize a label based on metadata.name (or 'app')
-               and set BOTH:
-                  - spec.template.metadata.labels
-                  - spec.selector.matchLabels
-    """
-    if not isinstance(doc, dict):
-        return []
-
-    if doc.get("kind") != "Deployment":
-        return []
-    spec = doc.get("spec")
-    if not isinstance(spec, dict):
-        return []
-
-    # If selector already exists, nothing to do.
-    if "selector" in spec:
-        return []
-
-    ops: List[Dict[str, Any]] = []
-
-    tmpl = (spec.get("template") or {})
-    tmeta = (tmpl.get("metadata") or {})
-    tlabels = (tmeta.get("labels") or {})
-
-    # Case 1: template already has labels → reuse them for selector
-    if tlabels:
-        ops.append(
-            {
-                "op": "add",
-                "path": "/spec/selector",
-                "value": {"matchLabels": tlabels},
-            }
-        )
-        return ops
-
-    # Case 2: no labels at all → synthesize one and apply in both places
-    md = doc.get("metadata") or {}
-    name = md.get("name") or "app"
-    synth_labels = {"app": name}
-
-    # Add labels to template.metadata.labels
-    if "metadata" not in tmpl:
-        # If there was no metadata at all, we need to add it
-        ops.append(
-            {
-                "op": "add",
-                "path": "/spec/template/metadata",
-                "value": {"labels": synth_labels},
-            }
-        )
-    else:
-        # metadata exists but labels may not
-        if not tlabels:
-            ops.append(
-                {
-                    "op": "add",
-                    "path": "/spec/template/metadata/labels",
-                    "value": synth_labels,
-                }
-            )
-
-    # Add selector.matchLabels using the same labels
-    ops.append(
-        {
-            "op": "add",
-            "path": "/spec/selector",
-            "value": {"matchLabels": synth_labels},
-        }
+def process_category(
+    category: str,
+    findings: List[Dict[str, Any]],
+    doc: Dict[str, Any],
+    original_yaml: str,
+    file_path: str,
+    models: Dict[str, str]
+) -> Tuple[Optional[List[Dict[str, Any]]], str, Dict[str, Any]]:
+    """Process a single category with enhanced error handling."""
+    
+    config = CATEGORY_CONFIG.get(category, {
+        "strategy": FixStrategy.LLM_GUIDED,
+        "provider": LlmProvider.OPENAI,
+        "fallback": LlmProvider.GROQ,
+        "priority": 2,
+        "max_retries": 3,
+    })
+    
+    strategy = config.get("strategy")
+    
+    result = {
+        "category": category,
+        "strategy": str(strategy),
+        "patches_count": 0,
+        "error": None,
+    }
+    
+    # Skip categories entirely
+    if strategy == FixStrategy.SKIP or category in SKIP_FROM_LLM:
+        skip_msg = SKIP_MESSAGES.get(category, "Category skipped (not actionable)")
+        result["error"] = f"Skipped: {skip_msg}"
+        print(f"    [{category}] SKIPPED")
+        print(f"      └─ {skip_msg}")
+        return None, "", result
+    
+    # Use comprehensive security hardening handler
+    if category in SECURITY_HARDENING_CATEGORIES or config.get("use_security_handler"):
+        handler = SecurityHardeningHandler()
+        patches, explanation = handler.generate_all_patches(doc)
+        result["patches_count"] = len(patches)
+        result["strategy"] = "deterministic_security"
+        print(f"    [{category}] Deterministic Security: {len(patches)} patch(es)")
+        print(f"      └─ Comprehensive hardening (all 4 controls)")
+        return patches, explanation, result
+    
+    # Deterministic fixes
+    if strategy == FixStrategy.DETERMINISTIC:
+        patches, explanation = apply_deterministic_fix(doc, category, findings)
+        result["patches_count"] = len(patches)
+        print(f"    [{category}] Deterministic: {len(patches)} patch(es)")
+        if explanation:
+            print(f"      └─ {explanation}")
+        return patches, explanation, result
+    
+    # Template fixes
+    if strategy == FixStrategy.TEMPLATE:
+        patches, explanation = apply_template_fix(doc, category, findings)
+        result["patches_count"] = len(patches)
+        print(f"    [{category}] Template: {len(patches)} patch(es)")
+        if explanation:
+            print(f"      └─ {explanation}")
+        return patches, explanation, result
+    
+    # LLM-guided fixes
+    context_yaml = extract_relevant_context(doc, category)
+    patches, explanation, error = call_llm_with_fallback(
+        category, doc, context_yaml, models, config
     )
+    
+    if error:
+        result["error"] = error
+        print(f"    [{category}] LLM error: {error}")
+        return None, "", result
+    
+    if not patches:
+        result["error"] = "No patches returned"
+        print(f"    [{category}] No patches returned")
+        return None, "", result
+    
+    provider_name = config.get("provider", LlmProvider.OPENAI).value
+    result["patches_count"] = len(patches)
+    print(f"    [{category}] LLM ({provider_name}): {len(patches)} patch(es)")
+    if explanation:
+        print(f"      └─ {explanation}")
+    
+    return patches, explanation or "", result
 
-    return ops
 
+# ======================= Main Processing =======================
 
-def local_fallback_ops(categories: List[str], docs: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    """
-    Local deterministic fallbacks for common structural issues.
-
-    Currently supports:
-    - Missing selector in Deployments (either via explicit MISSING_SELECTOR
-      category or via Schema/InvalidManifest when spec.selector is absent).
-    """
-    ops: List[Dict[str, Any]] = []
-    cats = set([c for c in categories if c])
+def process_file(
+    file_entry: Dict[str, Any],
+    original_yaml: str,
+    models: Dict[str, str],
+) -> Dict[str, Any]:
+    """Process a single file with all improvements."""
+    file_path = file_entry.get("file", "")
+    findings = file_entry.get("findings", [])
+    
+    by_category: Dict[str, List[Dict[str, Any]]] = {}
+    for finding in findings:
+        cat = finding.get("category", "")
+        if cat:
+            by_category.setdefault(cat, []).append(finding)
+    
+    print(f"\n[FILE] {file_path}")
+    print(f"  Categories: {', '.join(sorted(by_category.keys()))}")
+    
+    docs = yaml_load_all(original_yaml)
     if not docs:
-        return ops
+        return {"file": file_path, "error": "Could not parse YAML", "success": False}
+    
+    doc = docs[0]
+    
+    all_patches = []
+    all_explanations = []
+    category_results = {}
+    skipped_categories = []
+    
+    # Process each category
+    for category, cat_findings in sorted(by_category.items()):
+        patches, explanation, result = process_category(
+            category, cat_findings, doc, original_yaml, file_path, models
+        )
+        
+        category_results[category] = result
+        
+        if result.get("error") and "Skipped" in result.get("error", ""):
+            skipped_categories.append(category)
+        
+        if patches:
+            all_patches.extend(patches)
+            if explanation:
+                all_explanations.append(f"**{category}**: {explanation}")
+    
+    # Apply all patches
+    if all_patches:
+        try:
+            # Deduplicate patches first
+            unique_patches = deduplicate_patches(all_patches)
+            if len(unique_patches) < len(all_patches):
+                print(f"  [INFO] Deduplicated {len(all_patches) - len(unique_patches)} patch(es)")
+            
+            # Filter out invalid patches
+            valid_patches = filter_valid_patches(doc, unique_patches)
+            
+            if len(valid_patches) < len(unique_patches):
+                filtered_count = len(unique_patches) - len(valid_patches)
+                print(f"  [INFO] Filtered {filtered_count} invalid patch(es)")
+            
+            modified_doc = apply_json_patch(doc, valid_patches)
+            docs[0] = modified_doc
+            secured_yaml = yaml_dump_all(docs)
+            
+            summary = f"Applied {len(valid_patches)} fixes across {len(all_explanations)} categories:\n\n" + "\n\n".join(all_explanations)
+            
+            if skipped_categories:
+                summary += f"\n\n**Skipped Categories** (by design):\n"
+                for cat in skipped_categories:
+                    skip_msg = SKIP_MESSAGES.get(cat, "Not suitable for inline fix")
+                    summary += f"- {cat}: {skip_msg}\n"
+            
+            print(f"  Applied {len(valid_patches)} total patches")
+            print(f"\n  === FIX SUMMARY ===")
+            for exp in all_explanations:
+                print(f"  {exp}")
+            if skipped_categories:
+                print(f"\n  === SKIPPED (By Design) ===")
+                for cat in skipped_categories:
+                    print(f"  - {cat}")
+            print(f"  {'='*50}\n")
+            
+            return {
+                "file": file_path,
+                "categories": list(by_category.keys()),
+                "category_results": category_results,
+                "total_patches": len(valid_patches),
+                "skipped_categories": skipped_categories,
+                "secured_yaml": secured_yaml,
+                "explanation": summary,
+                "success": True,
+            }
+        except Exception as e:
+            return {"file": file_path, "error": f"Failed to apply patches: {e}", "success": False}
+    else:
+        return {"file": file_path, "error": "No patches generated", "success": False}
 
-    d0 = docs[0]
 
-    # Treat both MISSING_SELECTOR and Schema/InvalidManifest as candidates
-    # for auto-fixing missing spec.selector on Deployments.
-    if "MISSING_SELECTOR" in cats or "Schema/InvalidManifest" in cats:
-        ops += _fallback_ops_for_missing_selector(d0)
-
-    # You can extend here for other deterministic schema fixes if needed.
-    return ops
-
-
-# ---------------- Payload normalizer ----------------
-
-
-def normalize_payload_to_files(
-    payload: Dict[str, Any]
-) -> Tuple[Dict[str, Any], List[Dict[str, Any]]]:
-    """
-    Supports:
-    - Classic SafeFix payload: {"context": {...}, "files": [...]}
-    - SafeFix normalizer v3.x payload:
-        {"context": {...}, "files":[{"file":..., "findings":[{category, ...}]}]}
-    - Raw tool payloads (e.g., raw-kubescape):
-        {"version": "...", "items":[...]} -> grouped by file.
-    """
-    context = payload.get("context") or {}
-    meta = payload.get("metadata") or {}
-
-    # If context missing, synthesize from raw payload metadata
-    if not context:
-        context = {
-            "source_tool": meta.get("source_tool") or payload.get("version") or "unknown",
-            "generated_at": payload.get("generated_at") or "",
-            "raw_findings_count": meta.get("raw_findings_count") or 0,
-            "note": "Auto-derived context from raw payload.",
-        }
-
-    # Case 1: already a SafeFix-style payload with files[]
+def normalize_payload(payload: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """Normalize payload to list of files."""
     files = payload.get("files")
     if isinstance(files, list) and files:
-        normalized_files: List[Dict[str, Any]] = []
-        for fe in files:
-            f_findings = []
-            for fd in fe.get("findings", []):
-                fd = dict(fd)  # shallow copy
-                fd.setdefault("snippet", "")
-                fd.setdefault("patchHint", "")
-                f_findings.append(fd)
-            normalized_files.append({"file": fe.get("file"), "findings": f_findings})
-        return context, normalized_files
-
-    # Case 2: raw tool payload with items[]
+        return files
+    
     items = payload.get("items") or []
-    if not isinstance(items, list) or not items:
-        return context, []
-
     by_file: Dict[str, List[Dict[str, Any]]] = {}
-    for it in items:
-        file_rel = it.get("file") or it.get("filename") or "UNKNOWN_FILE"
-        finding = {
-            "category": it.get("category") or it.get("rule") or "UNKNOWN",
-            "severity": it.get("severity"),
-            "message": it.get("message") or it.get("description"),
-            "resourceRef": {
-                "kind": it.get("kind", ""),
-                "name": it.get("name", ""),
-                "namespace": it.get("namespace", "") or "default",
-            },
-            "raw": {
-                "tools": it.get("tools"),
-                "rule_ids": it.get("rule_ids"),
-                "examples": it.get("examples"),
-                "line": it.get("line"),
-            },
-            "snippet": it.get("snippet", ""),
-            "patchHint": it.get("patchHint", ""),
-        }
-        by_file.setdefault(file_rel, []).append(finding)
-
-    files_list = [{"file": f, "findings": v} for f, v in sorted(by_file.items())]
-    return context, files_list
-
-
-# ------------ File resolution helper (handles basename search) -------------
-
-
-def resolve_yaml_path(tests_dir: Path, file_rel: str) -> Path:
-    """
-    Try tests_dir / file_rel first.
-    If it doesn't exist, search by basename under tests_dir.
-    This helps when different tools normalize paths differently.
-    """
-    p = tests_dir / file_rel
-    if p.exists():
-        return p
-    base = Path(file_rel).name
-    candidates = list(tests_dir.rglob(base))
-    if candidates:
-        return candidates[0]
-    # Fallback: return the original (non-existing) path; caller will see empty content.
-    return p
-
-
-# ---------------- Prompt builder (uses snippet + patchHint) ----------------
-
-
-def build_prompt(
-    context: Dict[str, Any],
-    file_entry: Dict[str, Any],
-    original_text: str,
-) -> str:
-    file_rel = file_entry.get("file", "")
-    findings = file_entry.get("findings") or []
-
-    if findings:
-        rr = findings[0].get("resourceRef") or {}
-        kind = rr.get("kind", "")
-        name = rr.get("name", "")
-        ns = rr.get("namespace", "") or "default"
-    else:
-        kind = name = ""
-        ns = "default"
-
-    # Categories list
-    raw_cats = sorted(set(f.get("category") for f in findings if f.get("category")))
-    auto_fix_cats = [c for c in raw_cats if c not in NON_AUTO_FIX_CATEGORIES]
-    non_auto_fix_cats = [c for c in raw_cats if c in NON_AUTO_FIX_CATEGORIES]
-
-    categories_block = "- " + "\n- ".join(auto_fix_cats) if auto_fix_cats else "- (none)"
-    non_auto_fix_block = (
-        "- " + "\n- ".join(non_auto_fix_cats)
-        if non_auto_fix_cats
-        else "- (none; all categories are auto-fixable)"
-    )
-
-    # Allowed paths block (for the LLM)
-    allowed_paths_map = allowed_paths_for_categories(auto_fix_cats)
-    if allowed_paths_map:
-        lines = []
-        for c in sorted(allowed_paths_map.keys()):
-            paths = allowed_paths_map[c] or []
-            if not paths:
-                continue
-            lines.append(f"- {c}:")
-            for pth in paths:
-                lines.append(f"    - {pth}")
-        allowed_paths_block = "\n".join(lines)
-    else:
-        allowed_paths_block = "- (no explicit allowed paths; you must be extremely conservative)."
-
-    forbidden_paths_block = (
-        "- " + "\n- ".join(sorted(FORBIDDEN_EXACT | FORBIDDEN_PREFIXES))
-        + "\n- (and any path containing '/image' or '/spec/replicas' except imagePullPolicy)"
-    )
-
-    # Prefer per-finding snippet if present; else use file content
-    finding_snippets = [
-        f.get("snippet", "").strip()
-        for f in findings
-        if isinstance(f.get("snippet"), str) and f.get("snippet", "").strip()
-    ]
-    if finding_snippets:
-        unique_snips: List[str] = []
-        for s in finding_snippets:
-            if s not in unique_snips:
-                unique_snips.append(s)
-            if sum(len(x) for x in unique_snips) > 2000:
-                break
-        snippet = "\n---\n".join(unique_snips)[:2500]
-    else:
-        snippet = first_yaml_snippet(original_text)
-
-    docs = yaml_load_all(original_text)
-    hints = derive_hints_from_yaml(docs)
-
-    # Collect patch hints from payload (SafeFix v3.5 normalizer)
-    patch_hints = [
-        f.get("patchHint", "").strip()
-        for f in findings
-        if isinstance(f.get("patchHint"), str) and f.get("patchHint", "").strip()
-    ]
-    patch_hints_block = (
-        "- " + "\n- ".join(sorted(set(patch_hints)))
-        if patch_hints
-        else "- (no explicit patch hints provided)."
-    )
-
-    special = derive_special_guidance(raw_cats, patch_hints)
-
-    return USER_PROMPT_TEMPLATE.format(
-        context=json.dumps(
-            {
-                **context,
-                "kind": kind,
-                "name": name,
-                "namespace": ns,
-            },
-            ensure_ascii=False,
-            indent=2,
-        ),
-        file=file_rel,
-        yaml_snippet=snippet,
-        derived_hints=hints,
-        categories=categories_block,
-        non_auto_fix_categories=non_auto_fix_block,
-        allowed_paths_block=allowed_paths_block,
-        forbidden_paths_block=forbidden_paths_block,
-        patch_hints=patch_hints_block,
-        special_guidance=special,
-    )
-
-
-# ------------------------------ Main -----------------------------
+    for item in items:
+        file_path = item.get("file") or "UNKNOWN"
+        by_file.setdefault(file_path, []).append({
+            "category": item.get("category") or "UNKNOWN",
+            "severity": item.get("severity"),
+            "message": item.get("message"),
+        })
+    
+    return [{"file": f, "findings": v} for f, v in sorted(by_file.items())]
 
 
 def main():
-    ap = argparse.ArgumentParser(
-        description="Vote across multiple LLMs to fix payload categories and write secured YAMLs."
-    )
-    ap.add_argument(
-        "--payload",
-        required=True,
-        help="Path to output_llm_payload.json OR raw tool payload (e.g., raw-kubeconform).",
-    )
-    ap.add_argument(
-        "--tests-dir",
-        required=True,
-        help="Directory containing original YAML files (as referenced in payload)",
-    )
-    ap.add_argument("--out-dir", default="output/llm_fixes", help="Output directory")
-    ap.add_argument(
-        "--or-model",
-        default=os.environ.get("OPENROUTER_MODEL", "openai/gpt-4o-mini"),
-    )
-    ap.add_argument(
-        "--groq-model",
-        default=os.environ.get("GROQ_MODEL", "llama-3.1-8b-instant"),
-    )
-    ap.add_argument(
-        "--gemini-model",
-        default=os.environ.get("GEMINI_MODEL", "gemini-2.5-flash"),
-    )
-    ap.add_argument(
-        "--ollama-model",
-        default=os.environ.get("OLLAMA_MODEL", "meta-llama/llama-3-8b"),
-    )
-    args = ap.parse_args()
-
-    payload = read_json(Path(args.payload))
-    context, files = normalize_payload_to_files(payload)
-
+    """Main entry point."""
+    parser = argparse.ArgumentParser(description="Ultimate LLM orchestrator with comprehensive security hardening")
+    parser.add_argument("--payload", required=True, help="Path to payload JSON")
+    parser.add_argument("--tests-dir", required=True, help="Directory containing YAML files")
+    parser.add_argument("--out-dir", default="output/ultimate_fixes", help="Output directory")
+    
+    args = parser.parse_args()
+    
+    payload = json.loads(Path(args.payload).read_text())
+    files = normalize_payload(payload)
+    
     tests_dir = Path(args.tests_dir).resolve()
     out_dir = Path(args.out_dir).resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
-
-    rows: List[Tuple[str, str, str, int, int]] = []  # file, provider, status, ops_applied, ops_skipped
-
-    for f in files:
-        file_rel = f.get("file")
-        findings = f.get("findings") or []
-        if not file_rel or not findings:
+    
+    models = {
+        "openai": os.environ.get("OPENAI_MODEL", "gpt-4o-mini"),
+        "groq": os.environ.get("GROQ_MODEL", "llama-3.1-8b-instant"),
+        "gemini": os.environ.get("GEMINI_MODEL", "gemini-2.0-flash-exp"),
+        "openrouter": os.environ.get("OPENROUTER_MODEL", "x-ai/grok-vision-beta"),
+    }
+    
+    print(f"\n{'='*60}")
+    print(f"Ultimate SafeFix-K8s Orchestrator (IMPROVED)")
+    print(f"{'='*60}")
+    print(f"Enhancements:")
+    print(f"  • Comprehensive security hardening (all 4 controls)")
+    print(f"  • NetworkPolicy explicitly skipped")
+    print(f"  • Patch deduplication enabled")
+    print(f"{'='*60}")
+    
+    all_reports = []
+    for file_entry in files:
+        file_path = file_entry.get("file", "")
+        if not file_path:
             continue
+        
+        yaml_path = tests_dir / file_path
+        original_yaml = yaml_path.read_text() if yaml_path.exists() else ""
+        
+        if not original_yaml:
+            continue
+        
+        report = process_file(file_entry, original_yaml, models)
+        all_reports.append(report)
+        
+        if report.get("secured_yaml"):
+            safe_name = file_path.replace("/", "_").replace("\\", "_")
+            secured_path = out_dir / f"SECURED_{safe_name}"
+            secured_path.write_text(report["secured_yaml"], encoding='utf-8')
+            
+            if report.get("explanation"):
+                explanation_path = out_dir / f"EXPLANATION_{safe_name}.md"
+                explanation_content = f"""# Fix Explanation for {file_path}
 
-        file_path = resolve_yaml_path(tests_dir, file_rel)
-        original = read_text(file_path)
-        prompt = build_prompt(context, f, original)
+## Summary
+{report['explanation']}
 
-        provider_ops: List[Tuple[str, List[Dict[str, Any]]]] = []
-        provider_errs: Dict[str, str] = {}
+## Statistics
+- Total patches: {report['total_patches']}
+- Categories processed: {len(report['categories'])}
+- Categories skipped: {len(report.get('skipped_categories', []))}
+- Status: {'Success' if report['success'] else 'Failed'}
 
-        # space calls slightly (helps with bursty 429s)
-        if os.environ.get("OPENROUTER_API_KEY"):
-            ops, err = call_openrouter(args.or_model, prompt)
-            time.sleep(1.1)
-            provider_ops.append(("openrouter", sanitize_ops(ops or [])))
-            if err:
-                provider_errs["openrouter"] = err
-        if os.environ.get("GROQ_API_KEY"):
-            ops, err = call_groq(args.groq_model, prompt)
-            time.sleep(1.1)
-            provider_ops.append(("groq", sanitize_ops(ops or [])))
-            if err:
-                provider_errs["groq"] = err
-        if os.environ.get("GEMINI_API_KEY"):
-            ops, err = call_gemini(args.gemini_model, prompt)
-            time.sleep(1.1)
-            provider_ops.append(("gemini", sanitize_ops(ops or [])))
-            if err:
-                provider_errs["gemini"] = err
-        if os.environ.get("OLLAMA_BASE_URL"):
-            ops, err = call_ollama(args.ollama_model, prompt)
-            time.sleep(1.1)
-            provider_ops.append(("ollama", sanitize_ops(ops or [])))
-            if err:
-                provider_errs["ollama"] = err
-
-        have_any = any(len(ops) > 0 for _, ops in provider_ops)
-        merged: List[Dict[str, Any]] = []
-
-        cats = sorted(set(ff.get("category") for ff in findings if ff.get("category")))
-        auto_fix_cats = [c for c in cats if c not in NON_AUTO_FIX_CATEGORIES]
-        non_auto_fix_cats = [c for c in cats if c in NON_AUTO_FIX_CATEGORIES]
-
-        if have_any:
-            # 1) Start with consensus (vote) ops
-            merged = vote_merge(provider_ops)
-        else:
-            # 2) If no providers produced ops at all, try structural local fallback
-            merged = local_fallback_ops(auto_fix_cats, yaml_load_all(original))
-
-        # 3) For certain “safe” categories (resources / probes / seccomp),
-        #    also allow single-provider ops on whitelisted paths.
-        extra_safe_ops = category_aware_single_provider_fallback(provider_ops, auto_fix_cats)
-        if extra_safe_ops:
-            existing_keys = {json.dumps(o, sort_keys=True) for o in merged}
-            for op in extra_safe_ops:
-                key = json.dumps(op, sort_keys=True)
-                if key not in existing_keys:
-                    merged.append(op)
-                    existing_keys.add(key)
-
-        # 4) Security-aware fallback for uncovered security categories
-        merged = augment_with_security_fixes(
-            auto_fix_categories=auto_fix_cats,
-            provider_ops=provider_ops,
-            final_ops=merged,
-        )
-
-        # 5) Schema fallback: ensure spec.selector exists for Deployments
-        #    when Schema/InvalidManifest is present but no /spec/selector patch is present.
-        if "Schema/InvalidManifest" in auto_fix_cats:
-            docs_for_fallback = yaml_load_all(original)
-            if docs_for_fallback:
-                has_selector_op = any(
-                    isinstance(o.get("path"), str) and o["path"] == "/spec/selector"
-                    for o in merged
-                )
-                if not has_selector_op:
-                    selector_ops = local_fallback_ops(
-                        ["Schema/InvalidManifest"],
-                        docs_for_fallback,
-                    )
-                    if selector_ops:
-                        existing_keys = {json.dumps(o, sort_keys=True) for o in merged}
-                        for op in selector_ops:
-                            key = json.dumps(op, sort_keys=True)
-                            if key not in existing_keys:
-                                merged.append(op)
-                                existing_keys.add(key)
-
-        applied: List[Dict[str, Any]] = []
-        skipped: List[Dict[str, Any]] = []
-        fixed = ""
-
-        if merged:
-            docs = yaml_load_all(original) if original else []
-            if docs:
-                # assign to likely target doc (first workload / podspec)
-                def target_doc_index(path: str) -> int:
-                    if re.search(r"/(spec|template)/", path):
-                        for i, d in enumerate(docs):
-                            if get_pod_spec(d):
-                                return i
-                    return 0
-
-                for op in merged:
-                    try:
-                        idx = target_doc_index(op.get("path", ""))
-                        docs[idx] = apply_json_patch(docs[idx], [op])
-                        applied.append(op)
-                    except Exception as e:
-                        skipped.append({"op": op, "reason": f"apply error: {e}"})
-                fixed = yaml_dump_all(docs)
-            else:
-                skipped = [
-                    {"op": op, "reason": "original YAML not parseable"} for op in merged
-                ]
-
-        safe = file_rel.replace("\\", "_").replace("/", "_").replace("..", "")
-        secured_path = out_dir / f"SECURED_{safe}"
-        diff_path = out_dir / f"DIFF_{safe}.diff"
-        report_path = out_dir / f"REPORT_{safe}.json"
-
-        if fixed:
-            write_text(secured_path, fixed)
-            write_text(
-                diff_path,
-                unified_diff_text(
-                    original,
-                    fixed,
-                    str(Path(args.tests_dir) / file_rel),
-                    str(secured_path),
-                ),
-            )
-
-        # Track per-provider summary
-        for prov, ops in provider_ops:
-            rows.append(
-                (
-                    file_rel,
-                    prov,
-                    "ok" if ops else "empty",
-                    len(ops),
-                    0,
-                )
-            )
-
-        reason = None
-        if not have_any and not merged:
-            reason = "No provider produced valid JSON Patch ops (and no local fallback applicable)."
-        elif not have_any and merged:
-            reason = "Providers empty; used local deterministic fallback."
-
-        # Compute per-category fix stats based on op paths
-        categories_fixed, categories_unfixed = categorize_ops_against_categories(
-            applied,
-            auto_fix_cats,
-        )
-
-        summary = {
-            "file": file_rel,
-            # categories present in payload (ground truth)
-            "categories_present": cats,
-            # categories we ALLOW auto-fixing via LLM
-            "categories_auto_fix": auto_fix_cats,
-            # categories intentionally not auto-fixed (still vulnerable)
-            "non_auto_fix_categories": non_auto_fix_cats,
-            "providers": [{"name": n, "ops": ops} for n, ops in provider_ops],
-            "provider_errors": provider_errs,
-            "applied_ops_count": len(applied),
-            "skipped_ops_count": len(skipped),
-            "auto_fix_stats": {
-                "auto_fix_count": len(auto_fix_cats),
-                "categories_fixed": categories_fixed,
-                "categories_unfixed": categories_unfixed,
-            },
-            "reason": reason,
-            "notes": [
-                "Prompt included YAML snippet (prefer payload snippets) and derived hints to increase JSON compliance.",
-                "Ties resolved by provider priority: openrouter > groq > gemini > ollama.",
-                "Local fallback currently covers MISSING_SELECTOR (Deployment).",
-                "Understands SafeFix normalizer v3.5 payload (snippet + patchHint).",
-                "Category-aware fallback may apply resources/probes/seccompProfile from a single strong provider on safe paths.",
-                "Security-aware fallback may apply monotonic-hardening securityContext ops (runAsNonRoot, privileged=false, allowPrivilegeEscalation=false, capabilities.drop=[ALL]) on allowed paths when consensus is missing.",
-                (
-                    "The following categories were intentionally NOT auto-fixed; they remain vulnerable and "
-                    "require manual/cluster-specific handling: "
-                    + (", ".join(non_auto_fix_cats) if non_auto_fix_cats else "none")
-                ),
-            ],
-        }
-        write_text(report_path, json.dumps(summary, indent=2))
-
-    csv_lines = ["file,provider,status,ops_applied,ops_skipped"]
-    for file_rel, prov, status, a, s in rows:
-        csv_lines.append(",".join([file_rel.replace(",", ";"), prov, status, str(a), str(s)]))
-    write_text(out_dir / "REPORT_ALL.csv", "\n".join(csv_lines))
-
-    print(f"[OK] Wrote secured files, diffs and reports to: {out_dir}")
-
-
-# ---------------- Raw single-file runner (still available) ----------------
-
-
-def run_llm_on_raw_file(raw_path: Path, tests_dir: Path, out_dir: Path):
-    raw = read_json(raw_path)
-    context, files = normalize_payload_to_files(raw)
-    out_dir = Path(out_dir).resolve()
-    out_dir.mkdir(parents=True, exist_ok=True)
-    for idx, fe in enumerate(files):
-        file_rel = fe.get("file") or f"RAW_{idx}.yaml"
-        file_path = resolve_yaml_path(Path(tests_dir), file_rel)
-        original = read_text(file_path)
-        prompt = build_prompt(
-            context,
-            {"file": file_rel, "findings": fe.get("findings") or []},
-            original,
-        )
-
-        provider_ops: List[Tuple[str, List[Dict[str, Any]]]] = []
-        provider_errs: Dict[str, str] = {}
-
-        if os.environ.get("OPENROUTER_API_KEY"):
-            ops, err = call_openrouter(
-                os.environ.get("OPENROUTER_MODEL", "openai/gpt-4o-mini"),
-                prompt,
-            )
-            time.sleep(1.1)
-            provider_ops.append(("openrouter", sanitize_ops(ops or [])))
-            if err:
-                provider_errs["openrouter"] = err
-        if os.environ.get("GROQ_API_KEY"):
-            ops, err = call_groq(
-                os.environ.get("GROQ_MODEL", "llama-3.1-8b-instant"), prompt
-            )
-            time.sleep(1.1)
-            provider_ops.append(("groq", sanitize_ops(ops or [])))
-            if err:
-                provider_errs["groq"] = err
-        if os.environ.get("GEMINI_API_KEY"):
-            ops, err = call_gemini(
-                os.environ.get("GEMINI_MODEL", "gemini-2.5-flash"),
-                prompt,
-            )
-            time.sleep(1.1)
-            provider_ops.append(("gemini", sanitize_ops(ops or [])))
-            if err:
-                provider_errs["gemini"] = err
-        if os.environ.get("OLLAMA_BASE_URL"):
-            ops, err = call_ollama(
-                os.environ.get("OLLAMA_MODEL", "meta-llama/llama-3-8b"),
-                prompt,
-            )
-            time.sleep(1.1)
-            provider_ops.append(("ollama", sanitize_ops(ops or [])))
-            if err:
-                provider_errs["ollama"] = err
-
-        cats = sorted(
-            set(ff.get("category") for ff in (fe.get("findings") or []) if ff.get("category"))
-        )
-        auto_fix_cats = [c for c in cats if c not in NON_AUTO_FIX_CATEGORIES]
-        non_auto_fix_cats = [c for c in cats if c in NON_AUTO_FIX_CATEGORIES]
-
-        if any(len(ops) > 0 for _, ops in provider_ops):
-            merged = vote_merge(provider_ops)
-        else:
-            merged = local_fallback_ops(auto_fix_cats, yaml_load_all(original))
-
-        extra_safe_ops = category_aware_single_provider_fallback(provider_ops, auto_fix_cats)
-        if extra_safe_ops:
-            existing_keys = {json.dumps(o, sort_keys=True) for o in merged}
-            for op in extra_safe_ops:
-                key = json.dumps(op, sort_keys=True)
-                if key not in existing_keys:
-                    merged.append(op)
-                    existing_keys.add(key)
-
-        # Security-aware fallback in raw runner as well
-        merged = augment_with_security_fixes(
-            auto_fix_categories=auto_fix_cats,
-            provider_ops=provider_ops,
-            final_ops=merged,
-        )
-
-        # Schema fallback: ensure spec.selector exists for Deployments
-        if "Schema/InvalidManifest" in auto_fix_cats:
-            docs_for_fallback = yaml_load_all(original)
-            if docs_for_fallback:
-                has_selector_op = any(
-                    isinstance(o.get("path"), str) and o["path"] == "/spec/selector"
-                    for o in merged
-                )
-                if not has_selector_op:
-                    selector_ops = local_fallback_ops(
-                        ["Schema/InvalidManifest"],
-                        docs_for_fallback,
-                    )
-                    if selector_ops:
-                        existing_keys = {json.dumps(o, sort_keys=True) for o in merged}
-                        for op in selector_ops:
-                            key = json.dumps(op, sort_keys=True)
-                            if key not in existing_keys:
-                                merged.append(op)
-                                existing_keys.add(key)
-
-        applied, skipped = [], []
-        docs = yaml_load_all(original) if original else []
-        if docs and merged:
-            def target_doc_index(path: str) -> int:
-                if re.search(r"/(spec|template)/", path):
-                    for i, d in enumerate(docs):
-                        if get_pod_spec(d):
-                            return i
-                return 0
-
-            for op in merged:
-                try:
-                    idx = target_doc_index(op.get("path", ""))
-                    docs[idx] = apply_json_patch(docs[idx], [op])
-                    applied.append(op)
-                except Exception as e:
-                    skipped.append({"op": op, "reason": f"apply error: {e}"})
-        fixed = yaml_dump_all(docs) if docs else ""
-
-        categories_fixed, categories_unfixed = categorize_ops_against_categories(
-            applied,
-            auto_fix_cats,
-        )
-
-        sanitized_file = file_rel.replace("\\", "_").replace("/", "_").replace("..", "")
-        safe = f"RAW_{idx}_{sanitized_file}"
-        secured_path = out_dir / f"SECURED_{safe}"
-        diff_path = out_dir / f"DIFF_{safe}.diff"
-        report_path = out_dir / f"REPORT_{safe}.json"
-        if fixed:
-            write_text(secured_path, fixed)
-            write_text(diff_path, unified_diff_text(original, fixed, str(file_path), str(secured_path)))
-        write_text(
-            report_path,
-            json.dumps(
-                {
-                    "file": file_rel,
-                    "categories_present": cats,
-                    "categories_auto_fix": auto_fix_cats,
-                    "non_auto_fix_categories": non_auto_fix_cats,
-                    "providers": [{"name": n, "ops": ops} for n, ops in provider_ops],
-                    "provider_errors": provider_errs,
-                    "applied_ops_count": len(applied),
-                    "skipped_ops_count": len(skipped),
-                    "auto_fix_stats": {
-                        "auto_fix_count": len(auto_fix_cats),
-                        "categories_fixed": categories_fixed,
-                        "categories_unfixed": categories_unfixed,
-                    },
-                    "notes": [
-                        "Processed via raw runner with YAML context and tolerant JSON extraction.",
-                        "Understands SafeFix normalizer payload fields (snippet + patchHint) if present.",
-                        "Category-aware fallback may apply resources/probes/seccompProfile from a single strong provider on safe paths.",
-                        "Security-aware fallback may apply monotonic-hardening securityContext ops (runAsNonRoot, privileged=false, allowPrivilegeEscalation=false, capabilities.drop=[ALL]) on allowed paths when consensus is missing.",
-                        (
-                            "The following categories were intentionally NOT auto-fixed; they remain vulnerable and "
-                            "require manual/cluster-specific handling: "
-                            + (", ".join(non_auto_fix_cats) if non_auto_fix_cats else "none")
-                        ),
-                    ],
-                },
-                indent=2,
-            ),
-        )
+## Skipped Categories
+{chr(10).join(f"- {cat}" for cat in report.get('skipped_categories', [])) if report.get('skipped_categories') else "None"}
+"""
+                explanation_path.write_text(explanation_content, encoding='utf-8')
+    
+    successful = sum(1 for r in all_reports if r.get("success"))
+    total_skipped = sum(len(r.get("skipped_categories", [])) for r in all_reports)
+    
+    print(f"\n{'='*60}")
+    print(f"Completed: {successful}/{len(all_reports)} files fixed")
+    print(f"Total categories skipped (by design): {total_skipped}")
+    print(f"{'='*60}\n")
 
 
 if __name__ == "__main__":
