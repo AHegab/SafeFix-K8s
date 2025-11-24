@@ -1,0 +1,182 @@
+# SafeFix-K8s Validation Configuration
+# This file configures validation rules, severity levels, and policies
+
+# Dangerous security configurations
+dangerous_fields:
+  - field: "privileged"
+    value: true
+    severity: "CRITICAL"
+    message: "Privileged containers bypass most security mechanisms"
+
+  - field: "allowPrivilegeEscalation"
+    value: true
+    severity: "CRITICAL"
+    message: "Allow privilege escalation enables container breakout attacks"
+
+  - field: "hostPID"
+    value: true
+    severity: "CRITICAL"
+    message: "hostPID allows container to see host processes"
+
+  - field: "hostNetwork"
+    value: true
+    severity: "CRITICAL"
+    message: "hostNetwork exposes container to host network"
+
+  - field: "hostIPC"
+    value: true
+    severity: "CRITICAL"
+    message: "hostIPC allows inter-process communication with host"
+
+# Forbidden Linux capabilities
+forbidden_capabilities:
+  - "SYS_ADMIN"
+  - "NET_ADMIN"
+  - "SYS_MODULE"
+  - "SYS_RAWIO"
+  - "SYS_PTRACE"
+  - "SYS_BOOT"
+  - "MAC_ADMIN"
+
+# Trusted container registries
+trusted_registries:
+  - "docker.io/library"
+  - "gcr.io"
+  - "quay.io"
+  - "registry.k8s.io"
+  - "k8s.gcr.io"
+  - "ghcr.io"
+
+# Categories that cannot be auto-fixed
+non_auto_fix_categories:
+  - "Misc/Unmapped"
+  - "Network/MissingNetworkPolicy"
+  - "Schema/InvalidManifest"
+  - "Style/YamlLint"
+
+# Validation rules by category
+validation_rules:
+  # Security categories
+  "Security/PrivilegedContainer":
+    severity: "CRITICAL"
+    check_type: "security_context"
+    validator: "privileged_false"
+    description: "Ensure containers are not running in privileged mode"
+
+  "Security/AllowPrivilegeEscalation":
+    severity: "CRITICAL"
+    check_type: "security_context"
+    validator: "allow_privilege_escalation_false"
+    description: "Ensure privilege escalation is disabled"
+
+  "Security/CapabilitiesNotDropped":
+    severity: "HIGH"
+    check_type: "security_context"
+    validator: "capabilities_drop_all"
+    description: "Ensure all capabilities are dropped by default"
+
+  "Security/MissingSeccompProfile":
+    severity: "HIGH"
+    check_type: "security_context"
+    validator: "seccomp_profile_present"
+    description: "Ensure seccomp profile is configured"
+
+  "Security/ReadOnlyRootFSFalse":
+    severity: "HIGH"
+    check_type: "security_context"
+    validator: "readonly_root_filesystem"
+    description: "Ensure root filesystem is read-only"
+
+  "Security/MissingAppArmorProfile":
+    severity: "MEDIUM"
+    check_type: "annotation"
+    validator: "apparmor_profile_present"
+    description: "Ensure AppArmor profile is configured"
+
+  # Authentication/Authorization categories
+  "Auth/RunAsRoot":
+    severity: "HIGH"
+    check_type: "security_context"
+    validator: "run_as_non_root"
+    description: "Ensure containers run as non-root user"
+
+  "Auth/AutomountServiceAccountToken":
+    severity: "MEDIUM"
+    check_type: "pod_spec"
+    validator: "automount_sa_token_false"
+    description: "Ensure service account token is not auto-mounted"
+
+  "Auth/DefaultServiceAccount":
+    severity: "MEDIUM"
+    check_type: "pod_spec"
+    validator: "non_default_service_account"
+    description: "Ensure non-default service account is used"
+
+  "Auth/DefaultNamespace":
+    severity: "LOW"
+    check_type: "metadata"
+    validator: "non_default_namespace"
+    description: "Ensure resources are not in default namespace"
+
+  # Resource categories
+  "Resources/MissingRequests":
+    severity: "MEDIUM"
+    check_type: "container"
+    validator: "resources_requests_present"
+    description: "Ensure resource requests are defined"
+
+  "Resources/MissingLimits":
+    severity: "MEDIUM"
+    check_type: "container"
+    validator: "resources_limits_present"
+    description: "Ensure resource limits are defined"
+
+  # Probe categories
+  "Probes/MissingReadinessLiveness":
+    severity: "MEDIUM"
+    check_type: "container"
+    validator: "probes_present"
+    description: "Ensure liveness or readiness probe is configured"
+
+  # Image categories
+  "Image/TagNotPinned":
+    severity: "MEDIUM"
+    check_type: "container"
+    validator: "image_tag_pinned"
+    description: "Ensure image tags are pinned (not 'latest')"
+
+  "Image/UntrustedRegistry":
+    severity: "HIGH"
+    check_type: "container"
+    validator: "trusted_registry"
+    description: "Ensure images come from trusted registries"
+
+  # Policy categories
+  "Policy/PodSecurityViolation":
+    severity: "HIGH"
+    check_type: "pod_spec"
+    validator: "pod_security_standards"
+    description: "Ensure Pod Security Standards compliance"
+
+# Resource limit recommendations
+resource_limits:
+  cpu:
+    min: "10m"
+    max: "4000m"
+    default_request: "100m"
+    default_limit: "500m"
+
+  memory:
+    min: "64Mi"
+    max: "8Gi"
+    default_request: "128Mi"
+    default_limit: "512Mi"
+
+# Validation settings
+validation_settings:
+  enable_kubeconform: true
+  enable_schema_autofix: true
+  enable_parallel_validation: true
+  max_workers: 4
+  fail_on_needs_review: false
+  strict_mode: false

@@ -7,19 +7,22 @@ This version replaces the old strict gates with a realistic,
 LLM-friendly, schema-repair-driven validator.
 
 PASS IF:
+    - YAML can be parsed (after optional auto-repair)
     - All auto-fix categories are satisfied
-    - YAML is valid after auto-repair
     - No dangerous misconfigurations introduced
-    - Schema was fixed successfully (soft)
+    - Schema auto-fix (if any) succeeded
 
-FAIL ONLY IF:
-    - YAML cannot be parsed
-    - A required category is NOT fixed
-    - LLM added a dangerous configuration
+NEEDS_REVIEW IF:
+    - kubeconform (if installed) reports schema issues
+
+FAIL IF:
+    - YAML cannot be parsed even after auto-fix
+    - A required auto-fix category is NOT fixed
+    - LLM added dangerous configuration (privileged, hostPID, bad caps, etc.)
     - Required schema-repair cannot be inferred
 
-Everything else becomes WARN / NEEDS_REVIEW.
-
+Schema auto-fix alone no longer downgrades PASS to NEEDS_REVIEW;
+we just add a note instead.
 """
 
 import argparse
@@ -27,7 +30,7 @@ import yaml
 import json
 import csv
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 import subprocess
 import shutil
@@ -99,8 +102,8 @@ def autofix_schema_one(doc: dict) -> dict:
 
     # ---- Deployment selector missing
     if kind == "Deployment":
-        tmpl = spec.setdefault("template", {}).setdefault("metadata", {})
-        tmpl_labels = tmpl.setdefault("labels", {"app": "autofixed"})
+        tmpl_meta = spec.setdefault("template", {}).setdefault("metadata", {})
+        tmpl_labels = tmpl_meta.setdefault("labels", {"app": "autofixed"})
         sel = spec.setdefault("selector", {})
         sel.setdefault("matchLabels", tmpl_labels)
 
@@ -115,7 +118,7 @@ def autofix_schema_one(doc: dict) -> dict:
         api = doc.get("apiVersion", "")
         if api in ("extensions/v1beta1", "networking.k8s.io/v1beta1"):
             doc["apiVersion"] = "networking.k8s.io/v1"
-            # fix structure
+            # minimal structural fix
             spec.setdefault("rules", [])
             spec.setdefault("ingressClassName", "autofixed")
 
@@ -126,11 +129,9 @@ def autofix_schema_one(doc: dict) -> dict:
             if "port" in p:
                 try:
                     p["port"] = int(p["port"])
-                except:
+                except Exception:
                     p["port"] = 80
-            if "targetPort" in p:
-                # leave as string or int
-                pass
+            # targetPort can be int or string; leave as-is
 
     return doc
 
@@ -161,9 +162,25 @@ def find_security_contexts(doc: dict) -> List[dict]:
         results.append(c.get("securityContext", {}))
     return results
 
+
+def iter_effective_security_contexts(doc: dict):
+    """
+    Yield the *effective* securityContext for each container,
+    merging pod-level securityContext with container-level overrides.
+    """
+    spec = doc.get("spec", {})
+    pod = spec.get("template", {}).get("spec", spec)
+    pod_sc = pod.get("securityContext", {}) or {}
+
+    for c in pod.get("containers", []) + pod.get("initContainers", []):
+        c_sc = c.get("securityContext", {}) or {}
+        # container fields override pod-level fields
+        merged = {**pod_sc, **c_sc}
+        yield merged
+
 def check_dangerous(doc: dict) -> List[str]:
     """Return list of dangerous misconfigs."""
-    msgs = []
+    msgs: List[str] = []
     scs = find_security_contexts(doc)
 
     for sc in scs:
@@ -192,7 +209,6 @@ def category_fixed(doc: dict, cat: str) -> bool:
     """
     Check if an auto-fix category is satisfied.
     """
-    # Containers list
     spec = doc.get("spec", {})
     pod = spec.get("template", {}).get("spec", spec)
     containers = pod.get("containers", []) + pod.get("initContainers", [])
@@ -202,15 +218,16 @@ def category_fixed(doc: dict, cat: str) -> bool:
 
     req = AUTO_FIX_REQUIREMENTS[cat]
 
-    # Security category
+    # Security/Auth categories use securityContext
+        # Security + Auth categories – use effective (pod + container) securityContext
     if "Security" in cat or "Auth" in cat:
-        for c in containers:
-            sc = c.get("securityContext", {})
+        for sc in iter_effective_security_contexts(doc):
             if req(sc) is False:
                 return False
         return True
 
-    # Resource limits
+
+    # Resource limits/requests
     if "Resources" in cat:
         for c in containers:
             if req(c) is False:
@@ -234,8 +251,11 @@ def run_kubeconform(path: Path) -> bool:
     """Soft check: always allow fail."""
     if shutil.which("kubeconform") is None:
         return True
-    p = subprocess.run(["kubeconform", "-summary", str(path)],
-                        capture_output=True, text=True)
+    p = subprocess.run(
+        ["kubeconform", "-summary", str(path)],
+        capture_output=True,
+        text=True,
+    )
     return p.returncode == 0
 
 # ---------------------------------------------------------------------
@@ -243,7 +263,7 @@ def run_kubeconform(path: Path) -> bool:
 # ---------------------------------------------------------------------
 
 def validate_one(original: Path, secured: Path, categories: List[str]) -> Dict[str, Any]:
-    result = {
+    result: Dict[str, Any] = {
         "file": original.name,
         "status": "PASS",
         "dangerous": [],
@@ -271,7 +291,7 @@ def validate_one(original: Path, secured: Path, categories: List[str]) -> Dict[s
     # re-load after fix
     try:
         secured_docs = load_yaml(secured)
-    except:
+    except Exception:
         result["status"] = "FAIL"
         result["notes"].append("Schema fix still produced invalid YAML.")
         return result
@@ -295,13 +315,22 @@ def validate_one(original: Path, secured: Path, categories: List[str]) -> Dict[s
 
     if result["auto_fix_unfixed"]:
         result["status"] = "FAIL"
-        result["notes"].append("Auto-fix categories not satisfied: " + ",".join(result["auto_fix_unfixed"]))
+        result["notes"].append(
+            "Auto-fix categories not satisfied: " + ",".join(result["auto_fix_unfixed"])
+        )
         return result
 
     # --------------------- Kubeconform (soft) ---------------------
     if not run_kubeconform(secured):
         result["status"] = "NEEDS_REVIEW"
         result["notes"].append("Schema warnings: kubeconform errors.")
+
+    # --------------------- Annotate schema auto-fix (without downgrading PASS) ----
+    if result["schema_fixed"]:
+        # Only add the note once; do NOT change status from PASS.
+        note = "Schema was auto-fixed automatically; please review once."
+        if note not in result["notes"]:
+            result["notes"].append(note)
 
     return result
 
@@ -313,19 +342,29 @@ def write_summary(out_dir: Path, results: List[Dict[str, Any]]):
     path = out_dir / "SUMMARY_VALIDATION.csv"
     with path.open("w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
-        w.writerow([
-            "file", "status", "dangerous", "unfixed_categories",
-            "auto_fix_categories", "schema_fixed", "notes"
-        ])
+        w.writerow(
+            [
+                "file",
+                "status",
+                "dangerous",
+                "unfixed_categories",
+                "auto_fix_categories",
+                "schema_fixed",
+                "notes",
+            ]
+        )
         for r in results:
-            w.writerow([
-                r["file"], r["status"],
-                ";".join(r["dangerous"]),
-                ";".join(r["auto_fix_unfixed"]),
-                ";".join(r["auto_fix_categories"]),
-                r["schema_fixed"],
-                "; ".join(r["notes"]),
-            ])
+            w.writerow(
+                [
+                    r["file"],
+                    r["status"],
+                    ";".join(r["dangerous"]),
+                    ";".join(r["auto_fix_unfixed"]),
+                    ";".join(r["auto_fix_categories"]),
+                    r["schema_fixed"],
+                    "; ".join(r["notes"]),
+                ]
+            )
 
 # ---------------------------------------------------------------------
 # MAIN CLI
@@ -345,7 +384,7 @@ def main():
     out_dir.mkdir(parents=True, exist_ok=True)
 
     payload = json.loads(Path(args.payload).read_text(encoding="utf-8"))
-    file_map = {}
+    file_map: Dict[str, List[str]] = {}
 
     if "files" in payload:
         for f in payload["files"]:
@@ -354,7 +393,7 @@ def main():
         for it in payload["items"]:
             file_map.setdefault(it["file"], []).append(it["category"])
 
-    results = []
+    results: List[Dict[str, Any]] = []
 
     for rel, cats in file_map.items():
         orig = tests_dir / rel
@@ -373,15 +412,16 @@ def main():
     write_summary(out_dir, results)
 
     worst = "PASS"
-    order = {"PASS":0, "NEEDS_REVIEW":1, "FAIL":2}
+    order = {"PASS": 0, "NEEDS_REVIEW": 1, "FAIL": 2}
     for r in results:
         if order[r["status"]] > order[worst]:
             worst = r["status"]
 
     if worst == "FAIL":
-        exit(1)
+        raise SystemExit(1)
     else:
-        exit(0)
+        raise SystemExit(0)
+
 
 if __name__ == "__main__":
     main()
