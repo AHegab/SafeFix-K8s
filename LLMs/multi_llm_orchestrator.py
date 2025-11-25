@@ -415,13 +415,36 @@ class SecurityHardeningHandler:
 
             ensure_container_sc("allowPrivilegeEscalation", "allowPrivilegeEscalation",
                                 False, "Prevent privilege escalation")
-            if "capabilities" not in c_sc or "drop" not in c_sc.get("capabilities", {}):
-                patches.append({
-                    "op": "add",
-                    "path": f"{base_path}/capabilities",
-                    "value": {"drop": ["ALL"]},
-                    "description": f"Drop all capabilities in {container_name}",
-                })
+
+            # FIXED: Check if capabilities.drop contains "ALL", not just if it exists
+            caps = c_sc.get("capabilities", {})
+            drop_list = caps.get("drop", []) if isinstance(caps.get("drop"), list) else []
+            if "ALL" not in drop_list:
+                if "capabilities" not in c_sc:
+                    # No capabilities at all - add fresh
+                    patches.append({
+                        "op": "add",
+                        "path": f"{base_path}/capabilities",
+                        "value": {"drop": ["ALL"]},
+                        "description": f"Drop all capabilities in {container_name}",
+                    })
+                elif "drop" not in caps:
+                    # capabilities exists but no drop - add drop
+                    patches.append({
+                        "op": "add",
+                        "path": f"{base_path}/capabilities/drop",
+                        "value": ["ALL"],
+                        "description": f"Add capabilities.drop=[ALL] in {container_name}",
+                    })
+                else:
+                    # drop exists but doesn't contain ALL - replace it
+                    patches.append({
+                        "op": "replace",
+                        "path": f"{base_path}/capabilities/drop",
+                        "value": ["ALL"],
+                        "description": f"Replace capabilities.drop with [ALL] in {container_name}",
+                    })
+
             ensure_container_sc("readOnlyRootFilesystem", "readOnlyRootFilesystem",
                                 True, "Make root filesystem read-only")
             ensure_container_sc("runAsNonRoot", "runAsNonRoot",
@@ -1075,21 +1098,57 @@ def filter_valid_patches(doc: Any, patches: List[Dict[str, Any]]) -> List[Dict[s
 
 def deduplicate_patches(patches: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """
-    Remove duplicate patches based on path.
-    Keep the first occurrence.
+    Remove duplicate patches based on path AND operation.
+    Improved: Keep later occurrences if they have different values (prefer replace over add).
+    CRITICAL: Skip whole-object patches when individual field patches exist.
 
     Returns list of unique patches.
     """
-    seen_paths = set()
-    unique_patches = []
+    # First pass: identify paths that have child patches (individual fields)
+    paths_with_children = set()
+    for patch in patches:
+        path = patch.get("path", "")
+        # Check if this path has children by looking for longer paths with this prefix
+        for other_patch in patches:
+            other_path = other_patch.get("path", "")
+            # If other_path starts with path + "/", then path has children
+            if other_path.startswith(path + "/"):
+                paths_with_children.add(path)
+                break
+
+    # Use (path, op) as key instead of just path
+    # This allows different operations on the same path
+    seen = {}  # key: path, value: (op, patch)
 
     for patch in patches:
         path = patch.get("path", "")
-        if path not in seen_paths:
-            seen_paths.add(path)
-            unique_patches.append(patch)
+        op = patch.get("op", "")
+        value = patch.get("value")
 
-    return unique_patches
+        # CRITICAL FIX: Skip patches that set a whole object when we have individual field patches
+        if path in paths_with_children and op in ("add", "replace"):
+            # This patch sets a whole object, but we have patches for individual fields
+            # Skip this patch to avoid overwriting the individual fields
+            # Silently skip - comment out for debugging
+            # print(f"  [DEBUG DEDUP] Skipping whole-object patch for {path} (has child patches)")
+            continue
+
+        key = path
+        if key not in seen:
+            seen[key] = patch
+        else:
+            # If we see the same path again:
+            # - Prefer 'replace' over 'add' (more specific)
+            # - Keep the one with a value if the other doesn't
+            existing_op = seen[key].get("op")
+            if op == "replace" and existing_op == "add":
+                # Replace is more specific, use it
+                seen[key] = patch
+            elif op == existing_op and value is not None:
+                # Same op, but potentially better value - update
+                seen[key] = patch
+
+    return list(seen.values())
 
 
 # ======================= JSON Patch Application =======================
@@ -1100,6 +1159,7 @@ def apply_json_patch(doc: Any, patch_ops: List[Dict[str, Any]]) -> Any:
     import copy
 
     doc = copy.deepcopy(doc)
+    debug = os.environ.get("DEBUG_PATCHES", "").lower() == "true"
 
     for op in patch_ops:
         op_type = op.get("op")
@@ -1111,6 +1171,9 @@ def apply_json_patch(doc: Any, patch_ops: List[Dict[str, Any]]) -> Any:
             continue
         if op_type in ("add", "replace") and "value" not in op:
             continue
+
+        if debug and "securityContext" in path:
+            print(f"  [TRACE] Applying: {op_type} {path} = {op.get('value')}")
 
         try:
             parts = [p for p in path.split("/") if p]
@@ -1181,11 +1244,15 @@ def apply_json_patch(doc: Any, patch_ops: List[Dict[str, Any]]) -> Any:
                 # dict
                 if op_type in ("add", "replace"):
                     cur[last] = op.get("value")
+                    if debug and "securityContext" in path:
+                        print(f"  [TRACE] Successfully set {last} = {op.get('value')}")
                 elif op_type == "remove":
                     if last in cur:
                         del cur[last]
         except Exception as e:
             print(f"  [WARN] Failed to apply op {op}: {e}")
+            if debug and "securityContext" in path:
+                print(f"  [TRACE] Exception details: {type(e).__name__}: {str(e)}")
             continue
 
     return doc
@@ -1230,7 +1297,7 @@ def process_category(
         skip_msg = SKIP_MESSAGES.get(category, "Category skipped (not actionable)")
         result["error"] = f"Skipped: {skip_msg}"
         print(f"    [{category}] SKIPPED")
-        print(f"      └─ {skip_msg}")
+        print(f"      -> {skip_msg}")
         return None, "", result
 
     # Avoid touching Secret resources with generic hardening
@@ -1238,7 +1305,7 @@ def process_category(
         msg = "Automatic fixes for Secret resources are disabled (handle via dedicated secret rotation)."
         result["error"] = f"Skipped: {msg}"
         print(f"    [{category}] SKIPPED on Secret")
-        print(f"      └─ {msg}")
+        print(f"      -> {msg}")
         return None, "", result
 
     # Use comprehensive security hardening handler
@@ -1249,7 +1316,7 @@ def process_category(
         result["strategy"] = "deterministic_security"
         if patches:
             print(f"    [{category}] Deterministic Security: {len(patches)} patch(es)")
-            print("      └─ Comprehensive hardening (all 4 controls)")
+            print("      -> Comprehensive hardening (all 4 controls)")
         else:
             print(f"    [{category}] Security hardening produced no patches (probably non-workload)")
         return patches, explanation, result
@@ -1260,7 +1327,7 @@ def process_category(
         result["patches_count"] = len(patches)
         print(f"    [{category}] Deterministic: {len(patches)} patch(es)")
         if explanation:
-            print(f"      └─ {explanation}")
+            print(f"      -> {explanation}")
         return patches, explanation, result
 
     # Template fixes
@@ -1269,7 +1336,7 @@ def process_category(
         result["patches_count"] = len(patches)
         print(f"    [{category}] Template: {len(patches)} patch(es)")
         if explanation:
-            print(f"      └─ {explanation}")
+            print(f"      -> {explanation}")
         return patches, explanation, result
 
     # LLM-guided fixes
@@ -1296,7 +1363,7 @@ def process_category(
     result["patches_count"] = len(patches)
     print(f"    [{category}] LLM ({provider_name}): {len(patches)} patch(es)")
     if explanation:
-        print(f"      └─ {explanation}")
+        print(f"      -> {explanation}")
 
     return patches, explanation or "", result
 
@@ -1362,14 +1429,33 @@ def process_file(
 
     if all_patches:
         try:
+            # Debug: Show all patches before deduplication
+            debug_patches = os.environ.get("DEBUG_PATCHES", "").lower() == "true"
+            if debug_patches:
+                print(f"\n  [DEBUG] All patches before deduplication ({len(all_patches)}):")
+                for i, p in enumerate(all_patches):
+                    print(f"    {i+1}. {p.get('op')} {p.get('path')}")
+
             unique_patches = deduplicate_patches(all_patches)
             if len(unique_patches) < len(all_patches):
                 print(f"  [INFO] Deduplicated {len(all_patches) - len(unique_patches)} patch(es)")
+
+            if debug_patches:
+                print(f"\n  [DEBUG] Patches after deduplication ({len(unique_patches)}):")
+                for i, p in enumerate(unique_patches):
+                    print(f"    {i+1}. {p.get('op')} {p.get('path')}")
 
             valid_patches = filter_valid_patches(doc, unique_patches)
             if len(valid_patches) < len(unique_patches):
                 filtered_count = len(unique_patches) - len(valid_patches)
                 print(f"  [INFO] Filtered {filtered_count} invalid patch(es)")
+
+            if debug_patches:
+                print(f"\n  [DEBUG] Patches after filtering ({len(valid_patches)}):")
+                for i, p in enumerate(valid_patches):
+                    desc = p.get('description', 'No description')
+                    print(f"    {i+1}. {p.get('op')} {p.get('path')} = {p.get('value')}")
+                    print(f"        Description: {desc}")
 
             modified_doc = apply_json_patch(doc, valid_patches)
             docs[primary_index] = modified_doc
