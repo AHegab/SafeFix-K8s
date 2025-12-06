@@ -5,7 +5,7 @@ __pycache__/
 
 # C extensions
 *.so
-
+.docs/
 # Distribution / packaging
 .Python
 build/
@@ -257,6 +257,10 @@ $RECYCLE.BIN/
 kubeaudit.exe
 kubescape.exe
 !detection/tools/**/*.exe
+
+# Ignore documentation folder and artifacts
+docs/
+!docs/.gitkeep
 
 # Validation evidence and temp inputs
 Validations/evidence/**
