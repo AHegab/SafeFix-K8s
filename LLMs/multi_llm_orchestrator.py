@@ -175,6 +175,16 @@ CATEGORY_CONFIG: Dict[str, Dict[str, Any]] = {
         "priority": 10,
         "use_security_handler": True,
     },
+        # RBAC / Least-privilege fixes (deterministic)
+    "RBAC/WildcardVerbsOrResources": {
+        "strategy": FixStrategy.DETERMINISTIC,
+        "priority": 8,
+    },
+    "RBAC/ExcessivePermissions": {
+        "strategy": FixStrategy.DETERMINISTIC,
+        "priority": 8,
+    },
+
 
     # LLM-guided with fallback (for other security issues)
     "Security/PrivilegedContainer": {
@@ -1055,6 +1065,74 @@ def apply_deterministic_fix(
                 "Disabled automatic mounting of ServiceAccount token to reduce "
                 "attack surface."
             )
+    elif category in ("RBAC/WildcardVerbsOrResources", "RBAC/ExcessivePermissions"):
+        # Deterministic least-privilege fix for Role / ClusterRole
+        if kind not in ("Role", "ClusterRole"):
+            return [], f"RBAC fixes skipped for non-RBAC kind={kind}"
+
+        rules = doc.get("rules", [])
+        if not isinstance(rules, list):
+            return [], "No RBAC rules array to fix."
+
+        # verbs we consider dangerous for this fixer
+        dangerous_verbs = {"delete", "deletecollection", "*"}
+        # read-only verbs we are happy to keep if they already exist
+        readonly_priority = ("get", "list", "watch")
+
+        any_patch = False
+        for i, rule in enumerate(rules):
+            if not isinstance(rule, dict):
+                continue
+
+            verbs = rule.get("verbs")
+            if not isinstance(verbs, list):
+                continue
+
+            original_verbs = [v for v in verbs if isinstance(v, str)]
+            # Remove dangerous verbs
+            safe_verbs = [v for v in original_verbs if v.lower() not in dangerous_verbs]
+
+            if not safe_verbs:
+                # If we only had dangerous verbs, try to keep read-only verbs
+                # that were present originally (rare but safe).
+                preserved_readonly = [
+                    v
+                    for v in readonly_priority
+                    if v in original_verbs
+                ]
+                if preserved_readonly:
+                    safe_verbs = preserved_readonly
+                else:
+                    # Cannot safely infer minimal verbs -> leave rule as-is
+                    continue
+
+            # If nothing actually changed, skip patch
+            if safe_verbs == original_verbs:
+                continue
+
+            any_patch = True
+            patches.append({
+                "op": "replace",
+                "path": f"/rules/{i}/verbs",
+                "value": safe_verbs,
+                "description": (
+                    "Drop dangerous RBAC verbs (delete, deletecollection, *) "
+                    "while preserving existing read-only verbs."
+                ),
+            })
+
+        if any_patch:
+            explanation = (
+                "Cleaned up RBAC Role/ClusterRole rules by removing dangerous verbs "
+                "like 'delete', 'deletecollection', and '*' while preserving the "
+                "original read-only verbs (get, list, watch) where present."
+            )
+        else:
+            explanation = (
+                "No RBAC verb changes were required; either no dangerous verbs "
+                "were present or no safe replacement could be inferred."
+            )
+
 
     return patches, explanation
 

@@ -110,6 +110,35 @@ class ValidationConfig:
             return cls()
 
 
+# Human-facing hints for categories that typically require manual action
+MANUAL_FOLLOWUP_HINTS: Dict[str, str] = {
+    "Auth/DefaultServiceAccount": (
+        "This workload still uses the default service account. "
+        "Create a dedicated ServiceAccount with the minimum permissions it needs, "
+        "bind it using Role/RoleBinding, and set spec.template.spec.serviceAccountName "
+        "to that account."
+    ),
+    "Image/TagNotPinned": (
+        "Container images are still using 'latest' or an implicit tag. "
+        "Pin images to a specific version or, ideally, to a digest "
+        "(for example: nginx:1.25.3 or nginx@sha256:<digest>) in your CI/CD pipeline."
+    ),
+    "Network/MissingNetworkPolicy": (
+        "No NetworkPolicy resource is defined for this workload. "
+        "Add a NetworkPolicy to restrict which pods and IP ranges can talk to it, "
+        "instead of allowing all traffic by default."
+    ),
+    "Misc/Unmapped": (
+        "Some findings from detection tools are not mapped into a specific SafeFix-K8s "
+        "category. Review the original scanner output for more details."
+    ),
+    "Style/YamlLint": (
+        "YAML style issues do not affect security, but fixing them can improve "
+        "readability and maintainability."
+    ),
+}
+
+
 @dataclass
 class ValidationFinding:
     """A single validation finding with context."""
@@ -1086,19 +1115,172 @@ def write_summary(out_dir: Path, results: List[ValidationResult]) -> None:
     logger.info(f"Summary written to: {summary_path}")
 
 
-def write_detailed_reports(out_dir: Path, results: List[ValidationResult]) -> None:
-    """Write detailed JSON reports for each validation."""
+def build_human_report(result: ValidationResult, config: ValidationConfig) -> str:
+    """
+    Build a human-readable explanation of the validation result.
+
+    This is what you show to developers and platform engineers. It:
+      - Summarises the overall status
+      - Highlights what SafeFix-K8s has verified as secured
+      - Calls out manual follow-up actions (non-auto-fix categories)
+      - Includes key notes from the validation pipeline
+    """
+    lines: List[str] = []
+
+    # Header
+    lines.append(f"SafeFix-K8s validation report for: {result.file}")
+    lines.append("=" * 60)
+    lines.append(f"Overall status: {result.status}")
+    lines.append("")
+
+    # Quick stats
+    total_checks = len(result.findings)
+    passed_checks = len([f for f in result.findings if f.passed])
+    failed_checks = total_checks - passed_checks
+
+    lines.append("Summary")
+    lines.append("-------")
+    lines.append(f"Total checks:   {total_checks}")
+    lines.append(f"Passed checks:  {passed_checks}")
+    lines.append(f"Failed checks:  {failed_checks}")
+    if result.schema_fixed:
+        lines.append(f"Schema fixes:   {len(result.schema_changes)} change(s) applied automatically")
+    if result.dangerous:
+        lines.append(f"Dangerous:      {len(result.dangerous)} dangerous misconfiguration(s) detected")
+    lines.append("")
+
+    if result.dangerous:
+        lines.append("1) Dangerous misconfigurations (blocking)")
+        lines.append("----------------------------------------")
+        for d in result.dangerous:
+            lines.append(f"- {d}")
+        lines.append("")
+        # If there are dangerous configs, the rest of the sections are still useful,
+        # but the user clearly sees why it is blocked.
+
+    # What is strongly secured
+    strong_passes = [
+        f for f in result.findings
+        if f.passed and f.severity in (Severity.CRITICAL, Severity.HIGH)
+    ]
+
+    if strong_passes:
+        lines.append("2) High-impact controls that are secured")
+        lines.append("----------------------------------------")
+        # Group by category to avoid repetition
+        seen: Set[Tuple[str, Optional[str]]] = set()
+        for f in strong_passes:
+            key = (f.category, f.container)
+            if key in seen:
+                continue
+            seen.add(key)
+
+            container_prefix = f" [{f.container}]" if f.container else ""
+            lines.append(f"- {f.category}{container_prefix}: {f.message}")
+        lines.append("")
+
+    # Manual follow-up (non-auto-fix categories)
+    manual_failures = [
+        f for f in result.findings
+        if not f.passed and f.category in config.non_auto_fix_categories
+    ]
+
+    if manual_failures:
+        lines.append("3) Manual follow-up recommended")
+        lines.append("-------------------------------")
+        lines.append(
+            "These are areas SafeFix-K8s intentionally did not auto-fix. "
+            "They usually require architectural or CI/CD decisions."
+        )
+
+        grouped: Dict[str, List[ValidationFinding]] = {}
+        for f in manual_failures:
+            grouped.setdefault(f.category, []).append(f)
+
+        for category, findings in grouped.items():
+            sample = findings[0]
+            hint = MANUAL_FOLLOWUP_HINTS.get(category)
+
+            lines.append(f"")
+            lines.append(f"- {category}")
+            if hint:
+                lines.append(f"  Recommendation: {hint}")
+            else:
+                # Fallback if we do not have a predefined hint yet
+                lines.append(
+                    "  Recommendation: Review this category manually. "
+                    "Example finding: " + sample.message
+                )
+
+        lines.append("")
+
+    # Medium/low issues that are still relevant (auto-fix scope)
+    medium_or_low_failures = [
+        f for f in result.findings
+        if not f.passed
+        and f.category not in config.non_auto_fix_categories
+        and f.severity in (Severity.MEDIUM, Severity.LOW)
+    ]
+
+    if medium_or_low_failures:
+        lines.append("4) Additional issues inside auto-fix scope")
+        lines.append("-----------------------------------------")
+        lines.append(
+            "These checks belong to the auto-fix scope but still did not pass. "
+            "You may want to rerun SafeFix-K8s or adjust the manifest manually."
+        )
+
+        for f in medium_or_low_failures:
+            container_prefix = f" ({f.container})" if f.container else ""
+            lines.append(f"- [{f.severity.value}] {f.category}{container_prefix}: {f.message}")
+        lines.append("")
+
+    # Notes and diff summary
+    if result.diff_summary or result.notes:
+        lines.append("5) Pipeline notes and changes")
+        lines.append("-----------------------------")
+
+        if result.diff_summary:
+            sf = result.diff_summary
+            if sf.get("security_fields_added") or sf.get("resources_added") or sf.get("probes_added"):
+                lines.append("Security-related changes compared to the original manifest:")
+                for item in sf.get("security_fields_added", []):
+                    lines.append(f"- Added: {item}")
+                for item in sf.get("resources_added", []):
+                    lines.append(f"- Added resources: {item}")
+                for item in sf.get("probes_added", []):
+                    lines.append(f"- Added probes: {item}")
+                lines.append("")
+
+        if result.notes:
+            lines.append("Validation pipeline notes:")
+            for note in result.notes:
+                lines.append(f"- {note}")
+            lines.append("")
+
+    # Final friendly conclusion
+    lines.append("End of report.")
+    return "\n".join(lines)
+
+
+
+def write_detailed_reports(out_dir: Path, results: List[ValidationResult], config: ValidationConfig) -> None:
+    """Write detailed JSON reports for each validation (including human-readable summary)."""
     for result in results:
         report_name = f"REPORT_VALIDATE_{result.file.replace('/', '_')}.json"
         report_path = out_dir / report_name
 
         try:
+            data = result.to_dict()
+            data["human_report"] = build_human_report(result, config)
+
             report_path.write_text(
-                json.dumps(result.to_dict(), indent=2),
+                json.dumps(data, indent=2),
                 encoding="utf-8"
             )
         except Exception as e:
             logger.error(f"Failed to write report {report_name}: {e}")
+
 
 
 def print_summary_stats(results: List[ValidationResult]) -> None:
@@ -1193,7 +1375,7 @@ def main() -> int:
     results = validate_parallel(file_map, tests_dir, fixed_dir, config)
 
     # Write reports
-    write_detailed_reports(out_dir, results)
+    write_detailed_reports(out_dir, results, config)
     write_summary(out_dir, results)
 
     # Print summary
