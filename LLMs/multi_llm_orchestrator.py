@@ -43,6 +43,20 @@ WORKLOAD_KINDS = {
     "Pod",
 }
 
+# Valid Pod-level securityContext fields (PodSecurityContext)
+POD_SC_ALLOWED = {
+    "runAsUser",
+    "runAsGroup",
+    "runAsNonRoot",
+    "fsGroup",
+    "fsGroupChangePolicy",
+    "supplementalGroups",
+    "seccompProfile",
+    "seLinuxOptions",
+    "sysctls",
+    "windowsOptions",
+}
+
 # ======================= Configuration =======================
 
 
@@ -324,6 +338,34 @@ def get_containers_and_path(doc: Dict[str, Any]) -> Tuple[List[Dict[str, Any]], 
         base_path = "/spec/containers"
 
     return containers, base_path
+
+
+def sanitize_pod_security_context(pod_sc: dict) -> dict:
+    """
+    Remove invalid fields from Pod-level securityContext.
+    
+    Only keeps fields that are valid for PodSecurityContext.
+    This prevents LLM-generated patches from adding container-level
+    fields (like 'privileged', 'capabilities', 'allowPrivilegeEscalation')
+    to the Pod-level securityContext.
+    
+    Args:
+        pod_sc: The Pod securityContext dictionary to sanitize
+        
+    Returns:
+        Sanitized dictionary containing only valid PodSecurityContext fields
+    """
+    if not isinstance(pod_sc, dict):
+        return pod_sc
+    
+    sanitized = {k: v for k, v in pod_sc.items() if k in POD_SC_ALLOWED}
+    
+    # Log any removed fields for debugging
+    removed = set(pod_sc.keys()) - set(sanitized.keys())
+    if removed:
+        print(f"  [SANITIZE] Removed invalid Pod securityContext fields: {removed}")
+    
+    return sanitized
 
 
 # ======================= Security Hardening Handler =======================
@@ -1458,6 +1500,27 @@ def process_file(
                     print(f"        Description: {desc}")
 
             modified_doc = apply_json_patch(doc, valid_patches)
+            
+            # Sanitize Pod-level securityContext to remove invalid fields
+            kind = modified_doc.get("kind", "")
+            if kind in WORKLOAD_KINDS:
+                if kind in ("Deployment", "StatefulSet", "DaemonSet", "Job", "CronJob", "ReplicaSet"):
+                    pod_spec = (
+                        modified_doc.get("spec", {})
+                        .get("template", {})
+                        .get("spec", {})
+                    )
+                    if "securityContext" in pod_spec:
+                        pod_spec["securityContext"] = sanitize_pod_security_context(
+                            pod_spec["securityContext"]
+                        )
+                else:  # Pod
+                    pod_spec = modified_doc.get("spec", {})
+                    if "securityContext" in pod_spec:
+                        pod_spec["securityContext"] = sanitize_pod_security_context(
+                            pod_spec["securityContext"]
+                        )
+            
             docs[primary_index] = modified_doc
             secured_yaml = yaml_dump_all(docs)
 
@@ -1544,6 +1607,31 @@ def main():
         default="output/ultimate_fixes",
         help="Output directory",
     )
+    parser.add_argument(
+        "--models",
+        type=str,
+        default=None,
+        help=(
+            "Comma-separated list of provider names or provider:model pairs. "
+            "Examples: 'openai,groq' or 'openai:gpt-4o-mini,groq:llama-3.1-8b-instant'"
+        ),
+    )
+    parser.add_argument(
+        "--concurrency",
+        type=int,
+        default=5,
+        help="Number of concurrent LLM requests (optional, default: 5)",
+    )
+    parser.add_argument(
+        "--autofix",
+        action="store_true",
+        help="Enable autofix mode (apply fixes automatically)",
+    )
+    parser.add_argument(
+        "--hygiene",
+        action="store_true",
+        help="Enable hygiene mode (additional linting/formatting)",
+    )
 
     args = parser.parse_args()
 
@@ -1561,9 +1649,34 @@ def main():
         "openrouter": os.environ.get("OPENROUTER_MODEL", "x-ai/grok-vision-beta"),
     }
 
+    # If user provided --models, parse overrides or preference list
+    provider_order: List[str] = []
+    if args.models:
+        for part in [p.strip() for p in args.models.split(",") if p.strip()]:
+            if ":" in part:
+                # provider:model mapping
+                prov, mdl = part.split(":", 1)
+                prov = prov.strip().lower()
+                mdl = mdl.strip()
+                if prov in models:
+                    models[prov] = mdl
+            else:
+                provider_order.append(part.strip().lower())
+
+    # Concurrency / modes (kept for compatibility; not heavily used internally)
+    concurrency = int(args.concurrency) if hasattr(args, "concurrency") else 5
+    autofix = bool(getattr(args, "autofix", False))
+    hygiene = bool(getattr(args, "hygiene", False))
+
     print("\n" + "=" * 60)
     print("Ultimate SafeFix-K8s Orchestrator (IMPROVED)")
     print("=" * 60)
+    # Show runtime options for visibility
+    if args.models:
+        print(f"Runtime models override/pref: {args.models}")
+    print(f"Concurrency: {concurrency}")
+    print(f"Autofix: {autofix}")
+    print(f"Hygiene: {hygiene}")
     print("Enhancements:")
     print("  • Comprehensive security hardening (all 4 controls, merged safely)")
     print("  • NetworkPolicy categories explicitly skipped")

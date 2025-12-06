@@ -1,0 +1,2 @@
+﻿/scan/13.deployment.yaml:1:1: [warning] missing document start "---" (document-start)
+/scan/13.deployment.yaml:10:7: [error] wrong indentation: expected 8 but found 6 (indentation)

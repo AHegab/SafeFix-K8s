@@ -1,15 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "Bash(python:*)",
-      "Bash(cat:*)",
-      "Bash(cp:*)",
-      "Bash(powershell -ExecutionPolicy Bypass -File \".\\rerun_fixes_and_validate.ps1\")",
-      "Bash(set DEBUG_PATCHES=true:*)",
-      "Bash(Select-String -Pattern \"DEBUG|Applied|capabilities|seccompProfile|readOnlyRoot|runAsNonRoot|allowPrivilege\")",
-      "Bash($env:DEBUG_PATCHES=\"true\")",
-      "Bash(powershell -Command \"$env:DEBUG_PATCHES=''true''; python LLMs/multi_llm_orchestrator.py --payload ''Detection/output/hidden-in-layers.deployment/llm_payload.json'' --tests-dir ''Detection/output/hidden-in-layers.deployment'' --out-dir ''Detection/output/hidden-in-layers.deployment'' 2>&1 | Select-String ''DEBUG|Applied|Dedup''\")",
-      "Bash(powershell -Command:*)"
+      "Bash(chmod:*)"
     ],
     "deny": [],
     "ask": []

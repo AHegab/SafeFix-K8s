@@ -1,6 +1,0 @@
-# Sample Helm manifest (values.yaml) demonstrating configuration values used by a Helm chart
-primary:
-  service:
-    type: ClusterIP
-    ports:
-      mysql: 3306

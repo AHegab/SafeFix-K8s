@@ -1,0 +1,24 @@
+﻿{
+  "resources": [
+    {
+      "filename": "/scan/13.deployment.yaml",
+      "kind": "Deployment",
+      "name": "nginx-deployment",
+      "version": "apps/v1",
+      "status": "statusInvalid",
+      "msg": "problem validating schema. Check JSON formatting: jsonschema validation failed with 'https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/master-standalone-strict/deployment-apps-v1.json#' - at '/spec': missing property 'selector'",
+      "validationErrors": [
+        {
+          "path": "/spec",
+          "msg": "missing property 'selector'"
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "valid": 0,
+    "invalid": 1,
+    "errors": 0,
+    "skipped": 0
+  }
+}
