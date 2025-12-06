@@ -66,20 +66,6 @@
       },
       {
         "tool": "conftest",
-        "text": "nginx-deployment: container nginx is privileged",
-        "raw": {
-          "filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
-          "namespace": "kubernetes.privileged",
-          "failure": {
-            "msg": "nginx-deployment: container nginx is privileged",
-            "metadata": {
-              "query": "data.kubernetes.privileged.deny"
-            }
-          }
-        }
-      },
-      {
-        "tool": "conftest",
         "text": "CRITICAL: Container 'nginx' is running in privileged mode - grants full host access",
         "raw": {
           "filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
@@ -88,6 +74,20 @@
             "msg": "CRITICAL: Container 'nginx' is running in privileged mode - grants full host access",
             "metadata": {
               "query": "data.kubernetes.comprehensive_security.deny"
+            }
+          }
+        }
+      },
+      {
+        "tool": "conftest",
+        "text": "nginx-deployment: container nginx is privileged",
+        "raw": {
+          "filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
+          "namespace": "kubernetes.privileged",
+          "failure": {
+            "msg": "nginx-deployment: container nginx is privileged",
+            "metadata": {
+              "query": "data.kubernetes.privileged.deny"
             }
           }
         }
@@ -112,7 +112,7 @@
       }
     ],
     "provenance": "tools",
-    "decisionReason": "strong-tool={'kubeaudit', 'conftest', 'polaris', 'checkov'}"
+    "decisionReason": "strong-tool={'conftest', 'kubeaudit', 'polaris', 'checkov'}"
   },
   {
     "file": "13.deployment.yaml",
@@ -379,7 +379,7 @@
           "ResourceName": "nginx-deployment",
           "level": "error",
           "msg": "allowPrivilegeEscalation not set which allows privilege escalation. It should be set to 'false'.",
-          "time": "2025-12-06T13:18:09+02:00",
+          "time": "2025-12-06T15:53:45+02:00",
           "file": "/scan/13.deployment.yaml",
           "file_path": "/scan/13.deployment.yaml"
         }
@@ -404,7 +404,7 @@
       }
     ],
     "provenance": "tools",
-    "decisionReason": "strong-tool={'kubeaudit', 'conftest', 'polaris', 'checkov'}"
+    "decisionReason": "strong-tool={'conftest', 'kubeaudit', 'polaris', 'checkov'}"
   },
   {
     "file": "13.deployment.yaml",
@@ -513,14 +513,14 @@
       },
       {
         "tool": "conftest",
-        "text": "container \"nginx\" must set CPU limit",
+        "text": "nginx-deployment: missing cpu limit",
         "raw": {
           "filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
-          "namespace": "main",
+          "namespace": "kubernetes.resources",
           "failure": {
-            "msg": "container \"nginx\" must set CPU limit",
+            "msg": "nginx-deployment: missing cpu limit",
             "metadata": {
-              "query": "data.main.deny"
+              "query": "data.kubernetes.resources.deny"
             }
           }
         }
@@ -563,7 +563,7 @@
       }
     ],
     "provenance": "tools",
-    "decisionReason": "strong-tool={'checkov', 'polaris', 'conftest'}"
+    "decisionReason": "strong-tool={'conftest', 'polaris', 'checkov'}"
   },
   {
     "file": "13.deployment.yaml",
@@ -673,14 +673,14 @@
       },
       {
         "tool": "conftest",
-        "text": "container \"nginx\" must set CPU request",
+        "text": "nginx-deployment: missing cpu request",
         "raw": {
           "filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
-          "namespace": "main",
+          "namespace": "kubernetes.resources",
           "failure": {
-            "msg": "container \"nginx\" must set CPU request",
+            "msg": "nginx-deployment: missing cpu request",
             "metadata": {
-              "query": "data.main.deny"
+              "query": "data.kubernetes.resources.deny"
             }
           }
         }
@@ -723,7 +723,7 @@
       }
     ],
     "provenance": "tools",
-    "decisionReason": "strong-tool={'kubescore', 'checkov', 'polaris', 'conftest'}"
+    "decisionReason": "strong-tool={'conftest', 'kubescore', 'polaris', 'checkov'}"
   },
   {
     "file": "13.deployment.yaml",
@@ -865,7 +865,7 @@
       }
     ],
     "provenance": "tools",
-    "decisionReason": "strong-tool={'kubeaudit', 'polaris', 'checkov', 'trivy', 'conftest'}"
+    "decisionReason": "strong-tool={'trivy', 'checkov', 'conftest', 'kubeaudit', 'polaris'}"
   },
   {
     "file": "13.deployment.yaml",
@@ -1008,7 +1008,7 @@
       }
     ],
     "provenance": "tools",
-    "decisionReason": "strong-tool={'kubeaudit', 'conftest', 'polaris', 'checkov'}"
+    "decisionReason": "strong-tool={'conftest', 'kubeaudit', 'polaris', 'checkov'}"
   },
   {
     "file": "13.deployment.yaml",
@@ -1166,7 +1166,7 @@
       }
     ],
     "provenance": "tools",
-    "decisionReason": "strong-tool={'checkov', 'polaris', 'conftest'}"
+    "decisionReason": "strong-tool={'conftest', 'polaris', 'checkov'}"
   },
   {
     "file": "13.deployment.yaml",
@@ -1454,7 +1454,7 @@
       }
     ],
     "provenance": "tools",
-    "decisionReason": "strong-tool={'kubeaudit', 'conftest', 'polaris', 'checkov'}"
+    "decisionReason": "strong-tool={'conftest', 'kubeaudit', 'polaris', 'checkov'}"
   },
   {
     "file": "13.deployment.yaml",
@@ -1520,20 +1520,6 @@
       },
       {
         "tool": "conftest",
-        "text": "nginx-deployment must set seccompProfile.type: RuntimeDefault",
-        "raw": {
-          "filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
-          "namespace": "k8s.universal_hardening",
-          "failure": {
-            "msg": "nginx-deployment must set seccompProfile.type: RuntimeDefault",
-            "metadata": {
-              "query": "data.k8s.universal_hardening.deny"
-            }
-          }
-        }
-      },
-      {
-        "tool": "conftest",
         "text": "MEDIUM: Container 'nginx' missing seccomp profile - should use RuntimeDefault or Localhost",
         "raw": {
           "filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
@@ -1542,6 +1528,20 @@
             "msg": "MEDIUM: Container 'nginx' missing seccomp profile - should use RuntimeDefault or Localhost",
             "metadata": {
               "query": "data.kubernetes.comprehensive_security.deny"
+            }
+          }
+        }
+      },
+      {
+        "tool": "conftest",
+        "text": "nginx-deployment must set seccompProfile.type: RuntimeDefault",
+        "raw": {
+          "filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
+          "namespace": "k8s.universal_hardening",
+          "failure": {
+            "msg": "nginx-deployment must set seccompProfile.type: RuntimeDefault",
+            "metadata": {
+              "query": "data.k8s.universal_hardening.deny"
             }
           }
         }
@@ -1574,14 +1574,14 @@
           "ResourceName": "nginx-deployment",
           "level": "error",
           "msg": "Pod Seccomp profile is missing. Seccomp profile should be added to the pod SecurityContext.",
-          "time": "2025-12-06T13:18:09+02:00",
+          "time": "2025-12-06T15:53:45+02:00",
           "file": "/scan/13.deployment.yaml",
           "file_path": "/scan/13.deployment.yaml"
         }
       }
     ],
     "provenance": "tools",
-    "decisionReason": "strong-tool={'kubeaudit', 'polaris', 'checkov', 'trivy', 'conftest'}"
+    "decisionReason": "strong-tool={'trivy', 'checkov', 'conftest', 'kubeaudit', 'polaris'}"
   },
   {
     "file": "13.deployment.yaml",
@@ -1745,7 +1745,7 @@
       }
     ],
     "provenance": "tools",
-    "decisionReason": "strong-tool={'conftest', 'trivy'}"
+    "decisionReason": "strong-tool={'trivy', 'conftest'}"
   },
   {
     "file": "13.deployment.yaml",
@@ -1960,7 +1960,7 @@
       }
     ],
     "provenance": "tools",
-    "decisionReason": "strong-tool={'conftest', 'trivy'}"
+    "decisionReason": "strong-tool={'trivy', 'conftest'}"
   },
   {
     "file": "13.deployment.yaml",
@@ -2279,7 +2279,7 @@
       }
     ],
     "provenance": "tools",
-    "decisionReason": "strong-tool={'conftest', 'trivy'}"
+    "decisionReason": "strong-tool={'trivy', 'conftest'}"
   },
   {
     "file": "13.deployment.yaml",
@@ -2513,7 +2513,7 @@
       }
     ],
     "provenance": "tools",
-    "decisionReason": "strong-tool={'checkov', 'conftest'}"
+    "decisionReason": "strong-tool={'conftest', 'checkov'}"
   },
   {
     "file": "13.deployment.yaml",
@@ -2763,7 +2763,7 @@
           "ResourceName": "nginx-deployment",
           "level": "error",
           "msg": "AppArmor annotation missing. The annotation 'container.apparmor.security.beta.kubernetes.io/nginx' should be added.",
-          "time": "2025-12-06T13:18:09+02:00",
+          "time": "2025-12-06T15:53:45+02:00",
           "file": "/scan/13.deployment.yaml",
           "file_path": "/scan/13.deployment.yaml"
         }
@@ -2836,7 +2836,7 @@
           "ResourceName": "nginx-deployment",
           "level": "error",
           "msg": "Default service account with token mounted. automountServiceAccountToken should be set to 'false' on either the ServiceAccount or on the PodSpec or a non-default service account should be used.",
-          "time": "2025-12-06T13:18:09+02:00",
+          "time": "2025-12-06T15:53:45+02:00",
           "file": "/scan/13.deployment.yaml",
           "file_path": "/scan/13.deployment.yaml"
         }
@@ -3000,7 +3000,7 @@
       }
     ],
     "provenance": "tools",
-    "decisionReason": "strong-tool={'checkov', 'trivy'}"
+    "decisionReason": "strong-tool={'trivy', 'checkov'}"
   },
   {
     "file": "13.deployment.yaml",
@@ -3126,7 +3126,7 @@
       }
     ],
     "provenance": "tools",
-    "decisionReason": "strong-tool={'kubescore', 'checkov', 'polaris', 'conftest'}"
+    "decisionReason": "strong-tool={'conftest', 'kubescore', 'polaris', 'checkov'}"
   },
   {
     "file": "13.deployment.yaml",

@@ -1,6 +1,52 @@
 ﻿[
 	{
 		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
+		"namespace": "kubernetes.calico.networkpolicy",
+		"successes": 9
+	},
+	{
+		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
+		"namespace": "kubernetes.plainsecret",
+		"successes": 1
+	},
+	{
+		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
+		"namespace": "lib.helpers",
+		"successes": 0
+	},
+	{
+		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
+		"namespace": "kubernetes.resources",
+		"successes": 0,
+		"failures": [
+			{
+				"msg": "nginx-deployment: missing cpu limit",
+				"metadata": {
+					"query": "data.kubernetes.resources.deny"
+				}
+			},
+			{
+				"msg": "nginx-deployment: missing cpu request",
+				"metadata": {
+					"query": "data.kubernetes.resources.deny"
+				}
+			},
+			{
+				"msg": "nginx-deployment: missing memory limit",
+				"metadata": {
+					"query": "data.kubernetes.resources.deny"
+				}
+			},
+			{
+				"msg": "nginx-deployment: missing memory request",
+				"metadata": {
+					"query": "data.kubernetes.resources.deny"
+				}
+			}
+		]
+	},
+	{
+		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
 		"namespace": "main",
 		"successes": 69,
 		"failures": [
@@ -212,111 +258,8 @@
 	},
 	{
 		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
-		"namespace": "kubernetes.configmap.cni",
-		"successes": 2
-	},
-	{
-		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
-		"namespace": "kubernetes.secrets_security",
-		"successes": 11
-	},
-	{
-		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
-		"namespace": "kubernetes.privileged",
-		"successes": 3,
-		"failures": [
-			{
-				"msg": "nginx-deployment: container nginx is privileged",
-				"metadata": {
-					"query": "data.kubernetes.privileged.deny"
-				}
-			}
-		]
-	},
-	{
-		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
-		"namespace": "k8s.universal_hardening",
-		"successes": 4,
-		"failures": [
-			{
-				"msg": "nginx-deployment container \"nginx\" must not be privileged",
-				"metadata": {
-					"query": "data.k8s.universal_hardening.deny"
-				}
-			},
-			{
-				"msg": "nginx-deployment container \"nginx\" must set allowPrivilegeEscalation: false",
-				"metadata": {
-					"query": "data.k8s.universal_hardening.deny"
-				}
-			},
-			{
-				"msg": "nginx-deployment must set runAsNonRoot: true",
-				"metadata": {
-					"query": "data.k8s.universal_hardening.deny"
-				}
-			},
-			{
-				"msg": "nginx-deployment must set seccompProfile.type: RuntimeDefault",
-				"metadata": {
-					"query": "data.k8s.universal_hardening.deny"
-				}
-			}
-		]
-	},
-	{
-		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
-		"namespace": "k8s.configmap_embedded",
+		"namespace": "safefixk8s.env_port_mismatch",
 		"successes": 1
-	},
-	{
-		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
-		"namespace": "kubernetes.securitycontext",
-		"successes": 1,
-		"failures": [
-			{
-				"msg": "nginx-deployment: must set runAsNonRoot: true",
-				"metadata": {
-					"query": "data.kubernetes.securitycontext.deny"
-				}
-			}
-		]
-	},
-	{
-		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
-		"namespace": "kubernetes.plainsecret",
-		"successes": 1
-	},
-	{
-		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
-		"namespace": "kubernetes.resources",
-		"successes": 0,
-		"failures": [
-			{
-				"msg": "nginx-deployment: missing cpu limit",
-				"metadata": {
-					"query": "data.kubernetes.resources.deny"
-				}
-			},
-			{
-				"msg": "nginx-deployment: missing cpu request",
-				"metadata": {
-					"query": "data.kubernetes.resources.deny"
-				}
-			},
-			{
-				"msg": "nginx-deployment: missing memory limit",
-				"metadata": {
-					"query": "data.kubernetes.resources.deny"
-				}
-			},
-			{
-				"msg": "nginx-deployment: missing memory request",
-				"metadata": {
-					"query": "data.kubernetes.resources.deny"
-				}
-			}
-		]
 	},
 	{
 		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
@@ -325,13 +268,8 @@
 	},
 	{
 		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
-		"namespace": "lib.helpers",
-		"successes": 0
-	},
-	{
-		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
-		"namespace": "k8s.dynamic_ports",
-		"successes": 1
+		"namespace": "kubernetes.configmap.cni",
+		"successes": 2
 	},
 	{
 		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
@@ -438,8 +376,80 @@
 	},
 	{
 		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
-		"namespace": "safefixk8s.env_port_mismatch",
+		"namespace": "k8s.secure_secrets",
 		"successes": 1
+	},
+	{
+		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
+		"namespace": "kubernetes.securitycontext",
+		"successes": 1,
+		"failures": [
+			{
+				"msg": "nginx-deployment: must set runAsNonRoot: true",
+				"metadata": {
+					"query": "data.kubernetes.securitycontext.deny"
+				}
+			}
+		]
+	},
+	{
+		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
+		"namespace": "safefixk8s.network_policy_selector",
+		"successes": 3
+	},
+	{
+		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
+		"namespace": "safefixk8s.rbac_overly_permissive",
+		"successes": 4
+	},
+	{
+		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
+		"namespace": "kubernetes.secrets_security",
+		"successes": 11
+	},
+	{
+		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
+		"namespace": "k8s.configmap_embedded",
+		"successes": 1
+	},
+	{
+		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
+		"namespace": "kubernetes.network_security",
+		"successes": 10,
+		"failures": [
+			{
+				"msg": "MEDIUM: Deployment 'nginx-deployment' should have NetworkPolicy defined - missing network segmentation",
+				"metadata": {
+					"query": "data.kubernetes.network_security.deny"
+				}
+			}
+		]
+	},
+	{
+		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
+		"namespace": "kubernetes.privileged",
+		"successes": 3,
+		"failures": [
+			{
+				"msg": "nginx-deployment: container nginx is privileged",
+				"metadata": {
+					"query": "data.kubernetes.privileged.deny"
+				}
+			}
+		]
+	},
+	{
+		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
+		"namespace": "kubernetes.namespace",
+		"successes": 1,
+		"failures": [
+			{
+				"msg": "nginx-deployment: no namespace set (defaults to 'default')",
+				"metadata": {
+					"query": "data.kubernetes.namespace.deny"
+				}
+			}
+		]
 	},
 	{
 		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
@@ -462,58 +472,48 @@
 	},
 	{
 		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
-		"namespace": "kubernetes.probes_alignment",
-		"successes": 2
-	},
-	{
-		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
-		"namespace": "kubernetes.calico.networkpolicy",
-		"successes": 9
-	},
-	{
-		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
-		"namespace": "safefixk8s.rbac_overly_permissive",
-		"successes": 4
-	},
-	{
-		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
-		"namespace": "kubernetes.network_security",
-		"successes": 10,
-		"failures": [
-			{
-				"msg": "MEDIUM: Deployment 'nginx-deployment' should have NetworkPolicy defined - missing network segmentation",
-				"metadata": {
-					"query": "data.kubernetes.network_security.deny"
-				}
-			}
-		]
-	},
-	{
-		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
 		"namespace": "kubernetes.rbac_security",
 		"successes": 11
 	},
 	{
 		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
-		"namespace": "k8s.secure_secrets",
-		"successes": 1
-	},
-	{
-		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
-		"namespace": "safefixk8s.network_policy_selector",
-		"successes": 3
-	},
-	{
-		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
-		"namespace": "kubernetes.namespace",
-		"successes": 1,
+		"namespace": "k8s.universal_hardening",
+		"successes": 4,
 		"failures": [
 			{
-				"msg": "nginx-deployment: no namespace set (defaults to 'default')",
+				"msg": "nginx-deployment container \"nginx\" must not be privileged",
 				"metadata": {
-					"query": "data.kubernetes.namespace.deny"
+					"query": "data.k8s.universal_hardening.deny"
+				}
+			},
+			{
+				"msg": "nginx-deployment container \"nginx\" must set allowPrivilegeEscalation: false",
+				"metadata": {
+					"query": "data.k8s.universal_hardening.deny"
+				}
+			},
+			{
+				"msg": "nginx-deployment must set runAsNonRoot: true",
+				"metadata": {
+					"query": "data.k8s.universal_hardening.deny"
+				}
+			},
+			{
+				"msg": "nginx-deployment must set seccompProfile.type: RuntimeDefault",
+				"metadata": {
+					"query": "data.k8s.universal_hardening.deny"
 				}
 			}
 		]
+	},
+	{
+		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
+		"namespace": "kubernetes.probes_alignment",
+		"successes": 2
+	},
+	{
+		"filename": "C:\\Users\\Ahmed\\OneDrive - GIU AS - German International University of Applied Sciences\\Desktop\\Bsc Thesis\\Implementaions\\SafeFixK8s\\tests\\13.deployment.yaml",
+		"namespace": "k8s.dynamic_ports",
+		"successes": 1
 	}
 ]

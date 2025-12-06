@@ -1,2 +1,2 @@
 file,status,total_checks,passed_checks,failed_checks,critical_failures,high_failures,medium_failures,low_failures,dangerous_configs,schema_fixed,notes
-13.deployment.yaml,PASS,29,27,2,0,0,2,0,0,True,All validations passed (27 checks); Schema auto-fixed (3 changes)
+13.deployment.yaml,PASS,29,24,5,0,0,5,0,0,True,All validations passed (24 checks); Schema auto-fixed (3 changes)

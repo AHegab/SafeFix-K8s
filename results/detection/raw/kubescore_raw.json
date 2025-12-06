@@ -54,41 +54,36 @@
             },
             {
                 "check": {
-                    "name": "Container Ephemeral Storage Request and Limit",
-                    "id": "container-ephemeral-storage-request-and-limit",
+                    "name": "Pod NetworkPolicy",
+                    "id": "pod-networkpolicy",
                     "target_type": "Pod",
-                    "comment": "Makes sure all pods have ephemeral-storage requests and limits set",
+                    "comment": "Makes sure that all Pods are targeted by a NetworkPolicy",
                     "optional": false
                 },
                 "grade": 1,
                 "skipped": false,
                 "comments": [
                     {
-                        "path": "nginx",
-                        "summary": "Ephemeral Storage limit is not set",
-                        "description": "Resource limits are recommended to avoid resource DDOS. Set resources.limits.ephemeral-storage"
-                    },
-                    {
-                        "path": "nginx",
-                        "summary": "Ephemeral Storage request is not set",
-                        "description": "Resource requests are recommended to make sure the application can start and run without crashing. Set resource.requests.ephemeral-storage"
+                        "path": "",
+                        "summary": "The pod does not have a matching NetworkPolicy",
+                        "description": "Create a NetworkPolicy that targets this pod to control who/what can communicate with this pod. Note, this feature needs to be supported by the CNI implementation used in the Kubernetes cluster to have an effect."
                     }
                 ]
             },
             {
                 "check": {
-                    "name": "Container Ports Check",
-                    "id": "container-ports-check",
+                    "name": "Pod Probes",
+                    "id": "pod-probes",
                     "target_type": "Pod",
-                    "comment": "Container Ports Checks",
-                    "optional": true
+                    "comment": "Makes sure that all Pods have safe probe configurations",
+                    "optional": false
                 },
                 "grade": 10,
                 "skipped": true,
                 "comments": [
                     {
                         "path": "",
-                        "summary": "Skipped because container-ports-check is ignored",
+                        "summary": "The pod is not targeted by a service, skipping probe checks.",
                         "description": ""
                     }
                 ]
@@ -108,93 +103,6 @@
                         "path": "nginx",
                         "summary": "The pod has a container with a writable root filesystem",
                         "description": "Set securityContext.readOnlyRootFilesystem to true"
-                    }
-                ]
-            },
-            {
-                "check": {
-                    "name": "Container Resources",
-                    "id": "container-resources",
-                    "target_type": "Pod",
-                    "comment": "Makes sure that all pods have resource limits and requests set. The --ignore-container-cpu-limit flag can be used to disable the requirement of having a CPU limit",
-                    "optional": false
-                },
-                "grade": 1,
-                "skipped": false,
-                "comments": [
-                    {
-                        "path": "nginx",
-                        "summary": "CPU limit is not set",
-                        "description": "Resource limits are recommended to avoid resource DDOS. Set resources.limits.cpu"
-                    },
-                    {
-                        "path": "nginx",
-                        "summary": "Memory limit is not set",
-                        "description": "Resource limits are recommended to avoid resource DDOS. Set resources.limits.memory"
-                    },
-                    {
-                        "path": "nginx",
-                        "summary": "CPU request is not set",
-                        "description": "Resource requests are recommended to make sure that the application can start and run without crashing. Set resources.requests.cpu"
-                    },
-                    {
-                        "path": "nginx",
-                        "summary": "Memory request is not set",
-                        "description": "Resource requests are recommended to make sure that the application can start and run without crashing. Set resources.requests.memory"
-                    }
-                ]
-            },
-            {
-                "check": {
-                    "name": "Container Ephemeral Storage Request Equals Limit",
-                    "id": "container-ephemeral-storage-request-equals-limit",
-                    "target_type": "Pod",
-                    "comment": "Make sure all pods have matching ephemeral-storage requests and limits",
-                    "optional": true
-                },
-                "grade": 10,
-                "skipped": true,
-                "comments": [
-                    {
-                        "path": "",
-                        "summary": "Skipped because container-ephemeral-storage-request-equals-limit is ignored",
-                        "description": ""
-                    }
-                ]
-            },
-            {
-                "check": {
-                    "name": "Container Security Context Privileged",
-                    "id": "container-security-context-privileged",
-                    "target_type": "Pod",
-                    "comment": "Makes sure that all pods have a unprivileged security context set",
-                    "optional": false
-                },
-                "grade": 1,
-                "skipped": false,
-                "comments": [
-                    {
-                        "path": "nginx",
-                        "summary": "The container is privileged",
-                        "description": "Set securityContext.privileged to false. Privileged containers can access all devices on the host, and grants almost the same access as non-containerized processes on the host."
-                    }
-                ]
-            },
-            {
-                "check": {
-                    "name": "Pod Topology Spread Constraints",
-                    "id": "pod-topology-spread-constraints",
-                    "target_type": "Pod",
-                    "comment": "Pod Topology Spread Constraints",
-                    "optional": false
-                },
-                "grade": 10,
-                "skipped": false,
-                "comments": [
-                    {
-                        "path": "",
-                        "summary": "Pod Topology Spread Constraints",
-                        "description": "No Pod Topology Spread Constraints set, kube-scheduler defaults assumed"
                     }
                 ]
             },
@@ -236,24 +144,6 @@
             },
             {
                 "check": {
-                    "name": "Container Memory Requests Equal Limits",
-                    "id": "container-memory-requests-equal-limits",
-                    "target_type": "Pod",
-                    "comment": "Makes sure that all pods have the same memory requests as limits set.",
-                    "optional": true
-                },
-                "grade": 10,
-                "skipped": true,
-                "comments": [
-                    {
-                        "path": "",
-                        "summary": "Skipped because container-memory-requests-equal-limits is ignored",
-                        "description": ""
-                    }
-                ]
-            },
-            {
-                "check": {
                     "name": "Environment Variable Key Duplication",
                     "id": "environment-variable-key-duplication",
                     "target_type": "Pod",
@@ -266,19 +156,37 @@
             },
             {
                 "check": {
-                    "name": "Pod NetworkPolicy",
-                    "id": "pod-networkpolicy",
+                    "name": "Container Security Context Privileged",
+                    "id": "container-security-context-privileged",
                     "target_type": "Pod",
-                    "comment": "Makes sure that all Pods are targeted by a NetworkPolicy",
+                    "comment": "Makes sure that all pods have a unprivileged security context set",
                     "optional": false
                 },
                 "grade": 1,
                 "skipped": false,
                 "comments": [
                     {
+                        "path": "nginx",
+                        "summary": "The container is privileged",
+                        "description": "Set securityContext.privileged to false. Privileged containers can access all devices on the host, and grants almost the same access as non-containerized processes on the host."
+                    }
+                ]
+            },
+            {
+                "check": {
+                    "name": "Container Seccomp Profile",
+                    "id": "container-seccomp-profile",
+                    "target_type": "Pod",
+                    "comment": "Makes sure that all pods have at a seccomp policy configured.",
+                    "optional": true
+                },
+                "grade": 5,
+                "skipped": true,
+                "comments": [
+                    {
                         "path": "",
-                        "summary": "The pod does not have a matching NetworkPolicy",
-                        "description": "Create a NetworkPolicy that targets this pod to control who/what can communicate with this pod. Note, this feature needs to be supported by the CNI implementation used in the Kubernetes cluster to have an effect."
+                        "summary": "Skipped because container-seccomp-profile is ignored",
+                        "description": ""
                     }
                 ]
             },
@@ -296,18 +204,18 @@
             },
             {
                 "check": {
-                    "name": "Pod Probes",
-                    "id": "pod-probes",
+                    "name": "Container Ports Check",
+                    "id": "container-ports-check",
                     "target_type": "Pod",
-                    "comment": "Makes sure that all Pods have safe probe configurations",
-                    "optional": false
+                    "comment": "Container Ports Checks",
+                    "optional": true
                 },
                 "grade": 10,
                 "skipped": true,
                 "comments": [
                     {
                         "path": "",
-                        "summary": "The pod is not targeted by a service, skipping probe checks.",
+                        "summary": "Skipped because container-ports-check is ignored",
                         "description": ""
                     }
                 ]
@@ -323,6 +231,47 @@
                 "grade": 10,
                 "skipped": false,
                 "comments": null
+            },
+            {
+                "check": {
+                    "name": "Container Ephemeral Storage Request and Limit",
+                    "id": "container-ephemeral-storage-request-and-limit",
+                    "target_type": "Pod",
+                    "comment": "Makes sure all pods have ephemeral-storage requests and limits set",
+                    "optional": false
+                },
+                "grade": 1,
+                "skipped": false,
+                "comments": [
+                    {
+                        "path": "nginx",
+                        "summary": "Ephemeral Storage limit is not set",
+                        "description": "Resource limits are recommended to avoid resource DDOS. Set resources.limits.ephemeral-storage"
+                    },
+                    {
+                        "path": "nginx",
+                        "summary": "Ephemeral Storage request is not set",
+                        "description": "Resource requests are recommended to make sure the application can start and run without crashing. Set resource.requests.ephemeral-storage"
+                    }
+                ]
+            },
+            {
+                "check": {
+                    "name": "Container Ephemeral Storage Request Equals Limit",
+                    "id": "container-ephemeral-storage-request-equals-limit",
+                    "target_type": "Pod",
+                    "comment": "Make sure all pods have matching ephemeral-storage requests and limits",
+                    "optional": true
+                },
+                "grade": 10,
+                "skipped": true,
+                "comments": [
+                    {
+                        "path": "",
+                        "summary": "Skipped because container-ephemeral-storage-request-equals-limit is ignored",
+                        "description": ""
+                    }
+                ]
             },
             {
                 "check": {
@@ -349,73 +298,70 @@
             },
             {
                 "check": {
-                    "name": "Container Seccomp Profile",
-                    "id": "container-seccomp-profile",
+                    "name": "Pod Topology Spread Constraints",
+                    "id": "pod-topology-spread-constraints",
                     "target_type": "Pod",
-                    "comment": "Makes sure that all pods have at a seccomp policy configured.",
-                    "optional": true
-                },
-                "grade": 5,
-                "skipped": true,
-                "comments": [
-                    {
-                        "path": "",
-                        "summary": "Skipped because container-seccomp-profile is ignored",
-                        "description": ""
-                    }
-                ]
-            },
-            {
-                "check": {
-                    "name": "Deployment Strategy",
-                    "id": "deployment-strategy",
-                    "target_type": "Deployment",
-                    "comment": "Makes sure that all Deployments targeted by service use RollingUpdate strategy",
+                    "comment": "Pod Topology Spread Constraints",
                     "optional": false
                 },
-                "grade": 0,
-                "skipped": true,
+                "grade": 10,
+                "skipped": false,
                 "comments": [
                     {
                         "path": "",
-                        "summary": "Skipped as the Deployment is not targeted by a service",
-                        "description": ""
+                        "summary": "Pod Topology Spread Constraints",
+                        "description": "No Pod Topology Spread Constraints set, kube-scheduler defaults assumed"
                     }
                 ]
             },
             {
                 "check": {
-                    "name": "Deployment Replicas",
-                    "id": "deployment-replicas",
-                    "target_type": "Deployment",
-                    "comment": "Makes sure that Deployment has multiple replicas",
-                    "optional": false
-                },
-                "grade": 0,
-                "skipped": true,
-                "comments": [
-                    {
-                        "path": "",
-                        "summary": "Skipped as the Deployment is not targeted by service",
-                        "description": ""
-                    }
-                ]
-            },
-            {
-                "check": {
-                    "name": "Deployment has PodDisruptionBudget",
-                    "id": "deployment-has-poddisruptionbudget",
-                    "target_type": "Deployment",
-                    "comment": "Makes sure that all Deployments are targeted by a PDB",
+                    "name": "Container Resources",
+                    "id": "container-resources",
+                    "target_type": "Pod",
+                    "comment": "Makes sure that all pods have resource limits and requests set. The --ignore-container-cpu-limit flag can be used to disable the requirement of having a CPU limit",
                     "optional": false
                 },
                 "grade": 1,
                 "skipped": false,
                 "comments": [
                     {
+                        "path": "nginx",
+                        "summary": "CPU limit is not set",
+                        "description": "Resource limits are recommended to avoid resource DDOS. Set resources.limits.cpu"
+                    },
+                    {
+                        "path": "nginx",
+                        "summary": "Memory limit is not set",
+                        "description": "Resource limits are recommended to avoid resource DDOS. Set resources.limits.memory"
+                    },
+                    {
+                        "path": "nginx",
+                        "summary": "CPU request is not set",
+                        "description": "Resource requests are recommended to make sure that the application can start and run without crashing. Set resources.requests.cpu"
+                    },
+                    {
+                        "path": "nginx",
+                        "summary": "Memory request is not set",
+                        "description": "Resource requests are recommended to make sure that the application can start and run without crashing. Set resources.requests.memory"
+                    }
+                ]
+            },
+            {
+                "check": {
+                    "name": "Container Memory Requests Equal Limits",
+                    "id": "container-memory-requests-equal-limits",
+                    "target_type": "Pod",
+                    "comment": "Makes sure that all pods have the same memory requests as limits set.",
+                    "optional": true
+                },
+                "grade": 10,
+                "skipped": true,
+                "comments": [
+                    {
                         "path": "",
-                        "summary": "No matching PodDisruptionBudget was found",
-                        "description": "It's recommended to define a PodDisruptionBudget to avoid unexpected downtime during Kubernetes maintenance operations, such as when draining a node. "
+                        "summary": "Skipped because container-memory-requests-equal-limits is ignored",
+                        "description": ""
                     }
                 ]
             },
@@ -470,6 +416,60 @@
                         "path": "",
                         "summary": "Deployment selector labels not matching template metadata labels",
                         "description": "Deployment require `.spec.selector` to match `.spec.template.metadata.labels`. https://kubernetes.io/docs/concepts/workloads/controllers/deployment/"
+                    }
+                ]
+            },
+            {
+                "check": {
+                    "name": "Deployment Strategy",
+                    "id": "deployment-strategy",
+                    "target_type": "Deployment",
+                    "comment": "Makes sure that all Deployments targeted by service use RollingUpdate strategy",
+                    "optional": false
+                },
+                "grade": 0,
+                "skipped": true,
+                "comments": [
+                    {
+                        "path": "",
+                        "summary": "Skipped as the Deployment is not targeted by a service",
+                        "description": ""
+                    }
+                ]
+            },
+            {
+                "check": {
+                    "name": "Deployment Replicas",
+                    "id": "deployment-replicas",
+                    "target_type": "Deployment",
+                    "comment": "Makes sure that Deployment has multiple replicas",
+                    "optional": false
+                },
+                "grade": 0,
+                "skipped": true,
+                "comments": [
+                    {
+                        "path": "",
+                        "summary": "Skipped as the Deployment is not targeted by service",
+                        "description": ""
+                    }
+                ]
+            },
+            {
+                "check": {
+                    "name": "Deployment has PodDisruptionBudget",
+                    "id": "deployment-has-poddisruptionbudget",
+                    "target_type": "Deployment",
+                    "comment": "Makes sure that all Deployments are targeted by a PDB",
+                    "optional": false
+                },
+                "grade": 1,
+                "skipped": false,
+                "comments": [
+                    {
+                        "path": "",
+                        "summary": "No matching PodDisruptionBudget was found",
+                        "description": "It's recommended to define a PodDisruptionBudget to avoid unexpected downtime during Kubernetes maintenance operations, such as when draining a node. "
                     }
                 ]
             }

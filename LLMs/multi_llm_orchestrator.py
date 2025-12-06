@@ -44,6 +44,7 @@ WORKLOAD_KINDS = {
 }
 
 # Valid Pod-level securityContext fields (PodSecurityContext)
+# Note: apparmor is NOT a valid field - it must be set via Pod annotations
 POD_SC_ALLOWED = {
     "runAsUser",
     "runAsGroup",
@@ -80,6 +81,7 @@ class FixStrategy(Enum):
 SKIP_FROM_LLM = {
     "Network/MissingNetworkPolicy",
     "Network/NetworkPolicyMisconfiguration",
+    "Image/TagNotPinned",
 }
 
 SKIP_MESSAGES = {
@@ -89,6 +91,11 @@ SKIP_MESSAGES = {
     "Network/NetworkPolicyMisconfiguration":
         "NetworkPolicy misconfigurations require manual review of traffic "
         "requirements.",
+    "Image/TagNotPinned":
+        "Image tag pinning should be handled by CI/CD pipeline with proper "
+        "vulnerability scanning. Avoid automatic version changes that could "
+        "introduce vulnerable or incompatible versions. Recommendation: Use "
+        "image digests (SHA256) in your deployment pipeline.",
 }
 
 # Categories that use comprehensive security hardening handler
@@ -98,6 +105,8 @@ SECURITY_HARDENING_CATEGORIES = {
     "Security/ReadOnlyRootFSFalse",
     "Auth/RunAsRoot",
     "Security/MissingSecurityContextHardening",
+    "Security/MissingSeccompProfile",
+    "Security/MissingAppArmorProfile",
 }
 
 # Enhanced category configurations
@@ -176,25 +185,18 @@ CATEGORY_CONFIG: Dict[str, Dict[str, Any]] = {
         "max_retries": 3,
     },
     "Security/MissingSeccompProfile": {
-        "strategy": FixStrategy.LLM_GUIDED,
-        "provider": LlmProvider.GROQ,
-        "fallback": LlmProvider.OPENAI,
-        "priority": 8,
-        "max_retries": 3,
+        "strategy": FixStrategy.DETERMINISTIC,
+        "priority": 10,
+        "use_security_handler": True,
     },
     "Security/MissingAppArmorProfile": {
-        "strategy": FixStrategy.LLM_GUIDED,
-        "provider": LlmProvider.GROQ,
-        "fallback": LlmProvider.OPENAI,
-        "priority": 8,
-        "max_retries": 3,
+        "strategy": FixStrategy.DETERMINISTIC,
+        "priority": 10,
+        "use_apparmor_handler": True,
     },
     "Image/TagNotPinned": {
-        "strategy": FixStrategy.LLM_GUIDED,
-        "provider": LlmProvider.OPENAI,
-        "fallback": LlmProvider.GROQ,
-        "priority": 5,
-        "max_retries": 3,
+        "strategy": FixStrategy.SKIP,
+        "priority": 0,
     },
     "Policy/PodSecurityViolation": {
         "strategy": FixStrategy.LLM_GUIDED,
@@ -349,6 +351,8 @@ def sanitize_pod_security_context(pod_sc: dict) -> dict:
     fields (like 'privileged', 'capabilities', 'allowPrivilegeEscalation')
     to the Pod-level securityContext.
     
+    Also validates seccompProfile to ensure Localhost type has localhostProfile.
+    
     Args:
         pod_sc: The Pod securityContext dictionary to sanitize
         
@@ -365,7 +369,50 @@ def sanitize_pod_security_context(pod_sc: dict) -> dict:
     if removed:
         print(f"  [SANITIZE] Removed invalid Pod securityContext fields: {removed}")
     
+    # Special handling: apparmor should NEVER be in securityContext
+    if "apparmor" in pod_sc:
+        print("  [SANITIZE] Removed 'apparmor' from Pod securityContext (must use annotations)")
+    
+    # Validate seccompProfile: Localhost type must have localhostProfile
+    if "seccompProfile" in sanitized:
+        profile = sanitized["seccompProfile"]
+        if isinstance(profile, dict):
+            if profile.get("type") == "Localhost" and "localhostProfile" not in profile:
+                print(f"  [SANITIZE] Fixed invalid seccompProfile (Localhost without localhostProfile)")
+                sanitized["seccompProfile"] = {"type": "RuntimeDefault"}
+    
     return sanitized
+
+
+def sanitize_container_security_context(container_sc: dict) -> dict:
+    """
+    Validate container-level securityContext.
+    
+    Validates seccompProfile and removes invalid apparmor field.
+    
+    Args:
+        container_sc: The container securityContext dictionary to sanitize
+        
+    Returns:
+        Sanitized dictionary with validated seccompProfile
+    """
+    if not isinstance(container_sc, dict):
+        return container_sc
+    
+    # Remove apparmor if present (must use annotations)
+    if "apparmor" in container_sc:
+        print("  [SANITIZE] Removed 'apparmor' from container securityContext (must use annotations)")
+        del container_sc["apparmor"]
+    
+    # Validate seccompProfile: Localhost type must have localhostProfile
+    if "seccompProfile" in container_sc:
+        profile = container_sc["seccompProfile"]
+        if isinstance(profile, dict):
+            if profile.get("type") == "Localhost" and "localhostProfile" not in profile:
+                print(f"  [SANITIZE] Fixed invalid container seccompProfile (Localhost without localhostProfile)")
+                container_sc["seccompProfile"] = {"type": "RuntimeDefault"}
+    
+    return container_sc
 
 
 # ======================= Security Hardening Handler =======================
@@ -432,13 +479,14 @@ class SecurityHardeningHandler:
         ensure_pod_sc_field("runAsNonRoot", True)
         ensure_pod_sc_field("runAsUser", 1000)
         ensure_pod_sc_field("fsGroup", 1000)
-        if "seccompProfile" not in pod_sc:
-            patches.append({
-                "op": "add",
-                "path": f"{pod_spec_path}/securityContext/seccompProfile",
-                "value": {"type": "RuntimeDefault"},
-                "description": "Set pod-level seccompProfile RuntimeDefault",
-            })
+        
+        # Ensure seccompProfile is set and not Unconfined
+        SecurityHardeningHandler._ensure_seccomp_profile(
+            pod_sc, 
+            pod_spec_path, 
+            patches, 
+            "pod-level"
+        )
 
         # 2. Container-level security for each container (merge)
         for i, container in enumerate(containers):
@@ -493,13 +541,14 @@ class SecurityHardeningHandler:
                                 True, "Run as non-root")
             ensure_container_sc("runAsUser", "runAsUser",
                                 1000, "Run as UID 1000")
-            if "seccompProfile" not in c_sc:
-                patches.append({
-                    "op": "add",
-                    "path": f"{base_path}/seccompProfile",
-                    "value": {"type": "RuntimeDefault"},
-                    "description": f"Enable seccomp in {container_name}",
-                })
+            
+            # Ensure seccompProfile is set and not Unconfined at container level
+            SecurityHardeningHandler._ensure_seccomp_profile(
+                c_sc,
+                base_path,
+                patches,
+                f"container {container_name}"
+            )
 
             # 3. Add required volume mounts for read-only root filesystem
             image = container.get("image", "") or ""
@@ -561,6 +610,83 @@ class SecurityHardeningHandler:
         return patches, explanation
 
     @staticmethod
+    def _ensure_seccomp_profile(
+        security_context: Dict[str, Any],
+        base_path: str,
+        patches: List[Dict[str, Any]],
+        context_name: str,
+    ) -> None:
+        """
+        Ensure seccompProfile is properly configured (not missing or Unconfined).
+
+        - For pod-level securityContext, seccompProfile must live under:
+              spec.template.spec.securityContext.seccompProfile
+        - For container-level securityContext, seccompProfile lives under:
+              spec.template.spec.containers[i].securityContext.seccompProfile
+
+        Args:
+            security_context: The *current* securityContext dict at this level.
+            base_path: JSON Pointer to the *parent* location:
+                - Pod-level: "/spec/template/spec"
+                - Container-level: "/spec/template/spec/containers/0/securityContext"
+            patches: List of JSON Patch ops to append to.
+            context_name: Human-readable label ("pod-level" vs container name)
+        """
+
+        # Detect pod-level vs container-level based on context_name pattern
+        is_pod_level = context_name.startswith("pod-level")
+
+        if is_pod_level:
+            # Pod-level: seccompProfile should be inside pod securityContext
+            # (the JSON Patch engine will create securityContext if missing)
+            seccomp_path = f"{base_path}/securityContext/seccompProfile"
+        else:
+            # Container-level: base_path should already be the securityContext path
+            # e.g. "/spec/template/spec/containers/0/securityContext"
+            seccomp_path = f"{base_path}/seccompProfile"
+
+        existing_profile = security_context.get("seccompProfile")
+
+        # Case 1: seccompProfile missing → add RuntimeDefault
+        if existing_profile is None:
+            patches.append({
+                "op": "add",
+                "path": seccomp_path,
+                "value": {"type": "RuntimeDefault"},
+                "description": f"Set {context_name} seccompProfile to RuntimeDefault",
+                "source": "security_handler",
+            })
+            return
+
+        # Case 2: seccompProfile is a dict → maybe Unconfined
+        if isinstance(existing_profile, dict):
+            profile_type = existing_profile.get("type", "")
+            if profile_type == "Unconfined":
+                patches.append({
+                    "op": "replace",
+                    "path": seccomp_path,
+                    "value": {"type": "RuntimeDefault"},
+                    "description": (
+                        f"Replace insecure Unconfined seccomp with RuntimeDefault "
+                        f"for {context_name}"
+                    ),
+                    "source": "security_handler",
+                })
+            # Non-Unconfined types (e.g. Localhost) are respected and left as-is
+            return
+
+        # Any other unexpected types (string, list, etc.) → normalize to RuntimeDefault
+        patches.append({
+            "op": "replace",
+            "path": seccomp_path,
+            "value": {"type": "RuntimeDefault"},
+            "description": (
+                f"Normalize invalid seccompProfile to RuntimeDefault for {context_name}"
+            ),
+            "source": "security_handler",
+        })
+
+    @staticmethod
     def _get_required_mounts_for_image(image: str) -> List[Dict[str, str]]:
         """Get required volume mounts based on container image."""
         image_lower = image.lower()
@@ -582,7 +708,125 @@ class SecurityHardeningHandler:
             ]
 
 
+class AppArmorHandler:
+    """
+    AppArmor configuration handler.
+    
+    AppArmor profiles MUST be set via Pod template annotations, not securityContext.
+    The correct annotation format is:
+      container.apparmor.security.beta.kubernetes.io/<containerName>: runtime/default
+    """
+
+    @staticmethod
+    def generate_apparmor_patches(doc: Dict[str, Any]) -> Tuple[List[Dict[str, Any]], str]:
+        """
+        Generate patches to configure AppArmor via Pod annotations.
+
+        Returns: (patches, explanation)
+        """
+        patches: List[Dict[str, Any]] = []
+        kind = doc.get("kind", "")
+
+        # Only apply to workload resources
+        if kind not in WORKLOAD_KINDS:
+            return [], f"AppArmor skipped for non-workload resource kind={kind}"
+
+        # Get containers and determine annotation path
+        if kind in ("Deployment", "StatefulSet", "DaemonSet", "Job", "CronJob", "ReplicaSet"):
+            containers = (
+                doc.get("spec", {})
+                .get("template", {})
+                .get("spec", {})
+                .get("containers", [])
+            )
+            annotations_path = "/spec/template/metadata/annotations"
+            existing_annotations = (
+                doc.get("spec", {})
+                .get("template", {})
+                .get("metadata", {})
+                .get("annotations", {})
+            ) or {}
+        elif kind == "Pod":
+            containers = doc.get("spec", {}).get("containers", [])
+            annotations_path = "/metadata/annotations"
+            existing_annotations = doc.get("metadata", {}).get("annotations", {}) or {}
+        else:
+            return [], f"Unsupported workload kind: {kind}"
+
+        if not containers:
+            return [], "No containers found for AppArmor configuration."
+
+        # Build annotation patches for each container
+        for container in containers:
+            container_name = container.get("name")
+            if not container_name:
+                continue
+
+            annotation_key = f"container.apparmor.security.beta.kubernetes.io/{container_name}"
+            
+            # Skip if annotation already exists
+            if annotation_key in existing_annotations:
+                continue
+
+            patches.append({
+                "op": "add",
+                "path": f"{annotations_path}/{annotation_key.replace('/', '~1')}",
+                "value": "runtime/default",
+                "description": f"Set AppArmor profile for container {container_name}",
+            })
+
+        if patches:
+            explanation = (
+                f"Configured AppArmor via Pod annotations (runtime/default profile) "
+                f"for {len(patches)} container(s). AppArmor must be set via annotations, "
+                f"not securityContext."
+            )
+        else:
+            explanation = "AppArmor already configured or no containers to configure."
+
+        return patches, explanation
+
+
 # ======================= Template-Based Fixes =======================
+
+
+def guess_probe_port(container: dict) -> int:
+    """
+    Guess an appropriate port for health probes based on container configuration.
+    
+    Uses container ports if defined, otherwise applies heuristics based on
+    common image names.
+    
+    Args:
+        container: Container dictionary from Pod spec
+        
+    Returns:
+        Port number to use for probes
+    """
+    # If ports are defined on the container, prefer the first one
+    ports = container.get("ports") or []
+    if ports:
+        first = ports[0] or {}
+        return first.get("containerPort", 8080)
+
+    image = (container.get("image") or "").lower()
+
+    # Simple heuristics for common images
+    if "nginx" in image:
+        return 80
+    if "httpd" in image or "apache" in image:
+        return 80
+    if "redis" in image:
+        return 6379
+    if "mysql" in image or "mariadb" in image:
+        return 3306
+    if "postgres" in image:
+        return 5432
+    if "mongodb" in image or "mongo" in image:
+        return 27017
+
+    # Default fallback
+    return 8080
 
 
 def apply_template_fix(
@@ -633,12 +877,15 @@ def apply_template_fix(
                     f"traffic management."
                 )
             else:
+                # Use smart port guessing based on container image
+                port = guess_probe_port(c)
+                
                 if not c.get("livenessProbe"):
                     patches.append({
                         "op": "add",
                         "path": f"{containers_path}/{i}/livenessProbe",
                         "value": {
-                            "tcpSocket": {"port": 8080},
+                            "tcpSocket": {"port": port},
                             "initialDelaySeconds": 30,
                             "periodSeconds": 10,
                         },
@@ -648,13 +895,13 @@ def apply_template_fix(
                         "op": "add",
                         "path": f"{containers_path}/{i}/readinessProbe",
                         "value": {
-                            "tcpSocket": {"port": 8080},
+                            "tcpSocket": {"port": port},
                             "initialDelaySeconds": 10,
                             "periodSeconds": 5,
                         },
                     })
                 explanation = (
-                    f"Added TCP-based liveness and readiness probes for "
+                    f"Added TCP-based liveness and readiness probes on port {port} for "
                     f"{container_name} to enable automatic recovery and "
                     f"traffic management."
                 )
@@ -753,8 +1000,8 @@ def apply_deterministic_fix(
             )
 
     elif category == "Auth/DefaultServiceAccount":
-        sa_name = f"{name}-sa"
-
+        # NEW APPROACH: Preserve existing SA name, never invent new ones
+        # Only disable token automount for hardening
         if kind in ("Deployment", "StatefulSet", "DaemonSet", "Job", "CronJob", "ReplicaSet"):
             spec = (
                 doc.get("spec", {})
@@ -764,18 +1011,31 @@ def apply_deterministic_fix(
         else:
             spec = doc.get("spec", {})
 
-        if not spec.get("serviceAccountName"):
+        existing_sa = spec.get("serviceAccountName")
+        
+        # Always disable token automount for security hardening
+        if spec.get("automountServiceAccountToken") is not False:
             patches.append({
                 "op": "add",
-                "path": f"{pod_spec_path}/serviceAccountName",
-                "value": sa_name,
+                "path": f"{pod_spec_path}/automountServiceAccountToken",
+                "value": False,
             })
+        
+        if existing_sa:
+            # SA already set - preserve it and explain token hardening
             explanation = (
-                f"Added dedicated ServiceAccount '{sa_name}' following the "
-                f"principle of least privilege."
+                f"Preserved existing ServiceAccount '{existing_sa}' and disabled "
+                f"token automount to reduce attack surface."
+            )
+        else:
+            # No SA set - use default SA but still harden token mounting
+            explanation = (
+                "Disabled automatic mounting of ServiceAccount token to reduce "
+                "attack surface. Using default service account (no custom SA specified)."
             )
 
     elif category == "Auth/AutomountServiceAccountToken":
+        # Handle cases where this category is processed separately
         if kind in ("Deployment", "StatefulSet", "DaemonSet", "Job", "CronJob", "ReplicaSet"):
             spec = (
                 doc.get("spec", {})
@@ -807,7 +1067,10 @@ Return a JSON object with two fields:
 1. "patches": array of RFC-6902 patch operations
 2. "explanation": brief explanation of what was fixed and why
 
-Never change: metadata.name, metadata.namespace, kind, spec.selector, or Service ports.
+Never change: metadata.name, metadata.namespace, kind, spec.selector, Service ports, container image tags.
+Do not modify: securityContext.seccompProfile, securityContext.apparmor, spec.containers[*].image.
+AppArmor must be configured via Pod annotations, not securityContext.
+Image pinning is handled by CI/CD pipelines, not runtime configuration fixes.
 """.strip()
 
 
@@ -1117,7 +1380,53 @@ def validate_patch_path(doc: Any, path: str, op: str) -> bool:
 
 def filter_valid_patches(doc: Any, patches: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """
-    Filter out patches with invalid paths.
+    Filter out patches with invalid paths or that modify protected fields.
+    
+    Protected fields:
+    - seccompProfile (only deterministic security handler may touch it)
+    - apparmor (must be set via Pod annotations, not securityContext)
+    - image (container images should not be modified; version management is CI/CD concern)
+    """
+    valid_patches: List[Dict[str, Any]] = []
+
+    for patch in patches:
+        op = patch.get("op", "")
+        path = patch.get("path", "")
+
+        if not op or not path:
+            continue
+
+        # ✅ Allow ONLY the deterministic security handler to modify seccompProfile
+        if "seccompProfile" in path:
+            if patch.get("source") != "security_handler":
+                print(f"  [FILTER] Blocked non-security-handler patch touching seccompProfile: {op} {path}")
+                continue
+            # else allow it through
+
+        # Filter out patches that try to add apparmor to securityContext
+        if "securityContext" in path and "apparmor" in path.lower():
+            print(f"  [FILTER] Blocked patch trying to add apparmor to securityContext: {op} {path}")
+            continue
+
+        # Filter out patches that try to modify container images
+        if "/image" in path and "/containers/" in path:
+            print(f"  [FILTER] Blocked patch trying to modify container image: {op} {path}")
+            continue
+
+        if validate_patch_path(doc, path, op):
+            valid_patches.append(patch)
+        else:
+            print(f"  [DEBUG] Filtered invalid patch: {op} {path}")
+
+    return valid_patches
+
+    """
+    Filter out patches with invalid paths or that modify protected fields.
+    
+    Protected fields:
+    - seccompProfile (managed by deterministic security hardening)
+    - apparmor (must be set via Pod annotations, not securityContext)
+    - image (container images should not be modified; version management is CI/CD concern)
 
     Returns list of valid patches.
     """
@@ -1128,6 +1437,30 @@ def filter_valid_patches(doc: Any, patches: List[Dict[str, Any]]) -> List[Dict[s
         path = patch.get("path", "")
 
         if not op or not path:
+            continue
+        
+
+         # Filter out patches that try to modify seccompProfile
+        # but ONLY if they are not from the deterministic security handler
+        if "seccompProfile" in path and patch.get("source") != "security_handler":
+            print(f"  [FILTER] Blocked LLM patch trying to modify seccompProfile: {op} {path}")
+            continue
+        # Filter out patches that try to modify seccompProfile
+        # (managed by deterministic security hardening)
+        if "seccompProfile" in path:
+            print(f"  [FILTER] Blocked LLM patch trying to modify seccompProfile: {op} {path}")
+            continue
+        
+        # Filter out patches that try to add apparmor to securityContext
+        # (apparmor must be set via Pod annotations)
+        if "securityContext" in path and "apparmor" in path.lower():
+            print(f"  [FILTER] Blocked LLM patch trying to add apparmor to securityContext: {op} {path}")
+            continue
+        
+        # Filter out patches that try to modify container images
+        # Image version management should be handled by CI/CD with vulnerability scanning
+        if "/image" in path and "/containers/" in path:
+            print(f"  [FILTER] Blocked LLM patch trying to modify container image: {op} {path}")
             continue
 
         if validate_patch_path(doc, path, op):
@@ -1350,6 +1683,19 @@ def process_category(
         print(f"      -> {msg}")
         return None, "", result
 
+    # Use AppArmor handler for AppArmor-specific category
+    if config.get("use_apparmor_handler"):
+        handler = AppArmorHandler()
+        patches, explanation = handler.generate_apparmor_patches(doc)
+        result["patches_count"] = len(patches)
+        result["strategy"] = "deterministic_apparmor"
+        if patches:
+            print(f"    [{category}] Deterministic AppArmor: {len(patches)} patch(es)")
+            print("      -> AppArmor via Pod annotations")
+        else:
+            print(f"    [{category}] AppArmor already configured or no containers found")
+        return patches, explanation, result
+
     # Use comprehensive security hardening handler
     if category in SECURITY_HARDENING_CATEGORIES or config.get("use_security_handler"):
         handler = SecurityHardeningHandler()
@@ -1501,7 +1847,7 @@ def process_file(
 
             modified_doc = apply_json_patch(doc, valid_patches)
             
-            # Sanitize Pod-level securityContext to remove invalid fields
+            # Sanitize Pod-level and container-level securityContext to remove invalid fields
             kind = modified_doc.get("kind", "")
             if kind in WORKLOAD_KINDS:
                 if kind in ("Deployment", "StatefulSet", "DaemonSet", "Job", "CronJob", "ReplicaSet"):
@@ -1514,12 +1860,28 @@ def process_file(
                         pod_spec["securityContext"] = sanitize_pod_security_context(
                             pod_spec["securityContext"]
                         )
+                    
+                    # Sanitize each container's securityContext
+                    containers = pod_spec.get("containers", [])
+                    for container in containers:
+                        if isinstance(container, dict) and "securityContext" in container:
+                            container["securityContext"] = sanitize_container_security_context(
+                                container["securityContext"]
+                            )
                 else:  # Pod
                     pod_spec = modified_doc.get("spec", {})
                     if "securityContext" in pod_spec:
                         pod_spec["securityContext"] = sanitize_pod_security_context(
                             pod_spec["securityContext"]
                         )
+                    
+                    # Sanitize each container's securityContext
+                    containers = pod_spec.get("containers", [])
+                    for container in containers:
+                        if isinstance(container, dict) and "securityContext" in container:
+                            container["securityContext"] = sanitize_container_security_context(
+                                container["securityContext"]
+                            )
             
             docs[primary_index] = modified_doc
             secured_yaml = yaml_dump_all(docs)

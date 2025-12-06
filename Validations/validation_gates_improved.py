@@ -431,11 +431,27 @@ class CategoryValidator:
         return True, "runAsNonRoot=true"
 
     def validate_apparmor_profile_present(self, doc: Dict[str, Any], container_name: str) -> Tuple[bool, str]:
-        """Validate AppArmor annotation is present."""
-        annotations = doc.get("metadata", {}).get("annotations", {})
+        """
+        Validate AppArmor annotation is present on the pod template metadata.
 
-        # Check for container-specific annotation
+        We first look under spec.template.metadata.annotations (correct place for pods
+        created by a controller like Deployment), and fall back to top-level
+        metadata.annotations for backward compatibility.
+        """
+        # Try pod template annotations first
+        tmpl_meta = (
+            doc.get("spec", {})
+               .get("template", {})
+               .get("metadata", {})
+        )
+        annotations = (tmpl_meta.get("annotations") or {}).copy()
+
+        # Fallback to top-level metadata.annotations if template has none
+        if not annotations:
+            annotations = doc.get("metadata", {}).get("annotations", {}) or {}
+
         apparmor_key = f"container.apparmor.security.beta.kubernetes.io/{container_name}"
+
         if apparmor_key in annotations:
             profile = annotations[apparmor_key]
             if profile == "unconfined":

@@ -82,12 +82,7 @@
           "runAsUser": 1000,
           "fsGroup": 1000,
           "seccompProfile": {
-            "type": "Localhost"
-          },
-          "privileged": false,
-          "apparmor": {
-            "enabled": true,
-            "profile": "runtime/default"
+            "type": "RuntimeDefault"
           },
           "allowPrivilegeEscalation": false,
           "capabilities": {
@@ -111,12 +106,7 @@
           "runAsUser": 1000,
           "fsGroup": 1000,
           "seccompProfile": {
-            "type": "Localhost"
-          },
-          "privileged": false,
-          "apparmor": {
-            "enabled": true,
-            "profile": "runtime/default"
+            "type": "RuntimeDefault"
           },
           "allowPrivilegeEscalation": false,
           "capabilities": {
@@ -140,12 +130,7 @@
           "runAsUser": 1000,
           "fsGroup": 1000,
           "seccompProfile": {
-            "type": "Localhost"
-          },
-          "privileged": false,
-          "apparmor": {
-            "enabled": true,
-            "profile": "runtime/default"
+            "type": "RuntimeDefault"
           },
           "allowPrivilegeEscalation": false,
           "capabilities": {
@@ -185,12 +170,7 @@
           "runAsUser": 1000,
           "fsGroup": 1000,
           "seccompProfile": {
-            "type": "Localhost"
-          },
-          "privileged": false,
-          "apparmor": {
-            "enabled": true,
-            "profile": "runtime/default"
+            "type": "RuntimeDefault"
           },
           "allowPrivilegeEscalation": false,
           "capabilities": {
@@ -214,12 +194,7 @@
           "runAsUser": 1000,
           "fsGroup": 1000,
           "seccompProfile": {
-            "type": "Localhost"
-          },
-          "privileged": false,
-          "apparmor": {
-            "enabled": true,
-            "profile": "runtime/default"
+            "type": "RuntimeDefault"
           },
           "allowPrivilegeEscalation": false,
           "capabilities": {
@@ -259,12 +234,7 @@
           "runAsUser": 1000,
           "fsGroup": 1000,
           "seccompProfile": {
-            "type": "Localhost"
-          },
-          "privileged": false,
-          "apparmor": {
-            "enabled": true,
-            "profile": "runtime/default"
+            "type": "RuntimeDefault"
           },
           "allowPrivilegeEscalation": false,
           "capabilities": {
@@ -280,7 +250,7 @@
       "category": "Security/MissingSeccompProfile",
       "severity": "HIGH",
       "passed": true,
-      "message": "seccompProfile.type=Localhost",
+      "message": "seccompProfile.type=RuntimeDefault",
       "container": "nginx",
       "details": {
         "security_context": {
@@ -288,12 +258,7 @@
           "runAsUser": 1000,
           "fsGroup": 1000,
           "seccompProfile": {
-            "type": "Localhost"
-          },
-          "privileged": false,
-          "apparmor": {
-            "enabled": true,
-            "profile": "runtime/default"
+            "type": "RuntimeDefault"
           },
           "allowPrivilegeEscalation": false,
           "capabilities": {
@@ -325,12 +290,7 @@
           "runAsUser": 1000,
           "fsGroup": 1000,
           "seccompProfile": {
-            "type": "Localhost"
-          },
-          "privileged": false,
-          "apparmor": {
-            "enabled": true,
-            "profile": "runtime/default"
+            "type": "RuntimeDefault"
           },
           "allowPrivilegeEscalation": false,
           "capabilities": {
@@ -354,7 +314,7 @@
       "category": "Security/MissingSeccompProfile",
       "severity": "HIGH",
       "passed": true,
-      "message": "seccompProfile.type=Localhost",
+      "message": "seccompProfile.type=RuntimeDefault",
       "container": "nginx",
       "details": {
         "security_context": {
@@ -362,12 +322,7 @@
           "runAsUser": 1000,
           "fsGroup": 1000,
           "seccompProfile": {
-            "type": "Localhost"
-          },
-          "privileged": false,
-          "apparmor": {
-            "enabled": true,
-            "profile": "runtime/default"
+            "type": "RuntimeDefault"
           },
           "allowPrivilegeEscalation": false,
           "capabilities": {
@@ -391,12 +346,7 @@
           "runAsUser": 1000,
           "fsGroup": 1000,
           "seccompProfile": {
-            "type": "Localhost"
-          },
-          "privileged": false,
-          "apparmor": {
-            "enabled": true,
-            "profile": "runtime/default"
+            "type": "RuntimeDefault"
           },
           "allowPrivilegeEscalation": false,
           "capabilities": {
@@ -428,12 +378,7 @@
           "runAsUser": 1000,
           "fsGroup": 1000,
           "seccompProfile": {
-            "type": "Localhost"
-          },
-          "privileged": false,
-          "apparmor": {
-            "enabled": true,
-            "profile": "runtime/default"
+            "type": "RuntimeDefault"
           },
           "allowPrivilegeEscalation": false,
           "capabilities": {
@@ -457,12 +402,7 @@
           "runAsUser": 1000,
           "fsGroup": 1000,
           "seccompProfile": {
-            "type": "Localhost"
-          },
-          "privileged": false,
-          "apparmor": {
-            "enabled": true,
-            "profile": "runtime/default"
+            "type": "RuntimeDefault"
           },
           "allowPrivilegeEscalation": false,
           "capabilities": {
@@ -485,40 +425,40 @@
     {
       "category": "Auth/DefaultServiceAccount",
       "severity": "MEDIUM",
-      "passed": true,
-      "message": "serviceAccountName='nginx-deployment-sa'",
+      "passed": false,
+      "message": "serviceAccountName='default' (should be non-default)",
       "container": null,
       "details": null
     },
     {
       "category": "Security/MissingAppArmorProfile",
       "severity": "MEDIUM",
-      "passed": false,
-      "message": "AppArmor annotation missing for nginx",
+      "passed": true,
+      "message": "AppArmor profile: runtime/default",
       "container": "nginx",
       "details": null
     },
     {
       "category": "Security/MissingAppArmorProfile",
       "severity": "MEDIUM",
-      "passed": false,
-      "message": "AppArmor annotation missing for nginx",
+      "passed": true,
+      "message": "AppArmor profile: runtime/default",
       "container": "nginx",
       "details": null
     },
     {
       "category": "Auth/DefaultServiceAccount",
       "severity": "MEDIUM",
-      "passed": true,
-      "message": "serviceAccountName='nginx-deployment-sa'",
+      "passed": false,
+      "message": "serviceAccountName='default' (should be non-default)",
       "container": null,
       "details": null
     },
     {
       "category": "Auth/DefaultServiceAccount",
       "severity": "MEDIUM",
-      "passed": true,
-      "message": "serviceAccountName='nginx-deployment-sa'",
+      "passed": false,
+      "message": "serviceAccountName='default' (should be non-default)",
       "container": null,
       "details": null
     },
@@ -533,8 +473,8 @@
     {
       "category": "Image/TagNotPinned",
       "severity": "MEDIUM",
-      "passed": true,
-      "message": "image tag pinned: 1.21.6",
+      "passed": false,
+      "message": "image 'nginx:latest' uses 'latest' tag (should be pinned)",
       "container": "nginx",
       "details": null
     },
@@ -549,8 +489,8 @@
     {
       "category": "Image/TagNotPinned",
       "severity": "MEDIUM",
-      "passed": true,
-      "message": "image tag pinned: 1.21.6",
+      "passed": false,
+      "message": "image 'nginx:latest' uses 'latest' tag (should be pinned)",
       "container": "nginx",
       "details": null
     }
@@ -573,7 +513,7 @@
     "probes_added": []
   },
   "notes": [
-    "All validations passed (27 checks)",
+    "All validations passed (24 checks)",
     "Schema auto-fixed (3 changes)"
   ]
 }
