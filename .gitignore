@@ -186,6 +186,9 @@ cython_debug/
 # SafeFixK8s Specific Ignores
 # ============================================================================
 
+# Environment file with API keys (NEVER COMMIT!)
+.env
+
 # Scanner output files - raw results from security tools
 detection/output/raw/*.json
 detection/output/raw/*.txt
@@ -195,6 +198,10 @@ detection/output/raw/*.txt
 detection/output/logs/*.log
 detection/output/logs/*.txt
 !detection/output/logs/.gitkeep
+
+# All results directories
+results/
+output/
 
 # Normalized + pipeline outputs (reports/artifacts)
 output/normalized_findings.json

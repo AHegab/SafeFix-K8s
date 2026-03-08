@@ -1,90 +1,115 @@
-# SafeFixK8s
+# SafeFixK8s 🛡️
 
-**Automated Kubernetes Security Remediation System**
+**Automated Kubernetes Security Remediation Pipeline**
 
-SafeFixK8s is an intelligent, multi-stage pipeline that automatically detects, analyzes, and fixes security misconfigurations in Kubernetes YAML manifests. It combines the power of 13 industry-standard security scanners with advanced AI-driven patch generation to deliver production-ready, secure Kubernetes deployments.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![Docker Required](https://img.shields.io/badge/docker-required-blue.svg)](https://www.docker.com/)
 
-## Overview
+SafeFixK8s is an intelligent, multi-stage security pipeline that automatically detects, analyzes, and remediates security misconfigurations in Kubernetes manifests. By combining 13 industry-standard security scanners with AI-powered patch generation, it delivers production-ready, secure Kubernetes deployments.
 
-SafeFixK8s addresses the critical challenge of Kubernetes security hardening by automating the entire remediation lifecycle:
+## 🎯 Key Features
 
-1. **Detection**: Runs 13 security scanning tools to comprehensively identify vulnerabilities
-2. **Normalization**: Aggregates and unifies findings from different tools into a standardized schema
-3. **Repair**: Generates intelligent security patches using a hybrid approach (deterministic + template-based + LLM-guided)
-4. **Validation**: Validates fixes through a rigorous 7-gate framework to ensure safety and effectiveness
+- **🔍 Comprehensive Detection**: Leverages 13 industry-leading security scanners for maximum coverage
+- **🎨 Intelligent Normalization**: Unifies findings into 50+ standardized security categories across 7 families
+- **🤖 Hybrid Repair Strategy**: Combines deterministic fixes, smart templates, and AI-guided patches
+- **🔄 Multi-LLM Consensus**: Uses multiple AI providers (OpenAI, Groq, Gemini, OpenRouter) with automatic fallback
+- **✅ Rigorous Validation**: 7-gate validation framework ensures fixes are safe and production-ready
+- **💰 Cost Optimized**: Prioritizes deterministic fixes to minimize LLM API costs
+- **🔒 Comprehensive Hardening**: Applies all 4 critical security controls atomically
+- **📊 Human-Readable Reports**: Generates detailed explanations alongside technical outputs
 
-### Key Features
+## 📋 Table of Contents
 
-- **Multi-Tool Security Scanning**: Leverages 13 industry-leading security tools for comprehensive coverage
-- **Intelligent Normalization**: Unifies findings into 50+ standardized security categories across 7 families
-- **Hybrid Repair Strategy**: Combines deterministic fixes, smart templates, and AI-guided patches for optimal results
-- **Multi-LLM Consensus**: Uses multiple AI providers (OpenAI, Groq, Gemini, OpenRouter) with fallback support
-- **Rigorous Validation**: 7-gate validation framework ensures fixes are safe and production-ready
-- **Zero Token Optimization**: Prioritizes deterministic fixes to minimize LLM costs
-- **Comprehensive Security Hardening**: Applies all 4 critical security controls atomically
-- **Human-Readable Reports**: Generates detailed explanations alongside technical outputs
+- [Quick Start](#-quick-start)
+- [Installation](#-installation)
+- [Usage](#-usage)
+- [Architecture](#-architecture)
+- [Security Tools](#-security-tools)
+- [Output Structure](#-output-structure)
+- [Configuration](#-configuration)
+- [Examples](#-examples)
+- [Documentation](#-documentation)
+- [Contributing](#-contributing)
+- [License](#-license)
 
-## Table of Contents
-
-- [Installation](#installation)
-- [Prerequisites](#prerequisites)
-- [Quick Start](#quick-start)
-- [Usage](#usage)
-  - [Full Pipeline](#full-pipeline)
-  - [Individual Stages](#individual-stages)
-  - [Advanced Options](#advanced-options)
-- [Architecture](#architecture)
-- [Security Tools](#security-tools)
-- [Configuration](#configuration)
-- [Output Structure](#output-structure)
-- [Examples](#examples)
-- [Troubleshooting](#troubleshooting)
-- [Contributing](#contributing)
-- [License](#license)
-
-## Installation
+## 🚀 Quick Start
 
 ### Prerequisites
 
-#### Required Software
+- **Python 3.8+**
+- **Docker** (for security scanners)
+- **PowerShell 5.1+** (Windows) or **Bash 4.0+** (Linux/Mac)
 
-1. **Python 3.8+**
-   ```bash
-   python3 --version
-   ```
+### Installation
 
-2. **Docker** (for security scanners)
-   ```bash
-   docker --version
-   ```
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/SafeFixK8s.git
+cd SafeFixK8s
 
-3. **PowerShell** (Windows) or **Bash** (Linux/Mac)
-   - Windows: PowerShell 5.1+ (built-in)
-   - Linux/Mac: Bash 4.0+
+# Install Python dependencies
+pip install -r requirements.txt
 
-#### System Requirements
+# Configure API keys (copy example and edit)
+cp .env.example .env
+# Edit .env with your LLM API keys
+```
+
+### Basic Usage
+
+```bash
+# Place your Kubernetes manifests in tests/
+mkdir -p tests/
+cp your-deployment.yaml tests/
+
+# Run the full pipeline
+python pipeline.py --input tests/ --output results/
+
+# View secured manifests
+cat results/repair/SECURED_*.yaml
+
+# Read human-friendly explanation
+cat results/repair/EXPLANATION_*.yaml.md
+```
+
+**That's it!** Your Kubernetes manifests are now secured and validated.
+
+## 📦 Installation
+
+### System Requirements
 
 - **OS**: Windows 10/11, Linux (Ubuntu 20.04+), macOS 11+
 - **RAM**: 8GB minimum, 16GB recommended
 - **Disk**: 10GB free space (for Docker images)
 - **Network**: Internet connection for LLM APIs and Docker pulls
 
-### Setup Instructions
+### Detailed Setup
 
-1. **Clone the repository**
+1. **Install Python 3.8+**
    ```bash
-   git clone <repository-url>
+   python3 --version  # Verify installation
+   ```
+
+2. **Install Docker**
+   ```bash
+   docker --version  # Verify installation
+   ```
+
+3. **Clone Repository**
+   ```bash
+   git clone https://github.com/yourusername/SafeFixK8s.git
    cd SafeFixK8s
    ```
 
-2. **Install Python dependencies**
+4. **Install Dependencies**
    ```bash
    pip install -r requirements.txt
    ```
 
-3. **Configure API keys**
-
-   Create a `.env` file in the project root with your LLM provider API keys:
+5. **Configure API Keys**
+   
+   Create a `.env` file in the project root:
    ```bash
    # OpenRouter (Grok Vision)
    OPENROUTER_API_KEY=your_key_here
@@ -103,85 +128,14 @@ SafeFixK8s addresses the critical challenge of Kubernetes security hardening by 
    OPENAI_MODEL=gpt-4o-mini
    ```
 
-   **Note**: You only need API keys for the LLM providers you plan to use. The system supports fallback across providers.
+   **Note**: You only need API keys for the LLM providers you plan to use. The system supports automatic fallback across providers.
 
-4. **Pull Docker images for security scanners**
-
-   The detection layer will automatically pull required Docker images on first run. You can pre-pull them:
-   ```bash
-   docker pull bridgecrew/checkov:latest
-   docker pull aquasec/trivy:latest
-   docker pull quay.io/armosec/kubescape:latest
-   # ... (other scanners will pull automatically)
-   ```
-
-5. **Verify installation**
+6. **Verify Installation**
    ```bash
    python pipeline.py --help
    ```
 
-## Quick Start
-
-### Basic Usage
-
-1. **Place your Kubernetes manifests** in the `tests/` directory:
-   ```bash
-   mkdir -p tests/
-   cp your-deployment.yaml tests/
-   ```
-
-2. **Run the full pipeline**:
-
-   **Linux/Mac**:
-   ```bash
-   ./run_pipeline.sh
-   ```
-
-   **Windows**:
-   ```bash
-   .\run_pipeline.bat
-   ```
-
-   Or directly with Python:
-   ```bash
-   python pipeline.py --input tests/ --output results/
-   ```
-
-3. **Review the results**:
-   ```bash
-   # View secured manifests
-   cat results/repair/SECURED_*.yaml
-
-   # Read human-friendly explanation
-   cat results/repair/EXPLANATION_*.yaml.md
-
-   # Check validation summary
-   cat results/validation/SUMMARY_VALIDATION.csv
-   ```
-
-### Example Output
-
-After running the pipeline, you'll find:
-
-```
-results/
-├── detection/
-│   ├── raw/                          # Raw scanner outputs (13 JSON files)
-│   └── logs/                         # Detection logs
-├── normalization/
-│   ├── normalized_findings.json      # All findings with metadata
-│   ├── llm_payload.json              # Actionable findings for repair
-│   └── buckets.csv                   # Summary by category
-├── repair/
-│   ├── SECURED_deployment.yaml       # Fixed manifests
-│   ├── EXPLANATION_deployment.yaml.md # Human-readable explanation
-│   └── ...
-└── validation/
-    ├── SUMMARY_VALIDATION.csv        # High-level validation summary
-    └── REPORT_VALIDATE_*.json        # Detailed validation reports
-```
-
-## Usage
+## 📖 Usage
 
 ### Full Pipeline
 
@@ -191,15 +145,14 @@ Run all 4 stages in sequence:
 python pipeline.py --input tests/ --output results/
 ```
 
-Options:
-- `--input`: Directory containing Kubernetes YAML manifests (required)
-- `--output`: Output directory for results (default: `output/`)
-- `--detection-mode`: Scanner mode - `lean` (10 tools) or `extended` (13 tools) (default: `lean`)
-- `--models`: Comma-separated LLM providers (default: `groq,openrouter,gemini`)
-- `--concurrency`: Number of concurrent LLM requests (default: 5)
+**Options:**
+- `--input DIR`: Directory containing Kubernetes YAML manifests (required)
+- `--output DIR`: Output directory for results (default: `output/`)
+- `--detection-mode MODE`: Scanner mode - `lean` (10 tools) or `extended` (13 tools) (default: `lean`)
+- `--models LIST`: Comma-separated LLM providers (default: `groq,openrouter,gemini`)
+- `--concurrency N`: Number of concurrent LLM requests (default: 5)
 - `--strict`: Enable strict validation mode
 - `--verbose, -v`: Enable verbose logging
-- `--quiet, -q`: Quiet mode (errors only)
 
 ### Individual Stages
 
@@ -211,9 +164,9 @@ Run specific pipeline stages independently:
 python pipeline.py --stage detection --input tests/ --output results/
 ```
 
-Options:
-- `--detection-mode lean`: Use 10 core scanners (faster)
-- `--detection-mode extended`: Use all 13 scanners (comprehensive)
+**Options:**
+- `--detection-mode lean`: Use 10 core scanners (faster, ~2-5 minutes)
+- `--detection-mode extended`: Use all 13 scanners (comprehensive, ~5-10 minutes)
 
 #### Stage 2: Normalization
 
@@ -235,8 +188,8 @@ python pipeline.py --stage repair \
   --concurrency 5
 ```
 
-Options:
-- `--models`: Comma-separated list of LLM providers to use
+**Options:**
+- `--models`: Comma-separated list of LLM providers (`openai`, `groq`, `gemini`, `openrouter`)
 - `--concurrency`: Number of parallel LLM requests (higher = faster but more API load)
 
 #### Stage 4: Validation
@@ -250,44 +203,33 @@ python pipeline.py --stage validate \
   --strict
 ```
 
-Options:
+**Options:**
 - `--strict`: Enable strict validation (fails on warnings)
 
-### Advanced Options
+### Convenience Scripts
 
-#### Custom Output Directory Structure
-
+**Linux/Mac:**
 ```bash
-python pipeline.py \
-  --input tests/ \
-  --output custom-results/ \
-  --detection-mode extended \
-  --models openai,groq \
-  --concurrency 10 \
-  --verbose
+./run_pipeline.sh
 ```
 
-#### Skip Detection (Use Existing Scans)
-
+**Windows:**
 ```bash
-# Run only normalization, repair, and validation
-python pipeline.py --stage normalize --raw existing/detection/raw/ --tests tests/
-python pipeline.py --stage repair --payload results/normalization/llm_payload.json --tests tests/
-python pipeline.py --stage validate --tests tests/ --fixed results/repair/
+.\run_pipeline.bat
 ```
 
-## Architecture
+## 🏗️ Architecture
 
-SafeFixK8s implements a **4-stage architecture** with clear separation of concerns:
+SafeFixK8s implements a 4-stage pipeline architecture with clear separation of concerns:
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                    STAGE 1: DETECTION                           │
 │  ┌──────────────────────────────────────────────────────────┐  │
 │  │ PowerShell Orchestrator (detectors.ps1)                  │  │
-│  │  - Runs 13 security scanners via Docker                  │  │
-│  │  - Modes: LEAN (10 tools) / EXTENDED (13 tools)          │  │
-│  │  - Output: output/detection/raw/*.json                    │  │
+│  │  • Runs 13 security scanners via Docker                  │  │
+│  │  • Modes: LEAN (10 tools) / EXTENDED (13 tools)          │  │
+│  │  • Output: output/detection/raw/*.json                    │  │
 │  └──────────────────────────────────────────────────────────┘  │
 └─────────────────────────────────────────────────────────────────┘
                             ↓
@@ -295,14 +237,11 @@ SafeFixK8s implements a **4-stage architecture** with clear separation of concer
 │                  STAGE 2: NORMALIZATION                         │
 │  ┌──────────────────────────────────────────────────────────┐  │
 │  │ Normalizer (normalizer.py)                               │  │
-│  │  - Parses 13 different tool outputs                      │  │
-│  │  - Maps to 50+ standard categories (7 families)          │  │
-│  │  - Applies false positive filtering                      │  │
-│  │  - Implements consensus scoring                          │  │
-│  │  - Outputs:                                              │  │
-│  │    • normalized_findings.json (all findings)             │  │
-│  │    • llm_payload.json (actionable items)                 │  │
-│  │    • buckets.csv (summary)                               │  │
+│  │  • Parses 13 different tool outputs                      │  │
+│  │  • Maps to 50+ standard categories (7 families)          │  │
+│  │  • Applies false positive filtering                      │  │
+│  │  • Implements consensus scoring                          │  │
+│  │  • Outputs: normalized_findings.json, llm_payload.json   │  │
 │  └──────────────────────────────────────────────────────────┘  │
 └─────────────────────────────────────────────────────────────────┘
                             ↓
@@ -310,16 +249,10 @@ SafeFixK8s implements a **4-stage architecture** with clear separation of concer
 │                   STAGE 3: REPAIR (LLM)                         │
 │  ┌──────────────────────────────────────────────────────────┐  │
 │  │ Multi-LLM Orchestrator (multi_llm_orchestrator.py)       │  │
-│  │  - Implements 3 fix strategies:                          │  │
-│  │    • DETERMINISTIC (0 tokens)                            │  │
-│  │    • TEMPLATE (minimal tokens)                           │  │
-│  │    • LLM_GUIDED (with fallback)                          │  │
-│  │  - Comprehensive security hardening (4 controls)         │  │
-│  │  - JSON Patch (RFC-6902) application                     │  │
-│  │  - Patch deduplication & filtering                       │  │
-│  │  - Outputs:                                              │  │
-│  │    • SECURED_*.yaml (fixed manifests)                    │  │
-│  │    • EXPLANATION_*.md (human reports)                    │  │
+│  │  • 3 fix strategies: DETERMINISTIC, TEMPLATE, LLM_GUIDED │  │
+│  │  • Comprehensive security hardening (4 controls)         │  │
+│  │  • JSON Patch (RFC-6902) application                     │  │
+│  │  • Outputs: SECURED_*.yaml, EXPLANATION_*.md             │  │
 │  └──────────────────────────────────────────────────────────┘  │
 └─────────────────────────────────────────────────────────────────┘
                             ↓
@@ -327,202 +260,106 @@ SafeFixK8s implements a **4-stage architecture** with clear separation of concer
 │                  STAGE 4: VALIDATION                            │
 │  ┌──────────────────────────────────────────────────────────┐  │
 │  │ 7-Gate Validation (validation_gates_improved.py)         │  │
-│  │  - Schema auto-fix engine                                │  │
-│  │  - 20+ category validators                               │  │
-│  │  - Dangerous config detection                            │  │
-│  │  - Kubeconform integration                               │  │
-│  │  - Diff analysis                                         │  │
-│  │  - Parallel processing support                           │  │
-│  │  - Outputs:                                              │  │
-│  │    • SUMMARY_VALIDATION.csv                              │  │
-│  │    • REPORT_VALIDATE_*.json (detailed reports)           │  │
+│  │  • Schema auto-fix engine                                │  │
+│  │  • 20+ category validators                               │  │
+│  │  • Dangerous config detection                            │  │
+│  │  • Kubeconform integration                               │  │
+│  │  • Outputs: SUMMARY_VALIDATION.csv, detailed reports     │  │
 │  └──────────────────────────────────────────────────────────┘  │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
 ### Design Principles
 
-1. **Multi-Tool Consensus**: Reduces false positives by requiring agreement from multiple scanners
-2. **Deterministic First**: Prioritizes zero-LLM-token fixes where possible (cost + reliability)
+1. **Multi-Tool Consensus**: Reduces false positives through agreement from multiple scanners
+2. **Deterministic First**: Prioritizes zero-LLM-token fixes (cost + reliability)
 3. **Safe Defaults**: Never modifies protected fields (image, selectors, metadata.name)
-4. **Comprehensive Hardening**: Applies all 4 security controls together to avoid partial fixes
-5. **Category Families**: Organizes 50+ categories into 7 logical families for better understanding
-6. **Strong Tool Mapping**: Identifies authoritative tools per category
-7. **Human-Readable Output**: Generates markdown explanations alongside technical JSON
-8. **Validation Gates**: Multi-layered verification ensures fixes don't break workloads
+4. **Comprehensive Hardening**: Applies all 4 security controls together
+5. **Human-Readable**: Generates markdown explanations alongside technical JSON
+6. **Validation Gates**: Multi-layered verification ensures fixes don't break workloads
 
-## Security Tools
+## 🔧 Security Tools
 
-SafeFixK8s integrates **13 industry-standard security scanners** for comprehensive coverage:
+SafeFixK8s integrates **13 industry-standard security scanners**:
 
 ### Core Tools (LEAN Mode - 10 tools)
 
-1. **Checkov** - Infrastructure-as-Code security scanner by Bridgecrew
-2. **Conftest** - OPA-based policy testing framework
-3. **Trivy** - Comprehensive security scanner by Aqua Security
-4. **Kubescape** - Kubernetes security platform by ARMO
-5. **Polaris** - Best practices validation by Fairwinds
-6. **KubeLinter** - Static analysis tool by StackRox/Red Hat
-7. **Kubeaudit** - Security auditing tool by Shopify
-8. **KubeScore** - Static code analysis for Kubernetes
-9. **Kubeconform** - Kubernetes schema validation
-10. **yamllint** - YAML linting and validation
+| Tool | Provider | Focus Area |
+|------|----------|------------|
+| **Checkov** | Bridgecrew | Infrastructure-as-Code security |
+| **Conftest** | Open Policy Agent | OPA-based policy testing |
+| **Trivy** | Aqua Security | Comprehensive security scanning |
+| **Kubescape** | ARMO | Kubernetes security platform |
+| **Polaris** | Fairwinds | Best practices validation |
+| **KubeLinter** | StackRox/Red Hat | Static analysis |
+| **Kubeaudit** | Shopify | Security auditing |
+| **KubeScore** | Community | Static code analysis |
+| **Kubeconform** | Community | Schema validation |
+| **yamllint** | Community | YAML linting |
 
 ### Extended Tools (EXTENDED Mode - Additional 3 tools)
 
-11. **Pluto** - Deprecated Kubernetes API detection by Fairwinds
-12. **GitLeaks** - Secret detection and prevention
-13. **RBAC-Police** - RBAC least-privilege enforcement
+| Tool | Provider | Focus Area |
+|------|----------|------------|
+| **Pluto** | Fairwinds | Deprecated API detection |
+| **GitLeaks** | Community | Secret detection |
+| **RBAC-Police** | Community | RBAC least-privilege |
 
-### Tool Selection Strategy
-
-- **LEAN mode** (default): Runs 10 core tools - faster, suitable for CI/CD pipelines
+**Mode Selection:**
+- **LEAN mode** (default): Runs 10 core tools - faster, suitable for CI/CD
 - **EXTENDED mode**: Runs all 13 tools - comprehensive, suitable for security audits
 
-Each tool contributes unique findings to the normalization layer, where consensus scoring reduces false positives.
+## 📂 Output Structure
 
-## Configuration
-
-### Environment Variables (.env)
-
-Configure LLM providers and models:
-
-```bash
-# OpenRouter Configuration
-OPENROUTER_API_KEY=your_openrouter_key
-OPENROUTER_MODEL=x-ai/grok-vision-beta
-
-# Google Gemini Configuration
-GEMINI_API_KEY=your_gemini_key
-GEMINI_MODEL=gemini-2.0-flash-exp
-
-# Groq Configuration
-GROQ_API_KEY=your_groq_key
-GROQ_MODEL=llama-3.1-70b-versatile
-
-# OpenAI Configuration
-OPENAI_API_KEY=your_openai_key
-OPENAI_MODEL=gpt-4o-mini
 ```
+results/
+├── detection/
+│   ├── raw/                          # Raw scanner outputs (13 JSON files)
+│   └── logs/                         # Detection logs
+├── normalization/
+│   ├── normalized_findings.json      # All findings with metadata
+│   ├── llm_payload.json              # Actionable findings for repair
+│   └── buckets.csv                   # Summary by category
+├── repair/
+│   ├── SECURED_*.yaml                # Fixed manifests
+│   ├── EXPLANATION_*.yaml.md         # Human-readable explanations
+│   └── ...
+└── validation/
+    ├── SUMMARY_VALIDATION.csv        # High-level validation summary
+    └── REPORT_VALIDATE_*.json        # Detailed validation reports
+```
+
+## ⚙️ Configuration
 
 ### Security Categories
 
 SafeFixK8s normalizes findings into **7 category families** with **50+ specific categories**:
 
-#### 1. PrivilegeHostNamespace
-- Privileged containers
-- Host access (PID, IPC, network)
-- Security contexts (allowPrivilegeEscalation, capabilities, seccomp, AppArmor)
-- Read-only root filesystem
+1. **PrivilegeHostNamespace**: Privileged containers, host access, security contexts
+2. **ResourceConfigDoS**: Resource limits, health probes, high availability
+3. **ImageSupplyChain**: Image tags, pull policies, trusted registries
+4. **SecretsExposure**: Hardcoded credentials, secret leaks
+5. **RBAC**: Role bindings, permissions, cluster-admin usage
+6. **NetworkExposureTLS**: NetworkPolicies, Ingress, TLS settings
+7. **DeprecatedAPIIngress**: Deprecated Kubernetes API versions
 
-#### 2. ResourceConfigDoS
-- Resource limits and requests
-- Liveness and readiness probes
-- High availability settings
+### Validation Configuration
 
-#### 3. ImageSupplyChain
-- Image tags (latest, version pinning)
-- Image pull policies
-- Trusted registries
+Customize validation rules in `Validations/validation_config.yaml`:
 
-#### 4. SecretsExposure
-- Hardcoded credentials
-- Secret detection and leaks
-
-#### 5. RBAC
-- Role bindings and permissions
-- Wildcard permissions
-- Cluster-admin usage
-
-#### 6. NetworkExposureTLS
-- NetworkPolicies
-- Ingress configurations
-- TLS settings
-
-#### 7. DeprecatedAPIIngress
-- Deprecated Kubernetes API versions
-
-## Output Structure
-
-After running the pipeline, the output directory contains:
-
-```
-results/
-├── detection/
-│   ├── raw/
-│   │   ├── checkov_raw.json          # Checkov findings
-│   │   ├── trivy_raw.json            # Trivy findings
-│   │   ├── kubescape_raw.json        # Kubescape findings
-│   │   ├── conftest_raw.json         # Conftest findings
-│   │   ├── polaris_raw.json          # Polaris findings
-│   │   ├── kubelinter_raw.json       # KubeLinter findings
-│   │   ├── kubeaudit_raw.json        # Kubeaudit findings
-│   │   ├── kubescore_raw.json        # KubeScore findings
-│   │   ├── kubeconform_raw.json      # Kubeconform findings
-│   │   ├── yamllint_raw.json         # yamllint findings
-│   │   ├── pluto_raw.json            # Pluto findings (extended)
-│   │   ├── gitleaks_raw.json         # GitLeaks findings (extended)
-│   │   └── rbac_police_raw.json      # RBAC-Police findings (extended)
-│   └── logs/
-│       └── detection_<timestamp>.log # Detection execution logs
-│
-├── normalization/
-│   ├── normalized_findings.json      # All findings with full metadata
-│   ├── llm_payload.json              # Filtered, actionable findings for LLM
-│   └── buckets.csv                   # Summary grouped by (file, resource, category)
-│
-├── repair/
-│   ├── SECURED_deployment.yaml       # Fixed Kubernetes manifest
-│   ├── EXPLANATION_deployment.yaml.md # Human-readable explanation of fixes
-│   └── ... (one pair per input manifest)
-│
-└── validation/
-    ├── SUMMARY_VALIDATION.csv        # High-level summary (file, status, critical/high/medium/low counts)
-    ├── REPORT_VALIDATE_deployment.yaml.json # Detailed validation report
-    └── ... (one report per manifest)
+```yaml
+enable_kubeconform: true          # Schema validation
+enable_schema_autofix: true       # Auto-fix schema errors
+enable_parallel_validation: true  # Parallel processing
+max_workers: 4                    # Concurrent validators
+strict_mode: false                # Fail on warnings
 ```
 
-### Key Output Files
+## 💡 Examples
 
-#### normalized_findings.json
-Complete dataset of all security findings with:
-- Tool name and version
-- Category and severity
-- File path and resource reference
-- Consensus score
-- Detailed descriptions
+### Example: Secure a Simple Nginx Deployment
 
-#### llm_payload.json
-Filtered, actionable findings ready for repair:
-- Excludes non-auto-fixable categories
-- Groups by file and resource
-- Includes fix strategy hints
-
-#### SECURED_*.yaml
-Fixed Kubernetes manifests with:
-- All applicable security patches applied
-- Protected fields preserved (image, selectors, metadata.name)
-- Valid Kubernetes YAML structure
-
-#### EXPLANATION_*.yaml.md
-Human-readable reports explaining:
-- What vulnerabilities were found
-- What fixes were applied
-- Why each fix was necessary
-- Which categories were fixed vs. skipped
-
-#### SUMMARY_VALIDATION.csv
-Validation summary showing:
-- File name
-- Overall status (PASS/NEEDS_REVIEW/FAIL)
-- Count of violations by severity
-- Key validation messages
-
-## Examples
-
-### Example 1: Secure an Nginx Deployment
-
-**Input** (`tests/nginx-deployment.yaml`):
+**Input** (`tests/nginx.yaml`):
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -545,310 +382,73 @@ spec:
         - containerPort: 80
 ```
 
-**Run Pipeline**:
+**Run Pipeline:**
 ```bash
 python pipeline.py --input tests/ --output results/
 ```
 
-**Output** (`results/repair/SECURED_nginx-deployment.yaml`):
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: nginx
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: nginx
-  template:
-    metadata:
-      labels:
-        app: nginx
-      annotations:
-        container.apparmor.security.beta.kubernetes.io/nginx: runtime/default
-    spec:
-      securityContext:
-        runAsNonRoot: true
-        runAsUser: 1000
-        seccompProfile:
-          type: RuntimeDefault
-      containers:
-      - name: nginx
-        image: nginx:latest  # Note: Manual fix recommended for :latest tag
-        ports:
-        - containerPort: 80
-        securityContext:
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop:
-            - ALL
-          readOnlyRootFilesystem: true
-          runAsNonRoot: true
-          runAsUser: 1000
-        livenessProbe:
-          httpGet:
-            path: /
-            port: 80
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 80
-          initialDelaySeconds: 5
-          periodSeconds: 5
-        resources:
-          requests:
-            memory: "64Mi"
-            cpu: "250m"
-          limits:
-            memory: "128Mi"
-            cpu: "500m"
-        volumeMounts:
-        - name: tmp
-          mountPath: /tmp
-        - name: cache
-          mountPath: /var/cache/nginx
-        - name: run
-          mountPath: /var/run
-      volumes:
-      - name: tmp
-        emptyDir: {}
-      - name: cache
-        emptyDir: {}
-      - name: run
-        emptyDir: {}
-```
+**Output** (`results/repair/SECURED_nginx.yaml`):
 
-**Explanation** (`results/repair/EXPLANATION_nginx-deployment.yaml.md`):
-```markdown
-# Security Fixes Applied to nginx-deployment.yaml
+✅ **Security Improvements Applied:**
+- ✅ Added security contexts (runAsNonRoot, allowPrivilegeEscalation: false)
+- ✅ Dropped all capabilities
+- ✅ Added seccomp and AppArmor profiles
+- ✅ Set read-only root filesystem with emptyDir volumes
+- ✅ Added resource limits and requests
+- ✅ Added liveness and readiness probes
+- ✅ Disabled ServiceAccount token auto-mount
 
-## Summary
-Applied comprehensive security hardening to nginx Deployment.
+See [USAGE_GUIDE.md](USAGE_GUIDE.md) for complete examples.
 
-## Vulnerabilities Fixed
+## 📚 Documentation
 
-### 1. Privileged Container
-**Severity**: HIGH
-**Category**: Security/PrivilegedContainer
-**Fix**: Added `allowPrivilegeEscalation: false` and removed privileged mode
+- **[USAGE_GUIDE.md](USAGE_GUIDE.md)**: Comprehensive usage guide with examples
+- **[METHODOLOGY.md](METHODOLOGY.md)**: Technical methodology and algorithms
+- **[CONTRIBUTING.md](CONTRIBUTING.md)**: Contribution guidelines
 
-### 2. Missing Capabilities Drop
-**Severity**: MEDIUM
-**Category**: Security/CapabilitiesAdded
-**Fix**: Dropped all capabilities with `capabilities.drop: [ALL]`
+## 🤝 Contributing
 
-### 3. Missing Seccomp Profile
-**Severity**: MEDIUM
-**Category**: Security/SeccompProfileMissing
-**Fix**: Added seccomp profile `RuntimeDefault`
-
-### 4. Read-Only Root Filesystem
-**Severity**: MEDIUM
-**Category**: Security/ReadOnlyRootFilesystemFalse
-**Fix**: Set `readOnlyRootFilesystem: true` and added emptyDir volumes for writable paths
-
-### 5. Running as Root
-**Severity**: HIGH
-**Category**: AuthZ/RunAsRootAllowed
-**Fix**: Added `runAsNonRoot: true` and `runAsUser: 1000`
-
-### 6. Missing Resource Limits
-**Severity**: MEDIUM
-**Category**: ResourceConfig/LimitsMissing
-**Fix**: Added memory/CPU requests and limits
-
-### 7. Missing Health Probes
-**Severity**: MEDIUM
-**Category**: ResourceConfig/LivenessProbeMissing
-**Fix**: Added liveness and readiness probes
-
-## Manual Follow-Up Required
-
-### Image Tag: latest
-**Category**: ImageSupplyChain/ImageTagLatest
-**Recommendation**: Pin to specific version (e.g., `nginx:1.25.3-alpine`)
-```
-
-### Example 2: Run Individual Stages
-
-```bash
-# Stage 1: Detection only
-python pipeline.py --stage detection --input tests/ --output scan-results/
-
-# Stage 2: Normalize existing scan results
-python pipeline.py --stage normalize \
-  --raw scan-results/detection/raw/ \
-  --tests tests/ \
-  --output scan-results/
-
-# Stage 3: Generate fixes using only OpenAI
-python pipeline.py --stage repair \
-  --payload scan-results/normalization/llm_payload.json \
-  --tests tests/ \
-  --output scan-results/ \
-  --models openai
-
-# Stage 4: Validate with strict mode
-python pipeline.py --stage validate \
-  --tests tests/ \
-  --fixed scan-results/repair/ \
-  --output scan-results/ \
-  --strict
-```
-
-## Troubleshooting
-
-### Common Issues
-
-#### 1. Docker Permission Errors
-
-**Problem**: `ERROR: Got permission denied while trying to connect to the Docker daemon socket`
-
-**Solution**:
-```bash
-# Linux: Add user to docker group
-sudo usermod -aG docker $USER
-newgrp docker
-
-# Or run with sudo (not recommended for production)
-sudo python pipeline.py --input tests/
-```
-
-#### 2. LLM API Errors
-
-**Problem**: `ERROR: Invalid API key for <provider>`
-
-**Solution**:
-- Verify your `.env` file contains valid API keys
-- Check that API keys have sufficient credits/quota
-- Ensure API keys have correct permissions
-
-#### 3. PowerShell Execution Policy (Windows)
-
-**Problem**: `Cannot be loaded because running scripts is disabled on this system`
-
-**Solution**:
-```powershell
-# Run as Administrator
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-```
-
-#### 4. Missing Docker Images
-
-**Problem**: `ERROR: Unable to find image '<tool>:latest' locally`
-
-**Solution**: Docker will automatically pull images on first run. Ensure you have internet connectivity.
-
-#### 5. Out of Memory Errors
-
-**Problem**: Pipeline crashes with OOM errors
-
-**Solution**:
-- Reduce `--concurrency` value (default: 5)
-- Process fewer files at once
-- Increase Docker memory limit in Docker Desktop settings
-
-### Debug Mode
-
-Enable verbose logging for detailed diagnostics:
-
-```bash
-python pipeline.py --input tests/ --output results/ --verbose
-```
-
-### Log Files
-
-Check log files in the output directory:
-```bash
-# Detection logs
-cat results/detection/logs/detection_*.log
-
-# Pipeline logs (if using wrapper scripts)
-cat results/pipeline.log
-```
-
-## Project Structure
-
-```
-SafeFixK8s/
-├── Detection/
-│   ├── detectors.ps1              # PowerShell scanner orchestrator
-│   └── ...
-├── Normalizer/
-│   ├── normalizer.py              # Finding normalization engine (1,968 lines)
-│   └── ...
-├── LLMs/
-│   ├── multi_llm_orchestrator.py  # Multi-LLM repair orchestrator (2,176 lines)
-│   └── ...
-├── Validations/
-│   ├── validation_gates_improved.py # 7-gate validation framework (1,409 lines)
-│   └── ...
-├── policies/
-│   ├── conftest/                  # OPA Rego policies
-│   ├── checkov/                   # Checkov custom policies
-│   └── ...
-├── configs/
-│   └── ...                        # Configuration files
-├── tests/
-│   └── ...                        # Test Kubernetes manifests
-├── .env                           # LLM API keys (not in git)
-├── .gitignore
-├── pipeline.py                    # Main CLI orchestrator (655 lines)
-├── requirements.txt               # Python dependencies
-├── run_pipeline.sh                # Linux/Mac launcher
-├── run_pipeline.bat               # Windows launcher
-└── README.md                      # This file
-```
-
-## Contributing
-
-This project is part of a BSc thesis on automated Kubernetes security remediation. Contributions, suggestions, and feedback are welcome.
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ### Development Setup
 
-1. Clone the repository
-2. Create a virtual environment:
-   ```bash
-   python3 -m venv .venv
-   source .venv/bin/activate  # Linux/Mac
-   .venv\Scripts\activate     # Windows
-   ```
-3. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
+```bash
+# Clone and setup
+git clone https://github.com/yourusername/SafeFixK8s.git
+cd SafeFixK8s
 
-## License
+# Create virtual environment
+python3 -m venv .venv
+source .venv/bin/activate  # Linux/Mac
+# .venv\Scripts\activate   # Windows
 
-[License information to be added]
+# Install dependencies
+pip install -r requirements.txt
+```
 
-## Acknowledgments
+## 📄 License
 
-This project integrates and builds upon the following open-source security tools:
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-- Checkov (Bridgecrew)
-- Trivy (Aqua Security)
-- Kubescape (ARMO)
-- Polaris (Fairwinds)
-- KubeLinter (StackRox/Red Hat)
-- Kubeaudit (Shopify)
-- KubeScore
-- Conftest (Open Policy Agent)
-- Kubeconform
-- yamllint
-- Pluto (Fairwinds)
-- GitLeaks
-- RBAC-Police
+## 🙏 Acknowledgments
+
+This project integrates and builds upon these excellent open-source security tools:
+- Checkov (Bridgecrew), Trivy (Aqua Security), Kubescape (ARMO)
+- Polaris (Fairwinds), KubeLinter (StackRox/Red Hat), Kubeaudit (Shopify)
+- KubeScore, Conftest (OPA), Kubeconform, yamllint
+- Pluto (Fairwinds), GitLeaks, RBAC-Police
 
 Special thanks to the Kubernetes security community for their invaluable tools and research.
 
-## Contact
+## 📞 Contact & Support
 
-For questions, issues, or feedback, please open an issue on GitHub or contact the project maintainers.
+- **Issues**: [GitHub Issues](https://github.com/yourusername/SafeFixK8s/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/yourusername/SafeFixK8s/discussions)
+
+## 🌟 Star History
+
+If you find SafeFixK8s useful, please consider giving it a star ⭐
 
 ---
 
-**SafeFixK8s** - Automating Kubernetes Security, One Manifest at a Time
+**SafeFixK8s** - Automating Kubernetes Security, One Manifest at a Time 🛡️

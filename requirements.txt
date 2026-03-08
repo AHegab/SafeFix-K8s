@@ -1,2 +1,5 @@
-pyyaml>=6.0.0
-requests>=2.31.0
+# Runtime requirements (pinned for reproducibility)
+pyyaml==6.0
+requests==2.31.0
+
+# Note: For development and testing dependencies, see dev-requirements.txt
