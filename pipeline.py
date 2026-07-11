@@ -55,7 +55,11 @@ STAGES = {
     4: "validation"
 }
 
-# Default paths
+# Root of the SafeFixK8s installation (not the caller's cwd), so the tool can
+# be invoked from any directory/repo and still find its own subfolders.
+PACKAGE_ROOT = Path(__file__).resolve().parent
+
+# Default paths (relative to the caller's cwd, since --input/--output are user data)
 DEFAULT_OUTPUT_DIR = Path("output")
 DEFAULT_TESTS_DIR = Path("tests")
 
@@ -126,7 +130,7 @@ def run_detection(input_dir: Path, output_dir: Path, mode: str = "extended") -> 
     logger.info("=" * 70)
 
     # Prepare paths
-    detectors_script = Path("Detection/detectors.ps1")
+    detectors_script = PACKAGE_ROOT / "Detection" / "detectors.ps1"
     if not detectors_script.exists():
         logger.error(f"Detectors script not found: {detectors_script}")
         return False
@@ -197,7 +201,7 @@ def run_normalization(raw_dir: Path, tests_dir: Path, output_dir: Path) -> bool:
     logger.info("=" * 70)
 
     # Prepare paths
-    normalizer_script = Path("Normalizer/normalizer.py")
+    normalizer_script = PACKAGE_ROOT / "Normalizer" / "normalizer.py"
     if not normalizer_script.exists():
         logger.error(f"Normalizer script not found: {normalizer_script}")
         return False
@@ -277,7 +281,7 @@ def run_repair(
     logger.info("=" * 70)
 
     # Prepare paths
-    llm_script = Path("LLMs/multi_llm_orchestrator.py")
+    llm_script = PACKAGE_ROOT / "LLMs" / "multi_llm_orchestrator.py"
     if not llm_script.exists():
         logger.error(f"LLM orchestrator script not found: {llm_script}")
         return False
@@ -351,7 +355,7 @@ def run_validation(
     logger.info("=" * 70)
 
     # Prepare paths
-    validation_script = Path("Validations/validation_gates_improved.py")
+    validation_script = PACKAGE_ROOT / "Validations" / "validation_gates_improved.py"
     if not validation_script.exists():
         logger.error(f"Validation script not found: {validation_script}")
         return False

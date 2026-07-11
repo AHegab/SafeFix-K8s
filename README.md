@@ -56,6 +56,30 @@ cp .env.example .env
 # Edit .env with your LLM API keys
 ```
 
+### Installing into another repo/pipeline
+
+SafeFixK8s is pip-installable and exposes a `safefixk8s` CLI, so it can run from
+inside another repo's pipeline without needing that repo to check out this one:
+
+```bash
+# From the other repo (or any environment), install SafeFixK8s
+pip install "git+https://github.com/yourusername/SafeFixK8s.git"
+# or, for local development against a checked-out copy:
+pip install -e "/path/to/SafeFixK8s"
+
+# Configure LLM API keys the same way (.env or exported env vars) in that environment
+
+# Run it against manifests living in the other repo, from any working directory
+safefixk8s --input ./k8s-manifests --output ./safefix-results
+```
+
+Docker and PowerShell/Bash are still required in whatever environment runs the
+`detection` stage. Wrap the `safefixk8s` CLI call in your own script/CI job to chain
+it with other tools in your pipeline.
+
+See [INTEGRATION.md](INTEGRATION.md) for a full walkthrough (install, API keys,
+single-stage usage, output layout, CI example) to share with collaborators.
+
 ### Basic Usage
 
 ```bash
