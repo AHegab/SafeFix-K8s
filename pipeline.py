@@ -31,6 +31,7 @@ import argparse
 import json
 import logging
 import os
+import platform
 import subprocess
 import sys
 from pathlib import Path
@@ -68,7 +69,7 @@ DEFAULT_TESTS_DIR = Path("tests")
 # UTILITY FUNCTIONS
 # ============================================================================
 
-def run_command(cmd: List[str], description: str, cwd: Optional[Path] = None) -> Tuple[bool, str, str]:
+def run_command(cmd: List[str], description: str, cwd: Optional[Path] = None, env: Optional[dict] = None) -> Tuple[bool, str, str]:
     """
     Run a shell command and return success status, stdout, stderr.
     """
@@ -81,6 +82,7 @@ def run_command(cmd: List[str], description: str, cwd: Optional[Path] = None) ->
             capture_output=True,
             text=True,
             cwd=cwd,
+            env=env,
             timeout=3600  # 1 hour timeout
         )
 
@@ -115,7 +117,8 @@ def ensure_dir(path: Path) -> Path:
 
 def run_detection(input_dir: Path, output_dir: Path, mode: str = "extended") -> bool:
     """
-    Run detection stage using PowerShell detectors.ps1.
+    Run detection stage using the platform-appropriate detectors script:
+    detectors.ps1 (PowerShell) on Windows, detectors.sh (bash) on Mac/Linux.
 
     Args:
         input_dir: Directory containing test YAML manifests
@@ -129,40 +132,46 @@ def run_detection(input_dir: Path, output_dir: Path, mode: str = "extended") -> 
     logger.info("STAGE 1: DETECTION")
     logger.info("=" * 70)
 
-    # Prepare paths
-    detectors_script = PACKAGE_ROOT / "Detection" / "detectors.ps1"
-    if not detectors_script.exists():
-        logger.error(f"Detectors script not found: {detectors_script}")
-        return False
-
     if not input_dir.exists():
         logger.error(f"Input directory not found: {input_dir}")
         return False
 
     # Prepare output directory
-    # Note: detectors.ps1 creates $SAFEFIX_OUTPUT_ROOT/detection/raw
+    # Note: the detectors script creates $SAFEFIX_OUTPUT_ROOT/detection/raw
     # So we set it to output_dir, and it will create output_dir/detection/raw
     ensure_dir(output_dir)
 
-    # Prepare PowerShell command
-    # The detectors.ps1 script uses functions, not parameters
-    # We need to: 1) set SAFEFIX_OUTPUT_ROOT, 2) source script, 3) call function
-    function_name = "Det-RunExtended" if mode == "extended" else "Det-RunLean"
+    is_windows = platform.system() == "Windows"
+    env = os.environ.copy()
+    env["SAFEFIX_OUTPUT_ROOT"] = str(output_dir.absolute())
 
-    ps_cmd = [
-        "powershell",
-        "-ExecutionPolicy", "Bypass",
-        "-Command",
-        f"$env:SAFEFIX_OUTPUT_ROOT='{output_dir.absolute()}'; " +
-        f". '{detectors_script.absolute()}'; " +
-        f"{function_name} -Path '{input_dir.absolute()}'"
-    ]
+    if is_windows:
+        detectors_script = PACKAGE_ROOT / "Detection" / "detectors.ps1"
+        if not detectors_script.exists():
+            logger.error(f"Detectors script not found: {detectors_script}")
+            return False
+        function_name = "Det-RunExtended" if mode == "extended" else "Det-RunLean"
+        cmd = [
+            "powershell",
+            "-ExecutionPolicy", "Bypass",
+            "-Command",
+            f"$env:SAFEFIX_OUTPUT_ROOT='{output_dir.absolute()}'; " +
+            f". '{detectors_script.absolute()}'; " +
+            f"{function_name} -Path '{input_dir.absolute()}'"
+        ]
+    else:
+        detectors_script = PACKAGE_ROOT / "Detection" / "detectors.sh"
+        if not detectors_script.exists():
+            logger.error(f"Detectors script not found: {detectors_script}")
+            return False
+        cmd = ["bash", str(detectors_script.absolute()), mode, str(input_dir.absolute())]
 
     # Run detection
     success, stdout, stderr = run_command(
-        ps_cmd,
+        cmd,
         f"Detection ({mode} mode) on {input_dir}",
-        cwd=Path.cwd()
+        cwd=Path.cwd(),
+        env=env,
     )
 
     if success:

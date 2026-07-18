@@ -7,19 +7,20 @@ your repo — install it as a dependency and call it as a step in your own pipel
 
 - Python 3.8+
 - Docker (running — required by the detection stage's 13 scanners)
-- PowerShell 5.1+ (Windows) or Bash 4.0+ (Linux/Mac)
+- Windows: PowerShell 5.1+ (`pipeline.py` runs `Detection/detectors.ps1`)
+- Mac/Linux: Bash 4.0+ (`pipeline.py` runs `Detection/detectors.sh` — auto-selected via `platform.system()`, no flag needed)
 - At least one LLM API key (Groq, OpenRouter, Gemini, or OpenAI)
 
 ## 1. Install
 
 ```bash
-pip install "git+https://github.com/AHegab/SafeFixK8s.git"
+pip install "git+https://github.com/AHegab/SafeFix-K8s.git"
 ```
 
 Or, for local development against a checked-out copy:
 
 ```bash
-git clone https://github.com/AHegab/SafeFixK8s.git
+git clone https://github.com/AHegab/SafeFix-K8s.git
 pip install -e ./SafeFixK8s
 ```
 
@@ -86,7 +87,7 @@ Example CI step (GitHub Actions):
 ```yaml
 - name: Run SafeFixK8s
   run: |
-    pip install "git+https://github.com/AHegab/SafeFixK8s.git"
+    pip install "git+https://github.com/AHegab/SafeFix-K8s.git"
     safefixk8s --input ./k8s-manifests --output ./safefix-results
   env:
     GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
